@@ -46,6 +46,14 @@ export const exerciseTypes = [
     icon: '🔄',
     variant: 'accent' as const,
     category: 'grammar'
+  },
+  {
+    id: 'thematic',
+    title: 'Thematic Questions',
+    description: 'Find verses for life situations',
+    icon: '🎯',
+    variant: 'primary' as const,
+    category: 'wisdom'
   }
 ];
 

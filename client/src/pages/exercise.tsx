@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import AudioButton from "@/components/audio-button";
 import { apiRequest } from "@/lib/queryClient";
 import { getExerciseType } from "@/lib/exercises";
-import type { Phrase, ExerciseSession } from "@shared/schema";
+import type { Phrase, ExerciseSession, QuestionBank } from "@shared/schema";
 
 const DEMO_USER_ID = "demo-user";
 
@@ -28,11 +28,22 @@ export default function Exercise() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedback, setFeedback] = useState("");
 
-  // Fetch the specific phrase or get a random one
-  const { data: phrase, isLoading } = useQuery<Phrase>({
+  // Fetch data based on exercise type
+  const isThematicExercise = exerciseType === 'thematic';
+  
+  // For thematic exercises, fetch question banks; for others, fetch phrases
+  const { data: phrase, isLoading: phraseLoading } = useQuery<Phrase>({
     queryKey: phraseId ? ['/api/phrases', phraseId] : ['/api/phrases/random', exerciseType],
-    enabled: !!exerciseType,
+    enabled: !!exerciseType && !isThematicExercise,
   });
+  
+  const { data: questionBank, isLoading: questionBankLoading } = useQuery<QuestionBank & { associatedPhrases: Phrase[] }>({
+    queryKey: ['/api/question-banks/random/thematic'],
+    enabled: !!exerciseType && isThematicExercise,
+  });
+  
+  const isLoading = isThematicExercise ? questionBankLoading : phraseLoading;
+  const exerciseData = isThematicExercise ? questionBank : phrase;
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -71,7 +82,7 @@ export default function Exercise() {
     );
   }
 
-  if (!phrase || !exerciseConfig) {
+  if (!exerciseData || !exerciseConfig) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -156,6 +167,25 @@ export default function Exercise() {
           : "Convert the statement to a question using question words.";
         break;
 
+      case 'thematic':
+        // For thematic exercises, check if user answer matches any of the associated phrases
+        if (isThematicExercise && questionBank) {
+          const associatedPhrases = questionBank.associatedPhrases || [];
+          correct = associatedPhrases.some(phrase => 
+            phrase.arabicText.includes(userAnswer.trim()) || 
+            userAnswer.includes(phrase.arabicText.substring(0, 10))
+          );
+          correctAnswer = associatedPhrases.map(p => p.arabicText).join(' أو ');
+          feedbackMessage = correct 
+            ? `Perfect! You provided a relevant verse for "${questionBank.themeEnglish}".`
+            : `Think of verses related to "${questionBank.themeEnglish}". Any of these would work: ${associatedPhrases.map(p => p.surahAyah).join(', ')}`;
+        } else {
+          correct = false;
+          correctAnswer = "Question bank not loaded";
+          feedbackMessage = "Unable to validate thematic answer.";
+        }
+        break;
+
       default:
         correct = false;
         correctAnswer = "";
@@ -167,10 +197,11 @@ export default function Exercise() {
     setIsAnswered(true);
 
     // Submit the session
+    const dataId = isThematicExercise && questionBank ? questionBank.id : (phrase?.id || 'unknown');
     submitSessionMutation.mutate({
       userId: DEMO_USER_ID,
       exerciseType: exerciseType || '',
-      phraseId: phrase.id,
+      phraseId: dataId,
       userAnswer,
       correctAnswer,
       isCorrect: correct ? 'true' : 'false'
@@ -196,6 +227,47 @@ export default function Exercise() {
   };
 
   const renderExerciseContent = () => {
+    if (isThematicExercise && questionBank) {
+      return (
+        <div className="space-y-4">
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-3 text-foreground" data-testid="text-question-theme">
+              {questionBank.theme}
+            </h3>
+            <p className="text-muted-foreground mb-3" data-testid="text-question-theme-english">
+              {questionBank.themeEnglish}
+            </p>
+            <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-question-display">
+              {questionBank.description || 'سؤال موضوعي'}
+            </p>
+            <p className="text-muted-foreground" data-testid="text-question-english">
+              What Quranic verse would you use in this situation?
+            </p>
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>Related themes: {questionBank.tags?.join(', ') || 'None'}</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground">
+              Provide a Quranic verse that relates to this situation:
+            </label>
+            <Textarea
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="Write the Arabic verse that applies to this situation..."
+              className="min-h-[100px] arabic-text text-right"
+              dir="rtl"
+              lang="ar"
+              data-testid="textarea-thematic-answer"
+              disabled={isAnswered}
+            />
+          </div>
+        </div>
+      );
+    }
+    
+    if (!phrase) return null;
+    
     switch (exerciseType) {
       case 'substitution':
         return (
@@ -335,9 +407,9 @@ export default function Exercise() {
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground mb-2">Statement:</p>
               <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-transformation-statement">
-                {phrase.arabicText}
+                {phrase?.arabicText || 'Loading...'}
               </p>
-              <p className="text-muted-foreground mb-4">{phrase.englishTranslation}</p>
+              <p className="text-muted-foreground mb-4">{phrase?.englishTranslation || 'Loading...'}</p>
               <p className="text-sm text-muted-foreground">Convert this statement to a question:</p>
             </div>
             <Input
@@ -388,11 +460,15 @@ export default function Exercise() {
             <CardTitle className="flex items-center justify-between">
               <span>Exercise</span>
               <div className="flex items-center space-x-2">
-                <AudioButton 
-                  text={phrase.arabicText} 
-                  lang="ar-SA"
-                  data-testid="button-audio-phrase"
-                />
+                {isThematicExercise && questionBank ? (
+                  <span className="text-sm text-muted-foreground">Thematic Question</span>
+                ) : phrase ? (
+                  <AudioButton 
+                    text={phrase.arabicText} 
+                    lang="ar-SA"
+                    data-testid="button-audio-phrase"
+                  />
+                ) : null}
               </div>
             </CardTitle>
           </CardHeader>
@@ -465,23 +541,60 @@ export default function Exercise() {
         {/* Context Information */}
         <Card>
           <CardHeader>
-            <CardTitle>About This Phrase</CardTitle>
+            <CardTitle>
+              {isThematicExercise ? 'About This Question' : 'About This Phrase'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isThematicExercise && questionBank ? (
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Source</p>
-                <p className="text-foreground" data-testid="text-phrase-source">{phrase.surahAyah}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Theme</p>
+                    <p className="text-foreground" data-testid="text-question-theme">{questionBank.themeEnglish}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Difficulty</p>
+                    <p className="text-foreground" data-testid="text-question-difficulty">{questionBank.difficulty}/5</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                  <p className="text-foreground" data-testid="text-question-description">{questionBank.description}</p>
+                </div>
+                {questionBank.associatedPhrases && questionBank.associatedPhrases.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Acceptable Answers</p>
+                    <div className="space-y-1">
+                      {questionBank.associatedPhrases.map((phrase, index) => (
+                        <p key={index} className="text-sm text-muted-foreground" data-testid={`text-acceptable-answer-${index}`}>
+                          {phrase.surahAyah}: {phrase.englishTranslation}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
+            ) : phrase ? (
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Category</p>
-                <p className="text-foreground capitalize" data-testid="text-phrase-category">{phrase.category}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Source</p>
+                    <p className="text-foreground" data-testid="text-phrase-source">{phrase.surahAyah}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Category</p>
+                    <p className="text-foreground capitalize" data-testid="text-phrase-category">{phrase.category}</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Life Application</p>
+                  <p className="text-foreground" data-testid="text-phrase-application">{phrase.lifeApplication}</p>
+                </div>
               </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-sm font-medium text-muted-foreground mb-1">Life Application</p>
-              <p className="text-foreground" data-testid="text-phrase-application">{phrase.lifeApplication}</p>
-            </div>
+            ) : (
+              <p className="text-muted-foreground">Loading context information...</p>
+            )}
           </CardContent>
         </Card>
       </main>
