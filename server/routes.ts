@@ -1,17 +1,26 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPhraseSchema, insertExerciseSessionSchema, insertUserProgressSchema, insertDailyStatsSchema } from "@shared/schema";
+import { insertPhraseSchema, insertExerciseSessionSchema, insertUserProgressSchema, insertDailyStatsSchema, insertQuestionBankSchema } from "@shared/schema";
 import { phrasesData } from "../client/src/lib/phrases-data";
+import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-phrase-mapping";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Initialize with phrase data
+  // Initialize with phrase data and question banks
   (async () => {
     const existingPhrases = await storage.getAllPhrases();
     if (existingPhrases.length === 0) {
       for (const phraseData of phrasesData) {
         await storage.createPhrase(phraseData);
+      }
+    }
+    
+    const existingQuestionBanks = await storage.getAllQuestionBanks();
+    if (existingQuestionBanks.length === 0) {
+      const questionBanksWithPhraseIds = generateQuestionBanksWithPhraseIds();
+      for (const questionBankData of questionBanksWithPhraseIds) {
+        await storage.createQuestionBank(questionBankData);
       }
     }
   })();
@@ -186,6 +195,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(randomPhrase);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch random phrase" });
+    }
+  });
+
+  // Question bank routes
+  app.get("/api/question-banks", async (req, res) => {
+    try {
+      const { category, theme, tags } = req.query;
+      
+      let questionBanks;
+      
+      if (category && typeof category === 'string') {
+        questionBanks = await storage.getQuestionBanksByCategory(category);
+      } else if (theme && typeof theme === 'string') {
+        questionBanks = await storage.getQuestionBanksByTheme(theme);
+      } else if (tags && typeof tags === 'string') {
+        const tagArray = tags.split(',').map(tag => tag.trim());
+        questionBanks = await storage.searchQuestionBanksByTags(tagArray);
+      } else {
+        questionBanks = await storage.getAllQuestionBanks();
+      }
+      
+      res.json(questionBanks);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch question banks" });
+    }
+  });
+
+  app.get("/api/question-banks/:id", async (req, res) => {
+    try {
+      const questionBank = await storage.getQuestionBank(req.params.id);
+      if (!questionBank) {
+        return res.status(404).json({ message: "Question bank not found" });
+      }
+      res.json(questionBank);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch question bank" });
+    }
+  });
+
+  app.post("/api/question-banks", async (req, res) => {
+    try {
+      const validatedData = insertQuestionBankSchema.parse(req.body);
+      const questionBank = await storage.createQuestionBank(validatedData);
+      res.status(201).json(questionBank);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid question bank data" });
+    }
+  });
+
+  // Random question bank for thematic exercises
+  app.get("/api/question-banks/random/thematic", async (req, res) => {
+    try {
+      const { category, difficulty } = req.query;
+      
+      let questionBanks = await storage.getAllQuestionBanks();
+      
+      if (category && typeof category === 'string') {
+        questionBanks = questionBanks.filter(qb => qb.category === category);
+      }
+      
+      if (difficulty && typeof difficulty === 'string') {
+        const diff = parseInt(difficulty);
+        questionBanks = questionBanks.filter(qb => qb.difficulty === diff);
+      }
+
+      if (questionBanks.length === 0) {
+        return res.status(404).json({ message: "No question banks found for criteria" });
+      }
+
+      const randomQuestionBank = questionBanks[Math.floor(Math.random() * questionBanks.length)];
+      
+      // Get the associated phrases for this question bank
+      const allPhrases = await storage.getAllPhrases();
+      const associatedPhrases = allPhrases.filter(phrase => 
+        randomQuestionBank.correctPhraseIds.includes(phrase.id)
+      );
+      
+      res.json({
+        ...randomQuestionBank,
+        associatedPhrases
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch random question bank" });
     }
   });
 
