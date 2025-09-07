@@ -79,5 +79,24 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+// Question Banks for thematic exercises with multiple correct answers
+export const questionBanks = pgTable("question_banks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  theme: text("theme").notNull(), // Arabic theme like "المعية في الشدة"
+  themeEnglish: text("theme_english").notNull(), // English translation
+  description: text("description"), // Optional description
+  tags: jsonb("tags").$type<string[]>().default([]), // semantic tags
+  correctPhraseIds: jsonb("correct_phrase_ids").$type<string[]>().notNull(), // Multiple correct answers
+  difficulty: integer("difficulty").default(1),
+  category: text("category").notNull(), // thematic, grammar, vocabulary
+});
+
+export const insertQuestionBankSchema = createInsertSchema(questionBanks).omit({
+  id: true,
+});
+
+export type QuestionBank = typeof questionBanks.$inferSelect;
+export type InsertQuestionBank = z.infer<typeof insertQuestionBankSchema>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;

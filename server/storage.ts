@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Phrase, type InsertPhrase, type UserProgress, type InsertUserProgress, type ExerciseSession, type InsertExerciseSession, type DailyStats, type InsertDailyStats } from "@shared/schema";
+import { type User, type InsertUser, type Phrase, type InsertPhrase, type UserProgress, type InsertUserProgress, type ExerciseSession, type InsertExerciseSession, type DailyStats, type InsertDailyStats, type QuestionBank, type InsertQuestionBank } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -29,6 +29,14 @@ export interface IStorage {
   createDailyStats(stats: InsertDailyStats): Promise<DailyStats>;
   updateDailyStats(id: string, stats: Partial<DailyStats>): Promise<DailyStats | undefined>;
   getWeeklyStats(userId: string): Promise<DailyStats[]>;
+
+  // Question bank methods
+  getAllQuestionBanks(): Promise<QuestionBank[]>;
+  getQuestionBanksByCategory(category: string): Promise<QuestionBank[]>;
+  getQuestionBank(id: string): Promise<QuestionBank | undefined>;
+  createQuestionBank(questionBank: InsertQuestionBank): Promise<QuestionBank>;
+  getQuestionBanksByTheme(theme: string): Promise<QuestionBank[]>;
+  searchQuestionBanksByTags(tags: string[]): Promise<QuestionBank[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -37,6 +45,7 @@ export class MemStorage implements IStorage {
   private userProgress: Map<string, UserProgress>;
   private exerciseSessions: Map<string, ExerciseSession>;
   private dailyStats: Map<string, DailyStats>;
+  private questionBanks: Map<string, QuestionBank>;
 
   constructor() {
     this.users = new Map();
@@ -44,6 +53,7 @@ export class MemStorage implements IStorage {
     this.userProgress = new Map();
     this.exerciseSessions = new Map();
     this.dailyStats = new Map();
+    this.questionBanks = new Map();
   }
 
   // User methods
@@ -168,6 +178,40 @@ export class MemStorage implements IStorage {
       .filter((stats) => stats.userId === userId)
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 7);
+  }
+
+  // Question bank methods
+  async getAllQuestionBanks(): Promise<QuestionBank[]> {
+    return Array.from(this.questionBanks.values());
+  }
+
+  async getQuestionBanksByCategory(category: string): Promise<QuestionBank[]> {
+    return Array.from(this.questionBanks.values()).filter(
+      (questionBank) => questionBank.category === category
+    );
+  }
+
+  async getQuestionBank(id: string): Promise<QuestionBank | undefined> {
+    return this.questionBanks.get(id);
+  }
+
+  async createQuestionBank(insertQuestionBank: InsertQuestionBank): Promise<QuestionBank> {
+    const id = randomUUID();
+    const questionBank: QuestionBank = { ...insertQuestionBank, id };
+    this.questionBanks.set(id, questionBank);
+    return questionBank;
+  }
+
+  async getQuestionBanksByTheme(theme: string): Promise<QuestionBank[]> {
+    return Array.from(this.questionBanks.values()).filter(
+      (questionBank) => questionBank.theme.includes(theme) || questionBank.themeEnglish.includes(theme)
+    );
+  }
+
+  async searchQuestionBanksByTags(tags: string[]): Promise<QuestionBank[]> {
+    return Array.from(this.questionBanks.values()).filter(
+      (questionBank) => tags.some(tag => questionBank.tags.includes(tag))
+    );
   }
 }
 
