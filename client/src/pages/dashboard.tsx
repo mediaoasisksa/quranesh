@@ -2,8 +2,23 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Quote, Moon, User, Shuffle, Download, CheckCircle, RotateCcw, Lightbulb } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Quote,
+  Moon,
+  User,
+  Shuffle,
+  Download,
+  CheckCircle,
+  RotateCcw,
+  Lightbulb,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ExerciseCard from "@/components/exercise-card";
 import PhraseCard from "@/components/phrase-card";
@@ -16,48 +31,51 @@ const DEMO_USER_ID = "demo-user";
 export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isDark, setIsDark] = useState(false);
-  const [bookmarkedPhrases, setBookmarkedPhrases] = useState<Set<string>>(new Set());
+  const [bookmarkedPhrases, setBookmarkedPhrases] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Fetch phrases
   const { data: phrases = [], isLoading: phrasesLoading } = useQuery<Phrase[]>({
-    queryKey: ['/api/phrases'],
+    queryKey: ["/api/phrases"],
   });
 
   // Fetch daily stats
   const { data: dailyStats } = useQuery<DailyStats>({
-    queryKey: ['/api/daily-stats', DEMO_USER_ID],
+    queryKey: ["/api/daily-stats", DEMO_USER_ID],
   });
 
   // Fetch user progress
   const { data: userProgress = [] } = useQuery<UserProgress[]>({
-    queryKey: ['/api/user-progress', DEMO_USER_ID],
+    queryKey: ["/api/user-progress", DEMO_USER_ID],
   });
 
   // Fetch weekly stats for progress report
   const { data: weeklyStats = [] } = useQuery<DailyStats[]>({
-    queryKey: ['/api/weekly-stats', DEMO_USER_ID],
+    queryKey: ["/api/weekly-stats", DEMO_USER_ID],
   });
 
   const defaultDailyStats: DailyStats = {
-    id: 'default',
+    id: "default",
     userId: DEMO_USER_ID,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     phrasesUsed: 0,
     exercicesCompleted: 0,
-    accuracyRate: 0
+    accuracyRate: 0,
   };
 
   useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
 
-  const filteredPhrases = selectedCategory === "all" 
-    ? phrases 
-    : phrases.filter(phrase => phrase.category === selectedCategory);
+  const filteredPhrases =
+    selectedCategory === "all"
+      ? phrases
+      : phrases.filter((phrase) => phrase.category === selectedCategory);
 
   const handleRandomExercise = () => {
     const randomType = getRandomExerciseType();
@@ -75,7 +93,7 @@ export default function Dashboard() {
   };
 
   const handleBookmark = (phraseId: string) => {
-    setBookmarkedPhrases(prev => {
+    setBookmarkedPhrases((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(phraseId)) {
         newSet.delete(phraseId);
@@ -86,8 +104,12 @@ export default function Dashboard() {
     });
   };
 
-  const masteredPhrases = userProgress.filter(p => (p.masteryLevel || 0) >= 80);
-  const needReviewPhrases = userProgress.filter(p => (p.masteryLevel || 0) < 80 && (p.masteryLevel || 0) > 0);
+  const masteredPhrases = userProgress.filter(
+    (p) => (p.masteryLevel || 0) >= 80,
+  );
+  const needReviewPhrases = userProgress.filter(
+    (p) => (p.masteryLevel || 0) < 80 && (p.masteryLevel || 0) > 0,
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,21 +123,30 @@ export default function Dashboard() {
                   <Quote className="text-primary-foreground h-5 w-5" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold text-foreground">Quran Arabic Learning</h1>
-                  <p className="text-sm text-muted-foreground">AI-Powered Arabic Tutor</p>
+                  <h1 className="text-lg font-semibold text-foreground">
+                    Quran Arabic Learning
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    AI-Powered Arabic Tutor
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => setIsDark(!isDark)}
                 data-testid="button-dark-mode"
               >
                 <Moon className="h-5 w-5" />
               </Button>
+              <Link href="/login">
+                <Button className="bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors px-4 py-2 rounded-md text-sm font-semibold">
+                  Sign In
+                </Button>
+              </Link>
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                 <User className="text-primary-foreground h-4 w-4" />
               </div>
@@ -134,8 +165,10 @@ export default function Dashboard() {
         {/* Exercise Types Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Training Exercises</h2>
-            <Button 
+            <h2 className="text-2xl font-bold text-foreground">
+              Training Exercises
+            </h2>
+            <Button
               onClick={handleRandomExercise}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               data-testid="button-random-exercise"
@@ -147,8 +180,9 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {exerciseTypes.map((exercise) => {
-              const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-              
+              const randomPhrase =
+                phrases[Math.floor(Math.random() * phrases.length)];
+
               return (
                 <ExerciseCard
                   key={exercise.id}
@@ -168,9 +202,14 @@ export default function Dashboard() {
         {/* Phrase Database Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Quranic Phrases Database</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              Quranic Phrases Database
+            </h2>
             <div className="flex items-center space-x-3">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger className="w-48" data-testid="select-category">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -204,10 +243,7 @@ export default function Dashboard() {
 
               {filteredPhrases.length > 8 && (
                 <div className="text-center mt-6">
-                  <Button 
-                    variant="outline"
-                    data-testid="button-load-more"
-                  >
+                  <Button variant="outline" data-testid="button-load-more">
                     Load More Phrases <span className="ml-2">↓</span>
                   </Button>
                 </div>
@@ -219,7 +255,9 @@ export default function Dashboard() {
         {/* Progress Tracking Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Weekly Progress Report</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              Weekly Progress Report
+            </h2>
             <Button variant="outline" data-testid="button-export-report">
               <Download className="h-4 w-4 mr-2" />
               Export Report
@@ -234,15 +272,26 @@ export default function Dashboard() {
                   <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center mr-3">
                     <CheckCircle className="text-secondary h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold text-foreground">Mastered Phrases</h3>
+                  <h3 className="font-semibold text-foreground">
+                    Mastered Phrases
+                  </h3>
                 </div>
-                
+
                 <div className="space-y-3">
                   {masteredPhrases.slice(0, 3).map((progress) => {
-                    const phrase = phrases.find(p => p.id === progress.phraseId);
+                    const phrase = phrases.find(
+                      (p) => p.id === progress.phraseId,
+                    );
                     return phrase ? (
-                      <div key={progress.id} className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md">
-                        <span className="arabic-text text-sm" lang="ar" data-testid={`text-mastered-${progress.id}`}>
+                      <div
+                        key={progress.id}
+                        className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md"
+                      >
+                        <span
+                          className="arabic-text text-sm"
+                          lang="ar"
+                          data-testid={`text-mastered-${progress.id}`}
+                        >
                           {phrase.arabicText}
                         </span>
                         <span className="text-accent">⭐</span>
@@ -250,10 +299,14 @@ export default function Dashboard() {
                     ) : null;
                   })}
                 </div>
-                
+
                 <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground" data-testid="text-mastered-count">
-                    ✅ <strong>{masteredPhrases.length} phrases</strong> fully mastered this week
+                  <p
+                    className="text-sm text-muted-foreground"
+                    data-testid="text-mastered-count"
+                  >
+                    ✅ <strong>{masteredPhrases.length} phrases</strong> fully
+                    mastered this week
                   </p>
                 </div>
               </CardContent>
@@ -268,13 +321,22 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-semibold text-foreground">Need Review</h3>
                 </div>
-                
+
                 <div className="space-y-3">
                   {needReviewPhrases.slice(0, 2).map((progress) => {
-                    const phrase = phrases.find(p => p.id === progress.phraseId);
+                    const phrase = phrases.find(
+                      (p) => p.id === progress.phraseId,
+                    );
                     return phrase ? (
-                      <div key={progress.id} className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md">
-                        <span className="arabic-text text-sm" lang="ar" data-testid={`text-review-${progress.id}`}>
+                      <div
+                        key={progress.id}
+                        className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md"
+                      >
+                        <span
+                          className="arabic-text text-sm"
+                          lang="ar"
+                          data-testid={`text-review-${progress.id}`}
+                        >
                           {phrase.arabicText}
                         </span>
                         <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded">
@@ -284,10 +346,14 @@ export default function Dashboard() {
                     ) : null;
                   })}
                 </div>
-                
+
                 <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground" data-testid="text-review-count">
-                    🔄 <strong>{needReviewPhrases.length} phrases</strong> need more practice
+                  <p
+                    className="text-sm text-muted-foreground"
+                    data-testid="text-review-count"
+                  >
+                    🔄 <strong>{needReviewPhrases.length} phrases</strong> need
+                    more practice
                   </p>
                 </div>
               </CardContent>
@@ -300,17 +366,26 @@ export default function Dashboard() {
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                     <Lightbulb className="text-primary h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold text-foreground">New Suggestions</h3>
+                  <h3 className="font-semibold text-foreground">
+                    New Suggestions
+                  </h3>
                 </div>
-                
+
                 <div className="space-y-3">
                   {phrases.slice(0, 2).map((phrase) => (
-                    <div key={phrase.id} className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md">
-                      <span className="arabic-text text-sm" lang="ar" data-testid={`text-suggestion-${phrase.id}`}>
+                    <div
+                      key={phrase.id}
+                      className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md"
+                    >
+                      <span
+                        className="arabic-text text-sm"
+                        lang="ar"
+                        data-testid={`text-suggestion-${phrase.id}`}
+                      >
                         {phrase.arabicText}
                       </span>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         className="text-xs bg-primary/20 text-primary hover:bg-primary/30"
                         data-testid={`button-add-suggestion-${phrase.id}`}
@@ -320,10 +395,14 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground" data-testid="text-suggestion-count">
-                    🌟 <strong>12 new phrases</strong> suggested based on your progress
+                  <p
+                    className="text-sm text-muted-foreground"
+                    data-testid="text-suggestion-count"
+                  >
+                    🌟 <strong>12 new phrases</strong> suggested based on your
+                    progress
                   </p>
                 </div>
               </CardContent>
