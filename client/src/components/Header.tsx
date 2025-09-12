@@ -23,7 +23,7 @@ const Header = () => {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">QuranSpeak</span>
+              <span className="text-xl font-bold text-foreground">Quranic</span>
             </div>
           </Link>
 
@@ -43,14 +43,15 @@ const Header = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
             <Link href="/login">
-              <Button variant="ghost" className="text-muted-foreground hover:text-primary">
+              <Button
+                variant="ghost"
+                className="text-muted-foreground hover:text-primary"
+              >
                 Sign In
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="default">
-                Get Started
-              </Button>
+              <Button variant="default">Get Started</Button>
             </Link>
           </div>
 
@@ -59,7 +60,11 @@ const Header = () => {
             className="md:hidden p-2 text-muted-foreground hover:text-primary"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
