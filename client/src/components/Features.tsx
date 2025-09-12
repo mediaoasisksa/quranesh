@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import aiTutor from "@/assets/ai-tutor.jpg";
-import dashboardPreview from "@/assets/dashboard-preview.jpg";
+
+
 import { 
   Brain, 
   MessageCircle, 
