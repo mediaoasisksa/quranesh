@@ -41,13 +41,14 @@ export function NewLoginPage() {
             <div className="flex items-center mb-8">
               <Link href="/">
                 <span className="text-2xl font-bold text-gray-800 cursor-pointer">
-                  Qurankita
+                  QuranicArabic
                 </span>
               </Link>
             </div>
             <div className="flex border border-gray-200 rounded-lg p-1 mb-8 w-full max-w-xs mx-auto">
               <Button
                 id="signup-tab"
+                variant="custom"
                 className={`${isSignUp ? "bg-green-600 text-white" : "bg-transparent text-gray-500"} py-2 px-6 rounded-md text-sm font-semibold transition-colors flex-1`}
                 onClick={() => setIsSignUp(true)}
               >
@@ -55,6 +56,7 @@ export function NewLoginPage() {
               </Button>
               <Button
                 id="signin-tab"
+                variant="custom"
                 className={`${!isSignUp ? "bg-green-600 text-white" : "bg-transparent text-gray-500"} py-2 px-6 rounded-md text-sm font-semibold transition-colors hover:text-gray-700 flex-1`}
                 onClick={() => setIsSignUp(false)}
               >
