@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
+import heroBackground from "@assets/hero-background_1757702249890.jpg";
 
 const Hero = () => {
   return (
@@ -9,7 +10,7 @@ const Hero = () => {
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center z-0"
-        style={{ background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)' }}
+        style={{ backgroundImage: `url(${heroBackground})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70"></div>
       </div>

@@ -13,6 +13,8 @@ import {
   ArrowRight 
 } from "lucide-react";
 import { Link } from "wouter";
+import aiTutor from "@assets/ai-tutor_1757702249883.jpg";
+import dashboardPreview from "@assets/dashboard-preview_1757702249889.jpg";
 
 const Features = () => {
   const features = [
@@ -118,7 +120,7 @@ const Features = () => {
           
           <div className="relative">
             <img 
-              src="data:image/svg+xml,%3csvg%20width='100'%20height='100'%20xmlns='http://www.w3.org/2000/svg'%3e%3crect%20width='100'%20height='100'%20fill='%23e5e7eb'/%3e%3ctext%20x='50%25'%20y='50%25'%20font-size='18'%20text-anchor='middle'%20dy='.3em'%3eAI%20Tutor%3c/text%3e%3c/svg%3e" 
+              src={aiTutor} 
               alt="AI Tutor Interface" 
               className="rounded-2xl shadow-2xl w-full"
             />
@@ -133,7 +135,7 @@ const Features = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="order-2 lg:order-1 relative">
             <img 
-              src="data:image/svg+xml,%3csvg%20width='100'%20height='100'%20xmlns='http://www.w3.org/2000/svg'%3e%3crect%20width='100'%20height='100'%20fill='%23f3f4f6'/%3e%3ctext%20x='50%25'%20y='50%25'%20font-size='14'%20text-anchor='middle'%20dy='.3em'%3eDashboard%3c/text%3e%3c/svg%3e" 
+              src={dashboardPreview} 
               alt="Learning Dashboard" 
               className="rounded-2xl shadow-2xl w-full"
             />
