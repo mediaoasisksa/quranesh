@@ -25,7 +25,7 @@ const CTA = () => {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
-            Join thousands of Huffaz who are transforming their memorized verses 
+            Join thousands of Huffaz who are transforming their memorized verses
             into practical Arabic conversation skills.
           </p>
 
@@ -48,9 +48,9 @@ const CTA = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/login">
-              <Button 
-                variant="accent" 
-                size="lg" 
+              <Button
+                variant="accent"
+                size="lg"
                 className="text-lg px-8 py-6 shadow-2xl hover:shadow-accent/20"
               >
                 Start Your Journey Today
@@ -58,12 +58,12 @@ const CTA = () => {
               </Button>
             </Link>
             <Link href="/dashboard">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="text-lg px-8 py-6 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-6 bg-primary/20 border-white/30 text-white hover:bg-primary/30 hover:border-white/50 transition-all duration-300"
               >
-                Watch Demo Video
+                Try for free !
               </Button>
             </Link>
           </div>
