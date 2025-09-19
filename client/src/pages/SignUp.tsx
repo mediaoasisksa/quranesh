@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,13 +11,17 @@ import { Link } from "wouter";
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    memorationLevel: "",
+    memorizationLevel: "",
     nativeLanguage: "",
     learningGoal: ""
   });
@@ -25,10 +30,60 @@ const SignUp = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement sign up logic
-    console.log("Sign up attempt:", formData);
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const signupData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        memorizationLevel: formData.memorizationLevel,
+        nativeLanguage: formData.nativeLanguage,
+        learningGoal: formData.learningGoal
+      };
+
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(signupData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess("Account created successfully! Redirecting to sign in...");
+        setTimeout(() => {
+          setLocation('/signin');
+        }, 2000);
+      } else {
+        setError(data.message || 'Account creation failed');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -137,7 +192,7 @@ const SignUp = () => {
 
               <div className="space-y-2">
                 <Label>Quran Memorization Level</Label>
-                <Select value={formData.memorationLevel} onValueChange={(value) => handleInputChange("memorationLevel", value)}>
+                <Select value={formData.memorizationLevel} onValueChange={(value) => handleInputChange("memorizationLevel", value)}>
                   <SelectTrigger className="transition-all duration-200 focus:border-primary">
                     <SelectValue placeholder="Select your memorization level" />
                   </SelectTrigger>
@@ -187,6 +242,18 @@ const SignUp = () => {
                 </Select>
               </div>
 
+              {error && (
+                <div className="text-red-600 text-sm text-center p-3 bg-red-50 border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="text-green-600 text-sm text-center p-3 bg-green-50 border border-green-200 rounded-md">
+                  {success}
+                </div>
+              )}
+
               <div className="flex items-start gap-2">
                 <input type="checkbox" className="rounded border-border mt-1" required />
                 <span className="text-sm text-muted-foreground">
@@ -197,8 +264,8 @@ const SignUp = () => {
                 </span>
               </div>
 
-              <Button type="submit" variant="default" className="w-full">
-                Create Account
+              <Button type="submit" variant="default" className="w-full" disabled={loading}>
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
 
               <div className="relative">
