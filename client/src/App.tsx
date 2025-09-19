@@ -7,15 +7,23 @@ import HomePage from "@/pages/HomePage";
 import Dashboard from "@/pages/dashboard";
 import Exercise from "@/pages/exercise";
 import NotFound from "@/pages/not-found";
-import { NewLoginPage } from "@/pages/NewLoginPage";
+import SignIn from "@/pages/SignIn";
+import SignUp from "@/pages/SignUp";
+import Features from "@/pages/Features";
+import HowItWorks from "@/pages/HowItWorks";
+import Pricing from "@/pages/Pricing";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      <Route path="/features" component={Features} />
+      <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/exercise/:type/:phraseId?" component={Exercise} />
-      <Route path="/login" component={NewLoginPage} />
+      <Route path="/signin" component={SignIn} />
+      <Route path="/signup" component={SignUp} />
       <Route component={NotFound} />
     </Switch>
   );

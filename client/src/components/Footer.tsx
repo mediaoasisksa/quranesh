@@ -1,5 +1,4 @@
 import { BookOpen, Mail, MessageCircle, Globe } from "lucide-react";
-import { Link } from "wouter";
 
 const Footer = () => {
   const footerSections = [
@@ -49,26 +48,36 @@ const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
             {/* Brand Section */}
             <div className="lg:col-span-2">
-              <Link href="/">
-                <div className="flex items-center gap-2 mb-6 cursor-pointer">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <span className="text-xl font-bold text-foreground">QuranSpeak</span>
+              <div className="flex items-center gap-2 mb-6 cursor-pointer">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-primary-foreground" />
                 </div>
-              </Link>
+                <span className="text-xl font-bold text-foreground">
+                  Quranic
+                </span>
+              </div>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Empowering Huffaz worldwide to transform their Quranic knowledge 
-                into practical Arabic communication skills through AI-powered learning.
+                Empowering Huffaz worldwide to transform their Quranic knowledge
+                into practical Arabic communication skills through AI-powered
+                learning.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors"
+                >
                   <Mail className="w-5 h-5 text-primary" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors"
+                >
                   <MessageCircle className="w-5 h-5 text-primary" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-primary/10 hover:bg-primary/20 rounded-lg flex items-center justify-center transition-colors"
+                >
                   <Globe className="w-5 h-5 text-primary" />
                 </a>
               </div>
@@ -77,7 +86,9 @@ const Footer = () => {
             {/* Navigation Sections */}
             {footerSections.map((section, index) => (
               <div key={index}>
-                <h3 className="font-semibold text-foreground mb-4">{section.title}</h3>
+                <h3 className="font-semibold text-foreground mb-4">
+                  {section.title}
+                </h3>
                 <ul className="space-y-3">
                   {section.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
@@ -99,16 +110,26 @@ const Footer = () => {
         <div className="py-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-muted-foreground text-sm">
-              © 2024 QuranSpeak. All rights reserved. Developed with respect for Islamic values.
+              © 2024 Quranic. All rights reserved. Developed with respect for
+              Islamic values.
             </div>
             <div className="flex gap-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
                 Islamic Guidelines
               </a>
             </div>

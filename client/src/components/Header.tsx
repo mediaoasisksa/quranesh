@@ -7,10 +7,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: "Features", href: "#features" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "About", href: "#about" },
+    { name: "Features", href: "/features" },
+    { name: "How It Works", href: "/how-it-works" },
+    { name: "Pricing", href: "/pricing" },
   ];
 
   return (
@@ -18,31 +17,29 @@ const Header = () => {
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-foreground">Quranic</span>
+          <Link href="/" className="flex items-center gap-2 cursor-pointer">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-primary-foreground" />
             </div>
+            <span className="text-xl font-bold text-foreground">Quranic</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login">
+            <Link href="/signin">
               <Button
                 variant="ghost"
                 className="text-muted-foreground hover:text-primary"
@@ -50,7 +47,7 @@ const Header = () => {
                 Sign In
               </Button>
             </Link>
-            <Link href="/login">
+            <Link href="/signup">
               <Button variant="default">Get Started</Button>
             </Link>
           </div>
@@ -73,22 +70,22 @@ const Header = () => {
           <div className="md:hidden mt-4 pb-4 border-t border-border">
             <div className="flex flex-col gap-4 pt-4">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Link href="/login">
+                <Link href="/signin">
                   <Button variant="ghost" className="justify-start w-full">
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/signup">
                   <Button variant="default" className="w-full">
                     Get Started
                   </Button>

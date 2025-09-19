@@ -1,92 +1,105 @@
 import { Button } from "@/components/ui/button";
-
 import { ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
-import heroBackground from "@assets/hero-background_1757702249890.jpg";
 
 const Hero = () => {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden rounded-b-[3rem] lg:rounded-b-[4rem]">
-      {/* Background Image with Overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center z-0 rounded-b-[3rem] lg:rounded-b-[4rem]"
-        style={{ backgroundImage: `url(${heroBackground})` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 rounded-b-[3rem] lg:rounded-b-[4rem]"></div>
-      </div>
 
+  return (
+   <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-muted/10 to-primary/5 pb-32">
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 text-center text-primary-foreground">
+      <div className="relative z-10 container mx-auto px-6 text-center text-foreground">
         <div className="max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
-            <BookOpen className="w-4 h-4" />
-            <span className="text-sm font-medium">
-              AI-Powered Quranic Arabic Learning
-            </span>
+          {/* Quranic Text */}
+          <div className="text-center mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Quranic</h1>
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Transform Your
-            <span className="block bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
-              Quranic Knowledge
-            </span>
-            Into Daily Arabic
-          </h1>
+          {/* Lottie Animation with Decorative Lines */}
+          <div className="flex items-center justify-center mb-1 relative">
+            {/* Left Decorative Line */}
+            <div className="hidden md:block absolute left-0 top-1/2 transform -translate-y-1/2">
+              <div className="w-16 h-px bg-black opacity-30"></div>
+              <div className="w-12 h-px bg-black opacity-20 mt-2"></div>
+              <div className="w-8 h-px bg-black opacity-10 mt-2"></div>
+            </div>
 
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed max-w-3xl mx-auto">
-            Master conversational Arabic through the verses you've memorized.
-            Connect your Quranic knowledge with practical, everyday
-            communication.
-          </p>
+            {/* Animation */}
+            <dotlottie-wc 
+              src="https://lottie.host/cad9aaea-db6b-4f60-b409-69f1fafe1740/whCL9cRnjS.lottie" 
+              style={{width: '300px', height: '300px'}} 
+              speed="1" 
+              autoplay 
+              loop
+            ></dotlottie-wc>
+
+            {/* Right Decorative Line */}
+            <div className="hidden md:block absolute right-0 top-1/2 transform -translate-y-1/2">
+              <div className="w-16 h-px bg-black opacity-30"></div>
+              <div className="w-12 h-px bg-black opacity-20 mt-2"></div>
+              <div className="w-8 h-px bg-black opacity-10 mt-2"></div>
+            </div>
+          </div>
+
+          {/* Arabic Quote */}
+          <div className="text-center mb-6">
+            <p className="text-xl md:text-2xl font-bold text-foreground mb-4" dir="rtl">
+            «خَيْرُكُمْ مِنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمه»
+            </p>
+            <p className="text-lg text-foreground">
+              The best of you are those who learn the Qur'an and teach it
+            </p>
+          </div>
 
           {/* CTA Buttons */}
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link href="/login">
-              <Button variant="hero" size="lg" className="text-lg px-8 py-6">
+            <Link href="/signup">
+              <Button variant="default" size="lg" className="text-lg px-8 py-6">
                 Start Learning Now
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/dashboard">
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 bg-primary/20 border-white/30 text-white hover:bg-primary/30 hover:border-white/50 transition-all duration-300"
-              >
-                <MessageSquare className="w-5 h-5" />
-                See How It Works
-              </Button>
+            <Link href="/how-it-works">
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+              <MessageSquare className="w-5 h-5" />
+              See How It Works
+            </Button>
             </Link>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent mb-2">1000+</div>
-              <div className="text-sm opacity-80">Quranic Expressions</div>
+              <div className="text-3xl font-bold text-primary mb-2">1000+</div>
+              <div className="text-sm text-muted-foreground">Quranic Expressions</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent mb-2">
-                AI-Powered
-              </div>
-              <div className="text-sm opacity-80">Personalized Learning</div>
+              <div className="text-3xl font-bold text-primary mb-2">AI-Powered</div>
+              <div className="text-sm text-muted-foreground">Personalized Learning</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent mb-2">Daily</div>
-              <div className="text-sm opacity-80">Practice Sessions</div>
+              <div className="text-3xl font-bold text-primary mb-2">Daily</div>
+              <div className="text-sm text-muted-foreground">Practice Sessions</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Decorative Elements */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white/60">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"></div>
-        </div>
+      {/* Modern Wave Divider */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+        <svg 
+          className="relative block w-full h-20" 
+          data-name="Layer 1" 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 1200 120" 
+          preserveAspectRatio="none"
+        >
+          <path 
+            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
+            fill="#F6EFE2"
+            fillOpacity="0.8"
+          ></path>
+        </svg>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import CTA from "@/components/CTA";
+import Goal from "@/components/Goal";
 import Footer from "@/components/Footer";
 
 const HomePage = () => {
@@ -11,7 +11,7 @@ const HomePage = () => {
       <main>
         <Hero />
         <Features />
-        <CTA />
+        <Goal />
       </main>
       <Footer />
     </div>
