@@ -87,6 +87,23 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
+// Separate schema for signup requests (accepts password, not passwordHash)
+export const signupSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Valid email is required").transform(email => email.toLowerCase().trim()),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  memorizationLevel: z.string().optional(),
+  nativeLanguage: z.string().optional(),
+  learningGoal: z.string().optional(),
+});
+
+// Schema for signin requests
+export const signinSchema = z.object({
+  email: z.string().email("Valid email is required").transform(email => email.toLowerCase().trim()),
+  password: z.string().min(1, "Password is required"),
+});
+
 // Question Banks for thematic exercises with multiple correct answers
 export const questionBanks = pgTable("question_banks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

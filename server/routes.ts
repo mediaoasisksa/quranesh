@@ -1,11 +1,19 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPhraseSchema, insertExerciseSessionSchema, insertUserProgressSchema, insertDailyStatsSchema, insertQuestionBankSchema } from "@shared/schema";
+import { insertPhraseSchema, insertExerciseSessionSchema, insertUserProgressSchema, insertDailyStatsSchema, insertQuestionBankSchema, insertUserSchema, signupSchema, signinSchema } from "@shared/schema";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { phrasesData } from "../client/src/lib/phrases-data";
 import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-phrase-mapping";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Validate JWT secret on startup
+  const JWT_SECRET = process.env.JWT_SECRET;
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET environment variable is required for authentication");
+  }
   
   // Initialize with phrase data and question banks
   (async () => {
@@ -24,6 +32,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   })();
+
+  // Authentication routes
+  app.post("/api/signup", async (req, res) => {
+    try {
+      const validatedData = signupSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(409).json({ message: "User already exists with this email" });
+      }
+      
+      // Hash password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(validatedData.password, saltRounds);
+      
+      // Create user with hashed password (map to database schema)
+      const userData = {
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        email: validatedData.email,
+        passwordHash,
+        memorizationLevel: validatedData.memorizationLevel,
+        nativeLanguage: validatedData.nativeLanguage,
+        learningGoal: validatedData.learningGoal,
+      };
+      
+      const user = await storage.createUser(userData);
+      
+      // Remove password hash from response
+      const { passwordHash: _, ...userResponse } = user;
+      
+      res.status(201).json({ 
+        message: "User created successfully", 
+        user: userResponse 
+      });
+    } catch (error) {
+      // Handle database unique constraint errors
+      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+      
+      // Handle validation errors
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid input data", errors: error.message });
+      }
+      
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  app.post("/api/signin", async (req, res) => {
+    try {
+      const validatedData = signinSchema.parse(req.body);
+      
+      // Find user by email (email is already normalized by schema)
+      const user = await storage.getUserByEmail(validatedData.email);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+      
+      // Verify password
+      const isValidPassword = await bcrypt.compare(validatedData.password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+      
+      // Generate JWT token (JWT_SECRET is validated at startup)
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      
+      // Remove password hash from response
+      const { passwordHash: _, ...userResponse } = user;
+      
+      res.json({
+        message: "Login successful",
+        token,
+        tokenType: "Bearer",
+        expiresIn: "24h",
+        user: userResponse
+      });
+    } catch (error) {
+      // Handle validation errors
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid email or password format" });
+      }
+      
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
 
   // Phrase routes
   app.get("/api/phrases", async (req, res) => {
