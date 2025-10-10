@@ -390,13 +390,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingPath = path.resolve(import.meta.dirname, "..", "pricing.json");
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
-  // HyperPay Configuration
+  // HyperPay Configuration from environment variables
   const HYPERPAY_CONFIG = {
-    serverUrl: "https://eu-test.oppwa.com",
-    accessToken: "OGFjN2E0Yzk5NGFlZWE0ZDAxOTRiMWU0NWI2ZTAzZmZ8eDlqWjNxMkNOVUxOPVAlSG9waiU=",
-    entityIdVisaMaster: "8ac7a4c994aeea4d0194b1e58b280403",
-    entityIdMada: "8ac7a4c994aeea4d0194b1e6e7090408"
+    serverUrl: process.env.HYPERPAY_SERVER_URL || "https://eu-test.oppwa.com",
+    accessToken: process.env.HYPERPAY_ACCESS_TOKEN,
+    entityIdVisaMaster: process.env.HYPERPAY_ENTITY_ID_VISA_MASTER,
+    entityIdMada: process.env.HYPERPAY_ENTITY_ID_MADA
   };
+
+  // Validate HyperPay credentials
+  if (!HYPERPAY_CONFIG.accessToken || !HYPERPAY_CONFIG.entityIdVisaMaster || !HYPERPAY_CONFIG.entityIdMada) {
+    console.warn("⚠️  HyperPay credentials not fully configured. Payment processing may not work.");
+  }
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
