@@ -96,7 +96,12 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       console.log('Checkout ID received:', data.checkoutId);
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create checkout');
+        // Provide more helpful error messages
+        let errorMessage = data.message || 'Failed to create checkout';
+        if (response.status === 500) {
+          errorMessage = `Payment service temporarily unavailable. This usually means HyperPay's ${paymentMethod === 'VISA_MASTER' ? 'VISA/MASTER' : 'MADA'} service is down. Please try ${paymentMethod === 'VISA_MASTER' ? 'MADA' : 'VISA/MASTER'} instead, or try again later.`;
+        }
+        throw new Error(errorMessage);
       }
 
       setCheckoutId(data.checkoutId);
@@ -119,6 +124,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
       setIsLoading(false);
+      setCheckoutId(null); // Reset checkout ID on error so user can retry
     }
   };
 
@@ -274,8 +280,21 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
 
           {/* Error Display */}
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="border-red-500">
+              <AlertDescription className="space-y-2">
+                <p className="font-medium">{error}</p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setError(null);
+                    setCheckoutId(null);
+                  }}
+                  className="mt-2"
+                >
+                  Try Again
+                </Button>
+              </AlertDescription>
             </Alert>
           )}
 
