@@ -1,10 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { BookOpen, Menu, X } from "lucide-react";
+import { BookOpen, Menu, X, User, LogOut, Settings, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user, signOut } = useAuth();
 
   const navigation = [
     { name: "Features", href: "/features" },
@@ -39,17 +48,63 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/signin">
-              <Button
-                variant="ghost"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button variant="default">Get Started</Button>
-            </Link>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <UserCircle className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user?.givenName} {user?.surname}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      signOut();
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link href="/signin">
+                  <Button
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="default">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -80,16 +135,53 @@ const Header = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Link href="/signin">
-                  <Button variant="ghost" className="justify-start w-full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button variant="default" className="w-full">
-                    Get Started
-                  </Button>
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <div className="flex items-center gap-2 p-2">
+                      <UserCircle className="h-5 w-5" />
+                      <div className="flex flex-col">
+                        <p className="font-medium text-sm">{user?.givenName} {user?.surname}</p>
+                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      </div>
+                    </div>
+                    <Link href="/dashboard">
+                      <Button variant="ghost" className="justify-start w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/profile">
+                      <Button variant="ghost" className="justify-start w-full">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start w-full text-red-600 hover:text-red-700"
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/signin">
+                      <Button variant="ghost" className="justify-start w-full">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button variant="default" className="w-full">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -18,7 +18,18 @@ import {
   CheckCircle,
   RotateCcw,
   Lightbulb,
+  UserCircle,
+  LogOut,
+  Settings,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import ExerciseCard from "@/components/exercise-card";
 import PhraseCard from "@/components/phrase-card";
@@ -34,6 +45,7 @@ export default function Dashboard() {
   const [bookmarkedPhrases, setBookmarkedPhrases] = useState<Set<string>>(
     new Set(),
   );
+  const { isAuthenticated, user, signOut } = useAuth();
 
   // Fetch phrases
   const { data: phrases = [], isLoading: phrasesLoading } = useQuery<Phrase[]>({
@@ -142,14 +154,55 @@ export default function Dashboard() {
               >
                 <Moon className="h-5 w-5" />
               </Button>
-              <Link href="/login">
-                <Button className="bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors px-4 py-2 rounded-md text-sm font-semibold">
-                  Sign In
-                </Button>
-              </Link>
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <User className="text-primary-foreground h-4 w-4" />
-              </div>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <UserCircle className="h-6 w-6" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{user?.givenName} {user?.surname}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onSelect={(event) => {
+                        event.preventDefault();
+                        signOut();
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/signin">
+                  <Button className="bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors px-4 py-2 rounded-md text-sm font-semibold">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

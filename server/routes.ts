@@ -8,13 +8,13 @@ import { phrasesData } from "../client/src/lib/phrases-data";
 import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-phrase-mapping";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   // Validate JWT secret on startup
   const JWT_SECRET = process.env.JWT_SECRET;
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET environment variable is required for authentication");
   }
-  
+
   // Initialize with phrase data and question banks
   (async () => {
     const existingPhrases = await storage.getAllPhrases();
@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createPhrase(phraseData);
       }
     }
-    
+
     const existingQuestionBanks = await storage.getAllQuestionBanks();
     if (existingQuestionBanks.length === 0) {
       const questionBanksWithPhraseIds = generateQuestionBanksWithPhraseIds();
@@ -37,17 +37,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/signup", async (req, res) => {
     try {
       const validatedData = signupSchema.parse(req.body);
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
         return res.status(409).json({ message: "User already exists with this email" });
       }
-      
+
       // Hash password
       const saltRounds = 12;
       const passwordHash = await bcrypt.hash(validatedData.password, saltRounds);
-      
+
       // Create user with hashed password (map to database schema)
       const userData = {
         firstName: validatedData.firstName,
@@ -58,12 +58,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nativeLanguage: validatedData.nativeLanguage,
         learningGoal: validatedData.learningGoal,
       };
-      
+
       const user = await storage.createUser(userData);
-      
+
       // Remove password hash from response
       const { passwordHash: _, ...userResponse } = user;
-      
+
       res.status(201).json({ 
         message: "User created successfully", 
         user: userResponse 
@@ -73,12 +73,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
         return res.status(409).json({ message: "Email already exists" });
       }
-      
+
       // Handle validation errors
       if (error instanceof Error && error.name === 'ZodError') {
         return res.status(400).json({ message: "Invalid input data", errors: error.message });
       }
-      
+
       res.status(500).json({ message: "Failed to create user" });
     }
   });
@@ -86,29 +86,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/signin", async (req, res) => {
     try {
       const validatedData = signinSchema.parse(req.body);
-      
+
       // Find user by email (email is already normalized by schema)
       const user = await storage.getUserByEmail(validatedData.email);
       if (!user) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
-      
+
       // Verify password
       const isValidPassword = await bcrypt.compare(validatedData.password, user.passwordHash);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
-      
+
       // Generate JWT token (JWT_SECRET is validated at startup)
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         JWT_SECRET,
         { expiresIn: "24h" }
       );
-      
+
       // Remove password hash from response
       const { passwordHash: _, ...userResponse } = user;
-      
+
       res.json({
         message: "Login successful",
         token,
@@ -121,8 +121,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof Error && error.name === 'ZodError') {
         return res.status(400).json({ message: "Invalid email or password format" });
       }
-      
+
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Change password route
+  app.post("/api/change-password", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Authorization token required" });
+      }
+
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string; email: string };
+
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current password and new password are required" });
+      }
+
+      // Get user from database
+      const user = await storage.getUser(decoded.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify current password
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Hash new password
+      const saltRounds = 12;
+      const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update user password
+      await storage.updateUser(decoded.userId, { passwordHash: newPasswordHash });
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      res.status(500).json({ message: "Failed to update password" });
     }
   });
 
@@ -170,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update daily stats
       const today = new Date().toISOString().split('T')[0];
       let dailyStats = await storage.getDailyStats(validatedData.userId, today);
-      
+
       if (!dailyStats) {
         dailyStats = await storage.createDailyStats({
           userId: validatedData.userId,
@@ -184,9 +229,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const correctCount = validatedData.isCorrect === 'true' 
           ? Math.floor((dailyStats.accuracyRate || 0) * (dailyStats.exercicesCompleted || 0) / 100) + 1
           : Math.floor((dailyStats.accuracyRate || 0) * (dailyStats.exercicesCompleted || 0) / 100);
-        
+
         const newAccuracy = Math.round((correctCount / newExercisesCount) * 100);
-        
+
         await storage.updateDailyStats(dailyStats.id, {
           exercicesCompleted: newExercisesCount,
           accuracyRate: newAccuracy,
@@ -196,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user progress
       let userProgress = await storage.getUserProgressForPhrase(validatedData.userId, validatedData.phraseId);
-      
+
       if (!userProgress) {
         userProgress = await storage.createUserProgress({
           userId: validatedData.userId,
@@ -276,13 +321,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { exerciseType } = req.params;
       const { category, difficulty } = req.query;
-      
+
       let phrases = await storage.getAllPhrases();
-      
+
       if (category && typeof category === 'string') {
         phrases = phrases.filter(p => p.category === category);
       }
-      
+
       if (difficulty && typeof difficulty === 'string') {
         const diff = parseInt(difficulty);
         phrases = phrases.filter(p => p.difficulty === diff);
@@ -303,9 +348,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/question-banks", async (req, res) => {
     try {
       const { category, theme, tags } = req.query;
-      
+
       let questionBanks;
-      
+
       if (category && typeof category === 'string') {
         questionBanks = await storage.getQuestionBanksByCategory(category);
       } else if (theme && typeof theme === 'string') {
@@ -316,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         questionBanks = await storage.getAllQuestionBanks();
       }
-      
+
       res.json(questionBanks);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch question banks" });
@@ -349,13 +394,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/question-banks/random/thematic", async (req, res) => {
     try {
       const { category, difficulty } = req.query;
-      
+
       let questionBanks = await storage.getAllQuestionBanks();
-      
+
       if (category && typeof category === 'string') {
         questionBanks = questionBanks.filter(qb => qb.category === category);
       }
-      
+
       if (difficulty && typeof difficulty === 'string') {
         const diff = parseInt(difficulty);
         questionBanks = questionBanks.filter(qb => qb.difficulty === diff);
@@ -366,13 +411,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const randomQuestionBank = questionBanks[Math.floor(Math.random() * questionBanks.length)];
-      
+
       // Get the associated phrases for this question bank
       const allPhrases = await storage.getAllPhrases();
       const associatedPhrases = allPhrases.filter(phrase => 
         randomQuestionBank.correctPhraseIds.includes(phrase.id)
       );
-      
+
       res.json({
         ...randomQuestionBank,
         associatedPhrases

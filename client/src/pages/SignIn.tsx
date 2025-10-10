@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [, setLocation] = useLocation();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +34,9 @@ const SignIn = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Store the JWT token and user data in localStorage
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        // Use the signIn function from the auth hook
+        signIn(data.user, data.token);
+
         // Redirect to dashboard or home page
         setLocation('/');
       } else {

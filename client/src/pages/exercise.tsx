@@ -29,48 +29,52 @@ export default function Exercise() {
   const [feedback, setFeedback] = useState("");
 
   // Fetch data based on exercise type
-  const isThematicExercise = exerciseType === 'thematic';
-  
+  const isThematicExercise = exerciseType === "thematic";
+
   // For thematic exercises, fetch question banks; for others, fetch phrases
   const { data: phrase, isLoading: phraseLoading } = useQuery<Phrase>({
-    queryKey: phraseId ? ['/api/phrases', phraseId] : ['/api/phrases/random', exerciseType],
+    queryKey: phraseId
+      ? ["/api/phrases", phraseId]
+      : ["/api/phrases/random", exerciseType],
     enabled: !!exerciseType && !isThematicExercise,
   });
-  
-  const { data: questionBank, isLoading: questionBankLoading } = useQuery<QuestionBank & { associatedPhrases: Phrase[] }>({
-    queryKey: ['/api/question-banks/random/thematic'],
+
+  const { data: questionBank, isLoading: questionBankLoading } = useQuery<
+    QuestionBank & { associatedPhrases: Phrase[] }
+  >({
+    queryKey: ["/api/question-banks/random/thematic"],
     enabled: !!exerciseType && isThematicExercise,
   });
-  
+
   const isLoading = isThematicExercise ? questionBankLoading : phraseLoading;
   const exerciseData = isThematicExercise ? questionBank : phrase;
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
-    mutationFn: async (data: { 
-      userId: string; 
-      exerciseType: string; 
-      phraseId: string; 
-      userAnswer: string; 
-      correctAnswer: string; 
-      isCorrect: string; 
+    mutationFn: async (data: {
+      userId: string;
+      exerciseType: string;
+      phraseId: string;
+      userAnswer: string;
+      correctAnswer: string;
+      isCorrect: string;
     }) => {
       const response = await apiRequest("POST", "/api/exercise-sessions", data);
       return response.json();
     },
     onSuccess: () => {
       // Invalidate relevant queries to update stats
-      queryClient.invalidateQueries({ queryKey: ['/api/daily-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user-progress'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/weekly-stats'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/weekly-stats"] });
     },
   });
 
-  const exerciseConfig = getExerciseType(exerciseType || '');
+  const exerciseConfig = getExerciseType(exerciseType || "");
 
   useEffect(() => {
     if (!exerciseType || !exerciseConfig) {
-      setLocation('/');
+      setLocation("/");
     }
   }, [exerciseType, exerciseConfig, setLocation]);
 
@@ -87,7 +91,10 @@ export default function Exercise() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Exercise not found</p>
-          <Button onClick={() => setLocation('/')} data-testid="button-back-home">
+          <Button
+            onClick={() => setLocation("/")}
+            data-testid="button-back-home"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
@@ -101,7 +108,7 @@ export default function Exercise() {
       toast({
         title: "No answer provided",
         description: "Please provide an answer before submitting.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -111,74 +118,92 @@ export default function Exercise() {
     let feedbackMessage = "";
 
     switch (exerciseType) {
-      case 'substitution':
+      case "substitution":
         // Simple check for Arabic text (any meaningful Arabic input)
         correct = /[\u0600-\u06FF]/.test(userAnswer);
         correctAnswer = "Any valid Arabic attribute";
-        feedbackMessage = correct 
+        feedbackMessage = correct
           ? "Good! You provided an Arabic attribute."
           : "Please provide an Arabic word or phrase.";
         break;
 
-      case 'conversation':
+      case "conversation":
         // Check if response contains Arabic and relates to the context
         correct = /[\u0600-\u06FF]/.test(userAnswer) && userAnswer.length > 5;
         correctAnswer = "وَاللَّهُ بِمَا تَعۡمَلُونَ بَصِيرٌ";
-        feedbackMessage = correct 
+        feedbackMessage = correct
           ? "Excellent use of Quranic Arabic in conversation!"
           : "Try using a relevant Quranic verse in Arabic.";
         break;
 
-      case 'completion':
+      case "completion":
         // Check against common completions
-        const validCompletions = ['المحسنين', 'المتوكلين', 'الصابرين', 'المقسطين'];
-        correct = validCompletions.some(completion => userAnswer.includes(completion));
-        correctAnswer = validCompletions.join(' or ');
-        feedbackMessage = correct 
+        const validCompletions = [
+          "المحسنين",
+          "المتوكلين",
+          "الصابرين",
+          "المقسطين",
+        ];
+        correct = validCompletions.some((completion) =>
+          userAnswer.includes(completion),
+        );
+        correctAnswer = validCompletions.join(" or ");
+        feedbackMessage = correct
           ? "Perfect! You completed the verse correctly."
           : "Try one of the common attributes that Allah loves.";
         break;
 
-      case 'comparison':
+      case "comparison":
         // Check for meaningful Arabic explanation
         correct = /[\u0600-\u06FF]/.test(userAnswer) && userAnswer.length > 10;
-        correctAnswer = "Explanation in Arabic showing understanding of differences";
-        feedbackMessage = correct 
+        correctAnswer =
+          "Explanation in Arabic showing understanding of differences";
+        feedbackMessage = correct
           ? "Great analysis! You explained the difference well."
           : "Provide a more detailed explanation in Arabic.";
         break;
 
-      case 'roleplay':
+      case "roleplay":
         // Check for comforting Quranic verse
-        correct = /[\u0600-\u06FF]/.test(userAnswer) && 
-                 (userAnswer.includes('العسر') || userAnswer.includes('الله') || userAnswer.includes('الصبر'));
+        correct =
+          /[\u0600-\u06FF]/.test(userAnswer) &&
+          (userAnswer.includes("العسر") ||
+            userAnswer.includes("الله") ||
+            userAnswer.includes("الصبر"));
         correctAnswer = "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا";
-        feedbackMessage = correct 
+        feedbackMessage = correct
           ? "Beautiful! You used an appropriate verse for comfort."
           : "Try using a verse about patience, hope, or Allah's help.";
         break;
 
-      case 'transformation':
+      case "transformation":
         // Check if converted to question form
-        correct = userAnswer.includes('من') || userAnswer.includes('ما') || userAnswer.includes('متى') || userAnswer.includes('؟');
+        correct =
+          userAnswer.includes("من") ||
+          userAnswer.includes("ما") ||
+          userAnswer.includes("متى") ||
+          userAnswer.includes("؟");
         correctAnswer = "مَن يُحِبُّ اللَّهُ؟";
-        feedbackMessage = correct 
+        feedbackMessage = correct
           ? "Excellent transformation to question form!"
           : "Convert the statement to a question using question words.";
         break;
 
-      case 'thematic':
+      case "thematic":
         // For thematic exercises, check if user answer matches any of the associated phrases
         if (isThematicExercise && questionBank) {
           const associatedPhrases = questionBank.associatedPhrases || [];
-          correct = associatedPhrases.some(phrase => 
-            phrase.arabicText.includes(userAnswer.trim()) || 
-            userAnswer.includes(phrase.arabicText.substring(0, 10))
+          correct = associatedPhrases.some(
+            (phrase) =>
+              phrase.arabicText.includes(userAnswer.trim()) ||
+              userAnswer.includes(phrase.arabicText.substring(0, 10)),
           );
-          correctAnswer = associatedPhrases.map(p => p.arabicText).join(' أو ');
-          feedbackMessage = correct 
+          correctAnswer = associatedPhrases
+            .map((p) => p.arabicText)
+            .join(" أو ");
+          feedbackMessage = correct
             ? `Perfect! You provided a relevant verse for "${questionBank.themeEnglish}".`
-            : `Think of verses related to "${questionBank.themeEnglish}". Any of these would work: ${associatedPhrases.map(p => p.surahAyah).join(', ')}`;
+            : `Think of verses related to "${questionBank.themeEnglish}". Any of these would work: ${associatedPhrases.map((p) => p.surahAyah).join(", ")}`;
         } else {
           correct = false;
           correctAnswer = "Question bank not loaded";
@@ -197,20 +222,23 @@ export default function Exercise() {
     setIsAnswered(true);
 
     // Submit the session
-    const dataId = isThematicExercise && questionBank ? questionBank.id : (phrase?.id || 'unknown');
+    const dataId =
+      isThematicExercise && questionBank
+        ? questionBank.id
+        : phrase?.id || "unknown";
     submitSessionMutation.mutate({
       userId: DEMO_USER_ID,
-      exerciseType: exerciseType || '',
+      exerciseType: exerciseType || "",
       phraseId: dataId,
       userAnswer,
       correctAnswer,
-      isCorrect: correct ? 'true' : 'false'
+      isCorrect: correct ? "true" : "false",
     });
 
     toast({
       title: correct ? "Correct!" : "Try Again",
       description: feedbackMessage,
-      variant: correct ? "default" : "destructive"
+      variant: correct ? "default" : "destructive",
     });
   };
 
@@ -223,7 +251,7 @@ export default function Exercise() {
 
   const goToNextExercise = () => {
     // Navigate to a random exercise
-    setLocation('/');
+    setLocation("/dashboard");
   };
 
   const renderExerciseContent = () => {
@@ -231,20 +259,33 @@ export default function Exercise() {
       return (
         <div className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-3 text-foreground" data-testid="text-question-theme">
+            <h3
+              className="text-lg font-semibold mb-3 text-foreground"
+              data-testid="text-question-theme"
+            >
               {questionBank.theme}
             </h3>
-            <p className="text-muted-foreground mb-3" data-testid="text-question-theme-english">
+            <p
+              className="text-muted-foreground mb-3"
+              data-testid="text-question-theme-english"
+            >
               {questionBank.themeEnglish}
             </p>
-            <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-question-display">
-              {questionBank.description || 'سؤال موضوعي'}
+            <p
+              className="arabic-text text-xl text-foreground mb-3"
+              lang="ar"
+              data-testid="text-question-display"
+            >
+              {questionBank.description || "سؤال موضوعي"}
             </p>
-            <p className="text-muted-foreground" data-testid="text-question-english">
+            <p
+              className="text-muted-foreground"
+              data-testid="text-question-english"
+            >
               What Quranic verse would you use in this situation?
             </p>
             <div className="mt-4 text-sm text-muted-foreground">
-              <p>Related themes: {questionBank.tags?.join(', ') || 'None'}</p>
+              <p>Related themes: {questionBank.tags?.join(", ") || "None"}</p>
             </div>
           </div>
           <div className="space-y-3">
@@ -265,18 +306,25 @@ export default function Exercise() {
         </div>
       );
     }
-    
+
     if (!phrase) return null;
-    
+
     switch (exerciseType) {
-      case 'substitution':
+      case "substitution":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-phrase-display">
+              <p
+                className="arabic-text text-xl text-foreground mb-3"
+                lang="ar"
+                data-testid="text-phrase-display"
+              >
                 {phrase.arabicText}
               </p>
-              <p className="text-muted-foreground" data-testid="text-phrase-translation">
+              <p
+                className="text-muted-foreground"
+                data-testid="text-phrase-translation"
+              >
                 {phrase.englishTranslation}
               </p>
             </div>
@@ -294,12 +342,17 @@ export default function Exercise() {
           </div>
         );
 
-      case 'conversation':
+      case "conversation":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-foreground font-medium mb-2">How do you say in Arabic:</p>
-              <p className="text-lg text-foreground" data-testid="text-conversation-prompt">
+              <p className="text-foreground font-medium mb-2">
+                How do you say in Arabic:
+              </p>
+              <p
+                className="text-lg text-foreground"
+                data-testid="text-conversation-prompt"
+              >
                 "God is watching everything you do"
               </p>
             </div>
@@ -317,52 +370,72 @@ export default function Exercise() {
           </div>
         );
 
-      case 'completion':
+      case "completion":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-completion-prompt">
+              <p
+                className="arabic-text text-xl text-foreground mb-3"
+                lang="ar"
+                data-testid="text-completion-prompt"
+              >
                 إِنَّ اللَّهَ يُحِبُّ ...
               </p>
               <p className="text-muted-foreground">Indeed, Allah loves...</p>
             </div>
             <p className="text-foreground">Complete the verse:</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              {['المحسنين', 'المتوكلين', 'الصابرين', 'المقسطين'].map((option, index) => (
-                <Button
-                  key={index}
-                  variant={userAnswer === option ? "default" : "outline"}
-                  className="arabic-text text-lg p-4 h-auto"
-                  onClick={() => setUserAnswer(option)}
-                  disabled={isAnswered}
-                  data-testid={`button-completion-option-${index}`}
-                >
-                  {option}
-                </Button>
-              ))}
+              {["المحسنين", "المتوكلين", "الصابرين", "المقسطين"].map(
+                (option, index) => (
+                  <Button
+                    key={index}
+                    variant={userAnswer === option ? "default" : "outline"}
+                    className="arabic-text text-lg p-4 h-auto"
+                    onClick={() => setUserAnswer(option)}
+                    disabled={isAnswered}
+                    data-testid={`button-completion-option-${index}`}
+                  >
+                    {option}
+                  </Button>
+                ),
+              )}
             </div>
           </div>
         );
 
-      case 'comparison':
+      case "comparison":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4 space-y-4">
               <div>
-                <p className="arabic-text text-lg text-foreground mb-2" lang="ar" data-testid="text-comparison-verse1">
+                <p
+                  className="arabic-text text-lg text-foreground mb-2"
+                  lang="ar"
+                  data-testid="text-comparison-verse1"
+                >
                   إِنَّ مَعَ الْعُسْرِ يُسْرًا
                 </p>
-                <p className="text-sm text-muted-foreground">Indeed, with hardship comes ease</p>
+                <p className="text-sm text-muted-foreground">
+                  Indeed, with hardship comes ease
+                </p>
               </div>
               <hr className="border-border" />
               <div>
-                <p className="arabic-text text-lg text-foreground mb-2" lang="ar" data-testid="text-comparison-verse2">
+                <p
+                  className="arabic-text text-lg text-foreground mb-2"
+                  lang="ar"
+                  data-testid="text-comparison-verse2"
+                >
                   إِنَّ اللَّهَ مَعَ الصَّابِرِينَ
                 </p>
-                <p className="text-sm text-muted-foreground">Indeed, Allah is with the patient</p>
+                <p className="text-sm text-muted-foreground">
+                  Indeed, Allah is with the patient
+                </p>
               </div>
             </div>
-            <p className="text-foreground">Explain the difference between these verses in Arabic:</p>
+            <p className="text-foreground">
+              Explain the difference between these verses in Arabic:
+            </p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[120px]"
               placeholder="اشرح الفرق بين الآيتين..."
@@ -374,7 +447,7 @@ export default function Exercise() {
           </div>
         );
 
-      case 'roleplay':
+      case "roleplay":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
@@ -382,9 +455,13 @@ export default function Exercise() {
                 <span className="text-2xl">👥</span>
                 <div>
                   <p className="text-foreground font-medium mb-2">Scenario:</p>
-                  <p className="text-foreground" data-testid="text-roleplay-scenario">
-                    Your friend is going through a difficult time and feels hopeless. 
-                    Console them using an appropriate Quranic verse that offers hope and comfort.
+                  <p
+                    className="text-foreground"
+                    data-testid="text-roleplay-scenario"
+                  >
+                    Your friend is going through a difficult time and feels
+                    hopeless. Console them using an appropriate Quranic verse
+                    that offers hope and comfort.
                   </p>
                 </div>
               </div>
@@ -401,16 +478,24 @@ export default function Exercise() {
           </div>
         );
 
-      case 'transformation':
+      case "transformation":
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground mb-2">Statement:</p>
-              <p className="arabic-text text-xl text-foreground mb-3" lang="ar" data-testid="text-transformation-statement">
-                {phrase?.arabicText || 'Loading...'}
+              <p
+                className="arabic-text text-xl text-foreground mb-3"
+                lang="ar"
+                data-testid="text-transformation-statement"
+              >
+                {phrase?.arabicText || "Loading..."}
               </p>
-              <p className="text-muted-foreground mb-4">{phrase?.englishTranslation || 'Loading...'}</p>
-              <p className="text-sm text-muted-foreground">Convert this statement to a question:</p>
+              <p className="text-muted-foreground mb-4">
+                {phrase?.englishTranslation || "Loading..."}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Convert this statement to a question:
+              </p>
             </div>
             <Input
               className="arabic-text text-right text-lg"
@@ -434,19 +519,24 @@ export default function Exercise() {
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Button 
-              variant="ghost" 
-              onClick={() => setLocation('/')}
+            <Button
+              variant="ghost"
+              onClick={() => setLocation("/")}
               data-testid="button-back-dashboard"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
             <div className="text-center">
-              <h1 className="text-lg font-semibold text-foreground" data-testid="text-exercise-title">
+              <h1
+                className="text-lg font-semibold text-foreground"
+                data-testid="text-exercise-title"
+              >
                 {exerciseConfig?.title}
               </h1>
-              <p className="text-sm text-muted-foreground">{exerciseConfig?.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {exerciseConfig?.description}
+              </p>
             </div>
             <div className="w-20" /> {/* Spacer for centering */}
           </div>
@@ -461,10 +551,12 @@ export default function Exercise() {
               <span>Exercise</span>
               <div className="flex items-center space-x-2">
                 {isThematicExercise && questionBank ? (
-                  <span className="text-sm text-muted-foreground">Thematic Question</span>
+                  <span className="text-sm text-muted-foreground">
+                    Thematic Question
+                  </span>
                 ) : phrase ? (
-                  <AudioButton 
-                    text={phrase.arabicText} 
+                  <AudioButton
+                    text={phrase.arabicText}
                     lang="ar-SA"
                     data-testid="button-audio-phrase"
                   />
@@ -477,26 +569,37 @@ export default function Exercise() {
 
             {/* Feedback */}
             {isAnswered && (
-              <div className={`mt-6 p-4 rounded-lg border ${
-                isCorrect 
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
-                  : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-              }`}>
+              <div
+                className={`mt-6 p-4 rounded-lg border ${
+                  isCorrect
+                    ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                    : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                }`}
+              >
                 <div className="flex items-center space-x-2 mb-2">
                   {isCorrect ? (
                     <Check className="h-5 w-5 text-green-600" />
                   ) : (
                     <X className="h-5 w-5 text-red-600" />
                   )}
-                  <span className={`font-medium ${
-                    isCorrect ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
-                  }`}>
-                    {isCorrect ? 'Correct!' : 'Try Again'}
+                  <span
+                    className={`font-medium ${
+                      isCorrect
+                        ? "text-green-800 dark:text-green-200"
+                        : "text-red-800 dark:text-red-200"
+                    }`}
+                  >
+                    {isCorrect ? "Correct!" : "Try Again"}
                   </span>
                 </div>
-                <p className={`text-sm ${
-                  isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
-                }`} data-testid="text-exercise-feedback">
+                <p
+                  className={`text-sm ${
+                    isCorrect
+                      ? "text-green-700 dark:text-green-300"
+                      : "text-red-700 dark:text-red-300"
+                  }`}
+                  data-testid="text-exercise-feedback"
+                >
                   {feedback}
                 </p>
               </div>
@@ -504,8 +607,8 @@ export default function Exercise() {
 
             {/* Action Buttons */}
             <div className="flex justify-between items-center mt-6">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={resetExercise}
                 disabled={!isAnswered}
                 data-testid="button-reset-exercise"
@@ -516,7 +619,7 @@ export default function Exercise() {
 
               <div className="space-x-2">
                 {!isAnswered ? (
-                  <Button 
+                  <Button
                     onClick={checkAnswer}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     data-testid="button-check-answer"
@@ -524,7 +627,7 @@ export default function Exercise() {
                     Check Answer
                   </Button>
                 ) : (
-                  <Button 
+                  <Button
                     onClick={goToNextExercise}
                     className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
                     data-testid="button-next-exercise"
@@ -542,7 +645,7 @@ export default function Exercise() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {isThematicExercise ? 'About This Question' : 'About This Phrase'}
+              {isThematicExercise ? "About This Question" : "About This Phrase"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -550,50 +653,101 @@ export default function Exercise() {
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Theme</p>
-                    <p className="text-foreground" data-testid="text-question-theme">{questionBank.themeEnglish}</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Theme
+                    </p>
+                    <p
+                      className="text-foreground"
+                      data-testid="text-question-theme"
+                    >
+                      {questionBank.themeEnglish}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Difficulty</p>
-                    <p className="text-foreground" data-testid="text-question-difficulty">{questionBank.difficulty}/5</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Difficulty
+                    </p>
+                    <p
+                      className="text-foreground"
+                      data-testid="text-question-difficulty"
+                    >
+                      {questionBank.difficulty}/5
+                    </p>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
-                  <p className="text-foreground" data-testid="text-question-description">{questionBank.description}</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    Description
+                  </p>
+                  <p
+                    className="text-foreground"
+                    data-testid="text-question-description"
+                  >
+                    {questionBank.description}
+                  </p>
                 </div>
-                {questionBank.associatedPhrases && questionBank.associatedPhrases.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Acceptable Answers</p>
-                    <div className="space-y-1">
-                      {questionBank.associatedPhrases.map((phrase, index) => (
-                        <p key={index} className="text-sm text-muted-foreground" data-testid={`text-acceptable-answer-${index}`}>
-                          {phrase.surahAyah}: {phrase.englishTranslation}
-                        </p>
-                      ))}
+                {questionBank.associatedPhrases &&
+                  questionBank.associatedPhrases.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Acceptable Answers
+                      </p>
+                      <div className="space-y-1">
+                        {questionBank.associatedPhrases.map((phrase, index) => (
+                          <p
+                            key={index}
+                            className="text-sm text-muted-foreground"
+                            data-testid={`text-acceptable-answer-${index}`}
+                          >
+                            {phrase.surahAyah}: {phrase.englishTranslation}
+                          </p>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ) : phrase ? (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Source</p>
-                    <p className="text-foreground" data-testid="text-phrase-source">{phrase.surahAyah}</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Source
+                    </p>
+                    <p
+                      className="text-foreground"
+                      data-testid="text-phrase-source"
+                    >
+                      {phrase.surahAyah}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Category</p>
-                    <p className="text-foreground capitalize" data-testid="text-phrase-category">{phrase.category}</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Category
+                    </p>
+                    <p
+                      className="text-foreground capitalize"
+                      data-testid="text-phrase-category"
+                    >
+                      {phrase.category}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Life Application</p>
-                  <p className="text-foreground" data-testid="text-phrase-application">{phrase.lifeApplication}</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    Life Application
+                  </p>
+                  <p
+                    className="text-foreground"
+                    data-testid="text-phrase-application"
+                  >
+                    {phrase.lifeApplication}
+                  </p>
                 </div>
               </div>
             ) : (
-              <p className="text-muted-foreground">Loading context information...</p>
+              <p className="text-muted-foreground">
+                Loading context information...
+              </p>
             )}
           </CardContent>
         </Card>

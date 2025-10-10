@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [, setLocation] = useLocation();
+  const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",

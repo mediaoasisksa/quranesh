@@ -1,4 +1,23 @@
-import { users, phrases, userProgress, exerciseSessions, dailyStats, questionBanks, type User, type InsertUser, type Phrase, type InsertPhrase, type UserProgress, type InsertUserProgress, type ExerciseSession, type InsertExerciseSession, type DailyStats, type InsertDailyStats, type QuestionBank, type InsertQuestionBank } from "@shared/schema";
+import {
+  users,
+  phrases,
+  userProgress,
+  exerciseSessions,
+  dailyStats,
+  questionBanks,
+  type User,
+  type InsertUser,
+  type Phrase,
+  type InsertPhrase,
+  type UserProgress,
+  type InsertUserProgress,
+  type ExerciseSession,
+  type InsertExerciseSession,
+  type DailyStats,
+  type InsertDailyStats,
+  type QuestionBank,
+  type InsertQuestionBank,
+} from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
@@ -8,6 +27,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
 
   // Phrase methods
   getAllPhrases(): Promise<Phrase[]>;
@@ -17,19 +37,30 @@ export interface IStorage {
 
   // User progress methods
   getUserProgress(userId: string): Promise<UserProgress[]>;
-  getUserProgressForPhrase(userId: string, phraseId: string): Promise<UserProgress | undefined>;
+  getUserProgressForPhrase(
+    userId: string,
+    phraseId: string,
+  ): Promise<UserProgress | undefined>;
   createUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-  updateUserProgress(id: string, progress: Partial<UserProgress>): Promise<UserProgress | undefined>;
+  updateUserProgress(
+    id: string,
+    progress: Partial<UserProgress>,
+  ): Promise<UserProgress | undefined>;
 
   // Exercise session methods
-  createExerciseSession(session: InsertExerciseSession): Promise<ExerciseSession>;
+  createExerciseSession(
+    session: InsertExerciseSession,
+  ): Promise<ExerciseSession>;
   getUserExerciseSessions(userId: string): Promise<ExerciseSession[]>;
   getRecentSessions(userId: string, limit: number): Promise<ExerciseSession[]>;
 
   // Daily stats methods
   getDailyStats(userId: string, date: string): Promise<DailyStats | undefined>;
   createDailyStats(stats: InsertDailyStats): Promise<DailyStats>;
-  updateDailyStats(id: string, stats: Partial<DailyStats>): Promise<DailyStats | undefined>;
+  updateDailyStats(
+    id: string,
+    stats: Partial<DailyStats>,
+  ): Promise<DailyStats | undefined>;
   getWeeklyStats(userId: string): Promise<DailyStats[]>;
 
   // Question bank methods
@@ -54,11 +85,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
+    const [updated] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   // Continue with other methods...
@@ -67,7 +104,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPhrasesByCategory(category: string): Promise<Phrase[]> {
-    return await db.select().from(phrases).where(eq(phrases.category, category));
+    return await db
+      .select()
+      .from(phrases)
+      .where(eq(phrases.category, category));
   }
 
   async getPhrase(id: string): Promise<Phrase | undefined> {
@@ -76,26 +116,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPhrase(insertPhrase: InsertPhrase): Promise<Phrase> {
-    const [phrase] = await db
-      .insert(phrases)
-      .values(insertPhrase)
-      .returning();
+    const [phrase] = await db.insert(phrases).values(insertPhrase).returning();
     return phrase;
   }
 
   async getUserProgress(userId: string): Promise<UserProgress[]> {
-    return await db.select().from(userProgress).where(eq(userProgress.userId, userId));
+    return await db
+      .select()
+      .from(userProgress)
+      .where(eq(userProgress.userId, userId));
   }
 
-  async getUserProgressForPhrase(userId: string, phraseId: string): Promise<UserProgress | undefined> {
+  async getUserProgressForPhrase(
+    userId: string,
+    phraseId: string,
+  ): Promise<UserProgress | undefined> {
     const [progress] = await db
       .select()
       .from(userProgress)
-      .where(and(eq(userProgress.userId, userId), eq(userProgress.phraseId, phraseId)));
+      .where(
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.phraseId, phraseId),
+        ),
+      );
     return progress || undefined;
   }
 
-  async createUserProgress(insertProgress: InsertUserProgress): Promise<UserProgress> {
+  async createUserProgress(
+    insertProgress: InsertUserProgress,
+  ): Promise<UserProgress> {
     const [progress] = await db
       .insert(userProgress)
       .values(insertProgress)
@@ -103,7 +153,10 @@ export class DatabaseStorage implements IStorage {
     return progress;
   }
 
-  async updateUserProgress(id: string, updateData: Partial<UserProgress>): Promise<UserProgress | undefined> {
+  async updateUserProgress(
+    id: string,
+    updateData: Partial<UserProgress>,
+  ): Promise<UserProgress | undefined> {
     const [updated] = await db
       .update(userProgress)
       .set(updateData)
@@ -112,7 +165,9 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
-  async createExerciseSession(insertSession: InsertExerciseSession): Promise<ExerciseSession> {
+  async createExerciseSession(
+    insertSession: InsertExerciseSession,
+  ): Promise<ExerciseSession> {
     const [session] = await db
       .insert(exerciseSessions)
       .values(insertSession)
@@ -121,10 +176,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserExerciseSessions(userId: string): Promise<ExerciseSession[]> {
-    return await db.select().from(exerciseSessions).where(eq(exerciseSessions.userId, userId));
+    return await db
+      .select()
+      .from(exerciseSessions)
+      .where(eq(exerciseSessions.userId, userId));
   }
 
-  async getRecentSessions(userId: string, limit: number): Promise<ExerciseSession[]> {
+  async getRecentSessions(
+    userId: string,
+    limit: number,
+  ): Promise<ExerciseSession[]> {
     return await db
       .select()
       .from(exerciseSessions)
@@ -133,7 +194,10 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
 
-  async getDailyStats(userId: string, date: string): Promise<DailyStats | undefined> {
+  async getDailyStats(
+    userId: string,
+    date: string,
+  ): Promise<DailyStats | undefined> {
     const [stats] = await db
       .select()
       .from(dailyStats)
@@ -142,14 +206,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDailyStats(insertStats: InsertDailyStats): Promise<DailyStats> {
-    const [stats] = await db
-      .insert(dailyStats)
-      .values(insertStats)
-      .returning();
+    const [stats] = await db.insert(dailyStats).values(insertStats).returning();
     return stats;
   }
 
-  async updateDailyStats(id: string, updateData: Partial<DailyStats>): Promise<DailyStats | undefined> {
+  async updateDailyStats(
+    id: string,
+    updateData: Partial<DailyStats>,
+  ): Promise<DailyStats | undefined> {
     const [updated] = await db
       .update(dailyStats)
       .set(updateData)
@@ -172,15 +236,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getQuestionBanksByCategory(category: string): Promise<QuestionBank[]> {
-    return await db.select().from(questionBanks).where(eq(questionBanks.category, category));
+    return await db
+      .select()
+      .from(questionBanks)
+      .where(eq(questionBanks.category, category));
   }
 
   async getQuestionBank(id: string): Promise<QuestionBank | undefined> {
-    const [questionBank] = await db.select().from(questionBanks).where(eq(questionBanks.id, id));
+    const [questionBank] = await db
+      .select()
+      .from(questionBanks)
+      .where(eq(questionBanks.id, id));
     return questionBank || undefined;
   }
 
-  async createQuestionBank(insertQuestionBank: InsertQuestionBank): Promise<QuestionBank> {
+  async createQuestionBank(
+    insertQuestionBank: InsertQuestionBank,
+  ): Promise<QuestionBank> {
     const [questionBank] = await db
       .insert(questionBanks)
       .values(insertQuestionBank)
@@ -222,9 +294,7 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    return Array.from(this.users.values()).find((user) => user.email === email);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -235,6 +305,15 @@ export class MemStorage implements IStorage {
     return user;
   }
 
+  async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
+    const existing = this.users.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...data, updatedAt: new Date() };
+    this.users.set(id, updated);
+    return updated;
+  }
+
   // Phrase methods
   async getAllPhrases(): Promise<Phrase[]> {
     return Array.from(this.phrases.values());
@@ -242,7 +321,7 @@ export class MemStorage implements IStorage {
 
   async getPhrasesByCategory(category: string): Promise<Phrase[]> {
     return Array.from(this.phrases.values()).filter(
-      (phrase) => phrase.category === category
+      (phrase) => phrase.category === category,
     );
   }
 
@@ -260,58 +339,82 @@ export class MemStorage implements IStorage {
   // User progress methods
   async getUserProgress(userId: string): Promise<UserProgress[]> {
     return Array.from(this.userProgress.values()).filter(
-      (progress) => progress.userId === userId
+      (progress) => progress.userId === userId,
     );
   }
 
-  async getUserProgressForPhrase(userId: string, phraseId: string): Promise<UserProgress | undefined> {
+  async getUserProgressForPhrase(
+    userId: string,
+    phraseId: string,
+  ): Promise<UserProgress | undefined> {
     return Array.from(this.userProgress.values()).find(
-      (progress) => progress.userId === userId && progress.phraseId === phraseId
+      (progress) =>
+        progress.userId === userId && progress.phraseId === phraseId,
     );
   }
 
-  async createUserProgress(insertProgress: InsertUserProgress): Promise<UserProgress> {
+  async createUserProgress(
+    insertProgress: InsertUserProgress,
+  ): Promise<UserProgress> {
     const id = randomUUID();
     const progress: UserProgress = { ...insertProgress, id };
     this.userProgress.set(id, progress);
     return progress;
   }
 
-  async updateUserProgress(id: string, updateData: Partial<UserProgress>): Promise<UserProgress | undefined> {
+  async updateUserProgress(
+    id: string,
+    updateData: Partial<UserProgress>,
+  ): Promise<UserProgress | undefined> {
     const existing = this.userProgress.get(id);
     if (!existing) return undefined;
-    
+
     const updated = { ...existing, ...updateData };
     this.userProgress.set(id, updated);
     return updated;
   }
 
   // Exercise session methods
-  async createExerciseSession(insertSession: InsertExerciseSession): Promise<ExerciseSession> {
+  async createExerciseSession(
+    insertSession: InsertExerciseSession,
+  ): Promise<ExerciseSession> {
     const id = randomUUID();
-    const session: ExerciseSession = { ...insertSession, id, completedAt: new Date() };
+    const session: ExerciseSession = {
+      ...insertSession,
+      id,
+      completedAt: new Date(),
+    };
     this.exerciseSessions.set(id, session);
     return session;
   }
 
   async getUserExerciseSessions(userId: string): Promise<ExerciseSession[]> {
     return Array.from(this.exerciseSessions.values()).filter(
-      (session) => session.userId === userId
+      (session) => session.userId === userId,
     );
   }
 
-  async getRecentSessions(userId: string, limit: number): Promise<ExerciseSession[]> {
+  async getRecentSessions(
+    userId: string,
+    limit: number,
+  ): Promise<ExerciseSession[]> {
     const sessions = Array.from(this.exerciseSessions.values())
       .filter((session) => session.userId === userId)
-      .sort((a, b) => (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0))
+      .sort(
+        (a, b) =>
+          (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0),
+      )
       .slice(0, limit);
     return sessions;
   }
 
   // Daily stats methods
-  async getDailyStats(userId: string, date: string): Promise<DailyStats | undefined> {
+  async getDailyStats(
+    userId: string,
+    date: string,
+  ): Promise<DailyStats | undefined> {
     return Array.from(this.dailyStats.values()).find(
-      (stats) => stats.userId === userId && stats.date === date
+      (stats) => stats.userId === userId && stats.date === date,
     );
   }
 
@@ -322,10 +425,13 @@ export class MemStorage implements IStorage {
     return stats;
   }
 
-  async updateDailyStats(id: string, updateData: Partial<DailyStats>): Promise<DailyStats | undefined> {
+  async updateDailyStats(
+    id: string,
+    updateData: Partial<DailyStats>,
+  ): Promise<DailyStats | undefined> {
     const existing = this.dailyStats.get(id);
     if (!existing) return undefined;
-    
+
     const updated = { ...existing, ...updateData };
     this.dailyStats.set(id, updated);
     return updated;
@@ -334,7 +440,7 @@ export class MemStorage implements IStorage {
   async getWeeklyStats(userId: string): Promise<DailyStats[]> {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     return Array.from(this.dailyStats.values())
       .filter((stats) => stats.userId === userId)
       .sort((a, b) => b.date.localeCompare(a.date))
@@ -348,7 +454,7 @@ export class MemStorage implements IStorage {
 
   async getQuestionBanksByCategory(category: string): Promise<QuestionBank[]> {
     return Array.from(this.questionBanks.values()).filter(
-      (questionBank) => questionBank.category === category
+      (questionBank) => questionBank.category === category,
     );
   }
 
@@ -356,7 +462,9 @@ export class MemStorage implements IStorage {
     return this.questionBanks.get(id);
   }
 
-  async createQuestionBank(insertQuestionBank: InsertQuestionBank): Promise<QuestionBank> {
+  async createQuestionBank(
+    insertQuestionBank: InsertQuestionBank,
+  ): Promise<QuestionBank> {
     const id = randomUUID();
     const questionBank: QuestionBank = { ...insertQuestionBank, id };
     this.questionBanks.set(id, questionBank);
@@ -365,13 +473,15 @@ export class MemStorage implements IStorage {
 
   async getQuestionBanksByTheme(theme: string): Promise<QuestionBank[]> {
     return Array.from(this.questionBanks.values()).filter(
-      (questionBank) => questionBank.theme.includes(theme) || questionBank.themeEnglish.includes(theme)
+      (questionBank) =>
+        questionBank.theme.includes(theme) ||
+        questionBank.themeEnglish.includes(theme),
     );
   }
 
   async searchQuestionBanksByTags(tags: string[]): Promise<QuestionBank[]> {
-    return Array.from(this.questionBanks.values()).filter(
-      (questionBank) => tags.some(tag => questionBank.tags.includes(tag))
+    return Array.from(this.questionBanks.values()).filter((questionBank) =>
+      tags.some((tag) => questionBank.tags.includes(tag)),
     );
   }
 }

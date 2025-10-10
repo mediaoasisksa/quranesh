@@ -12,6 +12,8 @@ import SignUp from "@/pages/SignUp";
 import Features from "@/pages/Features";
 import HowItWorks from "@/pages/HowItWorks";
 import Pricing from "@/pages/Pricing";
+import Profile from "@/pages/Profile";
+import { PaymentSuccess } from "@/pages/payment-success";
 
 function Router() {
   return (
@@ -24,6 +26,8 @@ function Router() {
       <Route path="/exercise/:type/:phraseId?" component={Exercise} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/payment-success" component={PaymentSuccess} />
       <Route component={NotFound} />
     </Switch>
   );
