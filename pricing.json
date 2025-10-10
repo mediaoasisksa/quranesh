@@ -1,0 +1,43 @@
+{
+  "plans": [
+    {
+      "id": "basic",
+      "name": "Basic Plan",
+      "price": 29.99,
+      "currency": "SAR",
+      "duration": "monthly",
+      "features": [
+        "Access to basic Arabic phrases",
+        "Daily exercises",
+        "Progress tracking"
+      ]
+    },
+    {
+      "id": "premium",
+      "name": "Premium Plan",
+      "price": 59.99,
+      "currency": "SAR",
+      "duration": "monthly",
+      "features": [
+        "All basic features",
+        "Advanced exercises",
+        "AI-powered pronunciation",
+        "Personalized learning path",
+        "Priority support"
+      ]
+    },
+    {
+      "id": "lifetime",
+      "name": "Lifetime Access",
+      "price": 299.99,
+      "currency": "SAR",
+      "duration": "lifetime",
+      "features": [
+        "All premium features",
+        "Lifetime access",
+        "Future updates included",
+        "Exclusive content"
+      ]
+    }
+  ]
+}

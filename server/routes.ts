@@ -6,6 +6,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { phrasesData } from "../client/src/lib/phrases-data";
 import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-phrase-mapping";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -123,51 +126,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.status(500).json({ message: "Login failed" });
-    }
-  });
-
-  // Change password route
-  app.post("/api/change-password", async (req, res) => {
-    try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: "Authorization token required" });
-      }
-
-      const token = authHeader.substring(7);
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string; email: string };
-
-      const { currentPassword, newPassword } = req.body;
-
-      if (!currentPassword || !newPassword) {
-        return res.status(400).json({ message: "Current password and new password are required" });
-      }
-
-      // Get user from database
-      const user = await storage.getUser(decoded.userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Verify current password
-      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: "Current password is incorrect" });
-      }
-
-      // Hash new password
-      const saltRounds = 12;
-      const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
-
-      // Update user password
-      await storage.updateUser(decoded.userId, { passwordHash: newPasswordHash });
-
-      res.json({ message: "Password updated successfully" });
-    } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
-      res.status(500).json({ message: "Failed to update password" });
     }
   });
 
@@ -424,6 +382,256 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch random question bank" });
+    }
+  });
+
+  // HyperPay Payment Integration
+  // Load pricing data
+  const pricingPath = path.resolve(import.meta.dirname, "..", "pricing.json");
+  const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
+
+  // HyperPay Configuration
+  const HYPERPAY_CONFIG = {
+    serverUrl: "https://eu-test.oppwa.com",
+    accessToken: "OGFjN2E0Yzk5NGFlZWE0ZDAxOTRiMWU0NWI2ZTAzZmZ8eDlqWjNxMkNOVUxOPVAlSG9waiU=",
+    entityIdVisaMaster: "8ac7a4c994aeea4d0194b1e58b280403",
+    entityIdMada: "8ac7a4c994aeea4d0194b1e6e7090408"
+  };
+
+  // Get pricing plans
+  app.get("/api/pricing", (req, res) => {
+    res.json(pricingData);
+  });
+
+  // Create HyperPay checkout
+  app.post("/api/create-checkout", async (req, res) => {
+    try {
+      const { planId, paymentMethod, customerDetails } = req.body;
+
+      // Find the selected plan
+      const selectedPlan = pricingData.plans.find((plan: any) => plan.id === planId);
+      if (!selectedPlan) {
+        return res.status(400).json({ message: "Invalid plan selected" });
+      }
+
+      // Generate unique transaction ID
+      const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
+
+      // Choose entity ID based on payment method
+      const entityId = paymentMethod === 'MADA' 
+        ? HYPERPAY_CONFIG.entityIdMada 
+        : HYPERPAY_CONFIG.entityIdVisaMaster;
+
+      // Prepare checkout request
+      const checkoutData = {
+        entityId,
+        amount: selectedPlan.price.toFixed(2),
+        currency: selectedPlan.currency,
+        paymentType: 'DB',
+        merchantTransactionId,
+        'customer.email': customerDetails.email,
+        'customer.givenName': customerDetails.givenName,
+        'customer.surname': customerDetails.surname,
+        'billing.street1': customerDetails.street,
+        'billing.city': customerDetails.city,
+        'billing.state': customerDetails.state,
+        'billing.country': customerDetails.country,
+        'billing.postcode': customerDetails.postcode,
+        'customParameters[3DS2_enrolled]': 'true',
+        'shopperResultUrl': 'http://localhost:5000/payment-success'
+      };
+
+      // Add MADA-specific parameters if using MADA
+      if (paymentMethod === 'MADA') {
+        // MADA requires specific redirect URL configuration
+        (checkoutData as any)['customParameters[SHOPPER_ResultUrl]'] = 'http://localhost:5000/payment-success';
+      }
+
+      // Ensure shopperResultUrl is always set for all payment methods
+      checkoutData.shopperResultUrl = 'http://localhost:5000/payment-success';
+
+      // Debug: Log the checkout data being sent
+      console.log('=== CHECKOUT CREATION DEBUG ===');
+      console.log('Payment method:', paymentMethod);
+      console.log('Entity ID being used:', entityId);
+      console.log('Selected plan:', selectedPlan);
+      console.log('Customer details:', customerDetails);
+      console.log('Creating checkout with data:', JSON.stringify(checkoutData, null, 2));
+
+      // Convert checkout data to URL-encoded format for HyperPay
+      const formData = new URLSearchParams();
+      Object.entries(checkoutData).forEach(([key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            formData.append(`${key}.${subKey}`, String(subValue));
+          });
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+
+      console.log('=== FORM DATA BEING SENT ===');
+      console.log('Form data:', formData.toString());
+      console.log('============================');
+
+      // Send request to HyperPay
+      const response = await axios.post(`${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`, formData, {
+        headers: {
+          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      console.log('=== HYPERPAY RESPONSE ===');
+      console.log('Status:', response.status);
+      console.log('Response data:', JSON.stringify(response.data, null, 2));
+      console.log('Checkout ID:', response.data.id);
+      console.log('========================');
+
+      res.json({ 
+        checkoutId: response.data.id,
+        merchantTransactionId,
+        plan: selectedPlan
+      });
+
+    } catch (error) {
+      console.error('HyperPay checkout error:', error);
+      res.status(500).json({ message: "Failed to create checkout" });
+    }
+  });
+
+  // Handle payment status verification
+  app.get("/api/payment-status", async (req, res) => {
+    try {
+      const { resourcePath, entityId } = req.query;
+
+      if (!resourcePath) {
+        return res.status(400).json({ message: "Missing resourcePath parameter" });
+      }
+
+      // Verify payment with HyperPay
+      const response = await axios.get(`${HYPERPAY_CONFIG.serverUrl}${resourcePath}`, {
+        headers: {
+          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`
+        },
+        params: {
+          entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster
+        }
+      });
+
+      const paymentResult = response.data;
+
+      // Check if payment was successful
+      const isSuccessful = paymentResult.result.code.startsWith('000');
+
+      if (isSuccessful) {
+        // Here you would typically:
+        // 1. Update user subscription in database
+        // 2. Send confirmation email
+        // 3. Log the transaction
+
+        res.json({
+          success: true,
+          message: "Payment successful",
+          transactionId: paymentResult.id,
+          amount: paymentResult.amount,
+          currency: paymentResult.currency
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Payment failed",
+          error: paymentResult.result.description
+        });
+      }
+
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      res.status(500).json({ message: "Failed to verify payment" });
+    }
+  });
+
+  // Handle HyperPay redirect after payment
+  // Debug endpoint to validate checkout ID
+  app.get('/api/validate-checkout/:checkoutId', async (req, res) => {
+    try {
+      const { checkoutId } = req.params;
+      console.log('=== VALIDATING CHECKOUT ID ===');
+      console.log('Checkout ID:', checkoutId);
+
+      // Use POST request with proper parameters for HyperPay
+      const formData = new URLSearchParams();
+      formData.append('entityId', HYPERPAY_CONFIG.entityIdVisaMaster);
+      formData.append('amount', '100.00');
+      formData.append('currency', 'SAR');
+      formData.append('paymentType', 'DB');
+      formData.append('merchantTransactionId', `TX${Date.now()}`);
+      formData.append('customer.email', 'test@example.com');
+      formData.append('customer.givenName', 'Test');
+      formData.append('customer.surname', 'User');
+      formData.append('billing.street1', '123 Test Street');
+      formData.append('billing.city', 'Riyadh');
+      formData.append('billing.state', 'Riyadh');
+      formData.append('billing.country', 'SA');
+      formData.append('billing.postcode', '12345');
+      formData.append('customParameters[3DS2_enrolled]', 'true');
+
+      const response = await axios.post(`${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`, formData, {
+        headers: {
+          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      console.log('Validation response:', JSON.stringify(response.data, null, 2));
+      res.json({ 
+        valid: true, 
+        checkoutId,
+        response: response.data 
+      });
+    } catch (error: any) {
+      console.error('Checkout validation error:', error.response?.data || error.message);
+      res.status(400).json({ 
+        valid: false, 
+        error: error.response?.data || error.message 
+      });
+    }
+  });
+
+  app.get("/payment-success", async (req, res) => {
+    try {
+      const { resourcePath, entityId } = req.query;
+
+      if (!resourcePath) {
+        return res.redirect('/pricing?error=missing_parameters');
+      }
+
+      // Verify payment with HyperPay
+      const response = await axios.get(`${HYPERPAY_CONFIG.serverUrl}${resourcePath}`, {
+        headers: {
+          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`
+        },
+        params: {
+          entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster
+        }
+      });
+
+      const paymentResult = response.data;
+
+      // Check if payment was successful
+      const isSuccessful = paymentResult.result.code.startsWith('000');
+
+      if (isSuccessful) {
+        // Redirect to success page with success parameters
+        res.redirect(`/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`);
+      } else {
+        // Redirect to success page with error parameters
+        res.redirect(`/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`);
+      }
+
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      res.redirect('/payment-success?success=false&error=verification_failed');
     }
   });
 

@@ -4,8 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Star } from "lucide-react";
+import { PaymentForm } from "@/components/payment-form";
+import { useState, useEffect } from "react";
 
 const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [pricingPlans, setPricingPlans] = useState<any[]>([]);
+
+  // Load pricing plans from API
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const response = await fetch('/api/pricing');
+        const data = await response.json();
+        setPricingPlans(data.plans);
+      } catch (error) {
+        console.error('Failed to fetch pricing:', error);
+      }
+    };
+    fetchPricing();
+  }, []);
+
+  const handlePlanSelect = (plan: any) => {
+    setSelectedPlan(plan);
+    setShowPaymentForm(true);
+  };
+
+  const handlePaymentSuccess = (result: any) => {
+    // Redirect to success page or dashboard
+    window.location.href = '/payment-success';
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error('Payment error:', error);
+    alert('Payment failed: ' + error);
+  };
+
   const plans = [
     {
       name: "Basic",
@@ -94,6 +129,30 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="pt-20">
+        {/* Payment Form Modal */}
+        {showPaymentForm && selectedPlan && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold">Complete Your Purchase</h2>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setShowPaymentForm(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </Button>
+                </div>
+                <PaymentForm
+                  selectedPlan={selectedPlan}
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onPaymentError={handlePaymentError}
+                />
+              </div>
+            </div>
+          </div>
+        )}
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-6 text-center">
@@ -155,7 +214,20 @@ const Pricing = () => {
                     <Button 
                       variant={plan.buttonVariant} 
                       className="w-full"
-                      onClick={() => window.location.href = '/signup'}
+                      onClick={() => {
+                        if (plan.name === "Basic") {
+                          window.location.href = '/signup';
+                        } else {
+                          // Map to API pricing plans
+                          const apiPlan = pricingPlans.find(p => 
+                            (plan.name === "Standard" && p.id === "premium") ||
+                            (plan.name === "Premium" && p.id === "lifetime")
+                          );
+                          if (apiPlan) {
+                            handlePlanSelect(apiPlan);
+                          }
+                        }
+                      }}
                     >
                       {plan.buttonText}
                     </Button>

@@ -13,6 +13,7 @@ import Features from "@/pages/Features";
 import HowItWorks from "@/pages/HowItWorks";
 import Pricing from "@/pages/Pricing";
 import Profile from "@/pages/profile";
+import { PaymentSuccess } from "@/pages/payment-success";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={Profile} />
+      <Route path="/payment-success" component={PaymentSuccess} />
       <Route component={NotFound} />
     </Switch>
   );
