@@ -690,7 +690,11 @@ function fallbackValidation(
       hasArabic && hasContent && (hasQuranicAttribute || isCompletePhrase);
   } else if (exerciseType === "conversation") {
     // For conversation exercises, check if it's a Quranic verse with semantic relevance
+    console.log("=== CONVERSATION VALIDATION START ===");
+    console.log("Context (English prompt):", context);
+    console.log("User Answer:", userAnswer);
     const englishContext = context.toLowerCase();
+    console.log("English context (lowercase):", englishContext);
 
     // Check if the answer contains Quranic verse patterns
     const hasQuranicPattern =

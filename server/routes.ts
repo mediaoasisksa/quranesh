@@ -29,8 +29,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     );
   }
 
-  // Initialize with phrase data and question banks
+  // Initialize with demo user, phrase data and question banks
   (async () => {
+    // Create demo user if it doesn't exist
+    const demoEmail = "demo@example.com";
+    const existingDemoUser = await storage.getUserByEmail(demoEmail);
+    if (!existingDemoUser) {
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash("password123", saltRounds);
+      await storage.createUser({
+        firstName: "Demo",
+        lastName: "User",
+        email: demoEmail,
+        passwordHash,
+        memorizationLevel: "hafiz",
+        nativeLanguage: "English",
+        learningGoal: "daily_conversation",
+      });
+      console.log("✓ Demo user created: demo@example.com / password123");
+    }
+
     const existingPhrases = await storage.getAllPhrases();
     if (existingPhrases.length === 0) {
       for (const phraseData of phrasesData) {
