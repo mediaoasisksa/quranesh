@@ -509,111 +509,15 @@ function fallbackValidation(
       }
       break;
     case "transformation":
-      // Check if the answer is a proper question format
-      const hasQuestionWords = /(هل|ما|من|متى|أين|كيف|لماذا|أم|أليس|أو)/.test(
-        userAnswer,
-      );
-      const hasQuestionMark =
-        userAnswer.includes("؟") || userAnswer.includes("?");
-      const isQuestionFormat = hasQuestionWords || hasQuestionMark;
-
-      // Check if the question is relevant to the original statement
-      let isRelevantToStatement = false;
-      if (context) {
-        // Extract key concepts from the original statement
-        const originalStatement = context.toLowerCase();
-        const userQuestion = userAnswer.toLowerCase();
-
-        // Check for key concepts that should be preserved in the question
-        const keyConcepts = [];
-
-        if (
-          originalStatement.includes("الله") ||
-          originalStatement.includes("الله")
-        ) {
-          keyConcepts.push("الله");
-        }
-        if (
-          originalStatement.includes("يحب") ||
-          originalStatement.includes("يحب")
-        ) {
-          keyConcepts.push("يحب");
-        }
-        if (
-          originalStatement.includes("ظالم") ||
-          originalStatement.includes("ظالم")
-        ) {
-          keyConcepts.push("ظالم");
-        }
-        if (
-          originalStatement.includes("غني") ||
-          originalStatement.includes("غني")
-        ) {
-          keyConcepts.push("غني");
-        }
-        if (
-          originalStatement.includes("حميد") ||
-          originalStatement.includes("حميد")
-        ) {
-          keyConcepts.push("حميد");
-        }
-
-        // Check if the question contains at least 50% of the key concepts
-        let matchingConcepts = 0;
-        keyConcepts.forEach((concept) => {
-          if (userQuestion.includes(concept)) {
-            matchingConcepts++;
-          }
-        });
-
-        isRelevantToStatement =
-          keyConcepts.length > 0 &&
-          matchingConcepts / keyConcepts.length >= 0.5;
-      }
-
-      if (
-        isQuestionFormat &&
-        hasArabic &&
-        hasContent &&
-        isRelevantToStatement
-      ) {
-        exerciseSpecificFeedback =
-          "Excellent! You successfully converted the statement to a relevant question.";
-        suggestions = [
-          "Perfect question format!",
-          "Good use of Arabic question structure",
-          "Great job maintaining the original meaning",
-        ];
-      } else if (
-        isQuestionFormat &&
-        hasArabic &&
-        hasContent &&
-        !isRelevantToStatement
-      ) {
-        exerciseSpecificFeedback =
-          "You created a question, but it should be related to the original statement.";
-        suggestions = [
-          "Make sure your question is about the same topic as the original statement",
-          "Include key concepts from the original text",
-          "Example: If the statement is about Allah, your question should also be about Allah",
-        ];
-      } else if (hasArabic && hasContent) {
-        exerciseSpecificFeedback =
-          "You provided Arabic text, but it needs to be in question format.";
-        suggestions = [
-          "Add question words like هل، ما، من، متى، أين، كيف",
-          "End with a question mark (؟)",
-          "Example: هل الله غني حميد؟",
-        ];
-      } else {
-        exerciseSpecificFeedback =
-          "Incorrect! For transformation exercises, convert the statement to a question format.";
-        suggestions = [
-          "Use question words like هل، ما، من، متى، أين، كيف",
-          "End with a question mark (؟)",
-          "Example: هل الله غني حميد؟",
-        ];
-      }
+      // Transformation validation is handled in the fallback section below (after line 900)
+      // Just set default feedback here
+      exerciseSpecificFeedback =
+        "Transformation exercise: Convert the statement to a question format.";
+      suggestions = [
+        "Use question words like هل، ما، من، متى، أين، كيف",
+        "Maintain the key concepts from the original statement",
+        "End with a question mark (؟)",
+      ];
       break;
     case "thematic":
       // For thematic exercises, check if the answer contains Quranic verses and relates to the theme
@@ -1005,17 +909,26 @@ function fallbackValidation(
 
       // Extract ALL meaningful words from the original statement (excluding short connecting words)
       const stopWords = ["و", "ف", "ب", "ل", "ك", "من", "في", "على", "الى", "إلى", "عن", "ما", "لا", "إن", "أن", "إذا", "لم", "لن", "قد"];
-      const statementWords = normalizedStatement
-        .split(/\s+/)
-        .filter(word => word.length > 1 && !stopWords.includes(word))
-        .filter(word => /[\u0600-\u06FF]/.test(word)); // Must contain Arabic characters
-
+      
+      // Split and process words
+      const allWords = normalizedStatement.split(/\s+/);
       console.log("=== KEY CONCEPTS DEBUG ===");
       console.log("Original Statement:", context);
       console.log("Normalized Statement:", normalizedStatement);
+      console.log("All words after split:", allWords);
+      
+      const statementWords = allWords
+        .filter(word => {
+          const isLongEnough = word.length > 1;
+          const isNotStopWord = !stopWords.includes(word);
+          const hasArabic = /[\u0600-\u06FF]/.test(word);
+          console.log(`  Word "${word}": len=${word.length}, notStop=${isNotStopWord}, arabic=${hasArabic}`);
+          return isLongEnough && isNotStopWord && hasArabic;
+        });
+
       console.log("User Question:", userAnswer);
       console.log("Normalized Question:", normalizedQuestion);
-      console.log("Statement Words (Key Concepts):", statementWords);
+      console.log("Final Statement Words (Key Concepts):", statementWords);
 
       // Check if the question contains at least 50% of the key concepts from the statement
       let matchingConcepts = 0;
