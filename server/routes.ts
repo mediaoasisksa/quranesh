@@ -36,6 +36,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })();
 
+  // Serve PDF documentation
+  app.get("/app-description", (req, res) => {
+    const documentPath = path.resolve(import.meta.dirname, "..", "app-description.html");
+    res.sendFile(documentPath);
+  });
+
   // Authentication routes
   app.post("/api/signup", async (req, res) => {
     try {

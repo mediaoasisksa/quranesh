@@ -2,6 +2,11 @@
 
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
+## Documentation
+- **PDF Documentation**: Comprehensive app description available at `/app-description` endpoint
+- The documentation includes product overview, technical architecture, features, pricing, and more
+- Can be saved as PDF using browser's "Print to PDF" feature
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
