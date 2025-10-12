@@ -572,7 +572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Use POST request with proper parameters for HyperPay
       const formData = new URLSearchParams();
-      formData.append('entityId', HYPERPAY_CONFIG.entityIdVisaMaster);
+      formData.append('entityId', HYPERPAY_CONFIG.entityIdVisaMaster || '');
       formData.append('amount', '100.00');
       formData.append('currency', 'SAR');
       formData.append('paymentType', 'DB');
