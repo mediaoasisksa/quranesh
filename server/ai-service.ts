@@ -990,116 +990,54 @@ function fallbackValidation(
     // Check if the question is relevant to the original statement
     let isRelevantToStatement = false;
     if (context) {
-      const originalStatement = context.toLowerCase();
-      const userQuestion = userAnswer.toLowerCase();
+      // Normalize Arabic text by removing diacritics
+      const normalizeArabic = (text: string): string => {
+        return text
+          .replace(/[\u064B-\u065F\u0670]/g, "") // Remove all diacritics
+          .replace(/[ًٌٍَُِّْ]/g, "")
+          .replace(/أ|إ|آ/g, "ا") // Normalize alef variants
+          .replace(/ى/g, "ي") // Normalize ya variants
+          .trim();
+      };
 
-      // Extract key concepts from the original statement more comprehensively
-      const keyConcepts = [];
+      const normalizedStatement = normalizeArabic(context);
+      const normalizedQuestion = normalizeArabic(userAnswer);
 
-      // Check for Allah/God references
-      if (
-        originalStatement.includes("الله") ||
-        originalStatement.includes("الله")
-      ) {
-        keyConcepts.push("الله");
-      }
-
-      // Check for love/hate actions
-      if (
-        originalStatement.includes("يحب") ||
-        originalStatement.includes("يحب")
-      ) {
-        keyConcepts.push("يحب");
-      }
-      if (
-        originalStatement.includes("لا يحب") ||
-        originalStatement.includes("لا يحب")
-      ) {
-        keyConcepts.push("لا يحب");
-      }
-
-      // Check for wrongdoers/oppressors
-      if (
-        originalStatement.includes("ظالم") ||
-        originalStatement.includes("ظالم")
-      ) {
-        keyConcepts.push("ظالم");
-      }
-      if (
-        originalStatement.includes("ظالمين") ||
-        originalStatement.includes("ظالمين")
-      ) {
-        keyConcepts.push("ظالمين");
-      }
-
-      // Check for doers of good
-      if (
-        originalStatement.includes("محسن") ||
-        originalStatement.includes("محسن")
-      ) {
-        keyConcepts.push("محسن");
-      }
-      if (
-        originalStatement.includes("محسنين") ||
-        originalStatement.includes("محسنين")
-      ) {
-        keyConcepts.push("محسنين");
-      }
-      if (
-        originalStatement.includes("المحسنين") ||
-        originalStatement.includes("المحسنين")
-      ) {
-        keyConcepts.push("المحسنين");
-      }
-
-      // Check for other common concepts
-      if (
-        originalStatement.includes("غني") ||
-        originalStatement.includes("غني")
-      ) {
-        keyConcepts.push("غني");
-      }
-      if (
-        originalStatement.includes("حميد") ||
-        originalStatement.includes("حميد")
-      ) {
-        keyConcepts.push("حميد");
-      }
-      if (
-        originalStatement.includes("رحيم") ||
-        originalStatement.includes("رحيم")
-      ) {
-        keyConcepts.push("رحيم");
-      }
-      if (
-        originalStatement.includes("غفور") ||
-        originalStatement.includes("غفور")
-      ) {
-        keyConcepts.push("غفور");
-      }
+      // Extract ALL meaningful words from the original statement (excluding short connecting words)
+      const stopWords = ["و", "ف", "ب", "ل", "ك", "من", "في", "على", "الى", "إلى", "عن", "ما", "لا", "إن", "أن", "إذا", "لم", "لن", "قد"];
+      const statementWords = normalizedStatement
+        .split(/\s+/)
+        .filter(word => word.length > 1 && !stopWords.includes(word))
+        .filter(word => /[\u0600-\u06FF]/.test(word)); // Must contain Arabic characters
 
       console.log("=== KEY CONCEPTS DEBUG ===");
-      console.log("Original Statement:", originalStatement);
-      console.log("User Question:", userQuestion);
-      console.log("Key Concepts Found:", keyConcepts);
+      console.log("Original Statement:", context);
+      console.log("Normalized Statement:", normalizedStatement);
+      console.log("User Question:", userAnswer);
+      console.log("Normalized Question:", normalizedQuestion);
+      console.log("Statement Words (Key Concepts):", statementWords);
 
-      // Check if the question contains at least 50% of the key concepts
+      // Check if the question contains at least 50% of the key concepts from the statement
       let matchingConcepts = 0;
-      keyConcepts.forEach((concept) => {
-        if (userQuestion.includes(concept)) {
+      statementWords.forEach((word) => {
+        if (normalizedQuestion.includes(word)) {
           matchingConcepts++;
-          console.log(`✓ Matched concept: ${concept}`);
+          console.log(`✓ Matched word: ${word}`);
         } else {
-          console.log(`✗ Missed concept: ${concept}`);
+          console.log(`✗ Missed word: ${word}`);
         }
       });
 
+      const matchPercentage = statementWords.length > 0 
+        ? (matchingConcepts / statementWords.length) * 100 
+        : 0;
+
       console.log(
-        `Matching: ${matchingConcepts}/${keyConcepts.length} (${((matchingConcepts / keyConcepts.length) * 100).toFixed(1)}%)`,
+        `Matching: ${matchingConcepts}/${statementWords.length} (${matchPercentage.toFixed(1)}%)`,
       );
 
-      isRelevantToStatement =
-        keyConcepts.length > 0 && matchingConcepts / keyConcepts.length >= 0.5;
+      // Require at least 50% of the original statement's key words to be present in the question
+      isRelevantToStatement = statementWords.length > 0 && matchingConcepts / statementWords.length >= 0.5;
       console.log("Is Relevant:", isRelevantToStatement);
       console.log("========================");
     }
@@ -1119,8 +1057,8 @@ function fallbackValidation(
     );
     console.log("=====================================");
 
-    // Consider it correct if it has Arabic content AND is in question format (relevance is nice but not required)
-    isActuallyCorrect = hasArabic && hasContent && isQuestionFormat;
+    // Consider it correct if it has Arabic content AND is in question format AND is relevant to the original statement
+    isActuallyCorrect = hasArabic && hasContent && isQuestionFormat && isRelevantToStatement;
   } else if (exerciseType === "thematic") {
     // For thematic exercises, check if the answer contains Quranic verses and relates to the theme
     const hasThematicQuranicPattern =
