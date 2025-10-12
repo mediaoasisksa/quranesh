@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { BookOpen, Menu, X, User, LogOut, Settings, UserCircle } from "lucide-react";
+import {
+  BookOpen,
+  Menu,
+  X,
+  User,
+  LogOut,
+  Settings,
+  UserCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -51,14 +59,19 @@ const Header = () => {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full"
+                  >
                     <UserCircle className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.givenName} {user?.surname}</p>
+                      <p className="font-medium">
+                        {user?.firstName} {user?.lastName}
+                      </p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
                         {user?.email}
                       </p>
@@ -140,8 +153,12 @@ const Header = () => {
                     <div className="flex items-center gap-2 p-2">
                       <UserCircle className="h-5 w-5" />
                       <div className="flex flex-col">
-                        <p className="font-medium text-sm">{user?.givenName} {user?.surname}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="font-medium text-sm">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
                     <Link href="/dashboard">
@@ -156,8 +173,8 @@ const Header = () => {
                         Settings
                       </Button>
                     </Link>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="justify-start w-full text-red-600 hover:text-red-700"
                       onClick={() => {
                         signOut();

@@ -1,7 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPhraseSchema, insertExerciseSessionSchema, insertUserProgressSchema, insertDailyStatsSchema, insertQuestionBankSchema, insertUserSchema, signupSchema, signinSchema } from "@shared/schema";
+import {
+  insertPhraseSchema,
+  insertExerciseSessionSchema,
+  insertUserProgressSchema,
+  insertDailyStatsSchema,
+  insertQuestionBankSchema,
+  insertUserSchema,
+  signupSchema,
+  signinSchema,
+} from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { phrasesData } from "../client/src/lib/phrases-data";
@@ -9,13 +18,15 @@ import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-p
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { validateExerciseAnswer } from "./ai-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
   // Validate JWT secret on startup
   const JWT_SECRET = process.env.JWT_SECRET;
   if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET environment variable is required for authentication");
+    throw new Error(
+      "JWT_SECRET environment variable is required for authentication",
+    );
   }
 
   // Initialize with phrase data and question banks
@@ -36,12 +47,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })();
 
-  // Serve PDF documentation
-  app.get("/app-description", (req, res) => {
-    const documentPath = path.resolve(import.meta.dirname, "..", "app-description.html");
-    res.sendFile(documentPath);
-  });
-
   // Authentication routes
   app.post("/api/signup", async (req, res) => {
     try {
@@ -50,12 +55,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
-        return res.status(409).json({ message: "User already exists with this email" });
+        return res
+          .status(409)
+          .json({ message: "User already exists with this email" });
       }
 
       // Hash password
       const saltRounds = 12;
-      const passwordHash = await bcrypt.hash(validatedData.password, saltRounds);
+      const passwordHash = await bcrypt.hash(
+        validatedData.password,
+        saltRounds,
+      );
 
       // Create user with hashed password (map to database schema)
       const userData = {
@@ -73,19 +83,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password hash from response
       const { passwordHash: _, ...userResponse } = user;
 
-      res.status(201).json({ 
-        message: "User created successfully", 
-        user: userResponse 
+      res.status(201).json({
+        message: "User created successfully",
+        user: userResponse,
       });
     } catch (error) {
       // Handle database unique constraint errors
-      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "23505"
+      ) {
         return res.status(409).json({ message: "Email already exists" });
       }
 
       // Handle validation errors
-      if (error instanceof Error && error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid input data", errors: error.message });
+      if (error instanceof Error && error.name === "ZodError") {
+        return res
+          .status(400)
+          .json({ message: "Invalid input data", errors: error.message });
       }
 
       res.status(500).json({ message: "Failed to create user" });
@@ -103,7 +120,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify password
-      const isValidPassword = await bcrypt.compare(validatedData.password, user.passwordHash);
+      const isValidPassword = await bcrypt.compare(
+        validatedData.password,
+        user.passwordHash,
+      );
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
@@ -112,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "24h" },
       );
 
       // Remove password hash from response
@@ -123,12 +143,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         token,
         tokenType: "Bearer",
         expiresIn: "24h",
-        user: userResponse
+        user: userResponse,
       });
     } catch (error) {
       // Handle validation errors
-      if (error instanceof Error && error.name === 'ZodError') {
-        return res.status(400).json({ message: "Invalid email or password format" });
+      if (error instanceof Error && error.name === "ZodError") {
+        return res
+          .status(400)
+          .json({ message: "Invalid email or password format" });
       }
 
       res.status(500).json({ message: "Login failed" });
@@ -139,9 +161,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/phrases", async (req, res) => {
     try {
       const { category } = req.query;
-      const phrases = category && typeof category === 'string' 
-        ? await storage.getPhrasesByCategory(category)
-        : await storage.getAllPhrases();
+      const phrases =
+        category && typeof category === "string"
+          ? await storage.getPhrasesByCategory(category)
+          : await storage.getAllPhrases();
       res.json(phrases);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch phrases" });
@@ -177,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createExerciseSession(validatedData);
 
       // Update daily stats
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
       let dailyStats = await storage.getDailyStats(validatedData.userId, today);
 
       if (!dailyStats) {
@@ -186,47 +209,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
           date: today,
           phrasesUsed: 1,
           exercicesCompleted: 1,
-          accuracyRate: validatedData.isCorrect === 'true' ? 100 : 0
+          accuracyRate: validatedData.isCorrect === "true" ? 100 : 0,
         });
       } else {
         const newExercisesCount = (dailyStats.exercicesCompleted || 0) + 1;
-        const correctCount = validatedData.isCorrect === 'true' 
-          ? Math.floor((dailyStats.accuracyRate || 0) * (dailyStats.exercicesCompleted || 0) / 100) + 1
-          : Math.floor((dailyStats.accuracyRate || 0) * (dailyStats.exercicesCompleted || 0) / 100);
+        const correctCount =
+          validatedData.isCorrect === "true"
+            ? Math.floor(
+                ((dailyStats.accuracyRate || 0) *
+                  (dailyStats.exercicesCompleted || 0)) /
+                  100,
+              ) + 1
+            : Math.floor(
+                ((dailyStats.accuracyRate || 0) *
+                  (dailyStats.exercicesCompleted || 0)) /
+                  100,
+              );
 
-        const newAccuracy = Math.round((correctCount / newExercisesCount) * 100);
+        const newAccuracy = Math.round(
+          (correctCount / newExercisesCount) * 100,
+        );
 
         await storage.updateDailyStats(dailyStats.id, {
           exercicesCompleted: newExercisesCount,
           accuracyRate: newAccuracy,
-          phrasesUsed: (dailyStats.phrasesUsed || 0) + 1
+          phrasesUsed: (dailyStats.phrasesUsed || 0) + 1,
         });
       }
 
       // Update user progress
-      let userProgress = await storage.getUserProgressForPhrase(validatedData.userId, validatedData.phraseId);
+      let userProgress = await storage.getUserProgressForPhrase(
+        validatedData.userId,
+        validatedData.phraseId,
+      );
 
       if (!userProgress) {
         userProgress = await storage.createUserProgress({
           userId: validatedData.userId,
           phraseId: validatedData.phraseId,
-          masteryLevel: validatedData.isCorrect === 'true' ? 20 : 0,
-          correctAttempts: validatedData.isCorrect === 'true' ? 1 : 0,
+          masteryLevel: validatedData.isCorrect === "true" ? 20 : 0,
+          correctAttempts: validatedData.isCorrect === "true" ? 1 : 0,
           totalAttempts: 1,
-          lastPracticed: new Date()
+          lastPracticed: new Date(),
         });
       } else {
         const newTotal = (userProgress.totalAttempts || 0) + 1;
-        const newCorrect = validatedData.isCorrect === 'true' 
-          ? (userProgress.correctAttempts || 0) + 1 
-          : (userProgress.correctAttempts || 0);
-        const newMastery = Math.min(100, Math.round((newCorrect / newTotal) * 100));
+        const newCorrect =
+          validatedData.isCorrect === "true"
+            ? (userProgress.correctAttempts || 0) + 1
+            : userProgress.correctAttempts || 0;
+        const newMastery = Math.min(
+          100,
+          Math.round((newCorrect / newTotal) * 100),
+        );
 
         await storage.updateUserProgress(userProgress.id, {
           totalAttempts: newTotal,
           correctAttempts: newCorrect,
           masteryLevel: newMastery,
-          lastPracticed: new Date()
+          lastPracticed: new Date(),
         });
       }
 
@@ -247,16 +288,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/daily-stats/:userId", async (req, res) => {
     try {
-      const today = new Date().toISOString().split('T')[0];
-      const stats = await storage.getDailyStats(req.params.userId, today);
-      res.json(stats || {
-        userId: req.params.userId,
-        date: today,
-        phrasesUsed: 0,
-        exercicesCompleted: 0,
-        accuracyRate: 0
+      const today = new Date().toISOString().split("T")[0];
+      let stats = await storage.getDailyStats(req.params.userId, today);
+
+      if (!stats) {
+        // Create new daily stats if none exist
+        stats = await storage.createDailyStats({
+          userId: req.params.userId,
+          date: today,
+          phrasesUsed: 0,
+          exercicesCompleted: 0,
+          accuracyRate: 0,
+        });
+      }
+
+      // Calculate actual accuracy from today's exercise sessions
+      const todaySessions = await storage.getUserExerciseSessions(
+        req.params.userId,
+      );
+      const todaySessionsFiltered = todaySessions.filter((session) => {
+        if (!session.completedAt) return false;
+        const sessionDate = new Date(session.completedAt)
+          .toISOString()
+          .split("T")[0];
+        return sessionDate === today;
       });
+
+      console.log("=== DAILY STATS CALCULATION ===");
+      console.log("Today:", today);
+      console.log("Total sessions today:", todaySessionsFiltered.length);
+      console.log(
+        "Sessions:",
+        todaySessionsFiltered.map((s) => ({
+          id: s.id,
+          isCorrect: s.isCorrect,
+          exerciseType: s.exerciseType,
+          completedAt: s.completedAt,
+        })),
+      );
+
+      if (todaySessionsFiltered.length > 0) {
+        const correctSessions = todaySessionsFiltered.filter(
+          (session) => session.isCorrect === "true",
+        );
+        const accuracyRate = Math.round(
+          (correctSessions.length / todaySessionsFiltered.length) * 100,
+        );
+
+        console.log("Correct sessions:", correctSessions.length);
+        console.log("Accuracy rate:", accuracyRate + "%");
+        console.log("===============================");
+
+        // Update the stats with calculated values
+        const updatedStats = await storage.updateDailyStats(stats.id, {
+          exercicesCompleted: todaySessionsFiltered.length,
+          accuracyRate: accuracyRate,
+        });
+
+        res.json(updatedStats || stats);
+      } else {
+        res.json(stats);
+      }
     } catch (error) {
+      console.error("Daily stats error:", error);
       res.status(500).json({ message: "Failed to fetch daily stats" });
     }
   });
@@ -273,7 +367,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/exercise-sessions/:userId/recent", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
-      const sessions = await storage.getRecentSessions(req.params.userId, limit);
+      const sessions = await storage.getRecentSessions(
+        req.params.userId,
+        limit,
+      );
       res.json(sessions);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch recent sessions" });
@@ -288,17 +385,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let phrases = await storage.getAllPhrases();
 
-      if (category && typeof category === 'string') {
-        phrases = phrases.filter(p => p.category === category);
+      if (category && typeof category === "string") {
+        phrases = phrases.filter((p) => p.category === category);
       }
 
-      if (difficulty && typeof difficulty === 'string') {
+      if (difficulty && typeof difficulty === "string") {
         const diff = parseInt(difficulty);
-        phrases = phrases.filter(p => p.difficulty === diff);
+        phrases = phrases.filter((p) => p.difficulty === diff);
       }
 
       if (phrases.length === 0) {
-        return res.status(404).json({ message: "No phrases found for criteria" });
+        return res
+          .status(404)
+          .json({ message: "No phrases found for criteria" });
       }
 
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -315,12 +414,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let questionBanks;
 
-      if (category && typeof category === 'string') {
+      if (category && typeof category === "string") {
         questionBanks = await storage.getQuestionBanksByCategory(category);
-      } else if (theme && typeof theme === 'string') {
+      } else if (theme && typeof theme === "string") {
         questionBanks = await storage.getQuestionBanksByTheme(theme);
-      } else if (tags && typeof tags === 'string') {
-        const tagArray = tags.split(',').map(tag => tag.trim());
+      } else if (tags && typeof tags === "string") {
+        const tagArray = tags.split(",").map((tag) => tag.trim());
         questionBanks = await storage.searchQuestionBanksByTags(tagArray);
       } else {
         questionBanks = await storage.getAllQuestionBanks();
@@ -361,30 +460,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let questionBanks = await storage.getAllQuestionBanks();
 
-      if (category && typeof category === 'string') {
-        questionBanks = questionBanks.filter(qb => qb.category === category);
+      if (category && typeof category === "string") {
+        questionBanks = questionBanks.filter((qb) => qb.category === category);
       }
 
-      if (difficulty && typeof difficulty === 'string') {
+      if (difficulty && typeof difficulty === "string") {
         const diff = parseInt(difficulty);
-        questionBanks = questionBanks.filter(qb => qb.difficulty === diff);
+        questionBanks = questionBanks.filter((qb) => qb.difficulty === diff);
       }
 
       if (questionBanks.length === 0) {
-        return res.status(404).json({ message: "No question banks found for criteria" });
+        return res
+          .status(404)
+          .json({ message: "No question banks found for criteria" });
       }
 
-      const randomQuestionBank = questionBanks[Math.floor(Math.random() * questionBanks.length)];
+      const randomQuestionBank =
+        questionBanks[Math.floor(Math.random() * questionBanks.length)];
 
       // Get the associated phrases for this question bank
       const allPhrases = await storage.getAllPhrases();
-      const associatedPhrases = allPhrases.filter(phrase => 
-        randomQuestionBank.correctPhraseIds.includes(phrase.id)
+      const associatedPhrases = allPhrases.filter((phrase) =>
+        randomQuestionBank.correctPhraseIds.includes(phrase.id),
       );
 
       res.json({
         ...randomQuestionBank,
-        associatedPhrases
+        associatedPhrases,
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch random question bank" });
@@ -396,18 +498,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingPath = path.resolve(import.meta.dirname, "..", "pricing.json");
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
-  // HyperPay Configuration from environment variables
+  // HyperPay Configuration
   const HYPERPAY_CONFIG = {
-    serverUrl: process.env.HYPERPAY_SERVER_URL || "https://eu-test.oppwa.com",
-    accessToken: process.env.HYPERPAY_ACCESS_TOKEN,
-    entityIdVisaMaster: process.env.HYPERPAY_ENTITY_ID_VISA_MASTER,
-    entityIdMada: process.env.HYPERPAY_ENTITY_ID_MADA
+    serverUrl: "https://eu-test.oppwa.com",
+    accessToken:
+      "OGFjN2E0Yzk5NGFlZWE0ZDAxOTRiMWU0NWI2ZTAzZmZ8eDlqWjNxMkNOVUxOPVAlSG9waiU=",
+    entityIdVisaMaster: "8ac7a4c994aeea4d0194b1e58b280403",
+    entityIdMada: "8ac7a4c994aeea4d0194b1e6e7090408",
   };
-
-  // Validate HyperPay credentials
-  if (!HYPERPAY_CONFIG.accessToken || !HYPERPAY_CONFIG.entityIdVisaMaster || !HYPERPAY_CONFIG.entityIdMada) {
-    console.warn("⚠️  HyperPay credentials not fully configured. Payment processing may not work.");
-  }
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
@@ -420,7 +518,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planId, paymentMethod, customerDetails } = req.body;
 
       // Find the selected plan
-      const selectedPlan = pricingData.plans.find((plan: any) => plan.id === planId);
+      const selectedPlan = pricingData.plans.find(
+        (plan: any) => plan.id === planId,
+      );
       if (!selectedPlan) {
         return res.status(400).json({ message: "Invalid plan selected" });
       }
@@ -429,50 +529,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
       // Choose entity ID based on payment method
-      const entityId = paymentMethod === 'MADA' 
-        ? HYPERPAY_CONFIG.entityIdMada 
-        : HYPERPAY_CONFIG.entityIdVisaMaster;
+      const entityId =
+        paymentMethod === "MADA"
+          ? HYPERPAY_CONFIG.entityIdMada
+          : HYPERPAY_CONFIG.entityIdVisaMaster;
 
       // Prepare checkout request
       const checkoutData = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
         currency: selectedPlan.currency,
-        paymentType: 'DB',
+        paymentType: "DB",
         merchantTransactionId,
-        'customer.email': customerDetails.email,
-        'customer.givenName': customerDetails.givenName,
-        'customer.surname': customerDetails.surname,
-        'billing.street1': customerDetails.street,
-        'billing.city': customerDetails.city,
-        'billing.state': customerDetails.state,
-        'billing.country': customerDetails.country,
-        'billing.postcode': customerDetails.postcode,
-        'customParameters[3DS2_enrolled]': 'true',
-        'shopperResultUrl': 'http://localhost:5000/payment-success'
+        "customer.email": customerDetails.email,
+        "customer.givenName": customerDetails.givenName,
+        "customer.surname": customerDetails.surname,
+        "billing.street1": customerDetails.street,
+        "billing.city": customerDetails.city,
+        "billing.state": customerDetails.state,
+        "billing.country": customerDetails.country,
+        "billing.postcode": customerDetails.postcode,
+        "customParameters[3DS2_enrolled]": "true",
+        shopperResultUrl: "http://localhost:5000/payment-success",
       };
 
       // Add MADA-specific parameters if using MADA
-      if (paymentMethod === 'MADA') {
+      if (paymentMethod === "MADA") {
         // MADA requires specific redirect URL configuration
-        (checkoutData as any)['customParameters[SHOPPER_ResultUrl]'] = 'http://localhost:5000/payment-success';
+        (checkoutData as any)["customParameters[SHOPPER_ResultUrl]"] =
+          "http://localhost:5000/payment-success";
       }
 
       // Ensure shopperResultUrl is always set for all payment methods
-      checkoutData.shopperResultUrl = 'http://localhost:5000/payment-success';
+      checkoutData.shopperResultUrl = "http://localhost:5000/payment-success";
 
       // Debug: Log the checkout data being sent
-      console.log('=== CHECKOUT CREATION DEBUG ===');
-      console.log('Payment method:', paymentMethod);
-      console.log('Entity ID being used:', entityId);
-      console.log('Selected plan:', selectedPlan);
-      console.log('Customer details:', customerDetails);
-      console.log('Creating checkout with data:', JSON.stringify(checkoutData, null, 2));
+      console.log("=== CHECKOUT CREATION DEBUG ===");
+      console.log("Payment method:", paymentMethod);
+      console.log("Entity ID being used:", entityId);
+      console.log("Selected plan:", selectedPlan);
+      console.log("Customer details:", customerDetails);
+      console.log(
+        "Creating checkout with data:",
+        JSON.stringify(checkoutData, null, 2),
+      );
 
       // Convert checkout data to URL-encoded format for HyperPay
       const formData = new URLSearchParams();
       Object.entries(checkoutData).forEach(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
+        if (typeof value === "object" && value !== null) {
           Object.entries(value).forEach(([subKey, subValue]) => {
             formData.append(`${key}.${subKey}`, String(subValue));
           });
@@ -481,32 +586,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
-      console.log('=== FORM DATA BEING SENT ===');
-      console.log('Form data:', formData.toString());
-      console.log('============================');
+      console.log("=== FORM DATA BEING SENT ===");
+      console.log("Form data:", formData.toString());
+      console.log("============================");
 
       // Send request to HyperPay
-      const response = await axios.post(`${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`, formData, {
-        headers: {
-          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
+      const response = await axios.post(
+        `${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      );
 
-      console.log('=== HYPERPAY RESPONSE ===');
-      console.log('Status:', response.status);
-      console.log('Response data:', JSON.stringify(response.data, null, 2));
-      console.log('Checkout ID:', response.data.id);
-      console.log('========================');
+      console.log("=== HYPERPAY RESPONSE ===");
+      console.log("Status:", response.status);
+      console.log("Response data:", JSON.stringify(response.data, null, 2));
+      console.log("Checkout ID:", response.data.id);
+      console.log("========================");
 
-      res.json({ 
+      res.json({
         checkoutId: response.data.id,
         merchantTransactionId,
-        plan: selectedPlan
+        plan: selectedPlan,
       });
-
     } catch (error) {
-      console.error('HyperPay checkout error:', error);
+      console.error("HyperPay checkout error:", error);
       res.status(500).json({ message: "Failed to create checkout" });
     }
   });
@@ -517,23 +625,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { resourcePath, entityId } = req.query;
 
       if (!resourcePath) {
-        return res.status(400).json({ message: "Missing resourcePath parameter" });
+        return res
+          .status(400)
+          .json({ message: "Missing resourcePath parameter" });
       }
 
       // Verify payment with HyperPay
-      const response = await axios.get(`${HYPERPAY_CONFIG.serverUrl}${resourcePath}`, {
-        headers: {
-          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`
+      const response = await axios.get(
+        `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`,
+        {
+          headers: {
+            Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+          },
+          params: {
+            entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster,
+          },
         },
-        params: {
-          entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster
-        }
-      });
+      );
 
       const paymentResult = response.data;
 
       // Check if payment was successful
-      const isSuccessful = paymentResult.result.code.startsWith('000');
+      const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
         // Here you would typically:
@@ -546,65 +659,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Payment successful",
           transactionId: paymentResult.id,
           amount: paymentResult.amount,
-          currency: paymentResult.currency
+          currency: paymentResult.currency,
         });
       } else {
         res.json({
           success: false,
           message: "Payment failed",
-          error: paymentResult.result.description
+          error: paymentResult.result.description,
         });
       }
-
     } catch (error) {
-      console.error('Payment verification error:', error);
+      console.error("Payment verification error:", error);
       res.status(500).json({ message: "Failed to verify payment" });
     }
   });
 
   // Handle HyperPay redirect after payment
   // Debug endpoint to validate checkout ID
-  app.get('/api/validate-checkout/:checkoutId', async (req, res) => {
+  app.get("/api/validate-checkout/:checkoutId", async (req, res) => {
     try {
       const { checkoutId } = req.params;
-      console.log('=== VALIDATING CHECKOUT ID ===');
-      console.log('Checkout ID:', checkoutId);
+      console.log("=== VALIDATING CHECKOUT ID ===");
+      console.log("Checkout ID:", checkoutId);
 
       // Use POST request with proper parameters for HyperPay
       const formData = new URLSearchParams();
-      formData.append('entityId', HYPERPAY_CONFIG.entityIdVisaMaster || '');
-      formData.append('amount', '100.00');
-      formData.append('currency', 'SAR');
-      formData.append('paymentType', 'DB');
-      formData.append('merchantTransactionId', `TX${Date.now()}`);
-      formData.append('customer.email', 'test@example.com');
-      formData.append('customer.givenName', 'Test');
-      formData.append('customer.surname', 'User');
-      formData.append('billing.street1', '123 Test Street');
-      formData.append('billing.city', 'Riyadh');
-      formData.append('billing.state', 'Riyadh');
-      formData.append('billing.country', 'SA');
-      formData.append('billing.postcode', '12345');
-      formData.append('customParameters[3DS2_enrolled]', 'true');
+      formData.append("entityId", HYPERPAY_CONFIG.entityIdVisaMaster);
+      formData.append("amount", "100.00");
+      formData.append("currency", "SAR");
+      formData.append("paymentType", "DB");
+      formData.append("merchantTransactionId", `TX${Date.now()}`);
+      formData.append("customer.email", "test@example.com");
+      formData.append("customer.givenName", "Test");
+      formData.append("customer.surname", "User");
+      formData.append("billing.street1", "123 Test Street");
+      formData.append("billing.city", "Riyadh");
+      formData.append("billing.state", "Riyadh");
+      formData.append("billing.country", "SA");
+      formData.append("billing.postcode", "12345");
+      formData.append("customParameters[3DS2_enrolled]", "true");
 
-      const response = await axios.post(`${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`, formData, {
-        headers: {
-          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
+      const response = await axios.post(
+        `${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      );
 
-      console.log('Validation response:', JSON.stringify(response.data, null, 2));
-      res.json({ 
-        valid: true, 
+      console.log(
+        "Validation response:",
+        JSON.stringify(response.data, null, 2),
+      );
+      res.json({
+        valid: true,
         checkoutId,
-        response: response.data 
+        response: response.data,
       });
     } catch (error: any) {
-      console.error('Checkout validation error:', error.response?.data || error.message);
-      res.status(400).json({ 
-        valid: false, 
-        error: error.response?.data || error.message 
+      console.error(
+        "Checkout validation error:",
+        error.response?.data || error.message,
+      );
+      res.status(400).json({
+        valid: false,
+        error: error.response?.data || error.message,
       });
     }
   });
@@ -614,35 +736,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { resourcePath, entityId } = req.query;
 
       if (!resourcePath) {
-        return res.redirect('/pricing?error=missing_parameters');
+        return res.redirect("/pricing?error=missing_parameters");
       }
 
       // Verify payment with HyperPay
-      const response = await axios.get(`${HYPERPAY_CONFIG.serverUrl}${resourcePath}`, {
-        headers: {
-          'Authorization': `Bearer ${HYPERPAY_CONFIG.accessToken}`
+      const response = await axios.get(
+        `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`,
+        {
+          headers: {
+            Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
+          },
+          params: {
+            entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster,
+          },
         },
-        params: {
-          entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster
-        }
-      });
+      );
 
       const paymentResult = response.data;
 
       // Check if payment was successful
-      const isSuccessful = paymentResult.result.code.startsWith('000');
+      const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
         // Redirect to success page with success parameters
-        res.redirect(`/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`);
+        res.redirect(
+          `/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`,
+        );
       } else {
         // Redirect to success page with error parameters
-        res.redirect(`/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`);
+        res.redirect(
+          `/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`,
+        );
+      }
+    } catch (error) {
+      console.error("Payment verification error:", error);
+      res.redirect("/payment-success?success=false&error=verification_failed");
+    }
+  });
+
+  // Test Gemini API endpoint
+  app.get("/api/test-gemini", async (req, res) => {
+    try {
+      const { validateArabicAnswer } = await import("./ai-service");
+      const result = await validateArabicAnswer(
+        "وَاللَّهُ غَفُورٌ عَزِيزٌ",
+        "substitution",
+        "وَاللَّهُ غَفُورٌ رَّحِيمٌ",
+        "And Allah is Forgiving, Merciful",
+      );
+      res.json({ success: true, result });
+    } catch (error: any) {
+      console.error("Gemini test error:", error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // AI-powered answer validation
+  app.post("/api/validate-answer", async (req, res) => {
+    try {
+      const { userAnswer, exerciseType, phraseId, questionBankId } = req.body;
+
+      if (!userAnswer || !exerciseType) {
+        return res.status(400).json({
+          error: "Missing required fields: userAnswer, exerciseType",
+        });
       }
 
+      let phraseData = null;
+
+      // Fetch phrase or question bank data for context
+      if (phraseId) {
+        phraseData = await storage.getPhrase(phraseId);
+      } else if (questionBankId) {
+        phraseData = await storage.getQuestionBank(questionBankId);
+      }
+
+      console.log("=== AI VALIDATION DEBUG ===");
+      console.log("User Answer:", userAnswer);
+      console.log("Exercise Type:", exerciseType);
+      console.log("Phrase Data:", phraseData);
+      console.log("==========================");
+
+      // Use AI to validate the answer
+      const result = await validateExerciseAnswer(
+        userAnswer,
+        exerciseType,
+        phraseData,
+      );
+
+      console.log("AI Validation Result:", result);
+
+      res.json(result);
     } catch (error) {
-      console.error('Payment verification error:', error);
-      res.redirect('/payment-success?success=false&error=verification_failed');
+      console.error("AI validation error:", error);
+      res.status(500).json({
+        isCorrect: false,
+        score: 0,
+        feedback:
+          "AI validation service is temporarily unavailable. Please try again.",
+        suggestions: ["Check your Arabic spelling and grammar"],
+        confidence: 0,
+      });
     }
   });
 

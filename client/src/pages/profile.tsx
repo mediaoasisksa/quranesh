@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { BookOpen, ArrowLeft, User, Mail, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,13 +19,24 @@ const Profile = () => {
   const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    givenName: user?.givenName || "",
-    surname: user?.surname || "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
     email: user?.email || "",
   });
 
+  // Update form data when user data changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+      });
+    }
+  }, [user]);
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
@@ -29,7 +46,7 @@ const Profile = () => {
 
   const handleSignOut = () => {
     signOut();
-    setLocation('/');
+    setLocation("/");
   };
 
   return (
@@ -75,14 +92,23 @@ const Profile = () => {
                     <User className="w-8 h-8 text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{user?.givenName} {user?.surname}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {user?.firstName} {user?.lastName}
+                    </h3>
                     <p className="text-muted-foreground flex items-center gap-1">
                       <Mail className="w-4 h-4" />
                       {user?.email}
                     </p>
                     <p className="text-sm text-muted-foreground flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      Member since {new Date().toLocaleDateString()}
+                      Member since{" "}
+                      {user?.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })
+                        : "Recently"}
                     </p>
                   </div>
                 </div>
@@ -91,31 +117,37 @@ const Profile = () => {
               {/* Profile Form */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Personal Information</h3>
+                  <h3 className="text-lg font-semibold">
+                    Personal Information
+                  </h3>
                   <Button
                     variant="outline"
                     onClick={() => setIsEditing(!isEditing)}
                   >
-                    {isEditing ? 'Cancel' : 'Edit'}
+                    {isEditing ? "Cancel" : "Edit"}
                   </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="givenName">First Name</Label>
+                    <Label htmlFor="firstName">First Name</Label>
                     <Input
-                      id="givenName"
-                      value={formData.givenName}
-                      onChange={(e) => handleInputChange('givenName', e.target.value)}
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) =>
+                        handleInputChange("firstName", e.target.value)
+                      }
                       disabled={!isEditing}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="surname">Last Name</Label>
+                    <Label htmlFor="lastName">Last Name</Label>
                     <Input
-                      id="surname"
-                      value={formData.surname}
-                      onChange={(e) => handleInputChange('surname', e.target.value)}
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
                       disabled={!isEditing}
                     />
                   </div>
@@ -125,7 +157,9 @@ const Profile = () => {
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       disabled={!isEditing}
                     />
                   </div>
@@ -133,10 +167,11 @@ const Profile = () => {
 
                 {isEditing && (
                   <div className="flex gap-2">
-                    <Button onClick={handleSave}>
-                      Save Changes
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -153,8 +188,8 @@ const Profile = () => {
                   <Button variant="outline" className="w-full justify-start">
                     Download My Data
                   </Button>
-                  <Button 
-                    variant="destructive" 
+                  <Button
+                    variant="destructive"
                     className="w-full justify-start"
                     onClick={handleSignOut}
                   >

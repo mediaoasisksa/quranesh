@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Quote,
+  BookOpen,
   Moon,
   User,
   Shuffle,
@@ -46,6 +46,10 @@ export default function Dashboard() {
     new Set(),
   );
   const { isAuthenticated, user, signOut } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Use the actual user ID instead of hardcoded demo user
+  const userId = user?.id || "demo-user";
 
   // Fetch phrases
   const { data: phrases = [], isLoading: phrasesLoading } = useQuery<Phrase[]>({
@@ -54,22 +58,22 @@ export default function Dashboard() {
 
   // Fetch daily stats
   const { data: dailyStats } = useQuery<DailyStats>({
-    queryKey: ["/api/daily-stats", DEMO_USER_ID],
+    queryKey: ["/api/daily-stats", userId],
   });
 
   // Fetch user progress
   const { data: userProgress = [] } = useQuery<UserProgress[]>({
-    queryKey: ["/api/user-progress", DEMO_USER_ID],
+    queryKey: ["/api/user-progress", userId],
   });
 
   // Fetch weekly stats for progress report
   const { data: weeklyStats = [] } = useQuery<DailyStats[]>({
-    queryKey: ["/api/weekly-stats", DEMO_USER_ID],
+    queryKey: ["/api/weekly-stats", userId],
   });
 
   const defaultDailyStats: DailyStats = {
     id: "default",
-    userId: DEMO_USER_ID,
+    userId: userId,
     date: new Date().toISOString().split("T")[0],
     phrasesUsed: 0,
     exercicesCompleted: 0,
@@ -132,11 +136,11 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <Quote className="text-primary-foreground h-5 w-5" />
+                  <BookOpen className="text-primary-foreground h-5 w-5" />
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold text-foreground">
-                    Quran Arabic Learning
+                    Quranic
                   </h1>
                   <p className="text-sm text-muted-foreground">
                     AI-Powered Arabic Tutor
@@ -157,14 +161,19 @@ export default function Dashboard() {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
                       <UserCircle className="h-6 w-6" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{user?.givenName} {user?.surname}</p>
+                        <p className="font-medium">
+                          {user?.givenName} {user?.surname}
+                        </p>
                         <p className="w-[200px] truncate text-sm text-muted-foreground">
                           {user?.email}
                         </p>

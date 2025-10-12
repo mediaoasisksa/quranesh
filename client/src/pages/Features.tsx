@@ -139,7 +139,7 @@ const Features = () => {
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Join thousands of learners who are already mastering Quranic
-              Arabic with QuranSpeak.
+              Arabic with Quranic.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

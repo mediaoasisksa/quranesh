@@ -9,16 +9,25 @@ import { ArrowLeft, Check, X, RotateCcw, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AudioButton from "@/components/audio-button";
 import { apiRequest } from "@/lib/queryClient";
-import { getExerciseType } from "@/lib/exercises";
+import { getExerciseType, getRandomExerciseType } from "@/lib/exercises";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Phrase, ExerciseSession, QuestionBank } from "@shared/schema";
-
-const DEMO_USER_ID = "demo-user";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  // Use the actual user ID instead of hardcoded demo user
+  const userId = user?.id || "demo-user";
 
   const exerciseType = params?.type;
   const phraseId = params?.phraseId;
@@ -27,6 +36,7 @@ export default function Exercise() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
@@ -74,7 +84,7 @@ export default function Exercise() {
 
   useEffect(() => {
     if (!exerciseType || !exerciseConfig) {
-      setLocation("/");
+      setLocation("/dashboard");
     }
   }, [exerciseType, exerciseConfig, setLocation]);
 
@@ -92,7 +102,7 @@ export default function Exercise() {
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Exercise not found</p>
           <Button
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/dashboard")}
             data-testid="button-back-home"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -103,7 +113,7 @@ export default function Exercise() {
     );
   }
 
-  const checkAnswer = () => {
+  const checkAnswer = async () => {
     if (!userAnswer.trim()) {
       toast({
         title: "No answer provided",
@@ -113,113 +123,91 @@ export default function Exercise() {
       return;
     }
 
-    let correct = false;
-    let correctAnswer = "";
-    let feedbackMessage = "";
+    setIsValidating(true);
 
-    switch (exerciseType) {
-      case "substitution":
-        // Simple check for Arabic text (any meaningful Arabic input)
-        correct = /[\u0600-\u06FF]/.test(userAnswer);
-        correctAnswer = "Any valid Arabic attribute";
-        feedbackMessage = correct
-          ? "Good! You provided an Arabic attribute."
-          : "Please provide an Arabic word or phrase.";
-        break;
+    try {
+      console.log("=== AI VALIDATION REQUEST ===");
+      console.log("User Answer:", userAnswer);
+      console.log("Exercise Type:", exerciseType);
+      console.log("Phrase ID:", phraseId);
+      console.log("Question Bank ID:", questionBank?.id);
+      console.log("=============================");
 
-      case "conversation":
-        // Check if response contains Arabic and relates to the context
-        correct = /[\u0600-\u06FF]/.test(userAnswer) && userAnswer.length > 5;
-        correctAnswer = "وَاللَّهُ بِمَا تَعۡمَلُونَ بَصِيرٌ";
-        feedbackMessage = correct
-          ? "Excellent use of Quranic Arabic in conversation!"
-          : "Try using a relevant Quranic verse in Arabic.";
-        break;
+      // Call AI validation API
+      const response = await fetch("/api/validate-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userAnswer,
+          exerciseType,
+          phraseId: exerciseType === "thematic" ? null : phraseId || phrase?.id,
+          questionBankId: questionBank?.id,
+        }),
+      });
 
-      case "completion":
-        // Check against common completions
-        const validCompletions = [
-          "المحسنين",
-          "المتوكلين",
-          "الصابرين",
-          "المقسطين",
-        ];
-        correct = validCompletions.some((completion) =>
-          userAnswer.includes(completion),
-        );
-        correctAnswer = validCompletions.join(" or ");
-        feedbackMessage = correct
-          ? "Perfect! You completed the verse correctly."
-          : "Try one of the common attributes that Allah loves.";
-        break;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      case "comparison":
-        // Check for meaningful Arabic explanation
-        correct = /[\u0600-\u06FF]/.test(userAnswer) && userAnswer.length > 10;
-        correctAnswer =
-          "Explanation in Arabic showing understanding of differences";
-        feedbackMessage = correct
-          ? "Great analysis! You explained the difference well."
-          : "Provide a more detailed explanation in Arabic.";
-        break;
+      const result = await response.json();
 
-      case "roleplay":
-        // Check for comforting Quranic verse
-        correct =
-          /[\u0600-\u06FF]/.test(userAnswer) &&
-          (userAnswer.includes("العسر") ||
-            userAnswer.includes("الله") ||
-            userAnswer.includes("الصبر"));
-        correctAnswer = "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا";
-        feedbackMessage = correct
-          ? "Beautiful! You used an appropriate verse for comfort."
-          : "Try using a verse about patience, hope, or Allah's help.";
-        break;
+      console.log("AI Validation Result:", result);
 
-      case "transformation":
-        // Check if converted to question form
-        correct =
-          userAnswer.includes("من") ||
-          userAnswer.includes("ما") ||
-          userAnswer.includes("متى") ||
-          userAnswer.includes("؟");
-        correctAnswer = "مَن يُحِبُّ اللَّهُ؟";
-        feedbackMessage = correct
-          ? "Excellent transformation to question form!"
-          : "Convert the statement to a question using question words.";
-        break;
+      setIsCorrect(result.isCorrect);
+      setFeedback(result.feedback);
+      setIsAnswered(true);
 
-      case "thematic":
-        // For thematic exercises, check if user answer matches any of the associated phrases
-        if (isThematicExercise && questionBank) {
-          const associatedPhrases = questionBank.associatedPhrases || [];
-          correct = associatedPhrases.some(
-            (phrase) =>
-              phrase.arabicText.includes(userAnswer.trim()) ||
-              userAnswer.includes(phrase.arabicText.substring(0, 10)),
-          );
-          correctAnswer = associatedPhrases
-            .map((p) => p.arabicText)
-            .join(" أو ");
-          feedbackMessage = correct
-            ? `Perfect! You provided a relevant verse for "${questionBank.themeEnglish}".`
-            : `Think of verses related to "${questionBank.themeEnglish}". Any of these would work: ${associatedPhrases.map((p) => p.surahAyah).join(", ")}`;
-        } else {
-          correct = false;
-          correctAnswer = "Question bank not loaded";
-          feedbackMessage = "Unable to validate thematic answer.";
-        }
-        break;
+      // Show appropriate toast based on result
+      if (result.isCorrect) {
+        toast({
+          title: "Excellent!",
+          description: result.feedback,
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Keep trying!",
+          description: result.feedback,
+          variant: "destructive",
+        });
+      }
 
-      default:
-        correct = false;
-        correctAnswer = "";
-        feedbackMessage = "Unknown exercise type.";
+      // Show suggestions if available
+      if (result.suggestions && result.suggestions.length > 0) {
+        setTimeout(() => {
+          toast({
+            title: "Suggestions:",
+            description: result.suggestions.join(", "),
+            variant: "default",
+          });
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("AI validation error:", error);
+
+      // Fallback to basic validation
+      const hasArabic = /[\u0600-\u06FF]/.test(userAnswer);
+      const hasContent = userAnswer.trim().length > 2;
+
+      setIsCorrect(hasArabic && hasContent);
+      setFeedback(
+        hasArabic && hasContent
+          ? "Answer contains Arabic text. AI validation is temporarily unavailable."
+          : "Please provide an answer in Arabic. AI validation is temporarily unavailable.",
+      );
+      setIsAnswered(true);
+
+      toast({
+        title: "AI Service Unavailable",
+        description:
+          "Using basic validation. AI service is temporarily unavailable.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsValidating(false);
     }
-
-    setIsCorrect(correct);
-    setFeedback(feedbackMessage);
-    setIsAnswered(true);
 
     // Submit the session
     const dataId =
@@ -227,18 +215,12 @@ export default function Exercise() {
         ? questionBank.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
-      userId: DEMO_USER_ID,
+      userId: userId,
       exerciseType: exerciseType || "",
       phraseId: dataId,
       userAnswer,
-      correctAnswer,
-      isCorrect: correct ? "true" : "false",
-    });
-
-    toast({
-      title: correct ? "Correct!" : "Try Again",
-      description: feedbackMessage,
-      variant: correct ? "default" : "destructive",
+      correctAnswer: "AI Validated", // AI provides dynamic feedback
+      isCorrect: isCorrect ? "true" : "false",
     });
   };
 
@@ -249,9 +231,39 @@ export default function Exercise() {
     setFeedback("");
   };
 
-  const goToNextExercise = () => {
-    // Navigate to a random exercise
-    setLocation("/dashboard");
+  const goToNextExercise = async () => {
+    try {
+      console.log("=== NEXT EXERCISE DEBUG ===");
+
+      // Navigate to a random exercise
+      const randomType = getRandomExerciseType();
+      console.log("Random exercise type:", randomType);
+
+      // Get a random phrase for the exercise
+      const { data: phrases } = await queryClient.fetchQuery({
+        queryKey: ["phrases"],
+        queryFn: async () => {
+          const response = await fetch("/api/phrases");
+          return response.json();
+        },
+      });
+
+      console.log("Available phrases:", phrases?.length);
+
+      if (phrases && phrases.length > 0) {
+        const randomPhrase =
+          phrases[Math.floor(Math.random() * phrases.length)];
+        const newPath = `/exercise/${randomType.id}/${randomPhrase.id}`;
+        console.log("Navigating to:", newPath);
+        setLocation(newPath);
+      } else {
+        console.log("No phrases available, redirecting to dashboard");
+        setLocation("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error in goToNextExercise:", error);
+      setLocation("/dashboard");
+    }
   };
 
   const renderExerciseContent = () => {
@@ -371,6 +383,13 @@ export default function Exercise() {
         );
 
       case "completion":
+        const completionOptions = [
+          { arabic: "المحسنين", english: "the doers of good" },
+          { arabic: "المتوكلين", english: "those who put trust (in God)" },
+          { arabic: "الصابرين", english: "the patient ones" },
+          { arabic: "المقسطين", english: "those who are just" },
+        ];
+
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
@@ -385,20 +404,28 @@ export default function Exercise() {
             </div>
             <p className="text-foreground">Complete the verse:</p>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              {["المحسنين", "المتوكلين", "الصابرين", "المقسطين"].map(
-                (option, index) => (
-                  <Button
-                    key={index}
-                    variant={userAnswer === option ? "default" : "outline"}
-                    className="arabic-text text-lg p-4 h-auto"
-                    onClick={() => setUserAnswer(option)}
-                    disabled={isAnswered}
-                    data-testid={`button-completion-option-${index}`}
-                  >
-                    {option}
-                  </Button>
-                ),
-              )}
+              {completionOptions.map((option, index) => (
+                <TooltipProvider key={index}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={
+                          userAnswer === option.arabic ? "default" : "outline"
+                        }
+                        className="arabic-text text-lg p-4 h-auto"
+                        onClick={() => setUserAnswer(option.arabic)}
+                        disabled={isAnswered}
+                        data-testid={`button-completion-option-${index}`}
+                      >
+                        {option.arabic}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">{option.english}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
             </div>
           </div>
         );
@@ -521,7 +548,7 @@ export default function Exercise() {
           <div className="flex items-center justify-between h-16">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/")}
+              onClick={() => setLocation("/dashboard")}
               data-testid="button-back-dashboard"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -556,7 +583,11 @@ export default function Exercise() {
                   </span>
                 ) : phrase ? (
                   <AudioButton
-                    text={phrase.arabicText}
+                    text={
+                      exerciseType === "completion"
+                        ? "إِنَّ اللَّهَ يُحِبُّ المتوكلين" // Use a sample completion for audio
+                        : phrase.arabicText
+                    }
                     lang="ar-SA"
                     data-testid="button-audio-phrase"
                   />
@@ -621,10 +652,11 @@ export default function Exercise() {
                 {!isAnswered ? (
                   <Button
                     onClick={checkAnswer}
+                    disabled={isValidating}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     data-testid="button-check-answer"
                   >
-                    Check Answer
+                    {isValidating ? "AI is checking..." : "Check Answer"}
                   </Button>
                 ) : (
                   <Button

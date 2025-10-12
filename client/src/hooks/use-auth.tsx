@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface User {
   id: string;
   email: string;
-  givenName: string;
-  surname: string;
+  firstName: string;
+  lastName: string;
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -24,8 +25,8 @@ export function useAuth() {
 
   useEffect(() => {
     // Check for existing authentication on mount
-    const token = localStorage.getItem('authToken');
-    const userStr = localStorage.getItem('user');
+    const token = localStorage.getItem("authToken");
+    const userStr = localStorage.getItem("user");
 
     if (token && userStr) {
       try {
@@ -37,10 +38,10 @@ export function useAuth() {
           isLoading: false,
         });
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        console.error("Error parsing user data:", error);
         // Clear invalid data
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
         setAuthState({
           user: null,
           token: null,
@@ -59,8 +60,8 @@ export function useAuth() {
   }, []);
 
   const signIn = (user: User, token: string) => {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("user", JSON.stringify(user));
     setAuthState({
       user,
       token,
@@ -70,8 +71,8 @@ export function useAuth() {
   };
 
   const signOut = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     setAuthState({
       user: null,
       token: null,
