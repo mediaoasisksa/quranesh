@@ -678,16 +678,151 @@ function fallbackValidation(
   let isActuallyCorrect = hasArabic && hasContent;
 
   if (exerciseType === "substitution") {
+    console.log("=== SUBSTITUTION VALIDATION START ===");
+    console.log("Original phrase (context):", context);
+    console.log("User Answer:", userAnswer);
+
+    // Normalize both strings for comparison (remove diacritics and extra whitespace)
+    const normalizeArabic = (text: string) => {
+      return text
+        .replace(/[\u064B-\u065F\u0670]/g, "") // Remove diacritics
+        .replace(/[ٱأإآ]/g, "ا") // Normalize alef variants
+        .replace(/[ى]/g, "ي") // Normalize ya
+        .replace(/\s+/g, " ") // Normalize whitespace
+        .trim()
+        .toLowerCase();
+    };
+
+    const normalizedOriginal = normalizeArabic(context);
+    const normalizedAnswer = normalizeArabic(userAnswer);
+
+    console.log("Normalized Original:", normalizedOriginal);
+    console.log("Normalized Answer:", normalizedAnswer);
+
+    // Split into words/tokens
+    const originalTokens = normalizedOriginal.split(/\s+/);
+    const answerTokens = normalizedAnswer.split(/\s+/);
+
+    console.log("Original Tokens:", originalTokens);
+    console.log("Answer Tokens:", answerTokens);
+
+    // Check if the answer has similar length (allowing some flexibility)
+    const lengthRatio = answerTokens.length / originalTokens.length;
+    const hasCorrectLength = lengthRatio >= 0.7 && lengthRatio <= 1.3;
+
+    console.log("Length ratio:", lengthRatio, "Valid:", hasCorrectLength);
+
+    // Compare tokens directly from the original phrase
+    // In substitution drill, students should keep most tokens and only change 1-2 words
+    
+    // Check how many original tokens are preserved (in order)
+    let matchedTokens = 0;
+    let totalTokensToMatch = originalTokens.length;
+    
+    // For each original token, check if it appears in the answer in roughly the same position
+    for (let i = 0; i < originalTokens.length; i++) {
+      const originalToken = originalTokens[i];
+      
+      // Check if this token exists in the answer (allowing some position flexibility)
+      const foundIndex = answerTokens.indexOf(originalToken);
+      
+      if (foundIndex !== -1) {
+        // Token found - check if position is roughly similar (within 2 positions)
+        const positionDiff = Math.abs(i - foundIndex);
+        if (positionDiff <= 2) {
+          matchedTokens++;
+        }
+      }
+    }
+
+    // Calculate structure preservation rate based on how many original tokens are kept
+    // For substitution drill, we expect 60-90% of tokens to be identical
+    const structurePreservationRate = totalTokensToMatch > 0 
+      ? matchedTokens / totalTokensToMatch 
+      : 0;
+
+    console.log(
+      "Structure preservation:",
+      matchedTokens,
+      "/",
+      totalTokensToMatch,
+      "=",
+      structurePreservationRate,
+    );
+
+    // Check if substituted word is a valid Quranic attribute/noun
     const hasQuranicAttribute =
-      /(غفور|رحيم|عزيز|حكيم|كريم|عليم|حليم|شكور|صبور|ودود|مجيد|عظيم|قدير|سميع|بصير|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم|ودود|شكور|صبور|حليم|كريم|عظيم|مجيد|قدير|سميع|بصير|عليم|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم)/.test(
+      /(غفور|رحيم|عزيز|حكيم|كريم|عليم|حليم|شكور|صبور|ودود|مجيد|عظيم|قدير|سميع|بصير|عالم|غفار|تواب|رحمن|خبير|حكيم|قوي|متين|لطيف|حفيظ|مقيت|حسيب|جليل|كريم|رقيب|مجيب|واسع|حكيم|ودود|مجيد|باعث|شهيد|حق|وكيل|قوي|متين|ولي|حميد|محصي|مبدئ|معيد|محيي|مميت|حي|قيوم|واجد|ماجد|واحد|احد|صمد|قادر|مقتدر|مقدم|مؤخر|اول|اخر|ظاهر|باطن|والي|متعال|بر|تواب|منتقم|عفو|رؤوف|مالك|ذو|جلال|اكرام|مقسط|جامع|غني|مغني|مانع|ضار|نافع|نور|هادي|بديع|باقي|وارث|رشيد|صبور|ظالمين|مسرفين|محسنين|مقسطين|متقين|صابرين|صادقين|متوكلين)/.test(
         userAnswer,
       );
-    const isCompletePhrase =
-      userAnswer.includes("الله") || userAnswer.includes("اللَّهُ");
 
-    // Consider it correct if it has Arabic content AND either Quranic attributes OR complete phrase structure
-    isActuallyCorrect =
-      hasArabic && hasContent && (hasQuranicAttribute || isCompletePhrase);
+    console.log("Has Quranic attribute:", hasQuranicAttribute);
+
+    // Calculate relevance score (0-100)
+    let relevanceScore = 0;
+
+    // 50% for structure preservation (most important - need to keep most of the original)
+    relevanceScore += structurePreservationRate * 50;
+
+    // 30% for having valid Quranic attribute
+    if (hasQuranicAttribute) {
+      relevanceScore += 30;
+    }
+
+    // 20% for correct length
+    if (hasCorrectLength) {
+      relevanceScore += 20;
+    }
+
+    console.log("Relevance score:", relevanceScore);
+
+    // Consider it correct if:
+    // 1. Structure preservation is at least 50% (kept at least half the original tokens)
+    // 2. AND overall relevance score is >= 60
+    // 3. AND has a valid Quranic attribute (to ensure substitution is appropriate)
+    const hasGoodStructure = structurePreservationRate >= 0.5;
+    isActuallyCorrect = hasGoodStructure && hasQuranicAttribute && relevanceScore >= 60;
+
+    console.log("Structure >= 50%:", hasGoodStructure, "Has Quranic attr:", hasQuranicAttribute, "Score >= 60:", relevanceScore >= 60);
+
+    // Update feedback based on what's missing
+    if (!isActuallyCorrect) {
+      if (structurePreservationRate < 0.5) {
+        exerciseSpecificFeedback =
+          "You need to maintain the same grammatical structure as the original phrase. Keep most words and only substitute 1-2 words.";
+        suggestions = [
+          `Keep at least ${Math.ceil(originalTokens.length * 0.5)} of the ${originalTokens.length} original words`,
+          "Only substitute the attribute, noun, or verb - not the entire phrase",
+          `Your structure preservation: ${Math.round(structurePreservationRate * 100)}% (need at least 50%)`,
+        ];
+      } else if (!hasQuranicAttribute) {
+        exerciseSpecificFeedback =
+          "Your structure is good, but use a valid Quranic attribute or noun for the substitution.";
+        suggestions = [
+          "Use Quranic attributes like: المقسطين، المتقين، الصابرين، المحسنين",
+          "Or divine attributes like: حكيم، خبير، عليم، بصير، سميع",
+          "Make sure the substituted word fits grammatically",
+        ];
+      } else {
+        exerciseSpecificFeedback = `Your answer is close but needs improvement. Relevance score: ${Math.round(relevanceScore)}% (need at least 60%)`;
+        suggestions = [
+          "Check the grammatical structure more carefully",
+          "Ensure all key elements from the original are preserved",
+          "Verify the substituted word is appropriate",
+        ];
+      }
+    } else {
+      exerciseSpecificFeedback =
+        "Excellent substitution! You maintained the structure and used a valid Quranic term.";
+      suggestions = [
+        "Perfect structure preservation!",
+        "Great choice of Quranic vocabulary",
+        `Relevance score: ${Math.round(relevanceScore)}%`,
+      ];
+    }
+
+    console.log("Final decision:", isActuallyCorrect);
+    console.log("=========================================");
   } else if (exerciseType === "conversation") {
     // For conversation exercises, check if it's a Quranic verse with semantic relevance
     console.log("=== CONVERSATION VALIDATION START ===");
