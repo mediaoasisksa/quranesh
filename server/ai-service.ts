@@ -788,12 +788,43 @@ function fallbackValidation(
     const relevancePercentage =
       totalConcepts > 0 ? semanticRelevance / totalConcepts : 0;
 
-    // Consider it correct if it's a Quranic verse with at least 30% semantic relevance (more lenient)
+    console.log("=== CONVERSATION EXERCISE VALIDATION ===");
+    console.log("Has Quranic Pattern:", hasQuranicPattern);
+    console.log("Total Concepts:", totalConcepts);
+    console.log("Semantic Relevance:", semanticRelevance);
+    console.log("Relevance Percentage:", relevancePercentage);
+    console.log("========================================");
+
+    // Consider it correct if it's a Quranic verse with at least 50% semantic relevance (stricter)
     isActuallyCorrect =
       hasArabic &&
       hasContent &&
       hasQuranicPattern &&
-      relevancePercentage >= 0.3;
+      relevancePercentage >= 0.5;
+    
+    // Update feedback based on validation
+    if (!isActuallyCorrect) {
+      if (relevancePercentage < 0.5 && relevancePercentage > 0) {
+        exerciseSpecificFeedback = `Your answer contains some relevant concepts but doesn't fully match the English prompt. The answer should include key concepts like the ones mentioned in the English phrase.`;
+        suggestions = [
+          "Include ALL key concepts from the English prompt",
+          "Make sure your Arabic answer captures the complete meaning",
+          `Your answer matched only ${Math.round(relevancePercentage * 100)}% of the required concepts (need at least 50%)`,
+        ];
+      } else if (!hasQuranicPattern) {
+        exerciseSpecificFeedback = "Your answer doesn't appear to be a Quranic verse or proper Arabic phrase.";
+        suggestions = [
+          "Use authentic Quranic verses or proper Arabic phrases",
+          "Include Quranic vocabulary and patterns",
+        ];
+      } else {
+        exerciseSpecificFeedback = "Your answer doesn't match the English prompt. Make sure to include all key concepts.";
+        suggestions = [
+          "Read the English prompt carefully",
+          "Include all required concepts in your Arabic answer",
+        ];
+      }
+    }
   } else if (exerciseType === "roleplay") {
     // For roleplay exercises, check for Quranic patterns and comfort words
     const hasRoleplayQuranicPattern =
@@ -1030,14 +1061,20 @@ function fallbackValidation(
     }
   }
 
+  // Determine final feedback message
+  let completeFeedback = finalFeedback;
+  if (!isActuallyCorrect && !hasArabic) {
+    // Only add "Please provide an answer in Arabic" if there's NO Arabic at all
+    completeFeedback = `Please provide an answer in Arabic. ${finalFeedback}`;
+  } else if (!isActuallyCorrect) {
+    // If there IS Arabic but it's wrong, use the specific feedback directly
+    completeFeedback = finalFeedback;
+  }
+
   return {
     isCorrect: isActuallyCorrect,
     score: isActuallyCorrect ? 60 : 20,
-    feedback: isActuallyCorrect
-      ? finalFeedback
-      : exerciseType === "transformation"
-        ? finalFeedback // For transformation, use the specific feedback directly
-        : `Please provide an answer in Arabic. ${finalFeedback}`,
+    feedback: completeFeedback,
     suggestions,
     confidence: 0.3,
   };
