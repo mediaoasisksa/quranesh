@@ -131,7 +131,12 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={dir}>
+      {/* Language Toggle - Top Right Corner */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
+
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,7 +158,6 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <LanguageToggle />
               <Button
                 variant="ghost"
                 size="sm"

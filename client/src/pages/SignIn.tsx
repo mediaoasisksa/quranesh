@@ -59,11 +59,15 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6" dir={dir}>
+      {/* Language Toggle - Top Right Corner */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
+
       <div className="w-full max-w-md">
-        {/* Logo and Language Toggle */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex-1" />
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-8">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors"
@@ -73,9 +77,6 @@ const SignIn = () => {
             </div>
             Quranic
           </Link>
-          <div className="flex-1 flex justify-end">
-            <LanguageToggle />
-          </div>
         </div>
 
         <Card className="border-2 shadow-lg">

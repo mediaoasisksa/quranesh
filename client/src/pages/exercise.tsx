@@ -544,7 +544,12 @@ export default function Exercise() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={dir}>
+      {/* Language Toggle - Top Right Corner */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
+
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -557,7 +562,7 @@ export default function Exercise() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('backToDashboard')}
             </Button>
-            <div className="text-center">
+            <div className="text-center flex-1">
               <h1
                 className="text-lg font-semibold text-foreground"
                 data-testid="text-exercise-title"
@@ -568,7 +573,7 @@ export default function Exercise() {
                 {exerciseConfig?.description}
               </p>
             </div>
-            <LanguageToggle />
+            <div className="w-32"></div>
           </div>
         </div>
       </header>

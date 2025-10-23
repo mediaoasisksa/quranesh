@@ -21,6 +21,9 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query for server state and local React state for UI
 - **Speech Synthesis**: Browser Web Speech API for Arabic text-to-speech functionality
 - **Internationalization**: Custom i18n system with Context API supporting English and Arabic with RTL/LTR switching
+  - Language toggle button positioned at top-right corner (fixed position) on all pages
+  - Automatic direction switching (RTL for Arabic, LTR for English)
+  - Language preference persisted in localStorage
 
 ## Backend Architecture
 - **Server**: Express.js with TypeScript running in ESM mode
