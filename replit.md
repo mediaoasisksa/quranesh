@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with CSS variables for theming and Arabic font support (Amiri)
 - **State Management**: TanStack Query for server state and local React state for UI
 - **Speech Synthesis**: Browser Web Speech API for Arabic text-to-speech functionality
+- **Internationalization**: Custom i18n system with Context API supporting English and Arabic with RTL/LTR switching
 
 ## Backend Architecture
 - **Server**: Express.js with TypeScript running in ESM mode
