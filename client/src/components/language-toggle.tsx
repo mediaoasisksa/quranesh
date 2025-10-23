@@ -6,7 +6,27 @@ export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
   const toggleLanguage = () => {
-    setLanguage(language === "en" ? "ar" : "en");
+    // Cycle through: en -> id -> ar -> en
+    if (language === "en") {
+      setLanguage("id");
+    } else if (language === "id") {
+      setLanguage("ar");
+    } else {
+      setLanguage("en");
+    }
+  };
+
+  const getButtonText = () => {
+    switch (language) {
+      case "en":
+        return "Bahasa";
+      case "id":
+        return "العربية";
+      case "ar":
+        return "English";
+      default:
+        return "Language";
+    }
   };
 
   return (
@@ -18,7 +38,7 @@ export default function LanguageToggle() {
       data-testid="button-language-toggle"
     >
       <Languages className="h-4 w-4" />
-      <span>{language === "en" ? "العربية" : "English"}</span>
+      <span>{getButtonText()}</span>
     </Button>
   );
 }
