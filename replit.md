@@ -38,6 +38,8 @@ Preferred communication style: Simple, everyday language.
 ## Exercise System Architecture
 - **Exercise Types**: Six different exercise patterns including substitution drills, conversation practice, completion exercises, comparison tasks, role-play scenarios, and grammar transformation
 - **Dynamic Content**: Exercises are generated based on user's current phrase knowledge and difficulty progression
+- **Non-Repetition System**: Questions never repeat for the same user across sessions - tracks completed exercises per user and exercise type
+- **AI Question Generation**: When users exhaust all database questions, Gemini AI generates new authentic Quranic phrases and exercises
 - **Progress Tracking**: Real-time feedback and long-term progress analytics
 - **Adaptive Learning**: Exercise selection based on user performance and mastery levels
 
