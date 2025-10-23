@@ -20,6 +20,8 @@ import {
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/contexts/language-context";
+import LanguageToggle from "@/components/language-toggle";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +31,7 @@ const SignUp = () => {
   const [success, setSuccess] = useState("");
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
+  const { t, dir } = useLanguage();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -103,8 +106,9 @@ const SignUp = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6">
       <div className="w-full max-w-lg">
-        {/* Logo */}
-        <div className="text-center mb-8">
+        {/* Logo and Language Toggle */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex-1" />
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors"
@@ -114,23 +118,26 @@ const SignUp = () => {
             </div>
             Quranic
           </Link>
+          <div className="flex-1 flex justify-end">
+            <LanguageToggle />
+          </div>
         </div>
 
         <Card className="border-2 shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Join Quranic</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('signUp')}</CardTitle>
             <CardDescription>
-              Start your journey to master Quranic Arabic in daily conversation
+              {t('createNewAccount')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">{t('firstName')}</Label>
                   <Input
                     id="firstName"
-                    placeholder="First name"
+                    placeholder={t('firstName')}
                     value={formData.firstName}
                     onChange={(e) =>
                       handleInputChange("firstName", e.target.value)
@@ -140,10 +147,10 @@ const SignUp = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">{t('lastName')}</Label>
                   <Input
                     id="lastName"
-                    placeholder="Last name"
+                    placeholder={t('lastName')}
                     value={formData.lastName}
                     onChange={(e) =>
                       handleInputChange("lastName", e.target.value)
@@ -155,11 +162,11 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('email')}
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
@@ -168,7 +175,7 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -339,7 +346,7 @@ const SignUp = () => {
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? `${t('createAccount')}...` : t('createAccount')}
               </Button>
 
               <div className="relative">
@@ -389,12 +396,12 @@ const SignUp = () => {
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {t('alreadyHaveAccount')}{" "}
               <Link
                 href="/signin"
                 className="text-primary hover:underline font-medium"
               >
-                Sign in here
+                {t('signIn')}
               </Link>
             </div>
           </CardContent>

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import AudioButton from "./audio-button";
 import type { Phrase } from "@shared/schema";
+import { useLanguage } from "@/contexts/language-context";
 
 interface ExerciseCardProps {
   type: string;
@@ -32,6 +33,7 @@ export default function ExerciseCard({
   variant = "primary",
 }: ExerciseCardProps) {
   const [userInput, setUserInput] = useState("");
+  const { t } = useLanguage();
 
   const variantStyles = {
     primary: "bg-primary/10 text-primary",
@@ -309,7 +311,7 @@ export default function ExerciseCard({
             onClick={handleStart}
             data-testid={`button-start-exercise-${type}`}
           >
-            Start Exercise
+            {t('startPracticing')}
           </Button>
         </div>
       </CardContent>

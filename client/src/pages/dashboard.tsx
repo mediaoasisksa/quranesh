@@ -23,6 +23,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/contexts/language-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import ExerciseCard from "@/components/exercise-card";
 import PhraseCard from "@/components/phrase-card";
 import ProgressStats from "@/components/progress-stats";
+import LanguageToggle from "@/components/language-toggle";
 import { exerciseTypes, getRandomExerciseType } from "@/lib/exercises";
 import type { Phrase, DailyStats, UserProgress } from "@shared/schema";
 
@@ -47,6 +49,7 @@ export default function Dashboard() {
   );
   const { isAuthenticated, user, signOut } = useAuth();
   const [, setLocation] = useLocation();
+  const { t, dir } = useLanguage();
 
   // Use the actual user ID instead of hardcoded demo user
   const userId = user?.id || "demo-user";
@@ -150,6 +153,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center space-x-4">
+              <LanguageToggle />
               <Button
                 variant="ghost"
                 size="sm"

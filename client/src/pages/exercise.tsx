@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/tooltip";
 import type { Phrase, ExerciseSession, QuestionBank } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/contexts/language-context";
+import LanguageToggle from "@/components/language-toggle";
 
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
@@ -25,6 +27,7 @@ export default function Exercise() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t, dir } = useLanguage();
 
   // Use the actual user ID instead of hardcoded demo user
   const userId = user?.id || "demo-user";
@@ -100,7 +103,7 @@ export default function Exercise() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading exercise...</p>
+        <p className="text-muted-foreground">{t('loadingExercise')}</p>
       </div>
     );
   }
@@ -109,13 +112,13 @@ export default function Exercise() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Exercise not found</p>
+          <p className="text-muted-foreground mb-4">{t('exerciseNotFound')}</p>
           <Button
             onClick={() => setLocation("/dashboard")}
             data-testid="button-back-home"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            {t('backToDashboard')}
           </Button>
         </div>
       </div>
@@ -125,8 +128,8 @@ export default function Exercise() {
   const checkAnswer = async () => {
     if (!userAnswer.trim()) {
       toast({
-        title: "No answer provided",
-        description: "Please provide an answer before submitting.",
+        title: t('noAnswerProvided'),
+        description: t('pleaseProvideAnswer'),
         variant: "destructive",
       });
       return;
@@ -552,7 +555,7 @@ export default function Exercise() {
               data-testid="button-back-dashboard"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              {t('backToDashboard')}
             </Button>
             <div className="text-center">
               <h1
@@ -565,7 +568,7 @@ export default function Exercise() {
                 {exerciseConfig?.description}
               </p>
             </div>
-            <div className="w-20" /> {/* Spacer for centering */}
+            <LanguageToggle />
           </div>
         </div>
       </header>
@@ -620,7 +623,7 @@ export default function Exercise() {
                         : "text-red-800 dark:text-red-200"
                     }`}
                   >
-                    {isCorrect ? "Correct!" : "Try Again"}
+                    {isCorrect ? t('correct') : t('incorrect')}
                   </span>
                 </div>
                 <p
@@ -645,7 +648,7 @@ export default function Exercise() {
                 data-testid="button-reset-exercise"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Try Again
+                {t('tryAgain')}
               </Button>
 
               <div className="space-x-2">
@@ -656,7 +659,7 @@ export default function Exercise() {
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     data-testid="button-check-answer"
                   >
-                    {isValidating ? "AI is checking..." : "Check Answer"}
+                    {isValidating ? t('aiChecking') : t('checkAnswer')}
                   </Button>
                 ) : (
                   <Button
@@ -664,7 +667,7 @@ export default function Exercise() {
                     className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
                     data-testid="button-next-exercise"
                   >
-                    Next Exercise
+                    {t('nextExercise')}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 )}
