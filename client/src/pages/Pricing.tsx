@@ -6,39 +6,61 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Star } from "lucide-react";
 import { PaymentForm } from "@/components/payment-form";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
 
 const Pricing = () => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [pricingPlans, setPricingPlans] = useState<any[]>([]);
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Load pricing plans from API
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const response = await fetch('/api/pricing');
+        const response = await fetch("/api/pricing");
         const data = await response.json();
         setPricingPlans(data.plans);
       } catch (error) {
-        console.error('Failed to fetch pricing:', error);
+        console.error("Failed to fetch pricing:", error);
       }
     };
     fetchPricing();
   }, []);
 
+  // Check for pending payment plan after signup
+  useEffect(() => {
+    const pendingPlan = localStorage.getItem("pendingPaymentPlan");
+    if (pendingPlan && isAuthenticated) {
+      try {
+        const plan = JSON.parse(pendingPlan);
+        setSelectedPlan(plan);
+        setShowPaymentForm(true);
+        // Clear the pending plan since we're now processing it
+        localStorage.removeItem("pendingPaymentPlan");
+      } catch (error) {
+        console.error("Error parsing pending payment plan:", error);
+        localStorage.removeItem("pendingPaymentPlan");
+      }
+    }
+  }, [isAuthenticated]);
+
   const handlePlanSelect = (plan: any) => {
+    // This function is now only called for authenticated users
     setSelectedPlan(plan);
     setShowPaymentForm(true);
   };
 
   const handlePaymentSuccess = (result: any) => {
     // Redirect to success page or dashboard
-    window.location.href = '/payment-success';
+    window.location.href = "/payment-success";
   };
 
   const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error);
-    alert('Payment failed: ' + error);
+    console.error("Payment error:", error);
+    alert("Payment failed: " + error);
   };
 
   const plans = [
@@ -52,21 +74,22 @@ const Pricing = () => {
         "2 exercise types (Substitution & Completion)",
         "Basic progress tracking",
         "Community forum access",
-        "Mobile app access"
+        "Mobile app access",
       ],
       limitations: [
         "Limited AI interactions (10/day)",
-        "Basic pronunciation feedback"
+        "Basic pronunciation feedback",
       ],
       buttonText: "Get Started Free",
       buttonVariant: "outline" as const,
-      popular: false
+      popular: false,
     },
     {
       name: "Standard",
       price: "$19",
       period: "/month",
-      description: "Ideal for serious learners ready to accelerate their progress",
+      description:
+        "Ideal for serious learners ready to accelerate their progress",
       features: [
         "Access to 1000+ Quranic sentences",
         "All 6 exercise types",
@@ -75,12 +98,12 @@ const Pricing = () => {
         "Pronunciation correction",
         "Weekly progress reports",
         "Priority community support",
-        "Offline mode access"
+        "Offline mode access",
       ],
       limitations: [],
       buttonText: "Start Standard Plan",
       buttonVariant: "default" as const,
-      popular: true
+      popular: true,
     },
     {
       name: "Premium",
@@ -97,32 +120,36 @@ const Pricing = () => {
         "1-on-1 monthly coaching calls",
         "Advanced analytics dashboard",
         "Priority customer support",
-        "Early access to new features"
+        "Early access to new features",
       ],
       limitations: [],
       buttonText: "Go Premium",
       buttonVariant: "default" as const,
-      popular: false
-    }
+      popular: false,
+    },
   ];
 
   const faqs = [
     {
       question: "Can I switch plans anytime?",
-      answer: "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and billing is prorated."
+      answer:
+        "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and billing is prorated.",
     },
     {
       question: "Is there a money-back guarantee?",
-      answer: "We offer a 14-day money-back guarantee for all paid plans. If you're not satisfied, contact us for a full refund."
+      answer:
+        "We offer a 14-day money-back guarantee for all paid plans. If you're not satisfied, contact us for a full refund.",
     },
     {
       question: "Do you offer student discounts?",
-      answer: "Yes! Students and educators receive a 50% discount on all plans. Contact us with your student ID or educator credentials."
+      answer:
+        "Yes! Students and educators receive a 50% discount on all plans. Contact us with your student ID or educator credentials.",
     },
     {
       question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards, PayPal, and bank transfers. All payments are processed securely."
-    }
+      answer:
+        "We accept all major credit cards, PayPal, and bank transfers. All payments are processed securely.",
+    },
   ];
 
   return (
@@ -136,8 +163,8 @@ const Pricing = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold">Complete Your Purchase</h2>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     onClick={() => setShowPaymentForm(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
@@ -161,7 +188,8 @@ const Pricing = () => {
               <span className="text-primary"> Pricing</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Choose the perfect plan for your Quranic Arabic learning journey. Start free and upgrade as you grow.
+              Choose the perfect plan for your Quranic Arabic learning journey.
+              Start free and upgrade as you grow.
             </p>
           </div>
         </section>
@@ -171,10 +199,12 @@ const Pricing = () => {
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {plans.map((plan, index) => (
-                <Card 
-                  key={index} 
+                <Card
+                  key={index}
                   className={`relative border-2 transition-all duration-300 hover:shadow-lg ${
-                    plan.popular ? 'border-primary shadow-lg scale-105' : 'border-border hover:border-primary/50'
+                    plan.popular
+                      ? "border-primary shadow-lg scale-105"
+                      : "border-border hover:border-primary/50"
                   }`}
                 >
                   {plan.popular && (
@@ -187,10 +217,16 @@ const Pricing = () => {
                   )}
 
                   <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold mb-2">{plan.name}</CardTitle>
+                    <CardTitle className="text-2xl font-bold mb-2">
+                      {plan.name}
+                    </CardTitle>
                     <div className="mb-4">
-                      <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-4xl font-bold text-foreground">
+                        {plan.price}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {plan.period}
+                      </span>
                     </div>
                     <p className="text-muted-foreground">{plan.description}</p>
                   </CardHeader>
@@ -204,27 +240,64 @@ const Pricing = () => {
                         </div>
                       ))}
                       {plan.limitations.map((limitation, idx) => (
-                        <div key={idx} className="flex items-start gap-3 opacity-60">
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 opacity-60"
+                        >
                           <div className="w-5 h-5 mt-0.5 flex-shrink-0 border border-muted-foreground rounded-full"></div>
-                          <span className="text-sm text-muted-foreground">{limitation}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {limitation}
+                          </span>
                         </div>
                       ))}
                     </div>
 
-                    <Button 
-                      variant={plan.buttonVariant} 
+                    <Button
+                      variant={plan.buttonVariant}
                       className="w-full"
                       onClick={() => {
                         if (plan.name === "Basic") {
-                          window.location.href = '/signup';
+                          window.location.href = "/signup";
                         } else {
-                          // Map to API pricing plans
-                          const apiPlan = pricingPlans.find(p => 
-                            (plan.name === "Standard" && p.id === "premium") ||
-                            (plan.name === "Premium" && p.id === "lifetime")
+                          // For paid plans, check authentication first
+                          if (!isAuthenticated) {
+                            // Store the selected plan in localStorage to restore after signup
+                            localStorage.setItem(
+                              "pendingPaymentPlan",
+                              JSON.stringify({
+                                id: plan.name.toLowerCase(),
+                                name: plan.name,
+                                price: plan.price.replace("$", ""),
+                                currency: "USD",
+                                duration: "month",
+                                features: plan.features,
+                              }),
+                            );
+                            // Redirect to signup page
+                            setLocation("/signup");
+                            return;
+                          }
+
+                          // Map to API pricing plans for authenticated users
+                          const apiPlan = pricingPlans.find(
+                            (p) =>
+                              (plan.name === "Standard" &&
+                                p.id === "premium") ||
+                              (plan.name === "Premium" && p.id === "lifetime"),
                           );
                           if (apiPlan) {
                             handlePlanSelect(apiPlan);
+                          } else {
+                            // Fallback: create a plan object from the UI plan
+                            const fallbackPlan = {
+                              id: plan.name.toLowerCase(),
+                              name: plan.name,
+                              price: parseInt(plan.price.replace("$", "")),
+                              currency: "USD",
+                              duration: "month",
+                              features: plan.features,
+                            };
+                            handlePlanSelect(fallbackPlan);
                           }
                         }
                       }}
@@ -252,9 +325,14 @@ const Pricing = () => {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {faqs.map((faq, index) => (
-                <Card key={index} className="border hover:border-primary/50 transition-all duration-300">
+                <Card
+                  key={index}
+                  className="border hover:border-primary/50 transition-all duration-300"
+                >
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold">{faq.question}</CardTitle>
+                    <CardTitle className="text-lg font-semibold">
+                      {faq.question}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">{faq.answer}</p>
@@ -272,13 +350,22 @@ const Pricing = () => {
               Ready to Start Learning?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Join thousands of learners transforming their Quranic knowledge into practical Arabic skills.
+              Join thousands of learners transforming their Quranic knowledge
+              into practical Arabic skills.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="default" size="lg" onClick={() => window.location.href = '/signup'}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => (window.location.href = "/signup")}
+              >
                 Start Free Today
               </Button>
-              <Button variant="outline" size="lg" onClick={() => window.location.href = '/features'}>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => (window.location.href = "/features")}
+              >
                 Explore Features
               </Button>
             </div>

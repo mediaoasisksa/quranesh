@@ -18,10 +18,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import LanguageToggle from "@/components/language-toggle";
+import { useLanguage } from "@/contexts/language-context";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, signOut } = useAuth();
+  const { dir } = useLanguage();
 
   const navigation = [
     { name: "Features", href: "/features" },
@@ -30,7 +33,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border" dir={dir}>
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -56,6 +59,7 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
+            <LanguageToggle />
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -148,6 +152,7 @@ const Header = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <LanguageToggle />
                 {isAuthenticated ? (
                   <>
                     <div className="flex items-center gap-2 p-2">
