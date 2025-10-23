@@ -24,7 +24,7 @@ import { useLanguage } from "@/contexts/language-context";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, signOut } = useAuth();
-  const { dir } = useLanguage();
+  const { dir, t } = useLanguage();
 
   const navigation = [
     { name: "Features", href: "/features" },
@@ -85,7 +85,7 @@ const Header = () => {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>{t('dashboard')}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -103,7 +103,7 @@ const Header = () => {
                     }}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>{t('logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -114,11 +114,11 @@ const Header = () => {
                     variant="ghost"
                     className="text-muted-foreground hover:text-primary"
                   >
-                    Sign In
+                    {t('signIn')}
                   </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button variant="default">Get Started</Button>
+                  <Button variant="default">{t('signUp')}</Button>
                 </Link>
               </>
             )}
@@ -169,7 +169,7 @@ const Header = () => {
                     <Link href="/dashboard">
                       <Button variant="ghost" className="justify-start w-full">
                         <User className="mr-2 h-4 w-4" />
-                        Dashboard
+                        {t('dashboard')}
                       </Button>
                     </Link>
                     <Link href="/profile">
@@ -187,19 +187,19 @@ const Header = () => {
                       }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Log out
+                      {t('logout')}
                     </Button>
                   </>
                 ) : (
                   <>
                     <Link href="/signin">
                       <Button variant="ghost" className="justify-start w-full">
-                        Sign In
+                        {t('signIn')}
                       </Button>
                     </Link>
                     <Link href="/signup">
                       <Button variant="default" className="w-full">
-                        Get Started
+                        {t('signUp')}
                       </Button>
                     </Link>
                   </>
