@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { Phrase } from "@shared/schema";
 
 const GEMINI_API_KEY =
   process.env.GEMINI_API_KEY || "AIzaSyArY6r6fVZEaUIBNZD8_fRzRnjuGJ-TxKE";
@@ -10,6 +11,16 @@ interface AIValidationResult {
   feedback: string;
   suggestions: string[];
   confidence: number; // 0-1
+}
+
+export interface GeneratedExercise {
+  arabicText: string;
+  englishTranslation: string;
+  surahAyah: string;
+  lifeApplication: string;
+  category: string;
+  difficulty: number;
+  isAIGenerated: boolean;
 }
 
 export async function validateArabicAnswer(
@@ -1102,4 +1113,97 @@ export async function validateExerciseAnswer(
     context,
     expectedAnswer,
   );
+}
+
+// Function to generate new Quranic phrases when user has exhausted all available ones
+export async function generateNewQuranicPhrase(
+  exerciseType: string,
+  category: string = "short",
+  difficulty: number = 1,
+): Promise<GeneratedExercise> {
+  try {
+    console.log("=== GENERATING NEW QURANIC PHRASE ===");
+    console.log("Exercise Type:", exerciseType);
+    console.log("Category:", category);
+    console.log("Difficulty:", difficulty);
+
+    const prompt = `You are an expert in Quranic Arabic. Generate a NEW Quranic phrase or verse that would be suitable for an Arabic learning exercise.
+
+Exercise Type: ${exerciseType}
+Category: ${category} (short, long, commands, or proverbs)
+Difficulty: ${difficulty} (1-5 scale)
+
+Please provide a REAL Quranic verse or phrase (not made up) with the following information:
+1. Arabic Text (with proper diacritics/tashkeel)
+2. English Translation
+3. Surah and Ayah reference (e.g., البقرة:2)
+4. Life Application (brief practical application in Arabic)
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "arabicText": "the Arabic text with diacritics",
+  "englishTranslation": "the English translation",
+  "surahAyah": "السورة:رقم الآية",
+  "lifeApplication": "practical application in Arabic"
+}`;
+
+    const response = await axios.post(GEMINI_API_URL, {
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.7, // Higher temperature for more variety
+        maxOutputTokens: 500,
+        topP: 0.9,
+        topK: 40,
+      },
+    });
+
+    console.log("AI Response Status:", response.status);
+
+    const candidate = response.data.candidates[0];
+    if (!candidate.content?.parts?.[0]?.text) {
+      throw new Error("No valid content in AI response");
+    }
+
+    const responseText = candidate.content.parts[0].text.trim();
+    console.log("AI Generated Response:", responseText);
+
+    // Extract JSON from the response (might be wrapped in markdown code blocks)
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Could not extract JSON from AI response");
+    }
+
+    const generatedData = JSON.parse(jsonMatch[0]);
+
+    return {
+      arabicText: generatedData.arabicText,
+      englishTranslation: generatedData.englishTranslation,
+      surahAyah: generatedData.surahAyah,
+      lifeApplication: generatedData.lifeApplication,
+      category: category,
+      difficulty: difficulty,
+      isAIGenerated: true,
+    };
+  } catch (error) {
+    console.error("Error generating new phrase:", error);
+    
+    // Fallback: return a default phrase if AI fails
+    return {
+      arabicText: "إِنَّ مَعَ ٱلۡعُسۡرِ يُسۡرٗا",
+      englishTranslation: "Indeed, with hardship comes ease",
+      surahAyah: "الشرح:6",
+      lifeApplication: "التفاؤل في الشدائد",
+      category: category,
+      difficulty: difficulty,
+      isAIGenerated: true,
+    };
+  }
 }

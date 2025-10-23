@@ -45,7 +45,16 @@ export default function Exercise() {
   const { data: phrase, isLoading: phraseLoading } = useQuery<Phrase>({
     queryKey: phraseId
       ? ["/api/phrases", phraseId]
-      : ["/api/phrases/random", exerciseType],
+      : ["/api/phrases/random", exerciseType, userId],
+    queryFn: phraseId
+      ? undefined
+      : async () => {
+          const response = await fetch(
+            `/api/phrases/random/${exerciseType}?userId=${userId}`
+          );
+          if (!response.ok) throw new Error("Failed to fetch phrase");
+          return response.json();
+        },
     enabled: !!exerciseType && !isThematicExercise,
   });
 
@@ -235,31 +244,22 @@ export default function Exercise() {
     try {
       console.log("=== NEXT EXERCISE DEBUG ===");
 
-      // Navigate to a random exercise
+      // Navigate to a random exercise (same type or random)
       const randomType = getRandomExerciseType();
       console.log("Random exercise type:", randomType);
 
-      // Get a random phrase for the exercise
-      const { data: phrases } = await queryClient.fetchQuery({
-        queryKey: ["phrases"],
-        queryFn: async () => {
-          const response = await fetch("/api/phrases");
-          return response.json();
-        },
+      // Reset the exercise state
+      resetExercise();
+
+      // Invalidate the random phrase cache to force fetching a new one
+      await queryClient.invalidateQueries({
+        queryKey: ["/api/phrases/random", randomType.id, userId],
       });
 
-      console.log("Available phrases:", phrases?.length);
-
-      if (phrases && phrases.length > 0) {
-        const randomPhrase =
-          phrases[Math.floor(Math.random() * phrases.length)];
-        const newPath = `/exercise/${randomType.id}/${randomPhrase.id}`;
-        console.log("Navigating to:", newPath);
-        setLocation(newPath);
-      } else {
-        console.log("No phrases available, redirecting to dashboard");
-        setLocation("/dashboard");
-      }
+      // Navigate to the new exercise without phraseId (will fetch random with non-repetition)
+      const newPath = `/exercise/${randomType.id}`;
+      console.log("Navigating to:", newPath);
+      setLocation(newPath);
     } catch (error) {
       console.error("Error in goToNextExercise:", error);
       setLocation("/dashboard");

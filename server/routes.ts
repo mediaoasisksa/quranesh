@@ -395,11 +395,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Random phrase for exercises
+  // Random phrase for exercises (with non-repetition logic)
   app.get("/api/phrases/random/:exerciseType", async (req, res) => {
     try {
       const { exerciseType } = req.params;
-      const { category, difficulty } = req.query;
+      const { category, difficulty, userId } = req.query;
 
       let phrases = await storage.getAllPhrases();
 
@@ -412,15 +412,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phrases = phrases.filter((p) => p.difficulty === diff);
       }
 
+      // If userId is provided, filter out already-completed exercises
+      if (userId && typeof userId === "string") {
+        const completedSessions = await storage.getUserExerciseSessions(userId);
+        
+        // Get phrase IDs that have been completed for THIS specific exercise type
+        const completedPhraseIds = new Set(
+          completedSessions
+            .filter((session) => session.exerciseType === exerciseType)
+            .map((session) => session.phraseId)
+        );
+
+        console.log(`User ${userId} has completed ${completedPhraseIds.size} ${exerciseType} exercises`);
+        
+        // Filter out completed phrases
+        phrases = phrases.filter((p) => !completedPhraseIds.has(p.id));
+        
+        console.log(`${phrases.length} new phrases available for ${exerciseType}`);
+      }
+
       if (phrases.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No phrases found for criteria" });
+        // User has exhausted all available phrases - generate a new one using AI
+        console.log("No more phrases available - generating new one using AI");
+        const { generateNewQuranicPhrase } = await import("./ai-service");
+        const aiPhrase = await generateNewQuranicPhrase(
+          exerciseType,
+          typeof category === "string" ? category : "short",
+          typeof difficulty === "string" ? parseInt(difficulty) : 1
+        );
+        
+        return res.json({
+          ...aiPhrase,
+          id: `ai-${Date.now()}`, // Temporary ID for AI-generated phrases
+        });
       }
 
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
       res.json(randomPhrase);
     } catch (error) {
+      console.error("Error fetching random phrase:", error);
       res.status(500).json({ message: "Failed to fetch random phrase" });
     }
   });
