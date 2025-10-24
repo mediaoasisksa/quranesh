@@ -1,41 +1,44 @@
 import { BookOpen, Mail, MessageCircle, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   const footerSections = [
     {
-      title: "Platform",
+      titleKey: "platform",
       links: [
-        { name: "Features", href: "#features" },
-        { name: "Pricing", href: "#pricing" },
-        { name: "How It Works", href: "#how-it-works" },
-        { name: "Success Stories", href: "#testimonials" },
+        { nameKey: "features", href: "#features" },
+        { nameKey: "pricing", href: "#pricing" },
+        { nameKey: "howItWorks", href: "#how-it-works" },
+        { nameKey: "successStories", href: "#testimonials" },
       ],
     },
     {
-      title: "Learning",
+      titleKey: "learning",
       links: [
-        { name: "Arabic Grammar", href: "#" },
-        { name: "Pronunciation Guide", href: "#" },
-        { name: "Quranic Context", href: "#" },
-        { name: "Practice Exercises", href: "#" },
+        { nameKey: "arabicGrammar", href: "#" },
+        { nameKey: "pronunciationGuide", href: "#" },
+        { nameKey: "quranicContext", href: "#" },
+        { nameKey: "practiceExercises", href: "#" },
       ],
     },
     {
-      title: "Support",
+      titleKey: "support",
       links: [
-        { name: "Help Center", href: "#" },
-        { name: "Contact Us", href: "#" },
-        { name: "Community Forum", href: "#" },
-        { name: "Feedback", href: "#" },
+        { nameKey: "helpCenter", href: "#" },
+        { nameKey: "contactUs", href: "#" },
+        { nameKey: "communityForum", href: "#" },
+        { nameKey: "feedback", href: "#" },
       ],
     },
     {
-      title: "Company",
+      titleKey: "company",
       links: [
-        { name: "About Us", href: "#" },
-        { name: "Islamic Guidelines", href: "#" },
-        { name: "Privacy Policy", href: "#" },
-        { name: "Terms of Service", href: "#" },
+        { nameKey: "aboutUs", href: "#" },
+        { nameKey: "islamicGuidelines", href: "#" },
+        { nameKey: "privacyPolicy", href: "#" },
+        { nameKey: "termsOfService", href: "#" },
       ],
     },
   ];
@@ -57,9 +60,7 @@ const Footer = () => {
                 </span>
               </div>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Empowering Huffaz worldwide to transform their Quranic knowledge
-                into practical Arabic communication skills through AI-powered
-                learning.
+                {t('footerDescription')}
               </p>
               <div className="flex gap-4">
                 <a
@@ -87,7 +88,7 @@ const Footer = () => {
             {footerSections.map((section, index) => (
               <div key={index}>
                 <h3 className="font-semibold text-foreground mb-4">
-                  {section.title}
+                  {t(section.titleKey as any)}
                 </h3>
                 <ul className="space-y-3">
                   {section.links.map((link, linkIndex) => (
@@ -96,7 +97,7 @@ const Footer = () => {
                         href={link.href}
                         className="text-muted-foreground hover:text-primary transition-colors duration-200"
                       >
-                        {link.name}
+                        {t(link.nameKey as any)}
                       </a>
                     </li>
                   ))}
@@ -110,27 +111,26 @@ const Footer = () => {
         <div className="py-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-muted-foreground text-sm">
-              © 2024 Quranic. All rights reserved. Developed with respect for
-              Islamic values.
+              {t('footerCopyright')}
             </div>
             <div className="flex gap-6 text-sm">
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Privacy Policy
+                {t('privacyPolicy')}
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Terms of Service
+                {t('termsOfService')}
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Islamic Guidelines
+                {t('islamicGuidelines')}
               </a>
             </div>
           </div>

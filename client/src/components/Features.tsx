@@ -7,38 +7,41 @@ import {
   Target, 
   Users
 } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 const Features = () => {
+  const { t } = useLanguage();
+
   const features = [
     {
       icon: <Brain className="w-8 h-8 text-primary" />,
-      title: "AI-Powered Learning",
-      description: "Advanced AI technology adapts to your learning pace and provides personalized exercises based on your Quranic knowledge."
+      titleKey: "aiPoweredLearning",
+      descKey: "aiPoweredLearningDesc"
     },
     {
       icon: <MessageCircle className="w-8 h-8 text-primary" />,
-      title: "Interactive Conversations",
-      description: "Practice real-life dialogues using Quranic expressions. Role-play scenarios help you apply verses in everyday situations."
+      titleKey: "interactiveConversations",
+      descKey: "interactiveConversationsDesc"
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-primary" />,
-      title: "Progress Tracking",
-      description: "Monitor your advancement with detailed analytics. Track pronunciation, grammar accuracy, and vocabulary expansion."
+      titleKey: "progressTracking",
+      descKey: "progressTrackingDesc"
     },
     {
       icon: <BookOpen className="w-8 h-8 text-primary" />,
-      title: "Quranic Database",
-      description: "Access thousands of classified Quranic sentences with translations, contexts, and practical usage examples."
+      titleKey: "quranicDatabase",
+      descKey: "quranicDatabaseDesc"
     },
     {
       icon: <Target className="w-8 h-8 text-primary" />,
-      title: "Targeted Exercises",
-      description: "Substitution drills, completion exercises, and transformation practices designed specifically for Huffaz learners."
+      titleKey: "targetedExercises",
+      descKey: "targetedExercisesDesc"
     },
     {
       icon: <Users className="w-8 h-8 text-primary" />,
-      title: "Community Learning",
-      description: "Connect with fellow Huffaz worldwide. Share progress, practice together, and learn from each other's experiences."
+      titleKey: "communityLearning",
+      descKey: "communityLearningDesc"
     }
   ];
 
@@ -61,12 +64,8 @@ const Features = () => {
           {/* Text Content */}
           <div className="text-center lg:text-left">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Why  <span className="block text-primary"> Us?</span>
+              {t('whyUs')}
             </h2>
-            {/*<p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Designed specifically for Huffaz who want to bridge their memorized Quranic knowledge 
-              with practical Arabic communication skills.
-            </p>*/}
           </div>
         </div>
 
@@ -75,8 +74,8 @@ const Features = () => {
           {features.map((feature, index) => (
             <Card key={index} className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-card/50 backdrop-blur-sm">
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-3 text-card-foreground">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              <h3 className="text-xl font-semibold mb-3 text-card-foreground">{t(feature.titleKey as any)}</h3>
+              <p className="text-muted-foreground leading-relaxed">{t(feature.descKey as any)}</p>
             </Card>
           ))}
         </div>

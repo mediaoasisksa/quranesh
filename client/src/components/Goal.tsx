@@ -1,4 +1,8 @@
+import { useLanguage } from "@/contexts/language-context";
+
 const Goal = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="py-20 bg-background">
       {/* Modern Wave Divider */}
@@ -36,7 +40,7 @@ const Goal = () => {
             {/* Text Content */}
             <div className="text-center lg:text-left">
               <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-                Our <span className="block text-primary">Goal</span>
+                {t('ourGoal')}
               </h2>
             </div>
           </div>
@@ -44,7 +48,7 @@ const Goal = () => {
           <div className="max-w-4xl mx-auto">
             <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-3xl p-8 md:p-12 border border-primary/10 shadow-lg">
               <p className="text-lg md:text-xl text-foreground leading-relaxed text-center">
-                Our goal is to empower English-speaking Qur'an learners to master Arabic by bridging their existing Qur'anic knowledge with practical language skills—enabling them to understand, speak, and live the language of the Qur'an in daily life.
+                {t('ourGoalDesc')}
               </p>
             </div>
           </div>
