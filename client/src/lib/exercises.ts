@@ -41,11 +41,11 @@ export const exerciseTypes = [
   },
   {
     id: 'transformation',
-    title: 'Transformation',
-    description: 'Convert statements to questions',
-    icon: '🔄',
+    title: 'Philosophical Match',
+    description: 'Match wisdom with Quranic verses',
+    icon: '💎',
     variant: 'accent' as const,
-    category: 'grammar'
+    category: 'wisdom'
   },
   {
     id: 'thematic',

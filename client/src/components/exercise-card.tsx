@@ -232,34 +232,36 @@ export default function ExerciseCard({
         );
 
       case "transformation":
-        return phrase ? (
+        return (
           <div className="mb-4">
             <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <p className="text-xs text-muted-foreground mb-2">Statement:</p>
+              <p className="text-xs text-muted-foreground mb-2">
+                {t('philosophicalSentenceLabel')}
+              </p>
               <p
-                className="arabic-text text-sm text-foreground mb-2"
+                className="arabic-text text-lg text-foreground mb-3"
                 lang="ar"
-                data-testid="text-transformation-statement"
+                dir="rtl"
+                data-testid="text-transformation-philosophical"
               >
-                {phrase.arabicText}
+                💎 {phrase?.arabicText || "الحكمة ضالة المؤمن"}
               </p>
-              <p className="text-xs text-muted-foreground mb-3">
-                {phrase.englishTranslation}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Convert to a question:
+              <p className="text-xs text-muted-foreground font-medium">
+                {t('transformationInstruction')}
               </p>
             </div>
-            <Input
-              type="text"
+            <Textarea
               className="arabic-text text-right"
-              placeholder="حوّل إلى سؤال..."
+              rows={3}
+              placeholder={t('transformationPlaceholder')}
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              data-testid="input-transformation"
+              data-testid="textarea-transformation"
+              dir="rtl"
+              lang="ar"
             />
           </div>
-        ) : null;
+        );
 
       default:
         return null;
