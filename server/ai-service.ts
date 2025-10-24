@@ -153,12 +153,15 @@ function createValidationPrompt(
       - Should be relevant to providing comfort and hope to someone in distress`;
       break;
     case "transformation":
-      specificInstructions = `This is a TRANSFORMATION exercise. The student must convert statements to questions.
-      - The answer should be a proper Arabic question format
-      - Should use appropriate Arabic question words (هل، ما، من، متى، أين، كيف، لماذا)
-      - Should maintain the original meaning and key concepts from the statement
-      - Should follow proper Arabic question structure with question mark (؟)
-      - Example: If given "إِنَّ اللَّهَ غَنِيٌّ حَمِيدٌ" (Indeed, Allah is Free of need and Praiseworthy), a good answer would be "هَلْ اللَّهُ غَنِيٌّ حَمِيدٌ؟" (Is Allah Free of need and Praiseworthy?)`;
+      specificInstructions = `This is a PHILOSOPHICAL MATCH exercise. The student must identify a Quranic verse with a philosophical meaning that is close to or opposite to the given Arabic wisdom sentence.
+      - The answer must be an authentic Quranic verse (full or partial)
+      - The verse should have a philosophical/wisdom meaning that relates to the given sentence
+      - The relationship can be either:
+        * SIMILAR: The Quranic verse conveys a similar wisdom or principle
+        * OPPOSITE: The Quranic verse presents a contrasting or opposite perspective
+      - The answer should demonstrate understanding of both the wisdom sentence and Quranic meaning
+      - Example: If given "الحياة أقصر من أن نهدرها في الخصام" (Life is too short to waste in conflict), 
+        acceptable answers could include verses about forgiveness, patience, or the importance of good deeds`;
       break;
     case "thematic":
       specificInstructions = `This is a THEMATIC exercise. The student must find relevant Quranic verses for life situations.
@@ -520,15 +523,40 @@ function fallbackValidation(
       }
       break;
     case "transformation":
-      // Transformation validation is handled in the fallback section below (after line 900)
-      // Just set default feedback here
-      exerciseSpecificFeedback =
-        "Transformation exercise: Convert the statement to a question format.";
-      suggestions = [
-        "Use question words like هل، ما، من، متى، أين، كيف",
-        "Maintain the key concepts from the original statement",
-        "End with a question mark (؟)",
-      ];
+      // Check if the answer is a Quranic verse (has typical Quranic patterns)
+      const hasTransformQuranicPattern =
+        /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|قل|ولا|ولقد|أو|فلا|وما|ومن)/.test(
+          userAnswer,
+        );
+      const hasQuranicVocabulary =
+        /(يحب|يعلم|يرى|يسمع|عليم|حكيم|بصير|سميع|غفور|رحيم|عزيز|قدير)/.test(
+          userAnswer,
+        );
+      const isReasonableLength = userAnswer.length >= 10;
+
+      if (hasTransformQuranicPattern && hasQuranicVocabulary && isReasonableLength) {
+        exerciseSpecificFeedback =
+          "Good! This appears to be a Quranic verse. Make sure it relates philosophically to the wisdom sentence provided.";
+        suggestions = [
+          "Verify this verse has a similar or opposite meaning to the wisdom sentence",
+          "Excellent use of authentic Quranic text",
+        ];
+      } else if (hasTransformQuranicPattern && isReasonableLength) {
+        exerciseSpecificFeedback =
+          "This looks like a Quranic verse. Good attempt!";
+        suggestions = [
+          "Make sure it relates to the philosophical meaning of the wisdom sentence",
+          "Consider the thematic connection",
+        ];
+      } else {
+        exerciseSpecificFeedback =
+          "For this exercise, provide a Quranic verse with similar or opposite philosophical meaning to the wisdom sentence.";
+        suggestions = [
+          "Use an authentic Quranic verse",
+          "Find a verse that relates philosophically to the given wisdom",
+          "The verse can have either similar or opposite meaning",
+        ];
+      }
       break;
     case "thematic":
       // For thematic exercises, check if the answer contains Quranic verses and relates to the theme
