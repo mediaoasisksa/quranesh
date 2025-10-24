@@ -5,6 +5,7 @@ import {
   exerciseSessions,
   dailyStats,
   questionBanks,
+  philosophicalSentences,
   type User,
   type InsertUser,
   type Phrase,
@@ -17,6 +18,8 @@ import {
   type InsertDailyStats,
   type QuestionBank,
   type InsertQuestionBank,
+  type PhilosophicalSentence,
+  type InsertPhilosophicalSentence,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -70,6 +73,12 @@ export interface IStorage {
   createQuestionBank(questionBank: InsertQuestionBank): Promise<QuestionBank>;
   getQuestionBanksByTheme(theme: string): Promise<QuestionBank[]>;
   searchQuestionBanksByTags(tags: string[]): Promise<QuestionBank[]>;
+
+  // Philosophical sentence methods
+  getAllPhilosophicalSentences(): Promise<PhilosophicalSentence[]>;
+  getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined>;
+  createPhilosophicalSentence(sentence: InsertPhilosophicalSentence): Promise<PhilosophicalSentence>;
+  getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -269,6 +278,57 @@ export class DatabaseStorage implements IStorage {
     // For array operations, this is simplified - you may need custom SQL for complex array queries
     return await db.select().from(questionBanks);
   }
+
+  async getAllPhilosophicalSentences(): Promise<PhilosophicalSentence[]> {
+    return await db.select().from(philosophicalSentences);
+  }
+
+  async getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined> {
+    const [sentence] = await db
+      .select()
+      .from(philosophicalSentences)
+      .where(eq(philosophicalSentences.id, id));
+    return sentence || undefined;
+  }
+
+  async createPhilosophicalSentence(
+    insertSentence: InsertPhilosophicalSentence,
+  ): Promise<PhilosophicalSentence> {
+    const [sentence] = await db
+      .insert(philosophicalSentences)
+      .values(insertSentence)
+      .returning();
+    return sentence;
+  }
+
+  async getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined> {
+    // Get all philosophical sentence IDs that the user has already seen
+    const usedSessions = await db
+      .select({ phraseId: exerciseSessions.phraseId })
+      .from(exerciseSessions)
+      .where(
+        and(
+          eq(exerciseSessions.userId, userId),
+          eq(exerciseSessions.exerciseType, "transformation")
+        )
+      );
+
+    const usedIds = usedSessions.map(s => s.phraseId);
+
+    // Get all philosophical sentences
+    const allSentences = await db.select().from(philosophicalSentences);
+
+    // Filter out used ones and pick a random one
+    const unusedSentences = allSentences.filter(s => !usedIds.includes(s.id));
+
+    if (unusedSentences.length === 0) {
+      // All sentences have been used, return a random one
+      return allSentences[Math.floor(Math.random() * allSentences.length)];
+    }
+
+    // Return a random unused sentence
+    return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -278,6 +338,7 @@ export class MemStorage implements IStorage {
   private exerciseSessions: Map<string, ExerciseSession>;
   private dailyStats: Map<string, DailyStats>;
   private questionBanks: Map<string, QuestionBank>;
+  private philosophicalSentences: Map<string, PhilosophicalSentence>;
 
   constructor() {
     this.users = new Map();
@@ -286,6 +347,7 @@ export class MemStorage implements IStorage {
     this.exerciseSessions = new Map();
     this.dailyStats = new Map();
     this.questionBanks = new Map();
+    this.philosophicalSentences = new Map();
   }
 
   // User methods
@@ -483,6 +545,45 @@ export class MemStorage implements IStorage {
     return Array.from(this.questionBanks.values()).filter((questionBank) =>
       tags.some((tag) => questionBank.tags.includes(tag)),
     );
+  }
+
+  async getAllPhilosophicalSentences(): Promise<PhilosophicalSentence[]> {
+    return Array.from(this.philosophicalSentences.values());
+  }
+
+  async getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined> {
+    return this.philosophicalSentences.get(id);
+  }
+
+  async createPhilosophicalSentence(
+    insertSentence: InsertPhilosophicalSentence,
+  ): Promise<PhilosophicalSentence> {
+    const id = randomUUID();
+    const sentence: PhilosophicalSentence = { ...insertSentence, id };
+    this.philosophicalSentences.set(id, sentence);
+    return sentence;
+  }
+
+  async getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined> {
+    // Get all philosophical sentence IDs that the user has already seen
+    const usedIds = Array.from(this.exerciseSessions.values())
+      .filter(session => session.userId === userId && session.exerciseType === "transformation")
+      .map(session => session.phraseId);
+
+    // Get all philosophical sentences
+    const allSentences = Array.from(this.philosophicalSentences.values());
+
+    // Filter out used ones and pick a random one
+    const unusedSentences = allSentences.filter(s => !usedIds.includes(s.id));
+
+    if (unusedSentences.length === 0) {
+      // All sentences have been used, return a random one
+      if (allSentences.length === 0) return undefined;
+      return allSentences[Math.floor(Math.random() * allSentences.length)];
+    }
+
+    // Return a random unused sentence
+    return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
   }
 }
 

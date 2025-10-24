@@ -7,6 +7,7 @@ import {
   insertUserProgressSchema,
   insertDailyStatsSchema,
   insertQuestionBankSchema,
+  insertPhilosophicalSentenceSchema,
   insertUserSchema,
   signupSchema,
   signinSchema,
@@ -15,6 +16,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { phrasesData } from "../client/src/lib/phrases-data";
 import { generateQuestionBanksWithPhraseIds } from "../client/src/lib/question-phrase-mapping";
+import { philosophicalSentencesData } from "../client/src/lib/philosophical-sentences-data";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -62,6 +64,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const questionBankData of questionBanksWithPhraseIds) {
         await storage.createQuestionBank(questionBankData);
       }
+    }
+
+    const existingPhilosophicalSentences = await storage.getAllPhilosophicalSentences();
+    if (existingPhilosophicalSentences.length === 0) {
+      for (const sentenceData of philosophicalSentencesData) {
+        await storage.createPhilosophicalSentence(sentenceData);
+      }
+      console.log(`✓ Loaded ${philosophicalSentencesData.length} philosophical sentences`);
     }
   })();
 
@@ -208,6 +218,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(phrase);
     } catch (error) {
       res.status(400).json({ message: "Invalid phrase data" });
+    }
+  });
+
+  // Philosophical sentence routes
+  app.get("/api/philosophical-sentences/random", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      if (!userId || typeof userId !== "string") {
+        return res.status(400).json({ message: "userId is required" });
+      }
+
+      const sentence = await storage.getUnusedPhilosophicalSentence(userId);
+      if (!sentence) {
+        return res.status(404).json({ message: "No philosophical sentences available" });
+      }
+
+      res.json(sentence);
+    } catch (error) {
+      console.error("Error fetching philosophical sentence:", error);
+      res.status(500).json({ message: "Failed to fetch philosophical sentence" });
+    }
+  });
+
+  app.get("/api/philosophical-sentences", async (req, res) => {
+    try {
+      const sentences = await storage.getAllPhilosophicalSentences();
+      res.json(sentences);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch philosophical sentences" });
     }
   });
 
