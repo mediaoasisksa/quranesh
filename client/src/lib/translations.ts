@@ -87,6 +87,16 @@ export const translations = {
     all: "All",
     none: "None",
     or: "or",
+    
+    // Homepage
+    quranicQuote: "The best of you are those who learn the Qur'an and teach it",
+    startLearningNow: "Start Learning Now",
+    seeHowItWorks: "See How It Works",
+    quranicExpressions: "Quranic Expressions",
+    aiPowered: "AI-Powered",
+    personalizedLearning: "Personalized Learning",
+    dailyPractice: "Daily",
+    practiceSessions: "Practice Sessions",
   },
   ar: {
     // Navigation
@@ -176,6 +186,16 @@ export const translations = {
     all: "الكل",
     none: "لا شيء",
     or: "أو",
+    
+    // Homepage
+    quranicQuote: "خَيْرُكُمْ مِنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمه",
+    startLearningNow: "ابدأ التعلم الآن",
+    seeHowItWorks: "اطلع على طريقة العمل",
+    quranicExpressions: "عبارات قرآنية",
+    aiPowered: "مدعوم بالذكاء الاصطناعي",
+    personalizedLearning: "تعلم مخصص",
+    dailyPractice: "يومي",
+    practiceSessions: "جلسات التمرين",
   },
   id: {
     // Navigation
@@ -265,6 +285,16 @@ export const translations = {
     all: "Semua",
     none: "Tidak Ada",
     or: "atau",
+    
+    // Homepage
+    quranicQuote: "Sebaik-baik kalian adalah yang mempelajari Al-Qur'an dan mengajarkannya",
+    startLearningNow: "Mulai Belajar Sekarang",
+    seeHowItWorks: "Lihat Cara Kerjanya",
+    quranicExpressions: "Ungkapan Quran",
+    aiPowered: "Bertenaga AI",
+    personalizedLearning: "Pembelajaran Pribadi",
+    dailyPractice: "Harian",
+    practiceSessions: "Sesi Latihan",
   },
 };
 
