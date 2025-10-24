@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/contexts/language-context";
 
 const Hero = () => {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const { t, language } = useLanguage();
 
   const handleStartLearning = () => {
     if (isAuthenticated) {
@@ -62,7 +64,7 @@ const Hero = () => {
               «خَيْرُكُمْ مِنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمه»
             </p>
             <p className="text-lg text-foreground">
-              The best of you are those who learn the Qur'an and teach it
+              {t('quranicQuote')}
             </p>
           </div>
 
@@ -75,13 +77,13 @@ const Hero = () => {
               className="text-lg px-8 py-6"
               onClick={handleStartLearning}
             >
-              Start Learning Now
+              {t('startLearningNow')}
               <ArrowRight className="w-5 h-5" />
             </Button>
             <Link href="/how-it-works">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6">
                 <MessageSquare className="w-5 h-5" />
-                See How It Works
+                {t('seeHowItWorks')}
               </Button>
             </Link>
           </div>
@@ -91,21 +93,21 @@ const Hero = () => {
             <div className="text-center">
               <div className="text-3xl font-bold text-primary mb-2">1000+</div>
               <div className="text-sm text-muted-foreground">
-                Quranic Expressions
+                {t('quranicExpressions')}
               </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary mb-2">
-                AI-Powered
+                {t('aiPowered')}
               </div>
               <div className="text-sm text-muted-foreground">
-                Personalized Learning
+                {t('personalizedLearning')}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">Daily</div>
+              <div className="text-3xl font-bold text-primary mb-2">{t('dailyPractice')}</div>
               <div className="text-sm text-muted-foreground">
-                Practice Sessions
+                {t('practiceSessions')}
               </div>
             </div>
           </div>
