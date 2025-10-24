@@ -920,97 +920,27 @@ function fallbackValidation(
     isActuallyCorrect =
       hasArabic && hasContent && (hasRoleplayQuranicPattern || hasComfortWords);
   } else if (exerciseType === "transformation") {
-    // For transformation exercises, check if the answer is a proper question format
-    const hasQuestionWords = /(هل|ما|من|متى|أين|كيف|لماذا|أم|أليس|أو)/.test(
-      userAnswer,
-    );
-    const hasQuestionMark =
-      userAnswer.includes("؟") || userAnswer.includes("?");
-    // Consider it a question format if it has question words OR question mark OR starts with هل
-    const isQuestionFormat =
-      hasQuestionWords || hasQuestionMark || userAnswer.trim().startsWith("هل");
-
-    // Check if the question is relevant to the original statement
-    let isRelevantToStatement = false;
-    if (context) {
-      // Normalize Arabic text by removing diacritics
-      const normalizeArabic = (text: string): string => {
-        return text
-          .replace(/[\u064B-\u065F\u0670]/g, "") // Remove all diacritics
-          .replace(/[ًٌٍَُِّْ]/g, "")
-          .replace(/أ|إ|آ/g, "ا") // Normalize alef variants
-          .replace(/ى/g, "ي") // Normalize ya variants
-          .trim();
-      };
-
-      const normalizedStatement = normalizeArabic(context);
-      const normalizedQuestion = normalizeArabic(userAnswer);
-
-      // Extract ALL meaningful words from the original statement (excluding short connecting words)
-      const stopWords = ["و", "ف", "ب", "ل", "ك", "من", "في", "على", "الى", "إلى", "عن", "ما", "لا", "إن", "أن", "إذا", "لم", "لن", "قد"];
-      
-      // Split and process words
-      const allWords = normalizedStatement.split(/\s+/);
-      console.log("=== KEY CONCEPTS DEBUG ===");
-      console.log("Original Statement:", context);
-      console.log("Normalized Statement:", normalizedStatement);
-      console.log("All words after split:", allWords);
-      
-      const statementWords = allWords
-        .filter(word => {
-          const isLongEnough = word.length > 1;
-          const isNotStopWord = !stopWords.includes(word);
-          const hasArabic = /[\u0600-\u06FF]/.test(word);
-          console.log(`  Word "${word}": len=${word.length}, notStop=${isNotStopWord}, arabic=${hasArabic}`);
-          return isLongEnough && isNotStopWord && hasArabic;
-        });
-
-      console.log("User Question:", userAnswer);
-      console.log("Normalized Question:", normalizedQuestion);
-      console.log("Final Statement Words (Key Concepts):", statementWords);
-
-      // Check if the question contains at least 50% of the key concepts from the statement
-      let matchingConcepts = 0;
-      statementWords.forEach((word) => {
-        if (normalizedQuestion.includes(word)) {
-          matchingConcepts++;
-          console.log(`✓ Matched word: ${word}`);
-        } else {
-          console.log(`✗ Missed word: ${word}`);
-        }
-      });
-
-      const matchPercentage = statementWords.length > 0 
-        ? (matchingConcepts / statementWords.length) * 100 
-        : 0;
-
-      console.log(
-        `Matching: ${matchingConcepts}/${statementWords.length} (${matchPercentage.toFixed(1)}%)`,
+    // For transformation exercises, check if the answer is a Quranic verse (philosophical match)
+    const hasQuranicPattern =
+      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|قل|ولا|لا تحزن|ولقد|يا أيها|العسر|اليسر|صبر|رحمة)/.test(
+        userAnswer,
       );
-
-      // Require at least 50% of the original statement's key words to be present in the question
-      isRelevantToStatement = statementWords.length > 0 && matchingConcepts / statementWords.length >= 0.5;
-      console.log("Is Relevant:", isRelevantToStatement);
-      console.log("========================");
-    }
 
     console.log("=== TRANSFORMATION VALIDATION DEBUG ===");
     console.log("User Answer:", userAnswer);
     console.log("Has Arabic:", hasArabic);
     console.log("Has Content:", hasContent);
-    console.log("Has Question Words:", hasQuestionWords);
-    console.log("Has Question Mark:", hasQuestionMark);
-    console.log("Is Question Format:", isQuestionFormat);
-    console.log("Is Relevant to Statement:", isRelevantToStatement);
-    console.log("Context:", context);
+    console.log("Has Quranic Pattern:", hasQuranicPattern);
+    console.log("Context (Wisdom Sentence):", context);
     console.log(
       "Will be correct:",
-      hasArabic && hasContent && isQuestionFormat && isRelevantToStatement,
+      hasArabic && hasContent && hasQuranicPattern,
     );
     console.log("=====================================");
 
-    // Consider it correct if it has Arabic content AND is in question format AND is relevant to the original statement
-    isActuallyCorrect = hasArabic && hasContent && isQuestionFormat && isRelevantToStatement;
+    // Consider it correct if it has Arabic content AND Quranic patterns
+    // (More sophisticated semantic validation would require AI, which is the main path)
+    isActuallyCorrect = hasArabic && hasContent && hasQuranicPattern;
   } else if (exerciseType === "thematic") {
     // For thematic exercises, check if the answer contains Quranic verses and relates to the theme
     const hasThematicQuranicPattern =
@@ -1061,31 +991,26 @@ function fallbackValidation(
   if (exerciseType === "transformation") {
     if (isActuallyCorrect) {
       finalFeedback =
-        "Excellent! You successfully converted the statement to a relevant question.";
+        "Excellent! You provided a Quranic verse that relates well to the wisdom sentence.";
     } else {
-      // Use the specific feedback from the switch statement logic
-      const hasQuestionWords = /(هل|ما|من|متى|أين|كيف|لماذا|أم|أليس|أو)/.test(
-        userAnswer,
-      );
-      const hasQuestionMark =
-        userAnswer.includes("؟") || userAnswer.includes("?");
-      const isQuestionFormat =
-        hasQuestionWords ||
-        hasQuestionMark ||
-        userAnswer.trim().startsWith("هل");
+      // Check if it looks like a Quranic verse
+      const hasQuranicPattern =
+        /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|قل|ولا|لا تحزن|ولقد|يا أيها)/.test(
+          userAnswer,
+        );
 
-      if (isQuestionFormat && hasArabic && hasContent) {
-        // It's a question but not relevant
+      if (hasQuranicPattern && hasArabic && hasContent) {
+        // It looks like a Quranic verse but may not be semantically related
         finalFeedback =
-          "You created a question, but it should be related to the original statement.";
+          "You provided a Quranic verse, but it may not have a strong philosophical connection to the wisdom sentence. Try to find a verse with similar or opposite meaning.";
       } else if (hasArabic && hasContent) {
-        // It's Arabic but not a question
+        // It's Arabic but doesn't look Quranic
         finalFeedback =
-          "You provided Arabic text, but it needs to be in question format.";
+          "You provided Arabic text, but it should be an authentic Quranic verse. Try to recall a verse from the Quran that shares a similar wisdom or teaching.";
       } else {
         // Not Arabic or too short
         finalFeedback =
-          "Incorrect! For transformation exercises, convert the statement to a question format.";
+          "Incorrect! For this exercise, please provide a Quranic verse (full or partial) that has a philosophical meaning similar to or opposite to the given wisdom sentence.";
       }
     }
   }
