@@ -123,5 +123,19 @@ export const insertQuestionBankSchema = createInsertSchema(questionBanks).omit({
 export type QuestionBank = typeof questionBanks.$inferSelect;
 export type InsertQuestionBank = z.infer<typeof insertQuestionBankSchema>;
 
+// Philosophical sentences for transformation exercises
+export const philosophicalSentences = pgTable("philosophical_sentences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  arabicText: text("arabic_text").notNull(),
+  difficulty: integer("difficulty").default(1), // 1-5 scale
+});
+
+export const insertPhilosophicalSentenceSchema = createInsertSchema(philosophicalSentences).omit({
+  id: true,
+});
+
+export type PhilosophicalSentence = typeof philosophicalSentences.$inferSelect;
+export type InsertPhilosophicalSentence = z.infer<typeof insertPhilosophicalSentenceSchema>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
