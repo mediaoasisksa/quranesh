@@ -16,7 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { Phrase, ExerciseSession, QuestionBank } from "@shared/schema";
+import type { Phrase, ExerciseSession, QuestionBank, PhilosophicalSentence } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
@@ -43,6 +43,18 @@ export default function Exercise() {
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
+  const isTransformationExercise = exerciseType === "transformation";
+
+  // For transformation exercises, fetch philosophical sentences
+  const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
+    queryKey: ["/api/philosophical-sentences/random", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/philosophical-sentences/random?userId=${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch philosophical sentence");
+      return response.json();
+    },
+    enabled: !!exerciseType && isTransformationExercise,
+  });
 
   // For thematic exercises, fetch question banks; for others, fetch phrases
   const { data: phrase, isLoading: phraseLoading } = useQuery<Phrase>({
@@ -58,7 +70,7 @@ export default function Exercise() {
           if (!response.ok) throw new Error("Failed to fetch phrase");
           return response.json();
         },
-    enabled: !!exerciseType && !isThematicExercise,
+    enabled: !!exerciseType && !isThematicExercise && !isTransformationExercise,
   });
 
   const { data: questionBank, isLoading: questionBankLoading } = useQuery<
@@ -68,8 +80,8 @@ export default function Exercise() {
     enabled: !!exerciseType && isThematicExercise,
   });
 
-  const isLoading = isThematicExercise ? questionBankLoading : phraseLoading;
-  const exerciseData = isThematicExercise ? questionBank : phrase;
+  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : phraseLoading);
+  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : phrase);
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -154,8 +166,9 @@ export default function Exercise() {
         body: JSON.stringify({
           userAnswer,
           exerciseType,
-          phraseId: exerciseType === "thematic" ? null : phraseId || phrase?.id,
+          phraseId: exerciseType === "thematic" ? null : (exerciseType === "transformation" ? philosophicalSentence?.id : (phraseId || phrase?.id)),
           questionBankId: questionBank?.id,
+          philosophicalSentenceId: exerciseType === "transformation" ? philosophicalSentence?.id : undefined,
         }),
       });
 
@@ -225,6 +238,8 @@ export default function Exercise() {
     const dataId =
       isThematicExercise && questionBank
         ? questionBank.id
+        : isTransformationExercise && philosophicalSentence
+        ? philosophicalSentence.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
       userId: userId,
@@ -254,10 +269,16 @@ export default function Exercise() {
       // Reset the exercise state
       resetExercise();
 
-      // Invalidate the random phrase cache to force fetching a new one
-      await queryClient.invalidateQueries({
-        queryKey: ["/api/phrases/random", randomType.id, userId],
-      });
+      // Invalidate the appropriate cache based on exercise type
+      if (randomType.id === "transformation") {
+        await queryClient.invalidateQueries({
+          queryKey: ["/api/philosophical-sentences/random", userId],
+        });
+      } else {
+        await queryClient.invalidateQueries({
+          queryKey: ["/api/phrases/random", randomType.id, userId],
+        });
+      }
 
       // Navigate to the new exercise without phraseId (will fetch random with non-repetition)
       const newPath = `/exercise/${randomType.id}`;
@@ -322,7 +343,8 @@ export default function Exercise() {
       );
     }
 
-    if (!phrase) return null;
+    // For transformation exercises, we use philosophicalSentence instead of phrase
+    if (!phrase && !isTransformationExercise) return null;
 
     switch (exerciseType) {
       case "substitution":
@@ -512,28 +534,30 @@ export default function Exercise() {
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-2">Statement:</p>
+              <p className="text-sm text-muted-foreground mb-2">
+                {t('philosophicalSentenceLabel')}
+              </p>
               <p
                 className="arabic-text text-xl text-foreground mb-3"
                 lang="ar"
-                data-testid="text-transformation-statement"
+                dir="rtl"
+                data-testid="text-transformation-philosophical"
               >
-                {phrase?.arabicText || "Loading..."}
-              </p>
-              <p className="text-muted-foreground mb-4">
-                {phrase?.englishTranslation || "Loading..."}
+                💎 {philosophicalSentence?.arabicText || "جاري التحميل..."}
               </p>
               <p className="text-sm text-muted-foreground">
-                Convert this statement to a question:
+                {t('transformationInstruction')}
               </p>
             </div>
-            <Input
-              className="arabic-text text-right text-lg"
-              placeholder="حوّل إلى سؤال..."
+            <Textarea
+              className="arabic-text text-right text-lg min-h-[100px]"
+              placeholder={t('transformationPlaceholder')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
-              data-testid="input-transformation-answer"
+              dir="rtl"
+              lang="ar"
+              data-testid="textarea-transformation"
             />
           </div>
         );

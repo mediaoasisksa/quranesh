@@ -103,7 +103,10 @@ export default function Dashboard() {
   };
 
   const handleExerciseStart = (type: string, phraseId?: string) => {
-    if (phraseId) {
+    // Transformation exercises don't use phrases - they fetch philosophical sentences directly
+    if (type === "transformation") {
+      window.location.href = `/exercise/transformation`;
+    } else if (phraseId) {
       window.location.href = `/exercise/${type}/${phraseId}`;
     } else {
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];

@@ -881,7 +881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI-powered answer validation
   app.post("/api/validate-answer", async (req, res) => {
     try {
-      const { userAnswer, exerciseType, phraseId, questionBankId } = req.body;
+      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId } = req.body;
 
       if (!userAnswer || !exerciseType) {
         return res.status(400).json({
@@ -891,8 +891,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let phraseData = null;
 
-      // Fetch phrase or question bank data for context
-      if (phraseId) {
+      // For transformation exercises, fetch philosophical sentence
+      if (exerciseType === "transformation" && philosophicalSentenceId) {
+        const philosophicalSentence = await storage.getPhilosophicalSentence(philosophicalSentenceId);
+        if (philosophicalSentence) {
+          // Convert philosophical sentence to phrase-like structure for AI validation
+          phraseData = {
+            id: philosophicalSentence.id,
+            arabicText: philosophicalSentence.arabicText,
+            englishTranslation: "Philosophical wisdom sentence",
+            surahAyah: "N/A",
+            lifeApplication: "Find Quranic verse with similar or opposite philosophical meaning",
+            category: "transformation",
+            difficulty: philosophicalSentence.difficulty || 1,
+          };
+        }
+      } else if (phraseId) {
+        // Fetch phrase or question bank data for context
         phraseData = await storage.getPhrase(phraseId);
       } else if (questionBankId) {
         phraseData = await storage.getQuestionBank(questionBankId);
