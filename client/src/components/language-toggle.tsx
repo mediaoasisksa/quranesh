@@ -6,10 +6,12 @@ export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
   const toggleLanguage = () => {
-    // Cycle through: en -> id -> ar -> en
+    // Cycle through: en -> id -> tr -> ar -> en
     if (language === "en") {
       setLanguage("id");
     } else if (language === "id") {
+      setLanguage("tr");
+    } else if (language === "tr") {
       setLanguage("ar");
     } else {
       setLanguage("en");
@@ -21,6 +23,8 @@ export default function LanguageToggle() {
       case "en":
         return "Bahasa";
       case "id":
+        return "Türkçe";
+      case "tr":
         return "العربية";
       case "ar":
         return "English";
