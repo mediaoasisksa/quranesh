@@ -626,6 +626,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ? HYPERPAY_CONFIG.entityIdMada
           : HYPERPAY_CONFIG.entityIdVisaMaster;
 
+      // Determine callback URL based on environment
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+      const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:5000';
+      const baseUrl = `${protocol}://${host}`;
+      const callbackUrl = `${baseUrl}/api/payment-callback?entityId=${entityId}`;
+
       // Prepare checkout request
       const checkoutData = {
         entityId,
@@ -642,23 +648,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.country": customerDetails.country,
         "billing.postcode": customerDetails.postcode,
         "customParameters[3DS2_enrolled]": "true",
-        shopperResultUrl: `http://localhost:5000/api/payment-callback?entityId=${entityId}`,
+        shopperResultUrl: callbackUrl,
       };
 
       // Add MADA-specific parameters if using MADA
       if (paymentMethod === "MADA") {
         // MADA requires specific redirect URL configuration
-        (checkoutData as any)["customParameters[SHOPPER_ResultUrl]"] =
-          `http://localhost:5000/api/payment-callback?entityId=${entityId}`;
+        (checkoutData as any)["customParameters[SHOPPER_ResultUrl]"] = callbackUrl;
       }
-
-      // Ensure shopperResultUrl is always set for all payment methods
-      checkoutData.shopperResultUrl = `http://localhost:5000/api/payment-callback?entityId=${entityId}`;
 
       // Debug: Log the checkout data being sent
       console.log("=== CHECKOUT CREATION DEBUG ===");
       console.log("Payment method:", paymentMethod);
       console.log("Entity ID being used:", entityId);
+      console.log("Callback URL:", callbackUrl);
+      console.log("Base URL:", baseUrl);
       console.log("Selected plan:", selectedPlan);
       console.log("Customer details:", customerDetails);
       console.log(
