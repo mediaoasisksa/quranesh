@@ -637,18 +637,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.country": customerDetails.country,
         "billing.postcode": customerDetails.postcode,
         "customParameters[3DS2_enrolled]": "true",
-        shopperResultUrl: "http://localhost:5000/payment-success",
+        shopperResultUrl: `http://localhost:5000/api/payment-callback?entityId=${entityId}`,
       };
 
       // Add MADA-specific parameters if using MADA
       if (paymentMethod === "MADA") {
         // MADA requires specific redirect URL configuration
         (checkoutData as any)["customParameters[SHOPPER_ResultUrl]"] =
-          "http://localhost:5000/payment-success";
+          `http://localhost:5000/api/payment-callback?entityId=${entityId}`;
       }
 
       // Ensure shopperResultUrl is always set for all payment methods
-      checkoutData.shopperResultUrl = "http://localhost:5000/payment-success";
+      checkoutData.shopperResultUrl = `http://localhost:5000/api/payment-callback?entityId=${entityId}`;
 
       // Debug: Log the checkout data being sent
       console.log("=== CHECKOUT CREATION DEBUG ===");
@@ -818,15 +818,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/payment-success", async (req, res) => {
+  app.get("/api/payment-callback", async (req, res) => {
     try {
       const { resourcePath, entityId } = req.query;
 
+      console.log("=== PAYMENT CALLBACK RECEIVED ===");
+      console.log("Full query params:", req.query);
+      console.log("resourcePath:", resourcePath);
+      console.log("entityId:", entityId);
+
       if (!resourcePath) {
+        console.log("Missing resourcePath, redirecting to pricing with error");
         return res.redirect("/pricing?error=missing_parameters");
       }
 
       // Verify payment with HyperPay
+      // The entityId should be passed from our shopperResultUrl
+      const verificationEntityId = entityId as string || HYPERPAY_CONFIG.entityIdVisaMaster;
+      console.log("Using entityId for verification:", verificationEntityId);
+
       const response = await axios.get(
         `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`,
         {
@@ -834,29 +844,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
             Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
           },
           params: {
-            entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster,
+            entityId: verificationEntityId,
           },
         },
       );
 
       const paymentResult = response.data;
+      console.log("Payment verification result:", JSON.stringify(paymentResult, null, 2));
 
       // Check if payment was successful
       const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
+        console.log("Payment successful, redirecting to success page");
         // Redirect to success page with success parameters
         res.redirect(
           `/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`,
         );
       } else {
+        console.log("Payment failed, redirecting with error");
         // Redirect to success page with error parameters
         res.redirect(
           `/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment verification error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
       res.redirect("/payment-success?success=false&error=verification_failed");
     }
   });

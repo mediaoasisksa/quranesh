@@ -59,8 +59,9 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
   useEffect(() => {
     window.wpwlOptions = {
       paymentTarget: "_top",
-      brandOrder: ["MADA", "VISA", "MASTER"],
-      shopperResultUrl: "http://localhost:5000/payment-success"
+      brandOrder: ["MADA", "VISA", "MASTER"]
+      // Note: shopperResultUrl is set on the server side during checkout creation
+      // and includes the correct entityId for MADA/VISA_MASTER
     };
   }, []);
 
