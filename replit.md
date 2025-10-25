@@ -50,9 +50,29 @@ Preferred communication style: Simple, everyday language.
 - **Adaptive Learning**: Exercise selection based on user performance and mastery levels
 
 ## Authentication Strategy
-- **Current Implementation**: Demo user system for development and testing
-- **Scalable Design**: User ID-based data isolation ready for future authentication integration
-- **Session Management**: Prepared for session-based or token-based authentication
+- **Current Implementation**: Full authentication system with JWT tokens and bcrypt password hashing
+- **Demo User**: Email: demo@example.com, Password: demo123
+- **Scalable Design**: User ID-based data isolation with PostgreSQL database
+- **Session Management**: JWT-based authentication with secure session handling
+
+## Payment Integration (HyperPay)
+- **Gateway**: HyperPay payment gateway for subscription management
+- **Supported Methods**: VISA, MASTER, MADA cards
+- **Environment**: HyperPay EU test server (https://eu-test.oppwa.com)
+- **Authentication**: Bearer token-based API access
+- **Callback Flow**: Dynamic callback URL generation based on environment
+  - Development: Uses request headers to detect localhost or Replit URL
+  - Callback route: `/api/payment-callback` with entityId parameter
+  - Verification: Backend validates payment with HyperPay API before confirming
+- **Test Cards**:
+  - VISA: 4440000009900010 (Exp: 01/39, CVV: 100)
+  - MASTER: 5123450000000008 (Exp: 01/39, CVV: 100)
+  - MADA: 5297412484442387 (Exp: 10/26, CVV: 966)
+- **Recent Fixes**:
+  - Fixed plan selection mapping (Standard → standard, Premium → premium)
+  - Removed duplicate shopperResultUrl assignment
+  - Implemented dynamic callback URL generation
+  - Added entityId passing via shopperResultUrl for correct MADA/VISA verification
 
 # External Dependencies
 
