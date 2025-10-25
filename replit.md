@@ -20,12 +20,12 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with CSS variables for theming and Arabic font support (Amiri)
 - **State Management**: TanStack Query for server state and local React state for UI
 - **Speech Synthesis**: Browser Web Speech API for Arabic text-to-speech functionality
-- **Internationalization**: Custom i18n system with Context API supporting English, Bahasa Indonesia, Turkish, Arabic, and Chinese with RTL/LTR switching
+- **Internationalization**: Custom i18n system with Context API supporting English, Bahasa Indonesia, Turkish, Arabic, Chinese, and Swahili with RTL/LTR switching
   - Language toggle button positioned in navigation header on all pages
-  - Cycles through: English → Bahasa Indonesia → Turkish → Arabic → Chinese → English
-  - Automatic direction switching (RTL for Arabic, LTR for English, Bahasa, Turkish, and Chinese)
+  - Cycles through: English → Bahasa Indonesia → Turkish → Arabic → Chinese → Swahili → English
+  - Automatic direction switching (RTL for Arabic, LTR for English, Bahasa, Turkish, Chinese, and Swahili)
   - Language preference persisted in localStorage
-  - Full translations for all UI elements in all five languages
+  - Full translations for all UI elements in all six languages
 
 ## Backend Architecture
 - **Server**: Express.js with TypeScript running in ESM mode
