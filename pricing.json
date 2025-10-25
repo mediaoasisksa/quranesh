@@ -2,41 +2,52 @@
   "plans": [
     {
       "id": "basic",
-      "name": "Basic Plan",
-      "price": 29.99,
-      "currency": "SAR",
-      "duration": "monthly",
+      "name": "Basic",
+      "price": 0,
+      "currency": "USD",
+      "duration": "free",
       "features": [
-        "Access to basic Arabic phrases",
-        "Daily exercises",
-        "Progress tracking"
+        "Access to 100 basic Quranic sentences",
+        "2 exercise types (Substitution & Completion)",
+        "Basic progress tracking",
+        "Community forum access",
+        "Mobile app access"
+      ]
+    },
+    {
+      "id": "standard",
+      "name": "Standard",
+      "price": 19,
+      "currency": "USD",
+      "duration": "month",
+      "features": [
+        "Access to 1000+ Quranic sentences",
+        "All 6 exercise types",
+        "Advanced AI conversation partner",
+        "Detailed progress analytics",
+        "Pronunciation correction",
+        "Weekly progress reports",
+        "Priority community support",
+        "Offline mode access"
       ]
     },
     {
       "id": "premium",
-      "name": "Premium Plan",
-      "price": 59.99,
-      "currency": "SAR",
-      "duration": "monthly",
+      "name": "Premium",
+      "price": 39,
+      "currency": "USD",
+      "duration": "month",
       "features": [
-        "All basic features",
-        "Advanced exercises",
-        "AI-powered pronunciation",
-        "Personalized learning path",
-        "Priority support"
-      ]
-    },
-    {
-      "id": "lifetime",
-      "name": "Lifetime Access",
-      "price": 299.99,
-      "currency": "SAR",
-      "duration": "lifetime",
-      "features": [
-        "All premium features",
-        "Lifetime access",
-        "Future updates included",
-        "Exclusive content"
+        "Access to full Quranic database (5000+ sentences)",
+        "Unlimited AI interactions",
+        "Advanced speech recognition",
+        "Personal AI tutor with memory",
+        "Custom learning paths",
+        "Live pronunciation sessions",
+        "1-on-1 monthly coaching calls",
+        "Advanced analytics dashboard",
+        "Priority customer support",
+        "Early access to new features"
       ]
     }
   ]

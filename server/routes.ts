@@ -612,6 +612,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid plan selected" });
       }
 
+      // Don't process payment for free plans
+      if (selectedPlan.price === 0) {
+        return res.status(400).json({ message: "Cannot create checkout for free plan" });
+      }
+
       // Generate unique transaction ID
       const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 

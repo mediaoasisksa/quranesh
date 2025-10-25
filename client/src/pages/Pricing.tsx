@@ -32,20 +32,24 @@ const Pricing = () => {
 
   // Check for pending payment plan after signup
   useEffect(() => {
-    const pendingPlan = localStorage.getItem("pendingPaymentPlan");
-    if (pendingPlan && isAuthenticated) {
+    const pendingPlanData = localStorage.getItem("pendingPaymentPlan");
+    if (pendingPlanData && isAuthenticated && pricingPlans.length > 0) {
       try {
-        const plan = JSON.parse(pendingPlan);
-        setSelectedPlan(plan);
-        setShowPaymentForm(true);
-        // Clear the pending plan since we're now processing it
+        const pendingData = JSON.parse(pendingPlanData);
+        // Find the actual plan from API
+        const apiPlan = pricingPlans.find((p) => p.id === pendingData.id);
+        if (apiPlan) {
+          setSelectedPlan(apiPlan);
+          setShowPaymentForm(true);
+        }
+        // Clear the pending plan since we've now processed it
         localStorage.removeItem("pendingPaymentPlan");
       } catch (error) {
         console.error("Error parsing pending payment plan:", error);
         localStorage.removeItem("pendingPaymentPlan");
       }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, pricingPlans]);
 
   const handlePlanSelect = (plan: any) => {
     // This function is now only called for authenticated users
@@ -255,22 +259,19 @@ const Pricing = () => {
                     <Button
                       variant={plan.buttonVariant}
                       className="w-full"
+                      data-testid={`button-${plan.name.toLowerCase()}-plan`}
                       onClick={() => {
                         if (plan.name === "Basic") {
+                          // Basic plan is free, just redirect to signup
                           window.location.href = "/signup";
                         } else {
-                          // For paid plans, check authentication first
+                          // For paid plans (Standard/Premium), check authentication first
                           if (!isAuthenticated) {
-                            // Store the selected plan in localStorage to restore after signup
+                            // Store the selected plan ID to restore after signup
                             localStorage.setItem(
                               "pendingPaymentPlan",
                               JSON.stringify({
                                 id: plan.name.toLowerCase(),
-                                name: plan.name,
-                                price: plan.price.replace("$", ""),
-                                currency: "USD",
-                                duration: "month",
-                                features: plan.features,
                               }),
                             );
                             // Redirect to signup page
@@ -280,24 +281,12 @@ const Pricing = () => {
 
                           // Map to API pricing plans for authenticated users
                           const apiPlan = pricingPlans.find(
-                            (p) =>
-                              (plan.name === "Standard" &&
-                                p.id === "premium") ||
-                              (plan.name === "Premium" && p.id === "lifetime"),
+                            (p) => p.id === plan.name.toLowerCase()
                           );
                           if (apiPlan) {
                             handlePlanSelect(apiPlan);
                           } else {
-                            // Fallback: create a plan object from the UI plan
-                            const fallbackPlan = {
-                              id: plan.name.toLowerCase(),
-                              name: plan.name,
-                              price: parseInt(plan.price.replace("$", "")),
-                              currency: "USD",
-                              duration: "month",
-                              features: plan.features,
-                            };
-                            handlePlanSelect(fallbackPlan);
+                            console.error(`Plan ${plan.name} not found in API plans`);
                           }
                         }
                       }}
