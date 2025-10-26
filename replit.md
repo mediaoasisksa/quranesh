@@ -56,23 +56,34 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: JWT-based authentication with secure session handling
 
 ## Payment Integration (HyperPay)
-- **Gateway**: HyperPay payment gateway for subscription management
+- **Gateway**: HyperPay COPYandPAY Widget integration for subscription management
 - **Supported Methods**: VISA, MASTER, MADA cards
 - **Environment**: HyperPay EU test server (https://eu-test.oppwa.com)
 - **Authentication**: Bearer token-based API access
-- **Callback Flow**: Dynamic callback URL generation based on environment
-  - Development: Uses request headers to detect localhost or Replit URL
-  - Callback route: `/api/payment-callback` with entityId parameter
-  - Verification: Backend validates payment with HyperPay API before confirming
+- **Integration Pattern**: Follows official HyperPay Widget documentation
+  - Step 1 (Backend): Server-to-server POST to create checkout with `integrity: true` parameter
+  - Step 2 (Frontend): Load widget script with SRI (Subresource Integrity) verification
+  - Step 3 (Frontend): Form action attribute set to callback URL (shopperResultUrl)
+  - Step 4 (Backend): Callback validates payment status via GET request to resourcePath
+- **Callback Flow**: 
+  - Dynamic callback URL generation based on environment (localhost/Replit)
+  - Callback route: `/api/payment-callback?entityId={entityId}`
+  - entityId query parameter ensures correct MADA/VISA verification
+  - Backend validates payment with HyperPay API before redirecting to success page
+- **Security Features**:
+  - Integrity hash verification for widget script loading (SRI)
+  - Cross-origin iframe for card input (PCI compliance)
+  - Dynamic entity ID selection based on payment method
 - **Test Cards**:
   - VISA: 4440000009900010 (Exp: 01/39, CVV: 100)
   - MASTER: 5123450000000008 (Exp: 01/39, CVV: 100)
   - MADA: 5297412484442387 (Exp: 10/26, CVV: 966)
-- **Recent Fixes**:
-  - Fixed plan selection mapping (Standard → standard, Premium → premium)
-  - Removed duplicate shopperResultUrl assignment
-  - Implemented dynamic callback URL generation
-  - Added entityId passing via shopperResultUrl for correct MADA/VISA verification
+- **Implementation Details**:
+  - Backend creates checkout without shopperResultUrl (set on frontend instead)
+  - Backend returns formatted integrity hash (e.g., "sha256-xyz") from HyperPay response
+  - Frontend loads widget with integrity and crossorigin attributes
+  - Frontend sets shopperResultUrl via form action attribute as per HyperPay docs
+  - Payment widget uses cross-origin iframes for secure card data collection
 
 # External Dependencies
 
