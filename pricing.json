@@ -4,7 +4,7 @@
       "id": "basic",
       "name": "Basic",
       "price": 0,
-      "currency": "USD",
+      "currency": "SAR",
       "duration": "free",
       "features": [
         "Access to 100 basic Quranic sentences",
@@ -17,8 +17,8 @@
     {
       "id": "standard",
       "name": "Standard",
-      "price": 19,
-      "currency": "USD",
+      "price": 75,
+      "currency": "SAR",
       "duration": "month",
       "features": [
         "Access to 1000+ Quranic sentences",
@@ -34,8 +34,8 @@
     {
       "id": "premium",
       "name": "Premium",
-      "price": 39,
-      "currency": "USD",
+      "price": 150,
+      "currency": "SAR",
       "duration": "month",
       "features": [
         "Access to full Quranic database (5000+ sentences)",
