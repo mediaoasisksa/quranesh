@@ -698,12 +698,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Status:", response.status);
       console.log("Response data:", JSON.stringify(response.data, null, 2));
       console.log("Checkout ID:", response.data.id);
-      console.log("Integrity hash:", response.data.integrity);
+      console.log("Integrity object:", response.data.integrity);
       console.log("========================");
+
+      // HyperPay returns integrity as an object { value: string, algorithm: string }
+      // We need to format it for the script tag's integrity attribute
+      let integrityHash = null;
+      if (response.data.integrity && response.data.integrity.value) {
+        const algorithm = response.data.integrity.algorithm.toLowerCase().replace('-', '');
+        integrityHash = `${algorithm}-${response.data.integrity.value}`;
+        console.log("Formatted integrity hash:", integrityHash);
+      }
 
       res.json({
         checkoutId: response.data.id,
-        integrity: response.data.integrity, // Include integrity hash for secure script loading
+        integrity: integrityHash, // Include formatted integrity hash for secure script loading
         callbackUrl, // Include callback URL for form action
         merchantTransactionId,
         plan: selectedPlan,

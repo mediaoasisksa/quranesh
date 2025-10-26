@@ -53,6 +53,8 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
   const [paymentMethod, setPaymentMethod] = useState<'MADA' | 'VISA_MASTER'>('MADA');
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
+  const [integrity, setIntegrity] = useState<string | null>(null);
+  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Configure HyperPay widget options
@@ -60,8 +62,8 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     window.wpwlOptions = {
       paymentTarget: "_top",
       brandOrder: ["MADA", "VISA", "MASTER"]
-      // Note: shopperResultUrl is set on the server side during checkout creation
-      // and includes the correct entityId for MADA/VISA_MASTER
+      // Note: shopperResultUrl is set in the form's action attribute
+      // NOT in the backend checkout creation, as per HyperPay documentation
     };
   }, []);
 
@@ -106,11 +108,23 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       }
 
       setCheckoutId(data.checkoutId);
+      setIntegrity(data.integrity);
+      setCallbackUrl(data.callbackUrl);
 
-      // Load HyperPay widget script
+      // Load HyperPay widget script with integrity hash for security
       console.log('Loading HyperPay widget with checkoutId:', data.checkoutId);
+      console.log('Integrity hash:', data.integrity);
+      console.log('Callback URL:', data.callbackUrl);
+      
       const script = document.createElement('script');
       script.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
+      
+      // Add security attributes as per HyperPay documentation
+      if (data.integrity) {
+        script.integrity = data.integrity;
+        script.crossOrigin = 'anonymous';
+      }
+      
       script.onload = () => {
         console.log('HyperPay widget script loaded successfully');
         setIsLoading(false);
@@ -126,6 +140,8 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       setError(error instanceof Error ? error.message : 'An error occurred');
       setIsLoading(false);
       setCheckoutId(null); // Reset checkout ID on error so user can retry
+      setIntegrity(null);
+      setCallbackUrl(null);
     }
   };
 
@@ -290,8 +306,11 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                   onClick={() => {
                     setError(null);
                     setCheckoutId(null);
+                    setIntegrity(null);
+                    setCallbackUrl(null);
                   }}
                   className="mt-2"
+                  data-testid="button-try-again"
                 >
                   Try Again
                 </Button>
@@ -327,14 +346,11 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
               </div>
 
               {/* HyperPay Payment Form - Single form for all payment methods */}
+              {/* The form action is the shopperResultUrl - HyperPay redirects here after payment */}
               <form 
-                action="/payment-success"
+                action={callbackUrl || '/api/payment-callback'}
                 className="paymentWidgets" 
                 data-brands="MADA VISA MASTER"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  // Payment form submission handled by HyperPay widget
-                }}
               />
             </div>
           )}
