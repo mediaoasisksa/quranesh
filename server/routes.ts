@@ -633,12 +633,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const callbackUrl = `${baseUrl}/api/payment-callback?entityId=${entityId}`;
 
       // Prepare checkout request
+      // NOTE: According to HyperPay Widget documentation, shopperResultUrl should NOT be set here
+      // It should be set in the form's action attribute on the frontend
       const checkoutData = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
         currency: selectedPlan.currency,
         paymentType: "DB",
         merchantTransactionId,
+        integrity: "true", // Enable integrity hash for secure widget loading
         "customer.email": customerDetails.email,
         "customer.givenName": customerDetails.givenName,
         "customer.surname": customerDetails.surname,
@@ -648,14 +651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.country": customerDetails.country,
         "billing.postcode": customerDetails.postcode,
         "customParameters[3DS2_enrolled]": "true",
-        shopperResultUrl: callbackUrl,
       };
-
-      // Add MADA-specific parameters if using MADA
-      if (paymentMethod === "MADA") {
-        // MADA requires specific redirect URL configuration
-        (checkoutData as any)["customParameters[SHOPPER_ResultUrl]"] = callbackUrl;
-      }
 
       // Debug: Log the checkout data being sent
       console.log("=== CHECKOUT CREATION DEBUG ===");
@@ -702,10 +698,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Status:", response.status);
       console.log("Response data:", JSON.stringify(response.data, null, 2));
       console.log("Checkout ID:", response.data.id);
+      console.log("Integrity hash:", response.data.integrity);
       console.log("========================");
 
       res.json({
         checkoutId: response.data.id,
+        integrity: response.data.integrity, // Include integrity hash for secure script loading
+        callbackUrl, // Include callback URL for form action
         merchantTransactionId,
         plan: selectedPlan,
       });
