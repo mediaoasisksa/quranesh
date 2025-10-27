@@ -50,8 +50,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     postcode: ''
   });
 
-  // Remove payment method selection - HyperPay widget will show all payment options
-  const [paymentMethod] = useState<'ALL'>('ALL');
+  const [paymentMethod, setPaymentMethod] = useState<'MADA' | 'VISA_MASTER'>('VISA_MASTER');
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [integrity, setIntegrity] = useState<string | null>(null);
@@ -187,17 +186,54 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
             </ul>
           </div>
 
-          {/* Payment Methods Info */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-            <div className="flex items-start gap-3">
-              <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Accepted Payment Methods</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  We accept MADA, VISA, and MASTER cards. You'll be able to choose your preferred payment method in the next step.
-                </p>
-              </div>
+          {/* Payment Method Selection */}
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Select Payment Method</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant={paymentMethod === 'MADA' ? 'default' : 'outline'}
+                onClick={() => {
+                  setPaymentMethod('MADA');
+                  // Reset checkout if already created with different payment method
+                  if (checkoutId) {
+                    setCheckoutId(null);
+                    setIntegrity(null);
+                    setCallbackUrl(null);
+                    setError(null);
+                  }
+                }}
+                className="flex items-center justify-center gap-2 h-12"
+                disabled={isLoading}
+                data-testid="button-payment-mada"
+              >
+                <Shield className="h-5 w-5" />
+                <span className="font-semibold">MADA</span>
+              </Button>
+              <Button
+                type="button"
+                variant={paymentMethod === 'VISA_MASTER' ? 'default' : 'outline'}
+                onClick={() => {
+                  setPaymentMethod('VISA_MASTER');
+                  // Reset checkout if already created with different payment method
+                  if (checkoutId) {
+                    setCheckoutId(null);
+                    setIntegrity(null);
+                    setCallbackUrl(null);
+                    setError(null);
+                  }
+                }}
+                className="flex items-center justify-center gap-2 h-12"
+                disabled={isLoading}
+                data-testid="button-payment-visa-master"
+              >
+                <CreditCard className="h-5 w-5" />
+                <span className="font-semibold">VISA / MASTER</span>
+              </Button>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Please select your card type before proceeding to payment
+            </p>
           </div>
 
           {/* Customer Details Form */}
