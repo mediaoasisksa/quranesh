@@ -261,36 +261,33 @@ const Pricing = () => {
                       className="w-full"
                       data-testid={`button-${plan.name.toLowerCase()}-plan`}
                       onClick={() => {
-                        // Check authentication first for all plans
-                        if (!isAuthenticated) {
-                          // Store the selected plan ID to restore after signup
-                          localStorage.setItem(
-                            "pendingPaymentPlan",
-                            JSON.stringify({
-                              id: plan.name.toLowerCase(),
-                            }),
-                          );
-                          // Redirect to signup page
-                          setLocation("/signup");
-                          return;
-                        }
-
-                        // For authenticated users, map to API pricing plans
-                        const apiPlan = pricingPlans.find(
-                          (p) => p.id === plan.name.toLowerCase()
-                        );
-                        
-                        if (apiPlan) {
-                          // Check if plan is actually free (price is 0)
-                          if (apiPlan.price === 0) {
-                            // Free plan - redirect to dashboard
-                            setLocation("/dashboard");
-                          } else {
-                            // Paid plan - show payment form
-                            handlePlanSelect(apiPlan);
-                          }
+                        if (plan.name === "Basic") {
+                          // Basic plan is free, just redirect to signup
+                          window.location.href = "/signup";
                         } else {
-                          console.error(`Plan ${plan.name} not found in API plans`);
+                          // For paid plans (Standard/Premium), check authentication first
+                          if (!isAuthenticated) {
+                            // Store the selected plan ID to restore after signup
+                            localStorage.setItem(
+                              "pendingPaymentPlan",
+                              JSON.stringify({
+                                id: plan.name.toLowerCase(),
+                              }),
+                            );
+                            // Redirect to signup page
+                            setLocation("/signup");
+                            return;
+                          }
+
+                          // Map to API pricing plans for authenticated users
+                          const apiPlan = pricingPlans.find(
+                            (p) => p.id === plan.name.toLowerCase()
+                          );
+                          if (apiPlan) {
+                            handlePlanSelect(apiPlan);
+                          } else {
+                            console.error(`Plan ${plan.name} not found in API plans`);
+                          }
                         }
                       }}
                     >

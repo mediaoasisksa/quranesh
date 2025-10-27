@@ -31,24 +31,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     );
   }
 
-  // Authentication middleware - extracts user from JWT token
-  const authenticateUser = (req: any, res: any, next: any) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-      req.userId = decoded.userId;
-      req.userEmail = decoded.email;
-      next();
-    } catch (error) {
-      return res.status(401).json({ message: "Invalid or expired token" });
-    }
-  };
-
   // Initialize with demo user, phrase data and question banks
   (async () => {
     // Create demo user if it doesn't exist
@@ -200,31 +182,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.status(500).json({ message: "Login failed" });
-    }
-  });
-
-  // Check subscription status (requires authentication)
-  app.get("/api/subscription-status", authenticateUser, async (req: any, res) => {
-    try {
-      const user = await storage.getUser(req.userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Check if subscription is active and not expired
-      const now = new Date();
-      const isActive = user.subscriptionStatus === 'active' && 
-                      user.subscriptionExpiresAt && 
-                      new Date(user.subscriptionExpiresAt) > now;
-
-      res.json({
-        hasActiveSubscription: isActive,
-        subscriptionStatus: user.subscriptionStatus,
-        subscriptionPlan: user.subscriptionPlan,
-        subscriptionExpiresAt: user.subscriptionExpiresAt,
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to check subscription status" });
     }
   });
 
@@ -652,12 +609,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(pricingData);
   });
 
-  // Create HyperPay checkout (REQUIRES AUTHENTICATION)
-  app.post("/api/create-checkout", authenticateUser, async (req: any, res) => {
+  // Create HyperPay checkout
+  app.post("/api/create-checkout", async (req, res) => {
     try {
       console.log("=== RAW REQUEST BODY ===");
       console.log("Full request body:", JSON.stringify(req.body, null, 2));
-      console.log("Authenticated user ID:", req.userId);
       console.log("========================");
       
       const { planId, paymentMethod, customerDetails } = req.body;
@@ -722,10 +678,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.country": customerDetails.country,
         "billing.postcode": customerDetails.postcode,
         "customParameters[3DS2_enrolled]": "true",
-        // Embed user and plan info for subscription activation
-        "customParameters[userId]": req.userId,
-        "customParameters[planId]": planId,
-        "customParameters[planDuration]": selectedPlan.duration,
       };
 
       // Debug: Log the checkout data being sent
@@ -949,51 +901,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
-        console.log("Payment successful, activating subscription");
-        
-        // Extract custom parameters (user and plan info)
-        const userId = paymentResult.customParameters?.userId;
-        const planId = paymentResult.customParameters?.planId;
-        const planDuration = paymentResult.customParameters?.planDuration;
-        
-        console.log("Extracted custom parameters:", { userId, planId, planDuration });
-
-        // Activate subscription if we have user info
-        if (userId && planId && planDuration) {
-          try {
-            // Calculate subscription expiration based on plan duration
-            const now = new Date();
-            const expiresAt = new Date(now);
-            
-            // Parse duration (e.g., "1 month", "3 months", "1 year")
-            const durationMatch = planDuration.match(/(\d+)\s+(month|year)s?/i);
-            if (durationMatch) {
-              const quantity = parseInt(durationMatch[1]);
-              const unit = durationMatch[2].toLowerCase();
-              
-              if (unit === 'month') {
-                expiresAt.setMonth(expiresAt.getMonth() + quantity);
-              } else if (unit === 'year') {
-                expiresAt.setFullYear(expiresAt.getFullYear() + quantity);
-              }
-            }
-            
-            // Update user subscription in database
-            await storage.updateUser(userId, {
-              subscriptionStatus: 'active',
-              subscriptionPlan: planId,
-              subscriptionExpiresAt: expiresAt,
-            });
-            
-            console.log(`✅ Subscription activated for user ${userId} until ${expiresAt.toISOString()}`);
-          } catch (error) {
-            console.error("Failed to activate subscription:", error);
-            // Still redirect to success page, but log the error
-          }
-        } else {
-          console.warn("Missing custom parameters for subscription activation");
-        }
-
+        console.log("Payment successful, redirecting to success page");
         // Redirect to success page with success parameters
         res.redirect(
           `/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`,
