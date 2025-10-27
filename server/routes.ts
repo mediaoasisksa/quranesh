@@ -612,7 +612,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HyperPay checkout
   app.post("/api/create-checkout", async (req, res) => {
     try {
+      console.log("=== RAW REQUEST BODY ===");
+      console.log("Full request body:", JSON.stringify(req.body, null, 2));
+      console.log("========================");
+      
       const { planId, paymentMethod, customerDetails } = req.body;
+      
+      console.log("=== EXTRACTED VALUES ===");
+      console.log("planId:", planId);
+      console.log("paymentMethod:", paymentMethod);
+      console.log("paymentMethod type:", typeof paymentMethod);
+      console.log("========================");
 
       // Find the selected plan
       const selectedPlan = pricingData.plans.find(
@@ -630,11 +640,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique transaction ID
       const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
-      // Choose entity ID based on payment method
-      const entityId =
-        paymentMethod === "MADA"
-          ? HYPERPAY_CONFIG.entityIdMada
-          : HYPERPAY_CONFIG.entityIdVisaMaster;
+      // Use VISA/MASTER entity ID for ALL payment methods
+      // HyperPay widget will show MADA, VISA, and MASTER options
+      // Note: This requires the VISA/MASTER entity ID to be configured for all card types
+      const entityId = HYPERPAY_CONFIG.entityIdVisaMaster;
+      
+      console.log("=== USING UNIVERSAL ENTITY ID ===");
+      console.log("Entity ID (VISA/MASTER):", entityId);
+      console.log("This entity ID should support MADA, VISA, and MASTER");
+      console.log("===================================");
 
       // Determine callback URL based on environment
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
