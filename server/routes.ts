@@ -724,6 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         checkoutId: response.data.id,
         integrity: integrityHash, // Include formatted integrity hash for secure script loading
         callbackUrl, // Include callback URL for form action
+        widgetUrl: HYPERPAY_CONFIG.serverUrl, // Include widget server URL for frontend
         merchantTransactionId,
         plan: selectedPlan,
       });

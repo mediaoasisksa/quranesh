@@ -113,11 +113,12 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
 
       // Load HyperPay widget script with integrity hash for security
       console.log('Loading HyperPay widget with checkoutId:', data.checkoutId);
+      console.log('Widget URL:', data.widgetUrl);
       console.log('Integrity hash:', data.integrity);
       console.log('Callback URL:', data.callbackUrl);
       
       const script = document.createElement('script');
-      script.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
+      script.src = `${data.widgetUrl}/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
       
       // Add security attributes as per HyperPay documentation
       if (data.integrity) {
