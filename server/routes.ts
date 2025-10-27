@@ -586,13 +586,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
   // HyperPay Configuration
+  // Use production credentials if available, otherwise fall back to test environment
   const HYPERPAY_CONFIG = {
-    serverUrl: "https://eu-test.oppwa.com",
-    accessToken:
+    serverUrl: process.env.HYPERPAY_PROD_ACCESS_TOKEN 
+      ? "https://eu-prod.oppwa.com"
+      : "https://eu-test.oppwa.com",
+    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN ||
       "OGFjN2E0Yzk5NGFlZWE0ZDAxOTRiMWU0NWI2ZTAzZmZ8eDlqWjNxMkNOVUxOPVAlSG9waiU=",
-    entityIdVisaMaster: "8ac7a4c994aeea4d0194b1e58b280403",
-    entityIdMada: "8ac7a4c994aeea4d0194b1e6e7090408",
+    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER ||
+      "8ac7a4c994aeea4d0194b1e58b280403",
+    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA ||
+      "8ac7a4c994aeea4d0194b1e6e7090408",
+    isProduction: !!process.env.HYPERPAY_PROD_ACCESS_TOKEN,
   };
+
+  // Log environment on startup
+  console.log(`🔐 HyperPay Environment: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'}`);
+  console.log(`📍 HyperPay Server: ${HYPERPAY_CONFIG.serverUrl}`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
