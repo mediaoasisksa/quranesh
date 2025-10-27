@@ -17,7 +17,7 @@
     {
       "id": "standard",
       "name": "Standard",
-      "price": 75,
+      "price": 1,
       "currency": "SAR",
       "duration": "month",
       "features": [
