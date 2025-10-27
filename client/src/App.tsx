@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/language-context";
+import { ProtectedRoute } from "@/components/protected-route";
 import HomePage from "@/pages/HomePage";
 import Dashboard from "@/pages/dashboard";
 import Exercise from "@/pages/exercise";
@@ -23,7 +24,11 @@ function Router() {
       <Route path="/features" component={Features} />
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/pricing" component={Pricing} />
-      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/dashboard">
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      </Route>
       <Route path="/exercise/:type/:phraseId?" component={Exercise} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />

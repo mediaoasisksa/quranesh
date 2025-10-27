@@ -77,6 +77,9 @@ export const users = pgTable("users", {
   memorizationLevel: text("memorization_level"), // beginner, intermediate, advanced, hafiz
   nativeLanguage: text("native_language"),
   learningGoal: text("learning_goal"),
+  subscriptionStatus: text("subscription_status").default("inactive"), // inactive, active, expired
+  subscriptionPlan: text("subscription_plan"), // basic, standard, premium
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`now()`).notNull(),
 });
