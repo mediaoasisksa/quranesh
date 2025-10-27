@@ -187,16 +187,36 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
             <div className="flex gap-4">
               <Button
                 variant={paymentMethod === 'MADA' ? 'default' : 'outline'}
-                onClick={() => setPaymentMethod('MADA')}
+                onClick={() => {
+                  setPaymentMethod('MADA');
+                  // Reset checkout if already created with different payment method
+                  if (checkoutId) {
+                    setCheckoutId(null);
+                    setIntegrity(null);
+                    setCallbackUrl(null);
+                    setError(null);
+                  }
+                }}
                 className="flex items-center gap-2"
+                disabled={isLoading}
               >
                 <Shield className="h-4 w-4" />
                 MADA
               </Button>
               <Button
                 variant={paymentMethod === 'VISA_MASTER' ? 'default' : 'outline'}
-                onClick={() => setPaymentMethod('VISA_MASTER')}
+                onClick={() => {
+                  setPaymentMethod('VISA_MASTER');
+                  // Reset checkout if already created with different payment method
+                  if (checkoutId) {
+                    setCheckoutId(null);
+                    setIntegrity(null);
+                    setCallbackUrl(null);
+                    setError(null);
+                  }
+                }}
                 className="flex items-center gap-2"
+                disabled={isLoading}
               >
                 <CreditCard className="h-4 w-4" />
                 VISA/MASTER
