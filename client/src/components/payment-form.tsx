@@ -79,6 +79,11 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     setError(null);
 
     try {
+      console.log('=== FRONTEND PAYMENT REQUEST ===');
+      console.log('Payment method state:', paymentMethod);
+      console.log('Plan ID:', selectedPlan.id);
+      console.log('Customer details:', customerDetails);
+      
       const response = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: {
