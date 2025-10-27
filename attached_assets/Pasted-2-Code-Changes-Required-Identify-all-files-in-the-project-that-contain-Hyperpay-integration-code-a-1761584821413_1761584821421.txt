@@ -1,0 +1,94 @@
+2. Code Changes Required
+
+Identify all files in the project that contain Hyperpay integration code and apply the following three sets of changes:
+
+Change 2.1: Update Checkout Preparation (Server-Side)
+
+This change applies to the server-side code responsible for creating the checkout session (e.g., a backend file handling the /checkouts endpoint).
+
+1.
+Update Endpoint URL:
+
+•
+FROM: https://eu-test.oppwa.com/v1/checkouts
+
+•
+TO: https://eu-prod.oppwa.com/v1/checkouts
+
+
+
+2.
+Remove Test Mode Parameter:
+
+•
+Remove the testMode=EXTERNAL parameter from the checkout request body or query string. This is only required for the test environment.
+
+
+
+3.
+Add Mandatory Fields:
+
+•
+Ensure the following mandatory billing and customer fields are passed in the checkout request with dynamic values from the user's session or form submission. These fields are critical for transaction acceptance and must be populated with valid data.
+
+•
+merchantTransactionId: A unique ID generated and stored in the application's database for this transaction.
+
+•
+customer.email: The email address of the customer.
+
+•
+customer.givenName: The customer's first name.
+
+•
+customer.surname: The customer's last name.
+
+•
+billing.street1: The street address of the customer.
+
+•
+billing.city: The city of the customer.
+
+•
+billing.state: The state or province of the customer.
+
+•
+billing.country: The country of the customer (must be in Alpha-2 format, e.g., "SA" for Saudi Arabia).
+
+•
+billing.postcode: The postal code/zip code.
+
+
+
+
+
+Change 2.2: Update Payment Widget Loading (Client-Side)
+
+This change applies to the client-side code (HTML/JavaScript) where the Hyperpay payment widget is loaded.
+
+1.
+Update Widget Script URL:
+
+•
+FROM: https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId={checkoutId}
+
+•
+TO: https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId={checkoutId}
+
+
+
+Change 2.3: Update Payment Status Retrieval (Server-Side)
+
+This change applies to the server-side code responsible for querying the payment result after the user is redirected back (e.g., a backend file handling the result URL).
+
+1.
+Update Status Endpoint URL:
+
+•
+FROM: https://eu-test.oppwa.com/v1/checkouts/{id}/payment
+
+•
+TO: https://eu-prod.oppwa.com/v1/checkouts/{id}/payment
+
+
+
