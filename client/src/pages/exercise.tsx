@@ -356,13 +356,13 @@ export default function Exercise() {
                 lang="ar"
                 data-testid="text-phrase-display"
               >
-                {phrase.arabicText}
+                {phrase?.arabicText}
               </p>
               <p
                 className="text-muted-foreground"
                 data-testid="text-phrase-translation"
               >
-                {phrase.englishTranslation}
+                {phrase?.englishTranslation}
               </p>
             </div>
             <p className="text-foreground">
@@ -591,10 +591,10 @@ export default function Exercise() {
                 className="text-lg font-semibold text-foreground"
                 data-testid="text-exercise-title"
               >
-                {exerciseConfig?.title}
+                {exerciseConfig ? t(exerciseConfig.titleKey as any) : ''}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {exerciseConfig?.description}
+                {exerciseConfig ? t(exerciseConfig.descriptionKey as any) : ''}
               </p>
             </div>
             <div className="w-32"></div>
