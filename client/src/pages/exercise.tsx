@@ -57,12 +57,16 @@ export default function Exercise() {
   });
 
   // For thematic exercises, fetch question banks; for others, fetch phrases
-  const { data: phrase, isLoading: phraseLoading } = useQuery<Phrase>({
+  const { data: phrase, isLoading: phraseLoading, error: phraseError } = useQuery<Phrase>({
     queryKey: phraseId
       ? ["/api/phrases", phraseId]
       : ["/api/phrases/random", exerciseType, userId],
     queryFn: phraseId
-      ? undefined
+      ? async () => {
+          const response = await fetch(`/api/phrases/${phraseId}`);
+          if (!response.ok) throw new Error("Failed to fetch phrase");
+          return response.json();
+        }
       : async () => {
           const response = await fetch(
             `/api/phrases/random/${exerciseType}?userId=${userId}`
