@@ -25,17 +25,17 @@ export default function LanguageToggle() {
   const getButtonText = () => {
     switch (language) {
       case "en":
-        return "Bahasa";
-      case "id":
-        return "Türkçe";
-      case "tr":
-        return "العربية";
-      case "ar":
-        return "中文";
-      case "zh":
-        return "Kiswahili";
-      case "sw":
         return "English";
+      case "id":
+        return "Bahasa";
+      case "tr":
+        return "Türkçe";
+      case "ar":
+        return "العربية";
+      case "zh":
+        return "中文";
+      case "sw":
+        return "Kiswahili";
       default:
         return "Language";
     }
