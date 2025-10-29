@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { Loader2, CreditCard, Shield } from 'lucide-react';
+import { useLanguage } from '@/contexts/language-context';
 
 interface PricingPlan {
   id: string;
@@ -39,6 +40,8 @@ declare global {
 }
 
 export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: PaymentFormProps) {
+  const { t } = useLanguage();
+  
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     email: '',
     givenName: '',
@@ -188,7 +191,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
 
           {/* Payment Method Selection */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">Select Payment Method</Label>
+            <Label className="text-base font-medium">{t('selectPaymentMethod')}</Label>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 type="button"
@@ -208,7 +211,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 data-testid="button-payment-mada"
               >
                 <Shield className="h-5 w-5" />
-                <span className="font-semibold">MADA</span>
+                <span className="font-semibold">{t('mada')}</span>
               </Button>
               <Button
                 type="button"
@@ -228,18 +231,18 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 data-testid="button-payment-visa-master"
               >
                 <CreditCard className="h-5 w-5" />
-                <span className="font-semibold">VISA / MASTER</span>
+                <span className="font-semibold">{t('visaMaster')}</span>
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Please select your card type before proceeding to payment
+              {t('selectCardType')}
             </p>
           </div>
 
           {/* Customer Details Form */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email">{t('email')} *</Label>
               <Input
                 id="email"
                 type="email"
@@ -250,73 +253,73 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="givenName">First Name *</Label>
+              <Label htmlFor="givenName">{t('firstName')} *</Label>
               <Input
                 id="givenName"
                 type="text"
                 value={customerDetails.givenName}
                 onChange={(e) => handleInputChange('givenName', e.target.value)}
-                placeholder="First Name"
+                placeholder={t('firstName')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="surname">Last Name *</Label>
+              <Label htmlFor="surname">{t('lastName')} *</Label>
               <Input
                 id="surname"
                 type="text"
                 value={customerDetails.surname}
                 onChange={(e) => handleInputChange('surname', e.target.value)}
-                placeholder="Last Name"
+                placeholder={t('lastName')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="street">Street Address *</Label>
+              <Label htmlFor="street">{t('streetAddress')} *</Label>
               <Input
                 id="street"
                 type="text"
                 value={customerDetails.street}
                 onChange={(e) => handleInputChange('street', e.target.value)}
-                placeholder="Street Address"
+                placeholder={t('streetAddress')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
+              <Label htmlFor="city">{t('city')} *</Label>
               <Input
                 id="city"
                 type="text"
                 value={customerDetails.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
-                placeholder="City"
+                placeholder={t('city')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="state">State *</Label>
+              <Label htmlFor="state">{t('state')} *</Label>
               <Input
                 id="state"
                 type="text"
                 value={customerDetails.state}
                 onChange={(e) => handleInputChange('state', e.target.value)}
-                placeholder="State"
+                placeholder={t('state')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="postcode">Postcode *</Label>
+              <Label htmlFor="postcode">{t('postalCode')} *</Label>
               <Input
                 id="postcode"
                 type="text"
                 value={customerDetails.postcode}
                 onChange={(e) => handleInputChange('postcode', e.target.value)}
-                placeholder="Postcode"
+                placeholder={t('postalCode')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
+              <Label htmlFor="country">{t('country')} *</Label>
               <Input
                 id="country"
                 type="text"
@@ -345,7 +348,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                   className="mt-2"
                   data-testid="button-try-again"
                 >
-                  Try Again
+                  {t('tryAgain')}
                 </Button>
               </AlertDescription>
             </Alert>
@@ -362,10 +365,10 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
+                  {t('processingPayment')}
                 </>
               ) : (
-                `Pay ${selectedPlan.price} ${selectedPlan.currency}`
+                `${t('pay')} ${selectedPlan.price} ${selectedPlan.currency}`
               )}
             </Button>
           )}

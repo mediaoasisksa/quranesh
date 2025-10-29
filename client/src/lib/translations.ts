@@ -91,6 +91,24 @@ export const translations = {
     none: "None",
     or: "or",
     
+    // Payment
+    selectPaymentMethod: "Select Payment Method",
+    mada: "MADA",
+    visaMaster: "VISA / MASTER",
+    selectCardType: "Please select your card type before proceeding to payment",
+    customerDetails: "Customer Details",
+    streetAddress: "Street Address",
+    city: "City",
+    state: "State",
+    postalCode: "Postal Code",
+    country: "Country",
+    loadingPaymentForm: "Loading payment form...",
+    pay: "Pay",
+    paymentFailed: "Payment failed. Please try again.",
+    processingPayment: "Processing payment...",
+    planFeatures: "Plan Features",
+    selectedPlan: "Selected Plan",
+    
     // Homepage
     quranicQuote: "The best of you are those who learn the Qur'an and teach it",
     startLearningNow: "Start Learning Now",
@@ -234,6 +252,24 @@ export const translations = {
     all: "الكل",
     none: "لا شيء",
     or: "أو",
+    
+    // Payment
+    selectPaymentMethod: "اختر طريقة الدفع",
+    mada: "مدى",
+    visaMaster: "فيزا / ماستر",
+    selectCardType: "يرجى اختيار نوع البطاقة قبل المتابعة للدفع",
+    customerDetails: "بيانات العميل",
+    streetAddress: "عنوان الشارع",
+    city: "المدينة",
+    state: "المنطقة",
+    postalCode: "الرمز البريدي",
+    country: "الدولة",
+    loadingPaymentForm: "جاري تحميل نموذج الدفع...",
+    pay: "ادفع",
+    paymentFailed: "فشل الدفع. يرجى المحاولة مرة أخرى.",
+    processingPayment: "جاري معالجة الدفع...",
+    planFeatures: "مميزات الباقة",
+    selectedPlan: "الباقة المختارة",
     
     // Homepage
     quranicQuote: "خَيْرُكُمْ مِنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمه",
@@ -379,6 +415,24 @@ export const translations = {
     none: "Tidak Ada",
     or: "atau",
     
+    // Payment
+    selectPaymentMethod: "Pilih Metode Pembayaran",
+    mada: "MADA",
+    visaMaster: "VISA / MASTER",
+    selectCardType: "Silakan pilih jenis kartu Anda sebelum melanjutkan ke pembayaran",
+    customerDetails: "Detail Pelanggan",
+    streetAddress: "Alamat Jalan",
+    city: "Kota",
+    state: "Provinsi",
+    postalCode: "Kode Pos",
+    country: "Negara",
+    loadingPaymentForm: "Memuat formulir pembayaran...",
+    pay: "Bayar",
+    paymentFailed: "Pembayaran gagal. Silakan coba lagi.",
+    processingPayment: "Memproses pembayaran...",
+    planFeatures: "Fitur Paket",
+    selectedPlan: "Paket Terpilih",
+    
     // Homepage
     quranicQuote: "Sebaik-baik kalian adalah yang mempelajari Al-Qur'an dan mengajarkannya",
     startLearningNow: "Mulai Belajar Sekarang",
@@ -522,6 +576,24 @@ export const translations = {
     all: "Hepsi",
     none: "Hiçbiri",
     or: "veya",
+    
+    // Payment
+    selectPaymentMethod: "Ödeme Yöntemini Seçin",
+    mada: "MADA",
+    visaMaster: "VISA / MASTER",
+    selectCardType: "Lütfen ödemeye devam etmeden önce kart türünüzü seçin",
+    customerDetails: "Müşteri Bilgileri",
+    streetAddress: "Sokak Adresi",
+    city: "Şehir",
+    state: "Eyalet",
+    postalCode: "Posta Kodu",
+    country: "Ülke",
+    loadingPaymentForm: "Ödeme formu yükleniyor...",
+    pay: "Öde",
+    paymentFailed: "Ödeme başarısız oldu. Lütfen tekrar deneyin.",
+    processingPayment: "Ödeme işleniyor...",
+    planFeatures: "Plan Özellikleri",
+    selectedPlan: "Seçili Plan",
     
     // Homepage
     quranicQuote: "Sizin en hayırlınız Kur'an'ı öğrenen ve öğretenlerdir",
@@ -667,6 +739,24 @@ export const translations = {
     none: "无",
     or: "或",
     
+    // Payment
+    selectPaymentMethod: "选择支付方式",
+    mada: "MADA",
+    visaMaster: "VISA / MASTER",
+    selectCardType: "请在继续支付前选择您的卡类型",
+    customerDetails: "客户详情",
+    streetAddress: "街道地址",
+    city: "城市",
+    state: "省份",
+    postalCode: "邮政编码",
+    country: "国家",
+    loadingPaymentForm: "正在加载支付表单...",
+    pay: "支付",
+    paymentFailed: "支付失败。请重试。",
+    processingPayment: "正在处理支付...",
+    planFeatures: "计划功能",
+    selectedPlan: "选定计划",
+    
     // Homepage
     quranicQuote: "你们中最好的人是学习古兰经并教授它的人",
     startLearningNow: "立即开始学习",
@@ -810,6 +900,24 @@ export const translations = {
     all: "Yote",
     none: "Hakuna",
     or: "au",
+    
+    // Payment
+    selectPaymentMethod: "Chagua Njia ya Malipo",
+    mada: "MADA",
+    visaMaster: "VISA / MASTER",
+    selectCardType: "Tafadhali chagua aina ya kadi yako kabla ya kuendelea na malipo",
+    customerDetails: "Maelezo ya Mteja",
+    streetAddress: "Anwani ya Mtaa",
+    city: "Jiji",
+    state: "Jimbo",
+    postalCode: "Msimbo wa Posta",
+    country: "Nchi",
+    loadingPaymentForm: "Inapakia fomu ya malipo...",
+    pay: "Lipa",
+    paymentFailed: "Malipo yameshindwa. Tafadhali jaribu tena.",
+    processingPayment: "Inachakata malipo...",
+    planFeatures: "Vipengele vya Mpango",
+    selectedPlan: "Mpango Uliochaguliwa",
     
     // Homepage
     quranicQuote: "Bora kati yenu ni wale wanaojifunza Quran na kuifundisha",
