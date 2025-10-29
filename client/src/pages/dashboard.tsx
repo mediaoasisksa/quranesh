@@ -38,6 +38,7 @@ import ProgressStats from "@/components/progress-stats";
 import LanguageToggle from "@/components/language-toggle";
 import { exerciseTypes, getRandomExerciseType } from "@/lib/exercises";
 import type { Phrase, DailyStats, UserProgress } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 const DEMO_USER_ID = "demo-user";
 
@@ -50,6 +51,7 @@ export default function Dashboard() {
   const { isAuthenticated, user, signOut } = useAuth();
   const [, setLocation] = useLocation();
   const { t, dir } = useLanguage();
+  const { toast } = useToast();
 
   // Use the actual user ID instead of hardcoded demo user
   const userId = user?.id || "demo-user";
@@ -107,15 +109,15 @@ export default function Dashboard() {
     }
     const randomType = getRandomExerciseType();
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    window.location.href = `/exercise/${randomType.id}/${randomPhrase.id}`;
+    setLocation(`/exercise/${randomType.id}/${randomPhrase.id}`);
   };
 
   const handleExerciseStart = (type: string, phraseId?: string) => {
     // Transformation exercises don't use phrases - they fetch philosophical sentences directly
     if (type === "transformation") {
-      window.location.href = `/exercise/transformation`;
+      setLocation(`/exercise/transformation`);
     } else if (phraseId) {
-      window.location.href = `/exercise/${type}/${phraseId}`;
+      setLocation(`/exercise/${type}/${phraseId}`);
     } else {
       if (phrases.length === 0) {
         toast({
@@ -126,7 +128,7 @@ export default function Dashboard() {
         return;
       }
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      window.location.href = `/exercise/${type}/${randomPhrase.id}`;
+      setLocation(`/exercise/${type}/${randomPhrase.id}`);
     }
   };
 
