@@ -154,7 +154,7 @@ export default function Dashboard() {
                     Quranic
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    AI-Powered Arabic Tutor
+                    {t('aiPoweredTutor')}
                   </p>
                 </div>
               </div>
@@ -194,13 +194,13 @@ export default function Dashboard() {
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
+                        <span>{t('dashboard')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
+                        <span>{t('settings')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -212,14 +212,14 @@ export default function Dashboard() {
                       }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <Link href="/signin">
                   <Button className="bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors px-4 py-2 rounded-md text-sm font-semibold">
-                    Sign In
+                    {t('signIn')}
                   </Button>
                 </Link>
               )}
@@ -239,7 +239,7 @@ export default function Dashboard() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">
-              Training Exercises
+              {t('trainingExercises')}
             </h2>
             <Button
               onClick={handleRandomExercise}
@@ -247,7 +247,7 @@ export default function Dashboard() {
               data-testid="button-random-exercise"
             >
               <Shuffle className="h-4 w-4 mr-2" />
-              Random Exercise
+              {t('randomExercise')}
             </Button>
           </div>
 
@@ -260,8 +260,8 @@ export default function Dashboard() {
                 <ExerciseCard
                   key={exercise.id}
                   type={exercise.id}
-                  title={exercise.title}
-                  description={exercise.description}
+                  title={t(exercise.titleKey as any)}
+                  description={t(exercise.descriptionKey as any)}
                   icon={<span className="text-lg">{exercise.icon}</span>}
                   phrase={randomPhrase}
                   onStart={handleExerciseStart}
@@ -276,7 +276,7 @@ export default function Dashboard() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">
-              Quranic Phrases Database
+              {t('quranicPhrasesDatabase')}
             </h2>
             <div className="flex items-center space-x-3">
               <Select
@@ -287,11 +287,11 @@ export default function Dashboard() {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="short">Short Phrases</SelectItem>
-                  <SelectItem value="commands">Commands</SelectItem>
-                  <SelectItem value="proverbs">Proverbs</SelectItem>
-                  <SelectItem value="long">Long Structures</SelectItem>
+                  <SelectItem value="all">{t('allCategories')}</SelectItem>
+                  <SelectItem value="short">{t('shortPhrases')}</SelectItem>
+                  <SelectItem value="commands">{t('commands')}</SelectItem>
+                  <SelectItem value="proverbs">{t('proverbs')}</SelectItem>
+                  <SelectItem value="long">{t('longStructures')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -299,7 +299,7 @@ export default function Dashboard() {
 
           {phrasesLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading phrases...</p>
+              <p className="text-muted-foreground">{t('loadingPhrases')}</p>
             </div>
           ) : (
             <>
@@ -317,7 +317,7 @@ export default function Dashboard() {
               {filteredPhrases.length > 8 && (
                 <div className="text-center mt-6">
                   <Button variant="outline" data-testid="button-load-more">
-                    Load More Phrases <span className="ml-2">↓</span>
+                    {t('loadMorePhrases')} <span className="ml-2">↓</span>
                   </Button>
                 </div>
               )}
@@ -329,11 +329,11 @@ export default function Dashboard() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-foreground">
-              Weekly Progress Report
+              {t('weeklyProgressReport')}
             </h2>
             <Button variant="outline" data-testid="button-export-report">
               <Download className="h-4 w-4 mr-2" />
-              Export Report
+              {t('exportReport')}
             </Button>
           </div>
 
@@ -346,7 +346,7 @@ export default function Dashboard() {
                     <CheckCircle className="text-secondary h-5 w-5" />
                   </div>
                   <h3 className="font-semibold text-foreground">
-                    Mastered Phrases
+                    {t('masteredPhrases')}
                   </h3>
                 </div>
 
@@ -378,8 +378,7 @@ export default function Dashboard() {
                     className="text-sm text-muted-foreground"
                     data-testid="text-mastered-count"
                   >
-                    ✅ <strong>{masteredPhrases.length} phrases</strong> fully
-                    mastered this week
+                    ✅ <strong>{masteredPhrases.length}</strong> {t('phrasesFullyMastered')}
                   </p>
                 </div>
               </CardContent>
@@ -392,7 +391,7 @@ export default function Dashboard() {
                   <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mr-3">
                     <RotateCcw className="text-accent h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold text-foreground">Need Review</h3>
+                  <h3 className="font-semibold text-foreground">{t('needReview')}</h3>
                 </div>
 
                 <div className="space-y-3">
@@ -425,8 +424,7 @@ export default function Dashboard() {
                     className="text-sm text-muted-foreground"
                     data-testid="text-review-count"
                   >
-                    🔄 <strong>{needReviewPhrases.length} phrases</strong> need
-                    more practice
+                    🔄 <strong>{needReviewPhrases.length}</strong> {t('phrasesNeedPractice')}
                   </p>
                 </div>
               </CardContent>
@@ -440,7 +438,7 @@ export default function Dashboard() {
                     <Lightbulb className="text-primary h-5 w-5" />
                   </div>
                   <h3 className="font-semibold text-foreground">
-                    New Suggestions
+                    {t('newSuggestions')}
                   </h3>
                 </div>
 
@@ -463,7 +461,7 @@ export default function Dashboard() {
                         className="text-xs bg-primary/20 text-primary hover:bg-primary/30"
                         data-testid={`button-add-suggestion-${phrase.id}`}
                       >
-                        Add
+                        {t('add')}
                       </Button>
                     </div>
                   ))}
@@ -474,8 +472,7 @@ export default function Dashboard() {
                     className="text-sm text-muted-foreground"
                     data-testid="text-suggestion-count"
                   >
-                    🌟 <strong>12 new phrases</strong> suggested based on your
-                    progress
+                    🌟 <strong>12</strong> {t('newPhrasesAvailable')}
                   </p>
                 </div>
               </CardContent>

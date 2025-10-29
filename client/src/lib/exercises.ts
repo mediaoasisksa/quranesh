@@ -1,56 +1,56 @@
 export const exerciseTypes = [
   {
     id: 'substitution',
-    title: 'Substitution Drill',
-    description: 'Replace words in phrases',
+    titleKey: 'substitution',
+    descriptionKey: 'substitutionDesc',
     icon: '🔄',
     variant: 'primary' as const,
     category: 'interactive'
   },
   {
     id: 'conversation',
-    title: 'Daily Conversation',
-    description: 'English prompt → Arabic response',
+    titleKey: 'conversation',
+    descriptionKey: 'conversationDesc',
     icon: '💬',
     variant: 'secondary' as const,
     category: 'practical'
   },
   {
     id: 'completion',
-    title: 'Completion Drill',
-    description: 'Finish the verse',
+    titleKey: 'completion',
+    descriptionKey: 'completionDesc',
     icon: '🧩',
     variant: 'accent' as const,
     category: 'memory'
   },
   {
     id: 'comparison',
-    title: 'Comparison',
-    description: 'Compare similar verses',
+    titleKey: 'comparison',
+    descriptionKey: 'comparisonDesc',
     icon: '⚖️',
     variant: 'primary' as const,
     category: 'analysis'
   },
   {
     id: 'roleplay',
-    title: 'Role Play',
-    description: 'Apply Quran in real situations',
+    titleKey: 'roleplay',
+    descriptionKey: 'roleplayDesc',
     icon: '🎭',
     variant: 'secondary' as const,
     category: 'practical'
   },
   {
     id: 'transformation',
-    title: 'Philosophical Match',
-    description: 'Match wisdom with Quranic verses',
+    titleKey: 'transformation',
+    descriptionKey: 'transformationDesc',
     icon: '💎',
     variant: 'accent' as const,
     category: 'wisdom'
   },
   {
     id: 'thematic',
-    title: 'Thematic Questions',
-    description: 'Find verses for life situations',
+    titleKey: 'thematic',
+    descriptionKey: 'thematicDesc',
     icon: '🎯',
     variant: 'primary' as const,
     category: 'wisdom'
