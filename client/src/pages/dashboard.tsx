@@ -97,9 +97,17 @@ export default function Dashboard() {
       : phrases.filter((phrase) => phrase.category === selectedCategory);
 
   const handleRandomExercise = () => {
+    if (phrases.length === 0) {
+      toast({
+        title: "No phrases available",
+        description: "Please wait for phrases to load",
+        variant: "destructive",
+      });
+      return;
+    }
     const randomType = getRandomExerciseType();
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    window.location.href = `/exercise/${randomType.id}/${randomPhrase?.id}`;
+    window.location.href = `/exercise/${randomType.id}/${randomPhrase.id}`;
   };
 
   const handleExerciseStart = (type: string, phraseId?: string) => {
@@ -109,8 +117,16 @@ export default function Dashboard() {
     } else if (phraseId) {
       window.location.href = `/exercise/${type}/${phraseId}`;
     } else {
+      if (phrases.length === 0) {
+        toast({
+          title: "No phrases available",
+          description: "Please wait for phrases to load",
+          variant: "destructive",
+        });
+        return;
+      }
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      window.location.href = `/exercise/${type}/${randomPhrase?.id}`;
+      window.location.href = `/exercise/${type}/${randomPhrase.id}`;
     }
   };
 
