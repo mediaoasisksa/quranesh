@@ -461,13 +461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .filter((session) => session.exerciseType === exerciseType)
             .map((session) => session.phraseId)
         );
-
-        console.log(`User ${userId} has completed ${completedPhraseIds.size} ${exerciseType} exercises`);
         
         // Filter out completed phrases
         phrases = phrases.filter((p) => !completedPhraseIds.has(p.id));
-        
-        console.log(`${phrases.length} new phrases available for ${exerciseType}`);
       }
 
       if (phrases.length === 0) {

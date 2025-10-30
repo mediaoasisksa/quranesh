@@ -21,6 +21,7 @@ interface ExerciseCardProps {
   phrase?: Phrase;
   onStart: (type: string, phraseId?: string) => void;
   variant?: "primary" | "secondary" | "accent";
+  useRandomFromServer?: boolean; // If true, don't pass phraseId - let server select non-repeated phrase
 }
 
 export default function ExerciseCard({
@@ -31,6 +32,7 @@ export default function ExerciseCard({
   phrase,
   onStart,
   variant = "primary",
+  useRandomFromServer = false,
 }: ExerciseCardProps) {
   const [userInput, setUserInput] = useState("");
   const { t } = useLanguage();
@@ -48,7 +50,9 @@ export default function ExerciseCard({
   };
 
   const handleStart = () => {
-    onStart(type, phrase?.id);
+    // If useRandomFromServer is true, don't pass phraseId
+    // This allows the server to select a non-repeated phrase for the user
+    onStart(type, useRandomFromServer ? undefined : phrase?.id);
   };
 
   const renderExerciseContent = () => {

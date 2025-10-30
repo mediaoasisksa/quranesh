@@ -99,36 +99,18 @@ export default function Dashboard() {
       : phrases.filter((phrase) => phrase.category === selectedCategory);
 
   const handleRandomExercise = () => {
-    if (phrases.length === 0) {
-      toast({
-        title: "No phrases available",
-        description: "Please wait for phrases to load",
-        variant: "destructive",
-      });
-      return;
-    }
     const randomType = getRandomExerciseType();
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    setLocation(`/exercise/${randomType.id}/${randomPhrase.id}`);
+    // Navigate without phraseId - exercise page will fetch a non-repeated phrase from server
+    setLocation(`/exercise/${randomType.id}`);
   };
 
   const handleExerciseStart = (type: string, phraseId?: string) => {
-    // Transformation exercises don't use phrases - they fetch philosophical sentences directly
-    if (type === "transformation") {
-      setLocation(`/exercise/transformation`);
-    } else if (phraseId) {
+    // If phraseId is provided (user clicked on specific phrase), use it
+    // Otherwise, let exercise page fetch a non-repeated phrase from server
+    if (phraseId) {
       setLocation(`/exercise/${type}/${phraseId}`);
     } else {
-      if (phrases.length === 0) {
-        toast({
-          title: "No phrases available",
-          description: "Please wait for phrases to load",
-          variant: "destructive",
-        });
-        return;
-      }
-      const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      setLocation(`/exercise/${type}/${randomPhrase.id}`);
+      setLocation(`/exercise/${type}`);
     }
   };
 
@@ -284,6 +266,7 @@ export default function Dashboard() {
                   phrase={randomPhrase}
                   onStart={handleExerciseStart}
                   variant={exercise.variant}
+                  useRandomFromServer={true}
                 />
               );
             })}

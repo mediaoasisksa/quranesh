@@ -105,6 +105,11 @@ export default function Exercise() {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user-progress"] });
       queryClient.invalidateQueries({ queryKey: ["/api/weekly-stats"] });
+      
+      // CRITICAL: Invalidate random phrases cache so non-repetition system works
+      // This forces React Query to fetch new phrases from server with updated completed list
+      queryClient.invalidateQueries({ queryKey: ["/api/phrases/random"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/philosophical-sentences/random"] });
     },
   });
 

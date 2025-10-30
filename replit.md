@@ -2,6 +2,11 @@
 
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
+## Recent Updates (October 30, 2025)
+- **Non-Repetition System Fixed**: Users now never see the same exercise twice. Fixed React Query cache invalidation to ensure completed exercises are properly filtered out.
+- **Exercise Count Reduced**: Now showing 5 exercise types instead of 7 (Comparison and Thematic exercises hidden as per user request).
+- **Navigation Improved**: All exercise navigation uses client-side routing (wouter's setLocation) instead of full page reloads, maintaining React Query cache and improving performance.
+
 ## Documentation
 - **PDF Documentation**: Comprehensive app description available at `/app-description` endpoint
 - The documentation includes product overview, technical architecture, features, pricing, and more
@@ -42,9 +47,14 @@ Preferred communication style: Simple, everyday language.
 - **Schema Management**: Drizzle ORM with PostgreSQL dialect for database operations
 
 ## Exercise System Architecture
-- **Exercise Types**: Six different exercise patterns including substitution drills, conversation practice, completion exercises, comparison tasks, role-play scenarios, and grammar transformation
+- **Exercise Types**: Five different exercise patterns including substitution drills, conversation practice, completion exercises, role-play scenarios, and grammar transformation (Comparison and Thematic hidden)
 - **Dynamic Content**: Exercises are generated based on user's current phrase knowledge and difficulty progression
-- **Non-Repetition System**: Questions never repeat for the same user across sessions - tracks completed exercises per user and exercise type
+- **Non-Repetition System**: 
+  - Backend filters out completed exercises per user and exercise type
+  - Frontend invalidates React Query cache after each exercise completion
+  - Server-side random selection ensures users never see repeated phrases
+  - Tracks all completed exercise sessions in database
+  - Works seamlessly across all exercise types
 - **AI Question Generation**: When users exhaust all database questions, Gemini AI generates new authentic Quranic phrases and exercises
 - **Progress Tracking**: Real-time feedback and long-term progress analytics
 - **Adaptive Learning**: Exercise selection based on user performance and mastery levels
