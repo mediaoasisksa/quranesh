@@ -230,11 +230,6 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Dashboard Overview */}
-        <section className="mb-12">
-          <ProgressStats dailyStats={dailyStats || defaultDailyStats} />
-        </section>
-
         {/* Exercise Types Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
@@ -271,6 +266,11 @@ export default function Dashboard() {
               );
             })}
           </div>
+        </section>
+
+        {/* Dashboard Overview */}
+        <section className="mb-12">
+          <ProgressStats dailyStats={dailyStats || defaultDailyStats} />
         </section>
 
         {/* Phrase Database Section */}
