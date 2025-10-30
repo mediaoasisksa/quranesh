@@ -3,14 +3,14 @@
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
 ## Recent Updates (October 30, 2025)
-- **Major Content Expansion**: Added 243 new Quranic phrases/sentences from comprehensive input files
+- **Major Content Expansion**: Added 248 new Quranic phrases/sentences from comprehensive input files
   - Added 40 conversation prompts including greetings, advice, encouragement, supplications, and ethical guidance
-  - Added 144 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 159 phrases
+  - Added 149 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 164 phrases
   - Added 59 philosophical sentences containing wisdom and deep meanings
-  - **Total database content: 162 conversation prompts, 159 roleplay phrases, 2,452 philosophical sentences**
+  - **Total database content: 162 conversation prompts, 164 roleplay phrases, 2,452 philosophical sentences**
   - All new content sourced from Quranic verses with authentic English translations
   - Balance achieved across all three exercise types
-  - Latest additions include extensive story of Prophet Musa ("اخلع نعليك", "هي عصاي", "لا تخف", "خذها", "يسر لي امري", "احلل عقدة من لساني"), balanced spending ("ولا تبسطها كل البسط"), business ethics ("واقيموا الوزن بالقسط"), charity ("وان تصدقوا خير لكم"), and divine attributes ("من جاء بالحسنة فله عشر امثالها")
+  - Latest additions include extensive story of Prophet Musa ("اخلع نعليك", "هي عصاي", "لا تخف", "خذها", "يسر لي امري", "احلل عقدة من لساني"), balanced spending ("ولا تبسطها كل البسط"), business ethics ("واقيموا الوزن بالقسط"), charity ("وان تصدقوا خير لكم"), preventing corruption ("ولا تفسدوا في الارض"), and divine attributes ("من جاء بالحسنة فله عشر امثالها")
 - **Dashboard Layout Updated**: Training Exercises section now appears at the TOP of the dashboard for better user experience
 - **Conversation Exercise Enhanced**: Now uses database-backed prompts with 122 Arabic conversation questions and suggested Quranic verse responses
   - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", "من يشتري؟", etc.
