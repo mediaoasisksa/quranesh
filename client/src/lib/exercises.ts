@@ -23,14 +23,15 @@ export const exerciseTypes = [
     variant: 'accent' as const,
     category: 'memory'
   },
-  {
-    id: 'comparison',
-    titleKey: 'comparison',
-    descriptionKey: 'comparisonDesc',
-    icon: '⚖️',
-    variant: 'primary' as const,
-    category: 'analysis'
-  },
+  // Comparison exercise hidden per user request
+  // {
+  //   id: 'comparison',
+  //   titleKey: 'comparison',
+  //   descriptionKey: 'comparisonDesc',
+  //   icon: '⚖️',
+  //   variant: 'primary' as const,
+  //   category: 'analysis'
+  // },
   {
     id: 'roleplay',
     titleKey: 'roleplay',
@@ -47,14 +48,15 @@ export const exerciseTypes = [
     variant: 'accent' as const,
     category: 'wisdom'
   },
-  {
-    id: 'thematic',
-    titleKey: 'thematic',
-    descriptionKey: 'thematicDesc',
-    icon: '🎯',
-    variant: 'primary' as const,
-    category: 'wisdom'
-  }
+  // Thematic exercise hidden to keep total at 5
+  // {
+  //   id: 'thematic',
+  //   titleKey: 'thematic',
+  //   descriptionKey: 'thematicDesc',
+  //   icon: '🎯',
+  //   variant: 'primary' as const,
+  //   category: 'wisdom'
+  // }
 ];
 
 export function getExerciseType(id: string) {
