@@ -3,11 +3,13 @@
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
 ## Recent Updates (October 30, 2025)
-- **New Content Added**: Added 6 new phrases/sentences to exercise database
-  - Conversation prompts: "من يشتري؟" (Who buys?), "أروني" (Show me)
-  - Roleplay phrases: "بغير علم" (without knowledge), "إذ قال" (When he said)
-  - Philosophical sentences: "لهو الحديث" (idle talk), "ومن يشكر فإنما يشكر لنفسه" (And whoever is grateful is grateful only for himself)
-  - Total database content: 122 conversation prompts, 15 roleplay phrases, 2,393 philosophical sentences
+- **Major Content Expansion**: Added 200 new Quranic phrases/sentences from comprehensive input file
+  - Added 40 conversation prompts including greetings, advice, encouragement, supplications, and ethical guidance
+  - Added 120 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 135 phrases
+  - Added 40 philosophical sentences containing wisdom and deep meanings
+  - **Total database content: 162 conversation prompts, 135 roleplay phrases, 2,433 philosophical sentences**
+  - All new content sourced from Quranic verses with authentic English translations
+  - Balance achieved across all three exercise types
 - **Dashboard Layout Updated**: Training Exercises section now appears at the TOP of the dashboard for better user experience
 - **Conversation Exercise Enhanced**: Now uses database-backed prompts with 122 Arabic conversation questions and suggested Quranic verse responses
   - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", "من يشتري؟", etc.
@@ -54,7 +56,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Database Schema Design
 - **Phrases Table**: Stores Arabic text, English translations, Surah references, and categorization
-- **Conversation Prompts Table**: Stores 120 Arabic conversation questions with suggested Quranic verses (e.g., "متى التسليم" → "اذا عزم الامر")
+- **Conversation Prompts Table**: Stores 162 Arabic conversation questions with suggested Quranic verses covering greetings, advice, encouragement, trust, manners, business ethics, worship, and supplications
 - **User Progress**: Tracks mastery levels and practice statistics per phrase
 - **Exercise Sessions**: Records individual exercise attempts and results (used for non-repetition filtering)
 - **Daily Statistics**: Aggregates daily usage and performance metrics
@@ -63,7 +65,7 @@ Preferred communication style: Simple, everyday language.
 ## Exercise System Architecture
 - **Exercise Types**: Three different exercise patterns including conversation practice, role-play scenarios, and grammar transformation (Substitution, Completion, Comparison and Thematic hidden)
 - **Conversation Exercise**: 
-  - Database-backed with 120 Arabic conversation prompts covering daily topics (greetings, work, travel, health, food, family, technology, government services)
+  - Database-backed with 162 Arabic conversation prompts covering daily topics (greetings, advice, encouragement, consolation, trust, manners, business ethics, worship, supplication, unity, charity, family, speech, and reminders)
   - Each prompt paired with suggested Quranic verse response
   - Users write relevant Quranic verses that convey similar meanings
   - AI validates verse relevance, then displays suggested verse
