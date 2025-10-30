@@ -137,5 +137,19 @@ export const insertPhilosophicalSentenceSchema = createInsertSchema(philosophica
 export type PhilosophicalSentence = typeof philosophicalSentences.$inferSelect;
 export type InsertPhilosophicalSentence = z.infer<typeof insertPhilosophicalSentenceSchema>;
 
+export const conversationPrompts = pgTable("conversation_prompts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  question: text("question").notNull(),
+  suggestedVerse: text("suggested_verse").notNull(),
+  category: text("category"),
+});
+
+export const insertConversationPromptSchema = createInsertSchema(conversationPrompts).omit({
+  id: true,
+});
+
+export type ConversationPrompt = typeof conversationPrompts.$inferSelect;
+export type InsertConversationPrompt = z.infer<typeof insertConversationPromptSchema>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;

@@ -6,6 +6,7 @@ import {
   dailyStats,
   questionBanks,
   philosophicalSentences,
+  conversationPrompts,
   type User,
   type InsertUser,
   type Phrase,
@@ -20,6 +21,8 @@ import {
   type InsertQuestionBank,
   type PhilosophicalSentence,
   type InsertPhilosophicalSentence,
+  type ConversationPrompt,
+  type InsertConversationPrompt,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -79,6 +82,12 @@ export interface IStorage {
   getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined>;
   createPhilosophicalSentence(sentence: InsertPhilosophicalSentence): Promise<PhilosophicalSentence>;
   getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined>;
+
+  // Conversation prompt methods
+  getAllConversationPrompts(): Promise<ConversationPrompt[]>;
+  getConversationPrompt(id: string): Promise<ConversationPrompt | undefined>;
+  createConversationPrompt(prompt: InsertConversationPrompt): Promise<ConversationPrompt>;
+  getRandomConversationPrompt(): Promise<ConversationPrompt | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -339,6 +348,7 @@ export class MemStorage implements IStorage {
   private dailyStats: Map<string, DailyStats>;
   private questionBanks: Map<string, QuestionBank>;
   private philosophicalSentences: Map<string, PhilosophicalSentence>;
+  private conversationPrompts: Map<string, ConversationPrompt>;
 
   constructor() {
     this.users = new Map();
@@ -348,6 +358,7 @@ export class MemStorage implements IStorage {
     this.dailyStats = new Map();
     this.questionBanks = new Map();
     this.philosophicalSentences = new Map();
+    this.conversationPrompts = new Map();
   }
 
   // User methods
@@ -584,6 +595,29 @@ export class MemStorage implements IStorage {
 
     // Return a random unused sentence
     return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
+  }
+
+  async getAllConversationPrompts(): Promise<ConversationPrompt[]> {
+    return Array.from(this.conversationPrompts.values());
+  }
+
+  async getConversationPrompt(id: string): Promise<ConversationPrompt | undefined> {
+    return this.conversationPrompts.get(id);
+  }
+
+  async createConversationPrompt(
+    insertPrompt: InsertConversationPrompt,
+  ): Promise<ConversationPrompt> {
+    const id = randomUUID();
+    const prompt: ConversationPrompt = { ...insertPrompt, id };
+    this.conversationPrompts.set(id, prompt);
+    return prompt;
+  }
+
+  async getRandomConversationPrompt(): Promise<ConversationPrompt | undefined> {
+    const allPrompts = Array.from(this.conversationPrompts.values());
+    if (allPrompts.length === 0) return undefined;
+    return allPrompts[Math.floor(Math.random() * allPrompts.length)];
   }
 }
 
