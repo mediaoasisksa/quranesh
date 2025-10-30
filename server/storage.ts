@@ -338,6 +338,34 @@ export class DatabaseStorage implements IStorage {
     // Return a random unused sentence
     return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
   }
+
+  async getAllConversationPrompts(): Promise<ConversationPrompt[]> {
+    return await db.select().from(conversationPrompts);
+  }
+
+  async getConversationPrompt(id: string): Promise<ConversationPrompt | undefined> {
+    const [prompt] = await db
+      .select()
+      .from(conversationPrompts)
+      .where(eq(conversationPrompts.id, id));
+    return prompt || undefined;
+  }
+
+  async createConversationPrompt(
+    insertPrompt: InsertConversationPrompt,
+  ): Promise<ConversationPrompt> {
+    const [prompt] = await db
+      .insert(conversationPrompts)
+      .values(insertPrompt)
+      .returning();
+    return prompt;
+  }
+
+  async getRandomConversationPrompt(): Promise<ConversationPrompt | undefined> {
+    const allPrompts = await db.select().from(conversationPrompts);
+    if (allPrompts.length === 0) return undefined;
+    return allPrompts[Math.floor(Math.random() * allPrompts.length)];
+  }
 }
 
 export class MemStorage implements IStorage {
