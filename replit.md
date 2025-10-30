@@ -3,14 +3,20 @@
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
 ## Recent Updates (October 30, 2025)
-- **Conversation Exercise Enhanced**: Now uses database-backed prompts with 120 Arabic conversation questions and suggested Quranic verse responses
-  - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", etc.
-  - Each prompt has a suggested Quranic verse (e.g., "والعصر", "وتعاونوا على البر والتقوى")
+- **New Content Added**: Added 6 new phrases/sentences to exercise database
+  - Conversation prompts: "من يشتري؟" (Who buys?), "أروني" (Show me)
+  - Roleplay phrases: "بغير علم" (without knowledge), "إذ قال" (When he said)
+  - Philosophical sentences: "لهو الحديث" (idle talk), "ومن يشكر فإنما يشكر لنفسه" (And whoever is grateful is grateful only for himself)
+  - Total database content: 122 conversation prompts, 15 roleplay phrases, 2,393 philosophical sentences
+- **Dashboard Layout Updated**: Training Exercises section now appears at the TOP of the dashboard for better user experience
+- **Conversation Exercise Enhanced**: Now uses database-backed prompts with 122 Arabic conversation questions and suggested Quranic verse responses
+  - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", "من يشتري؟", etc.
+  - Each prompt has a suggested Quranic verse (e.g., "والعصر", "وتعاونوا على البر والتقوى", "ويل للمطففين")
   - After AI validation, suggested verse is displayed to users
   - Non-repetition system filters out completed prompts per user
   - Frontend uses React Query with userId-specific cache keys
   - "Next Exercise" button stays within conversation exercise flow
-- **Non-Repetition System Fixed**: Users now never see the same exercise twice. Fixed React Query cache invalidation to ensure completed exercises are properly filtered out.
+- **Non-Repetition System Verified**: Users never see the same exercise twice. System properly tracks completed exercises in database and filters them out using SQL queries. E2E testing confirmed 3 consecutive exercises showed different questions.
 - **Exercise Count Reduced**: Now showing 3 exercise types instead of 7 (Substitution, Completion, Comparison and Thematic exercises hidden as per user request).
 - **Navigation Improved**: All exercise navigation uses client-side routing (wouter's setLocation) instead of full page reloads, maintaining React Query cache and improving performance.
 
