@@ -1,12 +1,13 @@
 export const exerciseTypes = [
-  {
-    id: 'substitution',
-    titleKey: 'substitution',
-    descriptionKey: 'substitutionDesc',
-    icon: '🔄',
-    variant: 'primary' as const,
-    category: 'interactive'
-  },
+  // Substitution exercise hidden per user request
+  // {
+  //   id: 'substitution',
+  //   titleKey: 'substitution',
+  //   descriptionKey: 'substitutionDesc',
+  //   icon: '🔄',
+  //   variant: 'primary' as const,
+  //   category: 'interactive'
+  // },
   {
     id: 'conversation',
     titleKey: 'conversation',
@@ -15,14 +16,15 @@ export const exerciseTypes = [
     variant: 'secondary' as const,
     category: 'practical'
   },
-  {
-    id: 'completion',
-    titleKey: 'completion',
-    descriptionKey: 'completionDesc',
-    icon: '🧩',
-    variant: 'accent' as const,
-    category: 'memory'
-  },
+  // Completion exercise hidden per user request
+  // {
+  //   id: 'completion',
+  //   titleKey: 'completion',
+  //   descriptionKey: 'completionDesc',
+  //   icon: '🧩',
+  //   variant: 'accent' as const,
+  //   category: 'memory'
+  // },
   // Comparison exercise hidden per user request
   // {
   //   id: 'comparison',
@@ -48,7 +50,7 @@ export const exerciseTypes = [
     variant: 'accent' as const,
     category: 'wisdom'
   },
-  // Thematic exercise hidden to keep total at 5
+  // Thematic exercise hidden per user request
   // {
   //   id: 'thematic',
   //   titleKey: 'thematic',

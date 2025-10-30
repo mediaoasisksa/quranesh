@@ -11,7 +11,7 @@ This is an AI-powered Arabic language learning application specifically designed
   - Frontend uses React Query with userId-specific cache keys
   - "Next Exercise" button stays within conversation exercise flow
 - **Non-Repetition System Fixed**: Users now never see the same exercise twice. Fixed React Query cache invalidation to ensure completed exercises are properly filtered out.
-- **Exercise Count Reduced**: Now showing 5 exercise types instead of 7 (Comparison and Thematic exercises hidden as per user request).
+- **Exercise Count Reduced**: Now showing 3 exercise types instead of 7 (Substitution, Completion, Comparison and Thematic exercises hidden as per user request).
 - **Navigation Improved**: All exercise navigation uses client-side routing (wouter's setLocation) instead of full page reloads, maintaining React Query cache and improving performance.
 
 ## Documentation
@@ -55,7 +55,7 @@ Preferred communication style: Simple, everyday language.
 - **Schema Management**: Drizzle ORM with PostgreSQL dialect for database operations
 
 ## Exercise System Architecture
-- **Exercise Types**: Five different exercise patterns including substitution drills, conversation practice, completion exercises, role-play scenarios, and grammar transformation (Comparison and Thematic hidden)
+- **Exercise Types**: Three different exercise patterns including conversation practice, role-play scenarios, and grammar transformation (Substitution, Completion, Comparison and Thematic hidden)
 - **Conversation Exercise**: 
   - Database-backed with 120 Arabic conversation prompts covering daily topics (greetings, work, travel, health, food, family, technology, government services)
   - Each prompt paired with suggested Quranic verse response
