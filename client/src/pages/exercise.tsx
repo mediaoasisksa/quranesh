@@ -44,6 +44,7 @@ export default function Exercise() {
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
   const isTransformationExercise = exerciseType === "transformation";
+  const isConversationExercise = exerciseType === "conversation";
 
   // For transformation exercises, fetch philosophical sentences
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
@@ -84,8 +85,18 @@ export default function Exercise() {
     enabled: !!exerciseType && isThematicExercise,
   });
 
-  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : phraseLoading);
-  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : phrase);
+  const { data: conversationPrompt, isLoading: conversationLoading } = useQuery<{
+    id: string;
+    question: string;
+    suggestedVerse: string;
+    category: string | null;
+  }>({
+    queryKey: ["/api/conversation-prompts/random"],
+    enabled: !!exerciseType && isConversationExercise,
+  });
+
+  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isConversationExercise ? conversationLoading : phraseLoading));
+  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isConversationExercise ? conversationPrompt : phrase));
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -110,6 +121,7 @@ export default function Exercise() {
       // This forces React Query to fetch new phrases from server with updated completed list
       queryClient.invalidateQueries({ queryKey: ["/api/phrases/random"] });
       queryClient.invalidateQueries({ queryKey: ["/api/philosophical-sentences/random"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/conversation-prompts/random"] });
     },
   });
 
@@ -249,6 +261,8 @@ export default function Exercise() {
         ? questionBank.id
         : isTransformationExercise && philosophicalSentence
         ? philosophicalSentence.id
+        : isConversationExercise && conversationPrompt
+        ? conversationPrompt.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
       userId: userId,
@@ -393,26 +407,37 @@ export default function Exercise() {
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-foreground font-medium mb-2">
-                How do you say in Arabic:
+                {t('conversationPromptLabel') || "في هذا الموقف:"}
               </p>
               <p
-                className="text-lg text-foreground"
+                className="arabic-text text-xl text-foreground mb-3"
+                lang="ar"
                 data-testid="text-conversation-prompt"
               >
-                "God is watching everything you do"
+                {conversationPrompt?.question || "..."}
               </p>
             </div>
             <p className="text-foreground">
-              Respond using a relevant Quranic verse in Arabic:
+              {t('conversationInstruction') || "اكتب آية قرآنية تعطي نفس الإيحاء:"}
             </p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder="أجب بالعربية باستخدام آية قرآنية..."
+              placeholder="اكتب آية قرآنية..."
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
               data-testid="textarea-conversation-answer"
             />
+            {isAnswered && conversationPrompt?.suggestedVerse && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">
+                  {t('suggestedVerse') || "آية مقترحة:"}
+                </p>
+                <p className="arabic-text text-lg text-green-900 dark:text-green-100" lang="ar">
+                  {conversationPrompt.suggestedVerse}
+                </p>
+              </div>
+            )}
           </div>
         );
 

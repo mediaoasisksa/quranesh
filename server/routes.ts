@@ -250,6 +250,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Conversation prompt routes
+  app.get("/api/conversation-prompts/random", async (req, res) => {
+    try {
+      const prompt = await storage.getRandomConversationPrompt();
+      if (!prompt) {
+        return res.status(404).json({ message: "No conversation prompts available" });
+      }
+      res.json(prompt);
+    } catch (error) {
+      console.error("Error fetching conversation prompt:", error);
+      res.status(500).json({ message: "Failed to fetch conversation prompt" });
+    }
+  });
+
+  app.get("/api/conversation-prompts", async (req, res) => {
+    try {
+      const prompts = await storage.getAllConversationPrompts();
+      res.json(prompts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch conversation prompts" });
+    }
+  });
+
   // Exercise session routes
   app.post("/api/exercise-sessions", async (req, res) => {
     try {

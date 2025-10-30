@@ -24,7 +24,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "Conversation Practice",
-    conversationDesc: "Practice daily Arabic conversations",
+    conversationDesc: "Practice daily Arabic conversations with Quranic verses",
+    conversationPromptLabel: "In this situation:",
+    conversationInstruction: "Write a Quranic verse that conveys the same meaning:",
+    suggestedVerse: "Suggested verse:",
     substitution: "Substitution Drills",
     substitutionDesc: "Replace words while maintaining structure",
     completion: "Sentence Completion",
@@ -211,7 +214,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "تدريب المحادثة",
-    conversationDesc: "تدرب على المحادثات اليومية بالعربية",
+    conversationDesc: "تدرب على المحادثات اليومية بالعربية مع الآيات القرآنية",
+    conversationPromptLabel: "في هذا الموقف:",
+    conversationInstruction: "اكتب آية قرآنية تعطي نفس الإيحاء:",
+    suggestedVerse: "آية مقترحة:",
     substitution: "تمارين الاستبدال",
     substitutionDesc: "استبدل الكلمات مع الحفاظ على البنية",
     completion: "إكمال الجمل",
@@ -398,7 +404,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "Latihan Percakapan",
-    conversationDesc: "Praktikkan percakapan Arab sehari-hari",
+    conversationDesc: "Praktikkan percakapan Arab sehari-hari dengan ayat-ayat Al-Quran",
+    conversationPromptLabel: "Dalam situasi ini:",
+    conversationInstruction: "Tulislah ayat Al-Quran yang memberikan makna yang sama:",
+    suggestedVerse: "Ayat yang disarankan:",
     substitution: "Latihan Substitusi",
     substitutionDesc: "Ganti kata sambil mempertahankan struktur",
     completion: "Melengkapi Kalimat",
@@ -585,7 +594,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "Konuşma Pratiği",
-    conversationDesc: "Günlük Arapça konuşmaları pratik yapın",
+    conversationDesc: "Kur'an ayetleriyle günlük Arapça konuşmaları pratik yapın",
+    conversationPromptLabel: "Bu durumda:",
+    conversationInstruction: "Aynı anlamı taşıyan bir Kur'an ayeti yazın:",
+    suggestedVerse: "Önerilen ayet:",
     substitution: "Değiştirme Egzersizleri",
     substitutionDesc: "Yapıyı koruyarak kelimeleri değiştirin",
     completion: "Cümle Tamamlama",
@@ -772,7 +784,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "对话练习",
-    conversationDesc: "练习日常阿拉伯语对话",
+    conversationDesc: "用古兰经经文练习日常阿拉伯语对话",
+    conversationPromptLabel: "在这种情况下：",
+    conversationInstruction: "写一节传达相同含义的古兰经经文：",
+    suggestedVerse: "建议的经文：",
     substitution: "替换练习",
     substitutionDesc: "在保持结构的同时替换单词",
     completion: "完成句子",
@@ -959,7 +974,10 @@ export const translations = {
     
     // Exercise Types
     conversation: "Mazoezi ya Mazungumzo",
-    conversationDesc: "Fanya mazoezi ya mazungumzo ya kila siku ya Kiarabu",
+    conversationDesc: "Fanya mazoezi ya mazungumzo ya kila siku ya Kiarabu na aya za Qur'ani",
+    conversationPromptLabel: "Katika hali hii:",
+    conversationInstruction: "Andika aya ya Qur'ani inayotoa maana sawa:",
+    suggestedVerse: "Aya inayopendekezwa:",
     substitution: "Mazoezi ya Kubadilisha",
     substitutionDesc: "Badilisha maneno ukihifadhi muundo",
     completion: "Kukamilisha Sentensi",
