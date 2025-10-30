@@ -7,7 +7,7 @@ This is an AI-powered Arabic language learning application specifically designed
   - Added 40 conversation prompts including greetings, advice, encouragement, supplications, and ethical guidance
   - Added 151 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 166 phrases
   - Added 65 philosophical sentences containing wisdom and deep meanings
-  - **Total database content: 162 conversation prompts, 166 roleplay phrases, 2,458 philosophical sentences**
+  - **Total database content: 162 conversation prompts, 166 roleplay phrases, 2,459 philosophical sentences**
   - All new content sourced from Quranic verses with authentic English translations
   - Balance achieved across all three exercise types
   - Latest additions include extensive story of Prophet Musa ("اخلع نعليك", "هي عصاي", "لا تخف", "خذها", "يسر لي امري", "احلل عقدة من لساني", "اقذفيه في اليم", "واصطنعتك لنفسي"), balanced spending ("ولا تبسطها كل البسط"), business ethics ("واقيموا الوزن بالقسط"), charity ("وان تصدقوا خير لكم"), preventing corruption ("ولا تفسدوا في الارض"), and divine attributes ("من جاء بالحسنة فله عشر امثالها")
