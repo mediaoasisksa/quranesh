@@ -91,7 +91,12 @@ export default function Exercise() {
     suggestedVerse: string;
     category: string | null;
   }>({
-    queryKey: ["/api/conversation-prompts/random"],
+    queryKey: ["/api/conversation-prompts/random", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/conversation-prompts/random?userId=${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch conversation prompt");
+      return response.json();
+    },
     enabled: !!exerciseType && isConversationExercise,
   });
 
@@ -121,7 +126,7 @@ export default function Exercise() {
       // This forces React Query to fetch new phrases from server with updated completed list
       queryClient.invalidateQueries({ queryKey: ["/api/phrases/random"] });
       queryClient.invalidateQueries({ queryKey: ["/api/philosophical-sentences/random"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/conversation-prompts/random"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/conversation-prompts/random", userId] });
     },
   });
 
@@ -285,26 +290,30 @@ export default function Exercise() {
     try {
       console.log("=== NEXT EXERCISE DEBUG ===");
 
-      // Navigate to a random exercise (same type or random)
-      const randomType = getRandomExerciseType();
-      console.log("Random exercise type:", randomType);
+      // Stay in the same exercise type
+      const currentExerciseType = exerciseType || "conversation";
+      console.log("Staying in exercise type:", currentExerciseType);
 
       // Reset the exercise state
       resetExercise();
 
-      // Invalidate the appropriate cache based on exercise type
-      if (randomType.id === "transformation") {
+      // Invalidate the appropriate cache based on current exercise type
+      if (currentExerciseType === "transformation") {
         await queryClient.invalidateQueries({
           queryKey: ["/api/philosophical-sentences/random", userId],
         });
+      } else if (currentExerciseType === "conversation") {
+        await queryClient.invalidateQueries({
+          queryKey: ["/api/conversation-prompts/random", userId],
+        });
       } else {
         await queryClient.invalidateQueries({
-          queryKey: ["/api/phrases/random", randomType.id, userId],
+          queryKey: ["/api/phrases/random", currentExerciseType, userId],
         });
       }
 
-      // Navigate to the new exercise without phraseId (will fetch random with non-repetition)
-      const newPath = `/exercise/${randomType.id}`;
+      // Navigate to the same exercise type without phraseId (will fetch random with non-repetition)
+      const newPath = `/exercise/${currentExerciseType}`;
       console.log("Navigating to:", newPath);
       setLocation(newPath);
     } catch (error) {

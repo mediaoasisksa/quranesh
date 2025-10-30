@@ -25,7 +25,7 @@ import {
   type InsertConversationPrompt,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, notInArray } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -87,7 +87,7 @@ export interface IStorage {
   getAllConversationPrompts(): Promise<ConversationPrompt[]>;
   getConversationPrompt(id: string): Promise<ConversationPrompt | undefined>;
   createConversationPrompt(prompt: InsertConversationPrompt): Promise<ConversationPrompt>;
-  getRandomConversationPrompt(): Promise<ConversationPrompt | undefined>;
+  getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -361,10 +361,30 @@ export class DatabaseStorage implements IStorage {
     return prompt;
   }
 
-  async getRandomConversationPrompt(): Promise<ConversationPrompt | undefined> {
-    const allPrompts = await db.select().from(conversationPrompts);
-    if (allPrompts.length === 0) return undefined;
-    return allPrompts[Math.floor(Math.random() * allPrompts.length)];
+  async getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined> {
+    // Get all conversation prompts that the user hasn't completed yet
+    const completedPromptIds = await db
+      .select({ phraseId: exerciseSessions.phraseId })
+      .from(exerciseSessions)
+      .where(
+        and(
+          eq(exerciseSessions.userId, userId),
+          eq(exerciseSessions.exerciseType, "conversation")
+        )
+      );
+
+    const completedIds = completedPromptIds.map((session) => session.phraseId);
+
+    // Get all prompts except completed ones
+    const availablePrompts = completedIds.length > 0
+      ? await db
+          .select()
+          .from(conversationPrompts)
+          .where(notInArray(conversationPrompts.id, completedIds))
+      : await db.select().from(conversationPrompts);
+
+    if (availablePrompts.length === 0) return undefined;
+    return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
   }
 }
 
@@ -642,10 +662,22 @@ export class MemStorage implements IStorage {
     return prompt;
   }
 
-  async getRandomConversationPrompt(): Promise<ConversationPrompt | undefined> {
-    const allPrompts = Array.from(this.conversationPrompts.values());
-    if (allPrompts.length === 0) return undefined;
-    return allPrompts[Math.floor(Math.random() * allPrompts.length)];
+  async getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined> {
+    // Get all conversation prompts that the user hasn't completed yet
+    const completedPromptIds = Array.from(this.exerciseSessions.values())
+      .filter(
+        (session) =>
+          session.userId === userId && session.exerciseType === "conversation"
+      )
+      .map((session) => session.phraseId);
+
+    // Get all prompts except completed ones
+    const availablePrompts = Array.from(this.conversationPrompts.values()).filter(
+      (prompt) => !completedPromptIds.includes(prompt.id)
+    );
+
+    if (availablePrompts.length === 0) return undefined;
+    return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
   }
 }
 
