@@ -3,6 +3,13 @@
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
 ## Recent Updates (October 30, 2025)
+- **Conversation Exercise Enhanced**: Now uses database-backed prompts with 120 Arabic conversation questions and suggested Quranic verse responses
+  - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", etc.
+  - Each prompt has a suggested Quranic verse (e.g., "والعصر", "وتعاونوا على البر والتقوى")
+  - After AI validation, suggested verse is displayed to users
+  - Non-repetition system filters out completed prompts per user
+  - Frontend uses React Query with userId-specific cache keys
+  - "Next Exercise" button stays within conversation exercise flow
 - **Non-Repetition System Fixed**: Users now never see the same exercise twice. Fixed React Query cache invalidation to ensure completed exercises are properly filtered out.
 - **Exercise Count Reduced**: Now showing 5 exercise types instead of 7 (Comparison and Thematic exercises hidden as per user request).
 - **Navigation Improved**: All exercise navigation uses client-side routing (wouter's setLocation) instead of full page reloads, maintaining React Query cache and improving performance.
@@ -41,20 +48,27 @@ Preferred communication style: Simple, everyday language.
 
 ## Database Schema Design
 - **Phrases Table**: Stores Arabic text, English translations, Surah references, and categorization
+- **Conversation Prompts Table**: Stores 120 Arabic conversation questions with suggested Quranic verses (e.g., "متى التسليم" → "اذا عزم الامر")
 - **User Progress**: Tracks mastery levels and practice statistics per phrase
-- **Exercise Sessions**: Records individual exercise attempts and results
+- **Exercise Sessions**: Records individual exercise attempts and results (used for non-repetition filtering)
 - **Daily Statistics**: Aggregates daily usage and performance metrics
 - **Schema Management**: Drizzle ORM with PostgreSQL dialect for database operations
 
 ## Exercise System Architecture
 - **Exercise Types**: Five different exercise patterns including substitution drills, conversation practice, completion exercises, role-play scenarios, and grammar transformation (Comparison and Thematic hidden)
+- **Conversation Exercise**: 
+  - Database-backed with 120 Arabic conversation prompts covering daily topics (greetings, work, travel, health, food, family, technology, government services)
+  - Each prompt paired with suggested Quranic verse response
+  - Users write relevant Quranic verses that convey similar meanings
+  - AI validates verse relevance, then displays suggested verse
+  - "Next Exercise" button stays within conversation flow
 - **Dynamic Content**: Exercises are generated based on user's current phrase knowledge and difficulty progression
 - **Non-Repetition System**: 
   - Backend filters out completed exercises per user and exercise type
-  - Frontend invalidates React Query cache after each exercise completion
-  - Server-side random selection ensures users never see repeated phrases
-  - Tracks all completed exercise sessions in database
-  - Works seamlessly across all exercise types
+  - Frontend uses userId-specific React Query cache keys: `["/api/conversation-prompts/random", userId]`
+  - Cache invalidation after each exercise completion prevents repeated prompts
+  - Server queries `exercise_sessions` table to filter completed prompts via SQL `notInArray`
+  - Works seamlessly across all exercise types (phrases, philosophical sentences, conversation prompts)
 - **AI Question Generation**: When users exhaust all database questions, Gemini AI generates new authentic Quranic phrases and exercises
 - **Progress Tracking**: Real-time feedback and long-term progress analytics
 - **Adaptive Learning**: Exercise selection based on user performance and mastery levels
