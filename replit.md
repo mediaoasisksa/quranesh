@@ -7,6 +7,8 @@ This is an AI-powered Arabic language learning application specifically designed
   - All UI elements, exercises, navigation, and content translated
   - Language toggle cycles: English → Indonesian → Turkish → Arabic → Chinese → Swahili → Somali
   - Full coverage of 200+ translation keys
+  - Fixed hard-coded English text in exercise cards (exercise-card.tsx) by adding 5 new translation keys to all languages
+  - All exercise cards now fully translated in all 7 languages
 - **Logo Updated**: New Quranesh logo (colorful design with book and person) replacing old BookOpen icon
   - Logo appears on all pages: homepage, dashboard, exercise pages
   - Proper alt text "Quranesh Logo" for accessibility

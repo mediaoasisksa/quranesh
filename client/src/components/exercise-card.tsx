@@ -76,7 +76,7 @@ export default function ExerciseCard({
               </p>
             </div>
             <p className="text-sm text-foreground mb-3">
-              Replace a word with another attribute you know:
+              {t('replaceWordInstruction')}
             </p>
             <Input
               type="text"
@@ -94,13 +94,13 @@ export default function ExerciseCard({
           <div className="mb-4">
             <div className="bg-muted/50 rounded-lg p-4 mb-3">
               <p className="text-sm text-foreground font-medium mb-2">
-                How do you say:
+                {t('howDoYouSay')}
               </p>
               <p
                 className="text-foreground"
                 data-testid="text-conversation-prompt"
               >
-                "God is watching everything you do"
+                "{t('godIsWatchingExample')}"
               </p>
             </div>
             <Textarea
@@ -191,7 +191,7 @@ export default function ExerciseCard({
               </div>
             </div>
             <p className="text-sm text-foreground mb-2">
-              Explain the difference in Arabic:
+              {t('explainDifferenceInstruction')}
             </p>
             <Textarea
               className="arabic-text text-right"
@@ -212,14 +212,13 @@ export default function ExerciseCard({
                 <div className="mt-1">👥</div>
                 <div>
                   <p className="text-sm text-foreground font-medium mb-1">
-                    Scenario:
+                    {t('scenario')}:
                   </p>
                   <p
                     className="text-sm text-muted-foreground"
                     data-testid="text-roleplay-scenario"
                   >
-                    Your friend is sad and needs comfort. Console them using a
-                    Quranic verse.
+                    {t('consoleFriendScenario')}
                   </p>
                 </div>
               </div>
