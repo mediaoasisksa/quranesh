@@ -11,6 +11,7 @@ export const phrases = pgTable("phrases", {
   lifeApplication: text("life_application").notNull(),
   category: text("category").notNull(), // short, long, commands, proverbs
   difficulty: integer("difficulty").default(1), // 1-5 scale
+  symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation of the phrase
 });
 
 export const userProgress = pgTable("user_progress", {
@@ -128,6 +129,7 @@ export const philosophicalSentences = pgTable("philosophical_sentences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   arabicText: text("arabic_text").notNull(),
   difficulty: integer("difficulty").default(1), // 1-5 scale
+  symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
 });
 
 export const insertPhilosophicalSentenceSchema = createInsertSchema(philosophicalSentences).omit({
@@ -142,6 +144,7 @@ export const conversationPrompts = pgTable("conversation_prompts", {
   question: text("question").notNull(),
   suggestedVerse: text("suggested_verse").notNull(),
   category: text("category"),
+  symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
 });
 
 export const insertConversationPromptSchema = createInsertSchema(conversationPrompts).omit({
