@@ -20,6 +20,7 @@ import type { Phrase, ExerciseSession, QuestionBank, PhilosophicalSentence } fro
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
+import logoImage from "@assets/quranesh logo (1)_1761884773357.png";
 
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
@@ -633,7 +634,14 @@ export default function Exercise() {
                 {exerciseConfig ? t(exerciseConfig.descriptionKey as any) : ''}
               </p>
             </div>
-            <div className="w-32"></div>
+            <div className="w-32 flex items-center justify-end">
+              <img 
+                src={logoImage} 
+                alt="Quranesh Logo" 
+                className="h-8 w-auto object-contain"
+                data-testid="img-logo"
+              />
+            </div>
           </div>
         </div>
       </header>

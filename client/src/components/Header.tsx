@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  BookOpen,
   Menu,
   X,
   User,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import LanguageToggle from "@/components/language-toggle";
 import { useLanguage } from "@/contexts/language-context";
+import logoImage from "@assets/quranesh logo (1)_1761884773357.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,10 +38,11 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Quranic</span>
+            <img 
+              src={logoImage} 
+              alt="Quranesh Logo" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}
