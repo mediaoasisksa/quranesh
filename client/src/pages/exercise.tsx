@@ -90,6 +90,7 @@ export default function Exercise() {
     question: string;
     suggestedVerse: string;
     category: string | null;
+    symbolicMeaning?: string | null;
   }>({
     queryKey: ["/api/conversation-prompts/random", userId],
     queryFn: async () => {
@@ -843,6 +844,52 @@ export default function Exercise() {
                       data-testid="text-philosophical-symbolic"
                     >
                       {philosophicalSentence.symbolicMeaning}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : isConversationExercise && conversationPrompt ? (
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Type
+                    </p>
+                    <p className="text-foreground" data-testid="text-conversation-type">
+                      Conversation Prompt
+                    </p>
+                  </div>
+                  {conversationPrompt.category && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Category
+                      </p>
+                      <p className="text-foreground capitalize" data-testid="text-conversation-category">
+                        {conversationPrompt.category}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {isAnswered && conversationPrompt.suggestedVerse && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Suggested Verse
+                    </p>
+                    <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse">
+                      {conversationPrompt.suggestedVerse}
+                    </p>
+                  </div>
+                )}
+                {conversationPrompt.symbolicMeaning && (
+                  <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
+                      🔑 Symbolic Meaning / الرمزية السلوكية
+                    </p>
+                    <p
+                      className="text-foreground text-sm"
+                      data-testid="text-conversation-symbolic"
+                    >
+                      {conversationPrompt.symbolicMeaning}
                     </p>
                   </div>
                 )}
