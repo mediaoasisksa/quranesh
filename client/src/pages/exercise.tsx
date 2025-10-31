@@ -139,6 +139,14 @@ export default function Exercise() {
     }
   }, [exerciseType, exerciseConfig, setLocation]);
 
+  // Reset exercise state when new question is loaded
+  useEffect(() => {
+    setUserAnswer("");
+    setIsAnswered(false);
+    setIsCorrect(false);
+    setFeedback("");
+  }, [phrase?.id, philosophicalSentence?.id, conversationPrompt?.id, questionBank?.id]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
