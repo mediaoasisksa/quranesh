@@ -118,16 +118,10 @@ export default function Exercise() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate relevant queries to update stats
+      // Invalidate stats queries only (not the exercise data)
       queryClient.invalidateQueries({ queryKey: ["/api/daily-stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user-progress"] });
       queryClient.invalidateQueries({ queryKey: ["/api/weekly-stats"] });
-      
-      // CRITICAL: Invalidate random phrases cache so non-repetition system works
-      // This forces React Query to fetch new phrases from server with updated completed list
-      queryClient.invalidateQueries({ queryKey: ["/api/phrases/random"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/philosophical-sentences/random"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/conversation-prompts/random", userId] });
     },
   });
 
@@ -138,14 +132,6 @@ export default function Exercise() {
       setLocation("/dashboard");
     }
   }, [exerciseType, exerciseConfig, setLocation]);
-
-  // Reset exercise state when new question is loaded
-  useEffect(() => {
-    setUserAnswer("");
-    setIsAnswered(false);
-    setIsCorrect(false);
-    setFeedback("");
-  }, [phrase?.id, philosophicalSentence?.id, conversationPrompt?.id, questionBank?.id]);
 
   if (isLoading) {
     return (
