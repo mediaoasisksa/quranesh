@@ -813,6 +813,40 @@ export default function Exercise() {
                     </div>
                   )}
               </div>
+            ) : isTransformationExercise && philosophicalSentence ? (
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Type
+                    </p>
+                    <p className="text-foreground" data-testid="text-philosophical-type">
+                      Philosophical Sentence
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Difficulty
+                    </p>
+                    <p className="text-foreground" data-testid="text-philosophical-difficulty">
+                      {philosophicalSentence.difficulty}/5
+                    </p>
+                  </div>
+                </div>
+                {philosophicalSentence.symbolicMeaning && (
+                  <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
+                      🔑 Symbolic Meaning / الرمزية السلوكية
+                    </p>
+                    <p
+                      className="text-foreground text-sm"
+                      data-testid="text-philosophical-symbolic"
+                    >
+                      {philosophicalSentence.symbolicMeaning}
+                    </p>
+                  </div>
+                )}
+              </div>
             ) : phrase ? (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -850,6 +884,19 @@ export default function Exercise() {
                     {phrase.lifeApplication}
                   </p>
                 </div>
+                {phrase.symbolicMeaning && (
+                  <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
+                      🔑 Symbolic Meaning / الرمزية السلوكية
+                    </p>
+                    <p
+                      className="text-foreground text-sm"
+                      data-testid="text-phrase-symbolic"
+                    >
+                      {phrase.symbolicMeaning}
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-muted-foreground">

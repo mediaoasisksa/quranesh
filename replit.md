@@ -2,7 +2,16 @@
 
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
-## Recent Updates (October 30, 2025)
+## Recent Updates (October 31, 2025)
+- **Symbolic Meaning Feature**: Added behavioral symbolism system to transform Quranic phrases into applicable life lessons
+  - New `symbolic_meaning` field added to all three exercise types (phrases, philosophical sentences, conversation prompts)
+  - Symbolic meanings displayed in amber-highlighted boxes during exercises
+  - Examples: "إن مع العسر يسرا" → "التفاؤل الفعّال أثناء الابتلاء | Active optimism during trials"
+  - Converts Quranic stories into behavioral patterns applicable to daily life
+  - Educational approach that stays faithful to Quranic context
+  - Each symbolism includes Arabic and English explanation
+
+## Previous Updates (October 30, 2025)
 - **Major Content Expansion**: Added 256 new Quranic phrases/sentences from comprehensive input files
   - Added 40 conversation prompts including greetings, advice, encouragement, supplications, and ethical guidance
   - Added 151 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 166 phrases
