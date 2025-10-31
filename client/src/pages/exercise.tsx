@@ -345,7 +345,7 @@ export default function Exercise() {
               className="text-muted-foreground"
               data-testid="text-question-english"
             >
-              What Quranic verse would you use in this situation?
+              {t('thematicInstructionText')}
             </p>
             <div className="mt-4 text-sm text-muted-foreground">
               <p>Related themes: {questionBank.tags?.join(", ") || "None"}</p>
@@ -353,7 +353,7 @@ export default function Exercise() {
           </div>
           <div className="space-y-3">
             <label className="text-sm font-medium text-foreground">
-              Provide a Quranic verse that relates to this situation:
+              {t('thematicInstructionText2')}
             </label>
             <Textarea
               value={userAnswer}
@@ -549,9 +549,7 @@ export default function Exercise() {
                     className="text-foreground"
                     data-testid="text-roleplay-scenario"
                   >
-                    Your friend is going through a difficult time and feels
-                    hopeless. Console them using an appropriate Quranic verse
-                    that offers hope and comfort.
+                    {t('roleplayScenarioText')}
                   </p>
                 </div>
               </div>
@@ -649,7 +647,7 @@ export default function Exercise() {
               <div className="flex items-center space-x-2">
                 {isThematicExercise && questionBank ? (
                   <span className="text-sm text-muted-foreground">
-                    Thematic Question
+                    {t('thematicQuestionLabel')}
                   </span>
                 ) : phrase ? (
                   <AudioButton
@@ -756,7 +754,7 @@ export default function Exercise() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Theme
+                      {t('theme')}
                     </p>
                     <p
                       className="text-foreground"
@@ -767,7 +765,7 @@ export default function Exercise() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Difficulty
+                      {t('difficulty')}
                     </p>
                     <p
                       className="text-foreground"
@@ -779,7 +777,7 @@ export default function Exercise() {
                 </div>
                 <div className="mt-4">
                   <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Description
+                    {t('description')}
                   </p>
                   <p
                     className="text-foreground"
@@ -813,7 +811,7 @@ export default function Exercise() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Type
+                      {t('type')}
                     </p>
                     <p className="text-foreground" data-testid="text-philosophical-type">
                       Philosophical Sentence
@@ -821,7 +819,7 @@ export default function Exercise() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Difficulty
+                      {t('difficulty')}
                     </p>
                     <p className="text-foreground" data-testid="text-philosophical-difficulty">
                       {philosophicalSentence.difficulty}/5
@@ -847,10 +845,10 @@ export default function Exercise() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Type
+                      {t('type')}
                     </p>
                     <p className="text-foreground" data-testid="text-conversation-type">
-                      Conversation Prompt
+                      {t('conversationPromptType')}
                     </p>
                   </div>
                   {conversationPrompt.category && (
