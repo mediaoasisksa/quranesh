@@ -436,11 +436,11 @@ export default function Exercise() {
               </p>
             </div>
             <p className="text-foreground">
-              {t('conversationInstruction') || "اكتب آية قرآنية تعطي نفس الإيحاء:"}
+              {t('conversationInstruction') || "اكتب كلمة أو مفردة أو جملة استخدمها القرآن:"}
             </p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder="اكتب آية قرآنية..."
+              placeholder="اكتب كلمة أو مفردة أو جملة استخدمها القرآن..."
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
