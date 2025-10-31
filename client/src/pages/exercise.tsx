@@ -544,7 +544,7 @@ export default function Exercise() {
               <div className="flex items-start space-x-3">
                 <span className="text-2xl">👥</span>
                 <div>
-                  <p className="text-foreground font-medium mb-2">Scenario:</p>
+                  <p className="text-foreground font-medium mb-2">{t('scenario')}:</p>
                   <p
                     className="text-foreground"
                     data-testid="text-roleplay-scenario"
@@ -556,7 +556,7 @@ export default function Exercise() {
                 </div>
               </div>
             </div>
-            <p className="text-foreground">Your response in Arabic:</p>
+            <p className="text-foreground">{t('yourResponseInArabic')}:</p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"
               placeholder="استخدم آية مناسبة للمواساة والأمل..."
@@ -645,7 +645,7 @@ export default function Exercise() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Exercise</span>
+              <span>{t('exercise')}</span>
               <div className="flex items-center space-x-2">
                 {isThematicExercise && questionBank ? (
                   <span className="text-sm text-muted-foreground">
@@ -747,7 +747,7 @@ export default function Exercise() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {isThematicExercise ? "About This Question" : "About This Phrase"}
+              {isThematicExercise ? t('aboutThisQuestion') : t('aboutThisPhrase')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -856,7 +856,7 @@ export default function Exercise() {
                   {conversationPrompt.category && (
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Category
+                        {t('category')}
                       </p>
                       <p className="text-foreground capitalize" data-testid="text-conversation-category">
                         {conversationPrompt.category}
@@ -893,7 +893,7 @@ export default function Exercise() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Source
+                      {t('source')}
                     </p>
                     <p
                       className="text-foreground"
@@ -904,7 +904,7 @@ export default function Exercise() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Category
+                      {t('category')}
                     </p>
                     <p
                       className="text-foreground capitalize"

@@ -45,6 +45,13 @@ export const translations = {
     thematicDesc: "Apply verses to real situations",
     
     // Exercise Page
+    exercise: "Exercise",
+    scenario: "Scenario",
+    aboutThisPhrase: "About This Phrase",
+    aboutThisQuestion: "About This Question",
+    category: "Category",
+    source: "Source",
+    yourResponseInArabic: "Your response in Arabic",
     backToDashboard: "Back to Dashboard",
     checkAnswer: "Check Answer",
     nextExercise: "Next Exercise",
@@ -235,6 +242,13 @@ export const translations = {
     thematicDesc: "طبق الآيات على المواقف الحقيقية",
     
     // Exercise Page
+    exercise: "التمرين",
+    scenario: "السيناريو",
+    aboutThisPhrase: "حول هذه العبارة",
+    aboutThisQuestion: "حول هذا السؤال",
+    category: "الفئة",
+    source: "المصدر",
+    yourResponseInArabic: "إجابتك بالعربية",
     backToDashboard: "العودة للوحة التحكم",
     checkAnswer: "تحقق من الإجابة",
     nextExercise: "التمرين التالي",
@@ -425,6 +439,13 @@ export const translations = {
     thematicDesc: "Terapkan ayat ke situasi nyata",
     
     // Exercise Page
+    exercise: "Latihan",
+    scenario: "Skenario",
+    aboutThisPhrase: "Tentang Frasa Ini",
+    aboutThisQuestion: "Tentang Pertanyaan Ini",
+    category: "Kategori",
+    source: "Sumber",
+    yourResponseInArabic: "Respons Anda dalam bahasa Arab",
     backToDashboard: "Kembali ke Dasbor",
     checkAnswer: "Periksa Jawaban",
     nextExercise: "Latihan Berikutnya",
@@ -615,6 +636,13 @@ export const translations = {
     thematicDesc: "Ayetleri gerçek durumlara uygulayın",
     
     // Exercise Page
+    exercise: "Egzersiz",
+    scenario: "Senaryo",
+    aboutThisPhrase: "Bu İfade Hakkında",
+    aboutThisQuestion: "Bu Soru Hakkında",
+    category: "Kategori",
+    source: "Kaynak",
+    yourResponseInArabic: "Arapça cevabınız",
     backToDashboard: "Gösterge Paneline Dön",
     checkAnswer: "Cevabı Kontrol Et",
     nextExercise: "Sonraki Egzersiz",
@@ -805,6 +833,13 @@ export const translations = {
     thematicDesc: "将经文应用于实际情况",
     
     // Exercise Page
+    exercise: "练习",
+    scenario: "情景",
+    aboutThisPhrase: "关于此短语",
+    aboutThisQuestion: "关于此问题",
+    category: "类别",
+    source: "来源",
+    yourResponseInArabic: "您的阿拉伯语回答",
     backToDashboard: "返回仪表板",
     checkAnswer: "检查答案",
     nextExercise: "下一个练习",
@@ -995,6 +1030,13 @@ export const translations = {
     thematicDesc: "Tumia aya katika hali halisi",
     
     // Exercise Page
+    exercise: "Zoezi",
+    scenario: "Hali",
+    aboutThisPhrase: "Kuhusu Kifungu Hiki",
+    aboutThisQuestion: "Kuhusu Swali Hili",
+    category: "Kategori",
+    source: "Chanzo",
+    yourResponseInArabic: "Jibu lako kwa Kiarabu",
     backToDashboard: "Rudi kwenye Dashibodi",
     checkAnswer: "Angalia Jibu",
     nextExercise: "Zoezi Linalofuata",
