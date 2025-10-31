@@ -3,12 +3,17 @@
 This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
 
 ## Recent Updates (October 31, 2025)
-- **Somali Language Added**: Complete translation support for Somali (Soomaali) - now supporting 7 languages total
+- **Bosnian Language Added**: Complete translation support for Bosnian (Bosanski) - now supporting 8 languages total
   - All UI elements, exercises, navigation, and content translated
-  - Language toggle cycles: English → Indonesian → Turkish → Arabic → Chinese → Swahili → Somali
+  - Language toggle cycles: English → Indonesian → Turkish → Arabic → Chinese → Swahili → Somali → Bosnian
+  - Full coverage of 200+ translation keys
+  - Proper Islamic terminology in Bosnian (Kur'an, ajet, džuz, hafiz)
+  - E2E tested and verified working across all pages
+- **Somali Language Added**: Complete translation support for Somali (Soomaali) - 7th language
+  - All UI elements, exercises, navigation, and content translated
   - Full coverage of 200+ translation keys
   - Fixed hard-coded English text in exercise cards (exercise-card.tsx) by adding 5 new translation keys to all languages
-  - All exercise cards now fully translated in all 7 languages
+  - All exercise cards now fully translated in all 8 languages
 - **Logo Updated**: New Quranesh logo (colorful design with book and person) replacing old BookOpen icon
   - Logo appears on all pages: homepage, dashboard, exercise pages
   - Proper alt text "Quranesh Logo" for accessibility
@@ -64,12 +69,12 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with CSS variables for theming and Arabic font support (Amiri)
 - **State Management**: TanStack Query for server state and local React state for UI
 - **Speech Synthesis**: Browser Web Speech API for Arabic text-to-speech functionality
-- **Internationalization**: Custom i18n system with Context API supporting English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, and Somali with RTL/LTR switching
+- **Internationalization**: Custom i18n system with Context API supporting English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, and Bosnian with RTL/LTR switching
   - Language toggle button positioned in navigation header on all pages
-  - Cycles through: English → Bahasa Indonesia → Turkish → Arabic → Chinese → Swahili → Somali → English
+  - Cycles through: English → Bahasa Indonesia → Turkish → Arabic → Chinese → Swahili → Somali → Bosnian → English
   - Automatic direction switching (RTL for Arabic, LTR for all other languages)
   - Language preference persisted in localStorage
-  - Full translations for all UI elements in all seven languages (200+ translation keys each)
+  - Full translations for all UI elements in all eight languages (200+ translation keys each)
 
 ## Backend Architecture
 - **Server**: Express.js with TypeScript running in ESM mode
