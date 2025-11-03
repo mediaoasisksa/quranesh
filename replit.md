@@ -1,6 +1,25 @@
 # Overview
 
-This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice. It leverages Quranic phrases and verses already memorized by users, integrating them into interactive exercises, phrase management, and progress tracking. The project aims to combine existing Quranic knowledge with practical language skills, offering behavioral symbolism to transform Quranic phrases into applicable life lessons.
+This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
+
+## Recent Updates (November 3, 2025)
+- **SignUp Page Translation Completed**: Fixed incomplete translations on registration page
+  - Added 35 new translation keys to all 9 languages
+  - Covers password fields, memorization levels, native languages, learning goals, terms acceptance, and error messages
+  - All form labels, placeholders, dropdown options, and error messages now fully translated
+  - E2E tested across Arabic, Somali, Bosnian, and Albanian
+- **Albanian Language Added**: Complete translation support for Albanian (Shqip) - 9th language
+  - All UI elements, exercises, navigation, and content translated
+  - Language toggle cycles through 9 languages: English → Indonesian → Turkish → Arabic → Chinese → Swahili → Somali → Bosnian → Albanian
+  - Full coverage of 235+ translation keys per language
+  - Proper Islamic terminology in Albanian (Kuran, ajet, xhuz, hafiz)
+- **Bosnian Language Added**: Complete translation support for Bosnian (Bosanski) - 8th language
+  - Full coverage of 235+ translation keys
+  - Proper Islamic terminology in Bosnian (Kur'an, ajet, džuz, hafiz)
+- **Somali Language Added**: Complete translation support for Somali (Soomaali) - 7th language
+  - Fixed hard-coded English text in exercise cards across all languages
+
+## Project Overview It leverages Quranic phrases and verses already memorized by users, integrating them into interactive exercises, phrase management, and progress tracking. The project aims to combine existing Quranic knowledge with practical language skills, offering behavioral symbolism to transform Quranic phrases into applicable life lessons.
 
 The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, and Albanian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
 
