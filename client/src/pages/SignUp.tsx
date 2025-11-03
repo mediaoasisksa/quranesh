@@ -55,14 +55,14 @@ const SignUp = () => {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     // Validate password length
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError(t('passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -89,15 +89,15 @@ const SignUp = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess("Account created successfully! Redirecting to sign in...");
+        setSuccess(t('accountCreatedSuccess'));
         setTimeout(() => {
           setLocation("/signin");
         }, 2000);
       } else {
-        setError(data.message || "Account creation failed");
+        setError(data.message || t('accountCreationFailed'));
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      setError(t('networkError'));
     } finally {
       setLoading(false);
     }
@@ -181,7 +181,7 @@ const SignUp = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder={t('createPassword')}
                     value={formData.password}
                     onChange={(e) =>
                       handleInputChange("password", e.target.value)
@@ -204,12 +204,12 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t('confirmPasswordPlaceholder')}
                     value={formData.confirmPassword}
                     onChange={(e) =>
                       handleInputChange("confirmPassword", e.target.value)
@@ -232,7 +232,7 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Quran Memorization Level</Label>
+                <Label>{t('memorizationLevel')}</Label>
                 <Select
                   value={formData.memorizationLevel}
                   onValueChange={(value) =>
@@ -240,22 +240,22 @@ const SignUp = () => {
                   }
                 >
                   <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder="Select your memorization level" />
+                    <SelectValue placeholder={t('selectMemorizationLevel')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="para-1-3">1-3 Para (Juz)</SelectItem>
-                    <SelectItem value="para-4-10">4-10 Para (Juz)</SelectItem>
-                    <SelectItem value="para-11-20">11-20 Para (Juz)</SelectItem>
-                    <SelectItem value="para-21-30">21-30 Para (Juz)</SelectItem>
+                    <SelectItem value="para-1-3">{t('para1to3')}</SelectItem>
+                    <SelectItem value="para-4-10">{t('para4to10')}</SelectItem>
+                    <SelectItem value="para-11-20">{t('para11to20')}</SelectItem>
+                    <SelectItem value="para-21-30">{t('para21to30')}</SelectItem>
                     <SelectItem value="complete">
-                      Complete Quran (Hafiz)
+                      {t('completeQuran')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Native Language</Label>
+                <Label>{t('nativeLanguage')}</Label>
                 <Select
                   value={formData.nativeLanguage}
                   onValueChange={(value) =>
@@ -263,24 +263,24 @@ const SignUp = () => {
                   }
                 >
                   <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder="Select your native language" />
+                    <SelectValue placeholder={t('selectNativeLanguage')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="english">English</SelectItem>
-                    <SelectItem value="urdu">Urdu</SelectItem>
-                    <SelectItem value="hindi">Hindi</SelectItem>
-                    <SelectItem value="bengali">Bengali</SelectItem>
-                    <SelectItem value="indonesian">Indonesian</SelectItem>
-                    <SelectItem value="malay">Malay</SelectItem>
-                    <SelectItem value="turkish">Turkish</SelectItem>
-                    <SelectItem value="persian">Persian</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="english">{t('english')}</SelectItem>
+                    <SelectItem value="urdu">{t('urdu')}</SelectItem>
+                    <SelectItem value="hindi">{t('hindi')}</SelectItem>
+                    <SelectItem value="bengali">{t('bengali')}</SelectItem>
+                    <SelectItem value="indonesian">{t('indonesian')}</SelectItem>
+                    <SelectItem value="malay">{t('malay')}</SelectItem>
+                    <SelectItem value="turkish">{t('turkish')}</SelectItem>
+                    <SelectItem value="persian">{t('persian')}</SelectItem>
+                    <SelectItem value="other">{t('other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Learning Goal</Label>
+                <Label>{t('learningGoal')}</Label>
                 <Select
                   value={formData.learningGoal}
                   onValueChange={(value) =>
@@ -288,21 +288,21 @@ const SignUp = () => {
                   }
                 >
                   <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder="What's your main goal?" />
+                    <SelectValue placeholder={t('selectLearningGoal')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="daily-conversation">
-                      Daily conversation in Arabic
+                      {t('dailyConversation')}
                     </SelectItem>
                     <SelectItem value="understand-quran">
-                      Better understand Quran
+                      {t('understandQuran')}
                     </SelectItem>
                     <SelectItem value="islamic-studies">
-                      Islamic studies enhancement
+                      {t('islamicStudies')}
                     </SelectItem>
-                    <SelectItem value="teaching">Teaching and dawah</SelectItem>
+                    <SelectItem value="teaching">{t('teachingDawah')}</SelectItem>
                     <SelectItem value="cultural-connection">
-                      Cultural connection
+                      {t('culturalConnection')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -327,16 +327,16 @@ const SignUp = () => {
                   required
                 />
                 <span className="text-sm text-muted-foreground">
-                  I agree to the{" "}
+                  {t('agreeToTerms')}{" "}
                   <Link href="/terms" className="text-primary hover:underline">
-                    Terms of Service
+                    {t('termsOfService')}
                   </Link>{" "}
-                  and{" "}
+                  {t('and')}{" "}
                   <Link
                     href="/privacy"
                     className="text-primary hover:underline"
                   >
-                    Privacy Policy
+                    {t('privacyPolicy')}
                   </Link>
                 </span>
               </div>
@@ -356,7 +356,7 @@ const SignUp = () => {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with
+                    {t('orContinueWith')}
                   </span>
                 </div>
               </div>
