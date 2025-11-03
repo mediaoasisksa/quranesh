@@ -1,60 +1,8 @@
 # Overview
 
-This is an AI-powered Arabic language learning application specifically designed for Quran memorizers (huffaz) who speak English. The application helps users practice daily Arabic conversation using Quranic phrases and verses they have already memorized. It combines their existing Quranic knowledge with practical language skills through interactive exercises, phrase management, and progress tracking.
+This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice. It leverages Quranic phrases and verses already memorized by users, integrating them into interactive exercises, phrase management, and progress tracking. The project aims to combine existing Quranic knowledge with practical language skills, offering behavioral symbolism to transform Quranic phrases into applicable life lessons.
 
-## Recent Updates (October 31, 2025)
-- **Bosnian Language Added**: Complete translation support for Bosnian (Bosanski) - now supporting 8 languages total
-  - All UI elements, exercises, navigation, and content translated
-  - Language toggle cycles: English → Indonesian → Turkish → Arabic → Chinese → Swahili → Somali → Bosnian
-  - Full coverage of 200+ translation keys
-  - Proper Islamic terminology in Bosnian (Kur'an, ajet, džuz, hafiz)
-  - E2E tested and verified working across all pages
-- **Somali Language Added**: Complete translation support for Somali (Soomaali) - 7th language
-  - All UI elements, exercises, navigation, and content translated
-  - Full coverage of 200+ translation keys
-  - Fixed hard-coded English text in exercise cards (exercise-card.tsx) by adding 5 new translation keys to all languages
-  - All exercise cards now fully translated in all 8 languages
-- **Logo Updated**: New Quranesh logo (colorful design with book and person) replacing old BookOpen icon
-  - Logo appears on all pages: homepage, dashboard, exercise pages
-  - Proper alt text "Quranesh Logo" for accessibility
-- **Symbolic Meaning Feature (الرمزية السلوكية)**: Added behavioral symbolism system to transform Quranic phrases into applicable life lessons
-  - New `symbolic_meaning` field added to all three exercise types (phrases, philosophical sentences, conversation prompts)
-  - Symbolic meanings displayed in amber-highlighted boxes during exercises
-  - **Coverage**: 57 phrases (34.5%), 10 philosophical sentences (0.4%), 10 conversation prompts (6.2%) - total 77 entries
-  - Examples: "إن مع العسر يسرا" → "التفاؤل الفعّال أثناء الابتلاء | Active optimism during trials"
-  - Examples: "اتقوا الله" → "التقوى في القرارات اليومية | Righteousness in daily decisions"
-  - Examples: "التوبة كإصلاح مستمر | Repentance as continuous reform"
-  - Converts Quranic stories and verses into behavioral patterns applicable to daily life
-  - Educational approach that stays faithful to Quranic context
-  - Each symbolism includes Arabic and English explanation separated by "|"
-  - UI: Amber box with 🔑 icon, bilingual heading, displayed in "About This Phrase" section
-  - E2E tested and verified working across all three exercise types
-
-## Previous Updates (October 30, 2025)
-- **Major Content Expansion**: Added 256 new Quranic phrases/sentences from comprehensive input files
-  - Added 40 conversation prompts including greetings, advice, encouragement, supplications, and ethical guidance
-  - Added 151 roleplay phrases (commands, prohibitions, supplications) - critical expansion from only 15 to 166 phrases
-  - Added 65 philosophical sentences containing wisdom and deep meanings
-  - **Total database content: 162 conversation prompts, 166 roleplay phrases, 2,459 philosophical sentences**
-  - All new content sourced from Quranic verses with authentic English translations
-  - Balance achieved across all three exercise types
-  - Latest additions include extensive story of Prophet Musa ("اخلع نعليك", "هي عصاي", "لا تخف", "خذها", "يسر لي امري", "احلل عقدة من لساني", "اقذفيه في اليم", "واصطنعتك لنفسي"), balanced spending ("ولا تبسطها كل البسط"), business ethics ("واقيموا الوزن بالقسط"), charity ("وان تصدقوا خير لكم"), preventing corruption ("ولا تفسدوا في الارض"), and divine attributes ("من جاء بالحسنة فله عشر امثالها")
-- **Dashboard Layout Updated**: Training Exercises section now appears at the TOP of the dashboard for better user experience
-- **Conversation Exercise Enhanced**: Now uses database-backed prompts with 122 Arabic conversation questions and suggested Quranic verse responses
-  - Database table `conversation_prompts` stores questions like "متى يصل القطار", "هل أخذت دواءك", "من يشتري؟", etc.
-  - Each prompt has a suggested Quranic verse (e.g., "والعصر", "وتعاونوا على البر والتقوى", "ويل للمطففين")
-  - After AI validation, suggested verse is displayed to users
-  - Non-repetition system filters out completed prompts per user
-  - Frontend uses React Query with userId-specific cache keys
-  - "Next Exercise" button stays within conversation exercise flow
-- **Non-Repetition System Verified**: Users never see the same exercise twice. System properly tracks completed exercises in database and filters them out using SQL queries. E2E testing confirmed 3 consecutive exercises showed different questions.
-- **Exercise Count Reduced**: Now showing 3 exercise types instead of 7 (Substitution, Completion, Comparison and Thematic exercises hidden as per user request).
-- **Navigation Improved**: All exercise navigation uses client-side routing (wouter's setLocation) instead of full page reloads, maintaining React Query cache and improving performance.
-
-## Documentation
-- **PDF Documentation**: Comprehensive app description available at `/app-description` endpoint
-- The documentation includes product overview, technical architecture, features, pricing, and more
-- Can be saved as PDF using browser's "Print to PDF" feature
+The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, and Albanian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
 
 # User Preferences
 
@@ -63,124 +11,53 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-- **Framework**: React with TypeScript using Vite for development and building
-- **Routing**: Wouter for client-side routing with pages for dashboard and exercises
-- **UI Components**: Shadcn/ui component library built on Radix UI primitives
-- **Styling**: Tailwind CSS with CSS variables for theming and Arabic font support (Amiri)
-- **State Management**: TanStack Query for server state and local React state for UI
-- **Speech Synthesis**: Browser Web Speech API for Arabic text-to-speech functionality
-- **Internationalization**: Custom i18n system with Context API supporting English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, and Bosnian with RTL/LTR switching
-  - Language toggle button positioned in navigation header on all pages
-  - Cycles through: English → Bahasa Indonesia → Turkish → Arabic → Chinese → Swahili → Somali → Bosnian → English
-  - Automatic direction switching (RTL for Arabic, LTR for all other languages)
-  - Language preference persisted in localStorage
-  - Full translations for all UI elements in all eight languages (200+ translation keys each)
+The frontend is built with React and TypeScript using Vite. It employs Wouter for client-side routing, Shadcn/ui for UI components based on Radix UI primitives, and Tailwind CSS for styling with Amiri font for Arabic. TanStack Query manages server state, and the browser's Web Speech API provides Arabic text-to-speech. A custom i18n system with Context API supports nine languages, offering automatic RTL/LTR switching and persisting language preferences in localStorage. The application features a new colorful Quranesh logo.
 
 ## Backend Architecture
-- **Server**: Express.js with TypeScript running in ESM mode
-- **API Design**: RESTful API with structured routes for phrases, exercises, progress, and statistics
-- **Storage Layer**: Abstracted storage interface with in-memory implementation for development
-- **Data Validation**: Zod schemas for request/response validation
-- **Middleware**: Express middleware for JSON parsing, CORS, and request logging
+The backend uses Express.js with TypeScript, running in ESM mode. It provides a RESTful API for phrases, exercises, progress, and statistics. Zod schemas handle data validation, and Express middleware manages JSON parsing, CORS, and logging.
 
 ## Database Schema Design
-- **Phrases Table**: Stores Arabic text, English translations, Surah references, and categorization
-- **Conversation Prompts Table**: Stores 162 Arabic conversation questions with suggested Quranic verses covering greetings, advice, encouragement, trust, manners, business ethics, worship, and supplications
-- **User Progress**: Tracks mastery levels and practice statistics per phrase
-- **Exercise Sessions**: Records individual exercise attempts and results (used for non-repetition filtering)
-- **Daily Statistics**: Aggregates daily usage and performance metrics
-- **Schema Management**: Drizzle ORM with PostgreSQL dialect for database operations
+The PostgreSQL database, managed by Drizzle ORM, includes tables for:
+- **Phrases**: Stores Arabic text, English translations, Surah references, and categorization.
+- **Conversation Prompts**: Contains 162 Arabic conversation questions with suggested Quranic verses, covering various daily topics.
+- **User Progress**: Tracks mastery levels and practice statistics per phrase.
+- **Exercise Sessions**: Records individual exercise attempts for non-repetition filtering.
+- **Daily Statistics**: Aggregates usage and performance metrics.
+- **Symbolic Meaning**: A new field added to exercise types, providing behavioral interpretations for Quranic phrases in both Arabic and English.
 
 ## Exercise System Architecture
-- **Exercise Types**: Three different exercise patterns including conversation practice, role-play scenarios, and grammar transformation (Substitution, Completion, Comparison and Thematic hidden)
-- **Conversation Exercise**: 
-  - Database-backed with 162 Arabic conversation prompts covering daily topics (greetings, advice, encouragement, consolation, trust, manners, business ethics, worship, supplication, unity, charity, family, speech, and reminders)
-  - Each prompt paired with suggested Quranic verse response
-  - Users write relevant Quranic verses that convey similar meanings
-  - AI validates verse relevance, then displays suggested verse
-  - "Next Exercise" button stays within conversation flow
-- **Dynamic Content**: Exercises are generated based on user's current phrase knowledge and difficulty progression
-- **Non-Repetition System**: 
-  - Backend filters out completed exercises per user and exercise type
-  - Frontend uses userId-specific React Query cache keys: `["/api/conversation-prompts/random", userId]`
-  - Cache invalidation after each exercise completion prevents repeated prompts
-  - Server queries `exercise_sessions` table to filter completed prompts via SQL `notInArray`
-  - Works seamlessly across all exercise types (phrases, philosophical sentences, conversation prompts)
-- **AI Question Generation**: When users exhaust all database questions, Gemini AI generates new authentic Quranic phrases and exercises
-- **Progress Tracking**: Real-time feedback and long-term progress analytics
-- **Adaptive Learning**: Exercise selection based on user performance and mastery levels
+The system offers three exercise types: conversation practice, role-play scenarios, and grammar transformation. Exercises are dynamically generated based on user knowledge and difficulty. A non-repetition system ensures users don't encounter the same exercise twice by filtering completed exercises at the backend and using `userId`-specific React Query cache keys on the frontend. When database questions are exhausted, Gemini AI generates new Quranic phrases and exercises. Real-time feedback, long-term progress analytics, and adaptive learning based on user performance are integrated. The conversation exercise uses database-backed prompts with AI validation of user responses and displays suggested verses.
 
 ## Authentication Strategy
-- **Current Implementation**: Full authentication system with JWT tokens and bcrypt password hashing
-- **Demo User**: Email: demo@example.com, Password: demo123
-- **Scalable Design**: User ID-based data isolation with PostgreSQL database
-- **Session Management**: JWT-based authentication with secure session handling
+The application incorporates a full authentication system with JWT tokens and bcrypt password hashing. It supports a demo user (`demo@example.com`, `demo123`) and ensures user ID-based data isolation with secure session management.
 
-## Payment Integration (HyperPay)
-- **Gateway**: HyperPay COPYandPAY Widget integration for subscription management
-- **Supported Methods**: VISA, MASTER, MADA cards
-- **Environment**: Auto-detection (Production or Test)
-  - **Production**: https://eu-prod.oppwa.com (when production credentials are configured)
-  - **Test**: https://eu-test.oppwa.com (fallback when no production credentials)
-- **Currency**: SAR (Saudi Riyal) only for production
-- **Authentication**: Bearer token-based API access via secure environment variables
-- **Production Credentials** (stored as encrypted secrets):
-  - HYPERPAY_PROD_ACCESS_TOKEN
-  - HYPERPAY_PROD_ENTITY_ID_VISA_MASTER
-  - HYPERPAY_PROD_ENTITY_ID_MADA
-- **Integration Pattern**: Follows official HyperPay Widget documentation
-  - Step 1 (Backend): Server-to-server POST to create checkout with `integrity: true` parameter
-  - Step 2 (Frontend): Load widget script with SRI (Subresource Integrity) verification
-  - Step 3 (Frontend): Form action attribute set to callback URL (shopperResultUrl)
-  - Step 4 (Backend): Callback validates payment status via GET request to resourcePath
-- **Callback Flow**: 
-  - Dynamic callback URL generation based on environment (localhost/Replit)
-  - Callback route: `/api/payment-callback?entityId={entityId}`
-  - entityId query parameter ensures correct MADA/VISA verification
-  - Backend validates payment with HyperPay API before redirecting to success page
-- **Security Features**:
-  - Integrity hash verification for widget script loading (SRI)
-  - Cross-origin iframe for card input (PCI compliance)
-  - Dynamic entity ID selection based on payment method
-  - Production credentials stored as encrypted environment secrets
-- **Mandatory Fields** (all validated and sent):
-  - merchantTransactionId (unique per transaction)
-  - customer.email, customer.givenName, customer.surname
-  - billing.street1, billing.city, billing.state, billing.country, billing.postcode
-- **Implementation Details**:
-  - Backend auto-detects production vs test mode based on environment variables
-  - Backend creates checkout without shopperResultUrl (set on frontend instead)
-  - Backend returns formatted integrity hash and dynamic widget URL
-  - Frontend loads widget with integrity and crossorigin attributes
-  - Frontend sets shopperResultUrl via form action attribute as per HyperPay docs
-  - Payment widget uses cross-origin iframes for secure card data collection
+## Payment Integration
+HyperPay's COPYandPAY Widget is integrated for subscription management, supporting VISA, MASTER, and MADA cards. It operates in both production and test environments, using SAR currency in production. The integration follows HyperPay's official documentation, involving server-to-server checkout creation, client-side widget loading with SRI verification, and backend validation of payment status via a callback. Security features include integrity hash verification, cross-origin iframes for PCI compliance, and dynamic entity ID selection.
 
 # External Dependencies
 
 ## Core Dependencies
-- **@neondatabase/serverless**: PostgreSQL database connectivity for production deployment
-- **drizzle-orm**: Type-safe database ORM with PostgreSQL support
-- **@tanstack/react-query**: Server state management and caching
-- **express**: Node.js web framework for API server
+- `@neondatabase/serverless`: PostgreSQL connectivity.
+- `drizzle-orm`: Type-safe ORM.
+- `@tanstack/react-query`: Server state management.
+- `express`: Node.js web framework.
 
 ## UI and Styling Dependencies
-- **@radix-ui/***: Accessible UI primitive components (dialogs, dropdowns, forms, etc.)
-- **tailwindcss**: Utility-first CSS framework
-- **class-variance-authority**: Dynamic className generation for component variants
-- **lucide-react**: Icon library for UI elements
+- `@radix-ui/*`: Accessible UI primitives.
+- `tailwindcss`: Utility-first CSS.
+- `class-variance-authority`: Dynamic classname generation.
+- `lucide-react`: Icon library.
 
 ## Development Dependencies
-- **vite**: Fast development server and build tool
-- **typescript**: Type safety and development experience
-- **@replit/vite-plugin-***: Replit-specific development enhancements
-- **drizzle-kit**: Database migration and schema management tools
+- `vite`: Fast development server and build tool.
+- `@replit/vite-plugin-*`: Replit-specific enhancements.
+- `drizzle-kit`: Database migration tools.
 
 ## Browser APIs
-- **Web Speech API**: Text-to-speech functionality for Arabic pronunciation
-- **Responsive Design**: CSS Grid and Flexbox for multi-device compatibility
-- **Local Storage**: Client-side data persistence for user preferences
+- Web Speech API: Text-to-speech.
+- Local Storage: Client-side data persistence.
 
 ## Font and Internationalization
-- **Google Fonts**: Inter for English text and Amiri for Arabic text
-- **RTL Support**: Right-to-left text rendering for Arabic content
-- **Language Switching**: Dual-language interface with proper typography
+- Google Fonts: Inter (English) and Amiri (Arabic).
+- RTL Support for Arabic.
+- Custom language switching mechanism.
