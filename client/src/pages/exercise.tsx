@@ -41,6 +41,8 @@ export default function Exercise() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isValidating, setIsValidating] = useState(false);
+  const [suggestedAnswer, setSuggestedAnswer] = useState<string | null>(null);
+  const [showSuggested, setShowSuggested] = useState(false);
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
@@ -206,6 +208,16 @@ export default function Exercise() {
       setFeedback(result.feedback);
       setIsAnswered(true);
 
+      // Handle suggested answer if user made a mistake
+      if (!result.isCorrect && result.suggestedAnswer) {
+        setSuggestedAnswer(result.suggestedAnswer);
+        setShowSuggested(true);
+        // Hide suggested answer after 5 seconds
+        setTimeout(() => {
+          setShowSuggested(false);
+        }, 5000);
+      }
+
       // Show appropriate toast based on result
       if (result.isCorrect) {
         toast({
@@ -280,6 +292,8 @@ export default function Exercise() {
     setIsAnswered(false);
     setIsCorrect(false);
     setFeedback("");
+    setSuggestedAnswer(null);
+    setShowSuggested(false);
   };
 
   const goToNextExercise = async () => {
@@ -708,6 +722,26 @@ export default function Exercise() {
                   data-testid="text-exercise-feedback"
                 >
                   {feedback}
+                </p>
+              </div>
+            )}
+
+            {/* Suggested Correct Answer - Shows for 5 seconds */}
+            {showSuggested && suggestedAnswer && (
+              <div 
+                className="mt-4 p-4 rounded-lg border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 animate-in fade-in duration-300"
+                data-testid="card-suggested-answer"
+              >
+                <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  {t('suggestedCorrectAnswer')}
+                </p>
+                <p 
+                  className="arabic-text text-lg text-blue-900 dark:text-blue-100" 
+                  lang="ar"
+                  dir="rtl"
+                  data-testid="text-suggested-answer"
+                >
+                  {suggestedAnswer}
                 </p>
               </div>
             )}
