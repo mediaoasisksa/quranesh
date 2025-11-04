@@ -543,7 +543,7 @@ export default function Exercise() {
             </p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[120px]"
-              placeholder="اشرح الفرق بين الآيتين..."
+              placeholder={t('comparisonPlaceholder')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
@@ -572,7 +572,7 @@ export default function Exercise() {
             <p className="text-foreground">{t('yourResponseInArabic')}:</p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder="استخدم آية مناسبة للمواساة والأمل..."
+              placeholder={t('roleplayPlaceholder')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}

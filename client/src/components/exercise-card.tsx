@@ -196,7 +196,7 @@ export default function ExerciseCard({
             <Textarea
               className="arabic-text text-right"
               rows={2}
-              placeholder="اشرح الفرق..."
+              placeholder={t('comparisonPlaceholder')}
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               data-testid="textarea-comparison"
@@ -226,7 +226,7 @@ export default function ExerciseCard({
             <Textarea
               className="arabic-text text-right"
               rows={2}
-              placeholder="استخدم آية مناسبة للمواساة..."
+              placeholder={t('roleplayPlaceholder')}
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               data-testid="textarea-roleplay"

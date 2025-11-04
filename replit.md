@@ -2,7 +2,20 @@
 
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
-## Recent Updates (November 3, 2025)
+## Recent Updates (November 4, 2025)
+- **Suggested Answer Feature**: Display suggested correct answer for 5 seconds when users make mistakes
+  - Added `suggestedAnswer` field to AI validation response from Gemini API
+  - Implemented exercise-type-specific fallback answers for all exercise types
+  - Blue card with suggested answer appears for 5 seconds after incorrect submission
+  - Complete translation support across all 9 languages for "Suggested correct answer:" label
+  - E2E tested with successful validation of 5-second timer and card visibility
+- **Exercise Placeholder Translation Fix**: Resolved hard-coded Arabic text in exercise placeholders
+  - Fixed conversation, substitution, roleplay, and comparison exercise placeholders
+  - Added 4 new translation keys (`conversationPlaceholder`, `substitutionPlaceholder`, `roleplayPlaceholder`, `comparisonPlaceholder`)
+  - All placeholder text now properly translates based on selected language
+  - Users reported issue fixed: English language now shows English placeholders instead of Arabic
+
+## Previous Updates (November 3, 2025)
 - **SignUp Page Translation Completed**: Fixed incomplete translations on registration page
   - Added 35 new translation keys to all 9 languages
   - Covers password fields, memorization levels, native languages, learning goals, terms acceptance, and error messages
