@@ -10,6 +10,7 @@ interface AIValidationResult {
   score: number; // 0-100
   feedback: string;
   suggestions: string[];
+  suggestedAnswer?: string; // Suggested correct answer in Arabic (shown for 5 seconds when user makes a mistake)
   confidence: number; // 0-1
 }
 
@@ -197,6 +198,7 @@ Respond ONLY with a JSON object in this exact format:
   "score": number (0-100),
   "feedback": "string (helpful feedback in English explaining why correct/incorrect)",
   "suggestions": ["string array of specific improvement suggestions"],
+  "suggestedAnswer": "string (if answer is incorrect, provide ONE example of a correct answer in Arabic that would be appropriate)",
   "confidence": number (0-1)
 }`;
 
@@ -218,6 +220,7 @@ function parseAIResponse(response: string): AIValidationResult {
       score: Math.max(0, Math.min(100, parsed.score || 0)),
       feedback: parsed.feedback || "No feedback provided",
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+      suggestedAnswer: parsed.suggestedAnswer || undefined,
       confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
     };
   } catch (error) {
@@ -227,6 +230,7 @@ function parseAIResponse(response: string): AIValidationResult {
       score: 0,
       feedback: "Unable to evaluate answer. Please try again.",
       suggestions: ["Check your Arabic spelling and grammar"],
+      suggestedAnswer: undefined,
       confidence: 0,
     };
   }
@@ -249,6 +253,7 @@ function fallbackValidation(
 
   let exerciseSpecificFeedback = "";
   let suggestions: string[] = [];
+  let suggestedAnswer: string | undefined = undefined;
 
   switch (exerciseType) {
     case "substitution":
@@ -282,6 +287,7 @@ function fallbackValidation(
           "Try: والله غفور عزيز",
           "Complete the phrase properly",
         ];
+        suggestedAnswer = "وَاللَّهُ غَفُورٌ رَحِيمٌ";
       }
       break;
     case "conversation":
@@ -478,6 +484,7 @@ function fallbackValidation(
           "Make sure it relates to the English prompt",
           'Example: For "God is watching" use verses like "وَاللَّهُ بَصِيرٌ بِمَا تَعْمَلُونَ"',
         ];
+        suggestedAnswer = "وَاللَّهُ بَصِيرٌ بِمَا تَعْمَلُونَ";
       }
       break;
     case "completion":
@@ -488,6 +495,7 @@ function fallbackValidation(
         "Complete the meaning",
         "Check grammar",
       ];
+      suggestedAnswer = "إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ";
       break;
     case "roleplay":
       // Check for Quranic patterns and comfort-related words
@@ -520,6 +528,7 @@ function fallbackValidation(
           "Choose verses about mercy, hope, and relief",
           'Example: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا" (Indeed, with hardship comes ease)',
         ];
+        suggestedAnswer = "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا";
       }
       break;
     case "transformation":
@@ -556,6 +565,7 @@ function fallbackValidation(
           "Find a verse that relates philosophically to the given wisdom",
           "The verse can have either similar or opposite meaning",
         ];
+        suggestedAnswer = "وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ";
       }
       break;
     case "thematic":
@@ -605,6 +615,7 @@ function fallbackValidation(
           "Choose verses about mercy, forgiveness, patience, etc.",
           "Make sure the verse addresses the specific situation",
         ];
+        suggestedAnswer = "إِنَّ اللَّهَ غَفُورٌ رَّحِيمٌ";
       }
       break;
     default:
@@ -615,6 +626,7 @@ function fallbackValidation(
         "Address the specific question",
         "Check relevance",
       ];
+      suggestedAnswer = "وَاللَّهُ عَلِيمٌ حَكِيمٌ";
   }
 
   // For different exercise types, check if it's actually correct
@@ -1030,6 +1042,7 @@ function fallbackValidation(
     score: isActuallyCorrect ? 60 : 20,
     feedback: completeFeedback,
     suggestions,
+    suggestedAnswer: !isActuallyCorrect ? suggestedAnswer : undefined,
     confidence: 0.3,
   };
 }
