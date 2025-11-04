@@ -81,7 +81,7 @@ export default function ExerciseCard({
             <Input
               type="text"
               className="arabic-text text-right"
-              placeholder="اكتب صفة أخرى..."
+              placeholder={t('substitutionPlaceholder')}
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               data-testid="input-substitution"
@@ -106,7 +106,7 @@ export default function ExerciseCard({
             <Textarea
               className="arabic-text text-right"
               rows={2}
-              placeholder="أجب بالعربية باستخدام آية قرآنية..."
+              placeholder={t('conversationPlaceholder')}
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               data-testid="textarea-conversation"

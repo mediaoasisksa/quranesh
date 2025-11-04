@@ -412,7 +412,7 @@ export default function Exercise() {
             </p>
             <Input
               className="arabic-text text-right text-lg"
-              placeholder="اكتب صفة أخرى..."
+              placeholder={t('substitutionPlaceholder')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
@@ -441,7 +441,7 @@ export default function Exercise() {
             </p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder="اكتب كلمة أو مفردة أو جملة استخدمها القرآن..."
+              placeholder={t('conversationPlaceholder')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               disabled={isAnswered}
