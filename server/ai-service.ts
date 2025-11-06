@@ -58,7 +58,7 @@ export async function validateArabicAnswer(
       ],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 1000,
+        maxOutputTokens: 2000,
         topP: 0.8,
         topK: 40,
       },
@@ -155,14 +155,23 @@ function createValidationPrompt(
       break;
     case "transformation":
       specificInstructions = `This is a PHILOSOPHICAL MATCH exercise. The student must identify a Quranic verse with a philosophical meaning that is close to or opposite to the given Arabic wisdom sentence.
-      - The answer must be an authentic Quranic verse (full or partial)
-      - The verse should have a philosophical/wisdom meaning that relates to the given sentence
+      
+      CRITICAL INSTRUCTIONS ABOUT QURANIC TEXT:
+      - ACCEPT ANY authentic Quranic text - whether it's a full verse, partial verse, or even a short phrase from the Quran
+      - Examples of CORRECT answers:
+        * Full verse: "إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ"
+        * Partial verse: "وما تفعلوا من خير" (part of verse 2:215)
+        * Short phrase: "إن مع العسر يسرا"
+      - If the answer contains ANY authentic Quranic words or phrases, consider it CORRECT if it relates to the wisdom sentence
+      - DO NOT reject partial verses or Quranic phrases - they are valid answers!
+      
+      - The verse/phrase should have a philosophical/wisdom meaning that relates to the given sentence
       - The relationship can be either:
         * SIMILAR: The Quranic verse conveys a similar wisdom or principle
         * OPPOSITE: The Quranic verse presents a contrasting or opposite perspective
       - The answer should demonstrate understanding of both the wisdom sentence and Quranic meaning
-      - Example: If given "الحياة أقصر من أن نهدرها في الخصام" (Life is too short to waste in conflict), 
-        acceptable answers could include verses about forgiveness, patience, or the importance of good deeds`;
+      - Example: If given "من احسن الجزاءه الصغير فتح له الكبير" (Whoever does small good deeds, great things will be opened for them), 
+        acceptable answers include: "وما تفعلوا من خير" (partial verse), "إن الله لا يضيع أجر المحسنين", or any Quranic text about reward for good deeds`;
       break;
     case "thematic":
       specificInstructions = `This is a THEMATIC exercise. The student must find relevant Quranic verses for life situations.
@@ -184,13 +193,25 @@ ${expectedAnswer ? `Expected Answer: ${expectedAnswer}` : ""}
 
 ${specificInstructions}
 
+🔴 CRITICAL RULE ABOUT QURANIC TEXT (APPLIES TO ALL EXERCISE TYPES):
+- ALWAYS ACCEPT partial Quranic verses, phrases, or any authentic Quranic text as CORRECT answers
+- Students can provide:
+  ✅ Complete verses: "إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ"
+  ✅ Partial verses: "وما تفعلوا من خير" (from Surah Al-Baqarah 2:215)
+  ✅ Short Quranic phrases: "إن مع العسر يسرا", "والله بصير", "يحب المحسنين"
+  ✅ Even 3-4 words from a verse if they are authentic Quranic text
+- DO NOT reject answers just because they are "not a complete verse"
+- If the text is from the Quran and relates to the context, mark it as CORRECT
+- Partial verses are just as valid as complete verses!
+
 Please evaluate the answer considering:
-1. Arabic language accuracy and grammar
-2. Relevance to the specific exercise context
-3. Proper use of Quranic vocabulary and concepts
-4. Alternative correct answers that would also be acceptable
-5. Partial credit for partially correct answers
-6. Whether the answer directly addresses what was asked
+1. Is this authentic Quranic text (complete OR partial)? If YES → mark as correct
+2. Arabic language accuracy and grammar
+3. Relevance to the specific exercise context
+4. Proper use of Quranic vocabulary and concepts
+5. Alternative correct answers that would also be acceptable
+6. Partial credit for partially correct answers
+7. Whether the answer directly addresses what was asked
 
 Respond ONLY with a JSON object in this exact format:
 {
@@ -532,38 +553,61 @@ function fallbackValidation(
       }
       break;
     case "transformation":
-      // Check if the answer is a Quranic verse (has typical Quranic patterns)
-      const hasTransformQuranicPattern =
-        /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|قل|ولا|ولقد|أو|فلا|وما|ومن)/.test(
+      // CRITICAL: Accept partial Quranic verses as correct answers!
+      // But ensure we don't over-accept non-Quranic Arabic text
+      
+      // Strong Quranic patterns - particles and words that typically indicate Quranic text
+      const hasStrongQuranicPattern =
+        /(إن الله|إنا|فإن|والله|يا رب|الله|الرحمن الرحيم|قل|ولقد|وما|فلا تقنطوا|لا تيأسوا|إن مع)/.test(
           userAnswer,
         );
+      
+      // Quranic vocabulary - words commonly found in Quran
       const hasQuranicVocabulary =
-        /(يحب|يعلم|يرى|يسمع|عليم|حكيم|بصير|سميع|غفور|رحيم|عزيز|قدير)/.test(
+        /(يحب|يعلم|يرى|يسمع|عليم|حكيم|بصير|سميع|غفور|رحيم|عزيز|قدير|خير|شر|نور|ظلمات|هدى|ضلال|إيمان|كفر|جنة|نار|صبر|شكر|توبة|مغفرة|رحمة|عذاب|المحسنين|المتقين|الصالحين|الظالمين)/.test(
           userAnswer,
         );
-      const isReasonableLength = userAnswer.length >= 10;
+      
+      const isReasonableLength = userAnswer.length >= 8;
+      
+      // Known partial Quranic verses - curated list of commonly used partial verses
+      const isKnownPartialVerse = 
+        /(وما تفعلوا من خير|تفعلوا من خير|مع العسر يسرا|إن مع العسر يسرا|والله بصير|الله سميع|يحب المحسنين|لا يضيع أجر|على كل شيء قدير|إن الله لا يضيع أجر|يضيع أجر المحسنين|إن الله غفور رحيم|والله غفور رحيم)/.test(userAnswer);
 
-      if (hasTransformQuranicPattern && hasQuranicVocabulary && isReasonableLength) {
+      console.log("=== TRANSFORMATION VALIDATION DEBUG ===");
+      console.log("User Answer:", userAnswer);
+      console.log("Has Strong Quranic Pattern:", hasStrongQuranicPattern);
+      console.log("Has Quranic Vocabulary:", hasQuranicVocabulary);
+      console.log("Is Reasonable Length:", isReasonableLength);
+      console.log("Is Known Partial Verse:", isKnownPartialVerse);
+      console.log("================================");
+
+      // Accept if:
+      // 1. It's a known partial verse, OR
+      // 2. It has BOTH strong Quranic pattern AND Quranic vocabulary (not just pattern alone)
+      if (isKnownPartialVerse || (hasStrongQuranicPattern && hasQuranicVocabulary && isReasonableLength)) {
         exerciseSpecificFeedback =
-          "Good! This appears to be a Quranic verse. Make sure it relates philosophically to the wisdom sentence provided.";
+          "Excellent! This appears to be authentic Quranic text (complete or partial verse). Great job!";
         suggestions = [
-          "Verify this verse has a similar or opposite meaning to the wisdom sentence",
-          "Excellent use of authentic Quranic text",
+          "Perfect! You provided authentic Quranic text",
+          "This verse/phrase relates well to the wisdom sentence",
+          "Well done on recognizing the philosophical connection",
         ];
-      } else if (hasTransformQuranicPattern && isReasonableLength) {
+      } else if (hasStrongQuranicPattern || hasQuranicVocabulary) {
         exerciseSpecificFeedback =
-          "This looks like a Quranic verse. Good attempt!";
+          "This might be Quranic text, but please verify it's an authentic verse or phrase from the Quran.";
         suggestions = [
-          "Make sure it relates to the philosophical meaning of the wisdom sentence",
+          "Make sure it's authentic Quranic text",
+          "Verify the verse/phrase is from the Quran",
           "Consider the thematic connection",
         ];
       } else {
         exerciseSpecificFeedback =
-          "For this exercise, provide a Quranic verse with similar or opposite philosophical meaning to the wisdom sentence.";
+          "For this exercise, provide a Quranic verse or phrase with similar or opposite philosophical meaning to the wisdom sentence.";
         suggestions = [
-          "Use an authentic Quranic verse",
+          "Use authentic Quranic text (full or partial verses are acceptable)",
           "Find a verse that relates philosophically to the given wisdom",
-          "The verse can have either similar or opposite meaning",
+          'Examples: "وما تفعلوا من خير", "إن مع العسر يسرا"',
         ];
         suggestedAnswer = "وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ";
       }
@@ -933,26 +977,41 @@ function fallbackValidation(
       hasArabic && hasContent && (hasRoleplayQuranicPattern || hasComfortWords);
   } else if (exerciseType === "transformation") {
     // For transformation exercises, check if the answer is a Quranic verse (philosophical match)
-    const hasQuranicPattern =
-      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|قل|ولا|لا تحزن|ولقد|يا أيها|العسر|اليسر|صبر|رحمة)/.test(
+    // CRITICAL: Accept partial Quranic verses!
+    
+    // Strong Quranic patterns matching the first validation section
+    const hasStrongQuranicPatternFinal =
+      /(إن الله|إنا|فإن|والله|يا رب|الله|الرحمن الرحيم|قل|ولقد|وما|فلا تقنطوا|لا تيأسوا|إن مع|العسر|اليسر|صبر|رحمة)/.test(
         userAnswer,
       );
+    
+    const hasQuranicVocabularyFinal =
+      /(يحب|يعلم|يرى|يسمع|عليم|حكيم|بصير|سميع|غفور|رحيم|عزيز|قدير|خير|شر|نور|ظلمات|هدى|ضلال|إيمان|كفر|جنة|نار|صبر|شكر|توبة|مغفرة|رحمة|عذاب|المحسنين|المتقين|الصالحين|الظالمين)/.test(
+        userAnswer,
+      );
+    
+    // Known partial verses matching the first validation section
+    const isKnownPartialVerseFinal = 
+      /(وما تفعلوا من خير|تفعلوا من خير|مع العسر يسرا|إن مع العسر يسرا|والله بصير|الله سميع|يحب المحسنين|لا يضيع أجر|على كل شيء قدير|إن الله لا يضيع أجر|يضيع أجر المحسنين|إن الله غفور رحيم|والله غفور رحيم)/.test(userAnswer);
 
-    console.log("=== TRANSFORMATION VALIDATION DEBUG ===");
+    console.log("=== TRANSFORMATION FINAL VALIDATION DEBUG ===");
     console.log("User Answer:", userAnswer);
     console.log("Has Arabic:", hasArabic);
     console.log("Has Content:", hasContent);
-    console.log("Has Quranic Pattern:", hasQuranicPattern);
+    console.log("Has Strong Quranic Pattern:", hasStrongQuranicPatternFinal);
+    console.log("Has Quranic Vocabulary:", hasQuranicVocabularyFinal);
+    console.log("Is Known Partial Verse:", isKnownPartialVerseFinal);
     console.log("Context (Wisdom Sentence):", context);
     console.log(
       "Will be correct:",
-      hasArabic && hasContent && hasQuranicPattern,
+      hasArabic && hasContent && (isKnownPartialVerseFinal || (hasStrongQuranicPatternFinal && hasQuranicVocabularyFinal)),
     );
     console.log("=====================================");
 
-    // Consider it correct if it has Arabic content AND Quranic patterns
-    // (More sophisticated semantic validation would require AI, which is the main path)
-    isActuallyCorrect = hasArabic && hasContent && hasQuranicPattern;
+    // Accept if:
+    // 1. It's a known partial verse, OR
+    // 2. It has BOTH strong Quranic pattern AND Quranic vocabulary
+    isActuallyCorrect = hasArabic && hasContent && (isKnownPartialVerseFinal || (hasStrongQuranicPatternFinal && hasQuranicVocabularyFinal));
   } else if (exerciseType === "thematic") {
     // For thematic exercises, check if the answer contains Quranic verses and relates to the theme
     const hasThematicQuranicPattern =

@@ -2,7 +2,15 @@
 
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
-## Recent Updates (November 4, 2025)
+## Recent Updates (November 6, 2025)
+- **Partial Quranic Verse Acceptance**: AI validation now properly accepts partial Quranic verses as correct answers
+  - Enhanced AI validation prompts with explicit instructions to accept partial verses, phrases, and short Quranic text
+  - Examples: "وما تفعلوا من خير" (partial verse from 2:215), "إن مع العسر يسرا", "والله بصير"
+  - Added critical rule section emphasizing that partial verses are just as valid as complete verses
+  - Applies to all exercise types, ensuring students are not penalized for providing authentic Quranic text
+  - User-reported issue resolved: partial verse "وما تفعلوا من خير" now accepted as correct
+
+## Previous Updates (November 4, 2025)
 - **Suggested Answer Feature**: Display suggested correct answer for 5 seconds when users make mistakes
   - Added `suggestedAnswer` field to AI validation response from Gemini API
   - Implemented exercise-type-specific fallback answers for all exercise types
