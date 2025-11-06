@@ -1,0 +1,244 @@
+1) مواصفة واجهة الجلب (API Spec)
+A. جلب تمرين التحويل
+
+Endpoint: GET /api/exercise/transformation
+Query Params:
+
+wisdomId (اختياري لكن مفضّل): معرّف الحكمة/المثل.
+
+fallbackText (اختياري): النص الأصلي للحكمة إذا لم يوجد wisdomId.
+
+targetLang (إلزامي): رمز اللغة الحالية في زر اللغات (مثال: ar, en, tr, id…).
+
+Headers المقترحة:
+
+Accept-Language: <targetLang> (مرآة للبارام)
+
+X-Client: quranesh-web
+
+Cache-Control: no-cache (لو أردت فرض تحديث)
+
+Response 200 (نجاح):
+
+{
+  "exerciseId": "ex-78431",
+  "wisdom": {
+    "id": "w-102",
+    "sourceLang": "ar",
+    "targetLang": "en",
+    "text": "Do not carry the load of someone who does not deserve it."
+  },
+  "meta": {
+    "type": "philosophical",
+    "difficulty": 1,
+    "verseHint": null
+  },
+  "ui": {
+    "title": "Wisdom",
+    "prompt": "Write a word, phrase, or sentence used in the Quran:"
+  }
+}
+
+
+Response 206 (ترجمة غير متوفرة لكن لدينا العربية):
+
+{
+  "exerciseId": "ex-78431",
+  "wisdom": {
+    "id": "w-102",
+    "sourceLang": "ar",
+    "targetLang": "en",
+    "text": null,
+    "fallback": "لا تَحْمِلْ حِمْلَك إلى كتف من لا يُطيق"
+  },
+  "notice": "translation_unavailable_try_again",
+  "meta": { "type": "philosophical", "difficulty": 1 }
+}
+
+
+Response 429/503 (Quota/Rate limit):
+
+{
+  "error": "translation_rate_limited",
+  "retryAfterSeconds": 60,
+  "canShowArabic": true
+}
+
+
+ملاحظات:
+
+لا تعرض العربية في الواجهة إن كانت targetLang !== 'ar' إلا إذا رجع 206/429 ومع canShowArabic: true ثم ضع شارة صغيرة “ترجمة غير متاحة الآن”.
+
+B. خدمة الترجمة (داخلية)
+
+Endpoint: POST /api/translate
+Body:
+
+{
+  "text": "لا تَحْمِلْ حِمْلَك إلى كتف من لا يُطيق",
+  "sourceLang": "ar",
+  "targetLang": "en",
+  "wisdomId": "w-102",
+  "tone": "concise-natural",
+  "domain": "aphorism"
+}
+
+
+Response 200:
+
+{
+  "wisdomId": "w-102",
+  "targetLang": "en",
+  "translatedText": "Do not burden the shoulders of those who cannot bear it."
+}
+
+
+Response 400 (مدخلات ناقصة):
+
+{
+  "error": "bad_request_missing_params"
+}
+
+2) مفاتيح i18n المقترحة (واجهة المستخدم)
+
+exercise.title: Wisdom
+
+exercise.prompt: Write a word, phrase, or sentence used in the Quran
+
+exercise.check: Check Answer
+
+exercise.tryAgain: Try Again
+
+exercise.about: About This Phrase
+
+exercise.type: Type
+
+exercise.difficulty: Difficulty
+
+exercise.notice.translation_unavailable: Translation is currently unavailable. Showing the original text.
+
+exercise.notice.rate_limited: Translation is rate-limited. Please try again shortly.
+
+اربط كل النصوص أعلاه بملفات الترجمة؛ ولا تستخدم نصًا ثابتًا مثل "Arabic Wisdom:".
+
+3) مخطط التخزين المؤقت (Cache/DB)
+
+جدول: wisdom_translations
+
+wisdom_id (PK مركّب)
+
+target_lang (PK مركّب)
+
+translated_text (TEXT)
+
+source_lang (افتراضي ar)
+
+updated_at (TIMESTAMP)
+
+hash (اختياري: تجزئة للنص الأصلي لضمان عدم تغيره)
+
+سياسة:
+
+صلاحية 30 يومًا.
+
+إن تغيّر النص الأصلي (hash مختلف) → تجاهل الترجمة المخزّنة.
+
+مفتاح الكاش:
+cacheKey = wisdomId ? 'w:' + wisdomId + ':' + targetLang : 'hash:' + sha1(text) + ':' + targetLang
+
+4) قوالب برومبت للترجمة (Gemini/بدائل)
+A) قالب عام (Gemini)
+
+System/Instructions:
+
+You are a precise translation assistant. Translate short aphorisms into the requested language, preserving meaning and natural style, without adding commentary or punctuation changes. Output plain text only.
+
+User Prompt (variables بين <>):
+
+Translate this aphorism from <SRC_LANG> to <TGT_LANG>. Keep it concise and natural, without any extra words:
+
+<APHORISM_TEXT>
+
+
+قيود الإخراج:
+
+نص سطر واحد، بلا HTML/اقتباسات إضافية.
+
+B) قالب بديل (Google/DeepL)
+
+Please translate the following aphorism into <TGT_LANG>, concise and natural, without explanations:
+"<APHORISM_TEXT>"
+
+ملاحظات جودة خاصة بالنص القرآني/الحِكَم:
+
+تجنب نقل الصور البلاغية حرفيًا إن أفسدت المعنى؛ اختر أقرب معنى مألوف في اللغة الهدف.
+
+لا تُدخِل تشكيلًا عربيًا في لغة غير عربية.
+
+لا تُضيف “.” إن لم تكن لازمة في لغة الهدف.
+
+5) مسار القرار (Decision Flow) عند الطلب
+
+لدي wisdomId؟
+
+نعم → ابحث في Cache.
+
+لا → احسب hash(text) وابحث في Cache.
+
+إن وُجدت ترجمة صالحة → ارجع 200 بالنص المترجم.
+
+إن لم توجد → حاول ترجمة عبر مزودك (Gemini/…):
+
+نجاح → خزّن ثم 200.
+
+Rate limit/Quota → 429 + canShowArabic: true.
+
+خطأ آخر → 206 مع fallback (العربية) وإشعار “translation_unavailable”.
+
+6) حالات الحافة (Edge Cases)
+
+targetLang = 'ar': أعد العربية فقط، حتى لو كانت ترجمات مخزّنة.
+
+targetLang غير مدعوم: أعِد 400 برسالة unsupported_language.
+
+نص عربي فيه أمثال دارجة/لهجية: ترجم مع الحفاظ على المعنى العام لا اللفظ.
+
+اختلاف بسيط بين wisdomId وfallbackText: اعتمد wisdomId كمصدر، واعتبر fallbackText مجرد عرض احتياطي.
+
+7) معايير القبول (Acceptance Criteria)
+
+عند تغيير زر اللغة إلى أي لغة مدعومة، تُعرض الحِكمة بتلك اللغة فقط.
+
+لا تظهر النسخة العربية عندما targetLang !== 'ar' إلا في حالتي 206/429 كما هو موضح.
+
+تبديل اللغة يعمل دون إعادة تحميل الصفحة (إعادة جلب فقط).
+
+كل نصوص الواجهة (العناوين، الأزرار، placeholders) تتبع i18n للغة الحالية.
+
+عند الفشل في الترجمة، تظهر شارة إبلاغ قصيرة ويستمر التمرين.
+
+8) سيناريوهات اختبار سريعة (بدون كود)
+
+EN مختارة: تصل 200 بنص مترجم إنجليزي؛ لا وجود للعربية.
+
+TR مختارة: تصل 200 بنص تركي؛ اختبار RTL/LTR يبقى LTR.
+
+AR مختارة: تعرض العربية فقط؛ العناوين بالعربية وRTL فعّال.
+
+Rate limit: يصل 429؛ تعرض العربية مع شارة “الترجمة غير متاحة مؤقتًا”.
+
+Cache Hit: ترجمة فورية بلا تأخير ظاهر.
+
+Unsupported Lang (مثلاً jp): 400 ورسالة واضحة.
+
+تبديل اللغة أثناء فتح الصفحة: تُحدّث الترجمة فورًا بلا refresh كامل.
+
+9) ملاحظات تنفيذية قصيرة
+
+اربط زر اللغة بمصدر حالة عام currentLang، واستخدمه في كل استدعاء API.
+
+اضبط dir="rtl" وlang="ar" تلقائيًا عند العربية.
+
+امنع HTML في ناتج الترجمة (sanitize).
+
+قيّد طول الناتج (مثل ≤ 160 حرفًا) لمنع الإسهاب.
