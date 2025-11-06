@@ -1232,3 +1232,84 @@ Respond ONLY with a JSON object in this exact format:
     };
   }
 }
+
+// Language code mapping
+const languageNames: Record<string, string> = {
+  en: "English",
+  id: "Indonesian (Bahasa Indonesia)",
+  tr: "Turkish (Türkçe)",
+  ar: "Arabic (العربية)",
+  zh: "Chinese (中文)",
+  sw: "Swahili (Kiswahili)",
+  so: "Somali (Soomaali)",
+  bs: "Bosnian (Bosanski)",
+  sq: "Albanian (Shqip)",
+};
+
+/**
+ * Translate a philosophical sentence to a target language using Gemini AI
+ * @param arabicText - The original Arabic wisdom sentence
+ * @param targetLanguage - Target language code (en, id, tr, zh, sw, so, bs, sq)
+ * @returns Translated text
+ */
+export async function translatePhilosophicalSentence(
+  arabicText: string,
+  targetLanguage: string,
+): Promise<string> {
+  try {
+    console.log(`=== TRANSLATING PHILOSOPHICAL SENTENCE TO ${targetLanguage.toUpperCase()} ===`);
+    console.log("Arabic Text:", arabicText);
+
+    const languageName = languageNames[targetLanguage] || targetLanguage;
+
+    const prompt = `You are a professional translator specializing in Arabic wisdom and philosophical sentences.
+
+Task: Translate the following Arabic wisdom sentence into ${languageName}.
+
+Arabic Wisdom Sentence:
+${arabicText}
+
+Requirements:
+1. Provide a natural, culturally appropriate translation that preserves the philosophical meaning
+2. The translation should be concise and elegant
+3. Maintain the wisdom and depth of the original Arabic
+4. Use simple, clear language that non-Arabic speakers can understand
+5. Return ONLY the translated text, no explanations or additional commentary
+
+Translation in ${languageName}:`;
+
+    console.log("Translation Prompt:", prompt.substring(0, 200) + "...");
+
+    const response = await axios.post(GEMINI_API_URL, {
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.3, // Lower temperature for consistent translations
+        maxOutputTokens: 200,
+        topP: 0.8,
+        topK: 20,
+      },
+    });
+
+    const candidate = response.data.candidates[0];
+    if (!candidate.content?.parts?.[0]?.text) {
+      throw new Error("No valid translation from AI");
+    }
+
+    const translation = candidate.content.parts[0].text.trim();
+    console.log("Translation Result:", translation);
+
+    return translation;
+  } catch (error) {
+    console.error(`Error translating to ${targetLanguage}:`, error);
+    // Fallback: return the original Arabic text if translation fails
+    return arabicText;
+  }
+}

@@ -224,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Philosophical sentence routes
   app.get("/api/philosophical-sentences/random", async (req, res) => {
     try {
-      const { userId } = req.query;
+      const { userId, language } = req.query;
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({ message: "userId is required" });
       }
@@ -234,7 +234,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No philosophical sentences available" });
       }
 
-      res.json(sentence);
+      // If language is specified and not Arabic, get the translation
+      const targetLanguage = typeof language === "string" ? language : "ar";
+      const translatedSentence = await storage.getTranslatedPhilosophicalSentence(
+        sentence.id,
+        targetLanguage,
+      );
+
+      res.json(translatedSentence);
     } catch (error) {
       console.error("Error fetching philosophical sentence:", error);
       res.status(500).json({ message: "Failed to fetch philosophical sentence" });

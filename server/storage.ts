@@ -27,6 +27,7 @@ import {
 import { db } from "./db";
 import { eq, desc, and, notInArray } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { translatePhilosophicalSentence } from "./ai-service";
 
 export interface IStorage {
   // User methods
@@ -82,6 +83,7 @@ export interface IStorage {
   getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined>;
   createPhilosophicalSentence(sentence: InsertPhilosophicalSentence): Promise<PhilosophicalSentence>;
   getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined>;
+  getTranslatedPhilosophicalSentence(id: string, language: string): Promise<PhilosophicalSentence>;
 
   // Conversation prompt methods
   getAllConversationPrompts(): Promise<ConversationPrompt[]>;
@@ -337,6 +339,56 @@ export class DatabaseStorage implements IStorage {
 
     // Return a random unused sentence
     return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
+  }
+
+  async getTranslatedPhilosophicalSentence(id: string, language: string): Promise<PhilosophicalSentence> {
+    // Get the sentence from database
+    const sentence = await this.getPhilosophicalSentence(id);
+    if (!sentence) {
+      throw new Error("Philosophical sentence not found");
+    }
+
+    // If language is Arabic, return as is
+    if (language === "ar") {
+      return sentence;
+    }
+
+    // Check if translation already exists in database
+    const translations = sentence.translations as Record<string, string> || {};
+    
+    if (translations[language]) {
+      console.log(`Using cached translation for ${language}`);
+      // Return sentence with cached translation
+      return sentence;
+    }
+
+    // Translation doesn't exist, use Gemini API to translate
+    console.log(`Translating philosophical sentence to ${language}...`);
+    const translatedText = await translatePhilosophicalSentence(
+      sentence.arabicText,
+      language,
+    );
+
+    // Save translation to database
+    const updatedTranslations = {
+      ...translations,
+      [language]: translatedText,
+    };
+
+    await db
+      .update(philosophicalSentences)
+      .set({
+        translations: updatedTranslations,
+        lastTranslatedAt: new Date(),
+      })
+      .where(eq(philosophicalSentences.id, id));
+
+    // Return updated sentence
+    return {
+      ...sentence,
+      translations: updatedTranslations,
+      lastTranslatedAt: new Date(),
+    };
   }
 
   async getAllConversationPrompts(): Promise<ConversationPrompt[]> {
