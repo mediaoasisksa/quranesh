@@ -299,6 +299,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(philosophicalSentences)
       .where(eq(philosophicalSentences.id, id));
+    
+    console.log('=== GET PHILOSOPHICAL SENTENCE ===');
+    console.log('Querying ID:', id);
+    console.log('Result:', sentence);
+    console.log('Translations from query result:', sentence?.translations);
+    console.log('==================================');
+    
     return sentence || undefined;
   }
 
@@ -348,6 +355,14 @@ export class DatabaseStorage implements IStorage {
       throw new Error("Philosophical sentence not found");
     }
 
+    console.log('=== TRANSLATED PHILOSOPHICAL SENTENCE DEBUG ===');
+    console.log('Sentence ID:', sentence.id);
+    console.log('Arabic text:', sentence.arabicText);
+    console.log('Target language:', language);
+    console.log('Raw translations from DB:', sentence.translations);
+    console.log('Translations type:', typeof sentence.translations);
+    console.log('Translations keys:', sentence.translations ? Object.keys(sentence.translations) : 'null');
+
     // If language is Arabic, return as is
     if (language === "ar") {
       return sentence;
@@ -355,6 +370,9 @@ export class DatabaseStorage implements IStorage {
 
     // Check if translation already exists in database
     const translations = sentence.translations as Record<string, string> || {};
+    
+    console.log('Parsed translations:', translations);
+    console.log(`Translation for ${language}:`, translations[language]);
     
     if (translations[language]) {
       console.log(`Using cached translation for ${language}`);
