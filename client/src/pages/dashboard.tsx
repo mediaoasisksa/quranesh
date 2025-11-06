@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  BookOpen,
   Moon,
   User,
   Shuffle,
@@ -24,6 +23,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
+import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,20 +144,14 @@ export default function Dashboard() {
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <BookOpen className="text-primary-foreground h-5 w-5" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-foreground">
-                    Quranic
-                  </h1>
-                  <p className="text-sm text-muted-foreground">
-                    {t('aiPoweredTutor')}
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center">
+              <Link href="/" className="cursor-pointer">
+                <img 
+                  src={logoImage} 
+                  alt="Quranesh Logo" 
+                  className="h-12 w-auto object-contain hover:opacity-90 transition-opacity"
+                />
+              </Link>
             </div>
 
             <div className="flex items-center space-x-4">

@@ -10,11 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
+import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -68,14 +69,12 @@ const SignIn = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors"
-          >
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-primary-foreground" />
-            </div>
-            Quranic
+          <Link href="/" className="cursor-pointer">
+            <img 
+              src={logoImage} 
+              alt="Quranesh Logo" 
+              className="h-20 w-auto object-contain hover:opacity-90 transition-opacity"
+            />
           </Link>
         </div>
 

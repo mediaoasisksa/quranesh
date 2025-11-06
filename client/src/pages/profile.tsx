@@ -10,9 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, ArrowLeft, User, Mail, Calendar } from "lucide-react";
+import { ArrowLeft, User, Mail, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -55,11 +56,12 @@ const Profile = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <nav className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-foreground">Quranic</span>
+            <Link href="/" className="cursor-pointer">
+              <img 
+                src={logoImage} 
+                alt="Quranesh Logo" 
+                className="h-10 w-auto object-contain hover:opacity-90 transition-opacity"
+              />
             </Link>
             <Link href="/dashboard">
               <Button variant="ghost" className="flex items-center gap-2">

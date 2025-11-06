@@ -3,11 +3,17 @@
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
 ## Recent Updates (November 6, 2025)
-- **Logo Updated**: Replaced Quranesh logo with new version and increased size
+- **Logo Updated Across All Pages**: Replaced Quranesh logo with new version and increased size
   - Updated logo file: `quranesh logo (1)_1762444380395.png`
-  - Increased logo size in Header component from h-10 to h-16 (60% larger)
-  - Increased logo size in Exercise page from h-8 to h-14 (75% larger)
-  - Logo now more prominent and visible across all pages
+  - Added logo to all major pages: Header, Exercise, SignUp, SignIn, Dashboard, Profile
+  - Logo sizes by page:
+    - Header component: h-16 (60% increase)
+    - Exercise page: h-14 (75% increase)
+    - SignUp/SignIn pages: h-20 (large and prominent)
+    - Dashboard: h-12 (medium size)
+    - Profile: h-10 (standard size)
+  - Replaced old icon-based branding with full Quranesh logo across the entire application
+  - Logo now consistent and prominent across all pages with hover effects
 - **Instruction Text Updated**: Changed from "Quranic verse" to "Quranic words or phrases" across all UI
   - Updated 8 translation keys across all 9 languages (English, Indonesian, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian)
   - Affected keys: `consoleFriendScenario`, `conversationPlaceholder`, `roleplayPlaceholder`, `roleplayScenarioText`, `thematicInstructionText`, `thematicInstructionText2`
