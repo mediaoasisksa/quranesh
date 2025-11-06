@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import LanguageToggle from "@/components/language-toggle";
 import { useLanguage } from "@/contexts/language-context";
-import logoImage from "@assets/quranesh logo (1)_1761884773357.png";
+import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,7 +41,7 @@ const Header = () => {
             <img 
               src={logoImage} 
               alt="Quranesh Logo" 
-              className="h-10 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
 
