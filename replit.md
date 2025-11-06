@@ -3,14 +3,28 @@
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
 ## Recent Updates (November 6, 2025)
-- **Philosophical Sentence Translation System**: Implemented dynamic translation of Arabic wisdom sentences to match selected UI language
+- **Philosophical Sentence Translation System**: Implemented comprehensive dynamic translation of Arabic wisdom sentences to match selected UI language
   - Added language parameter to philosophical sentence API endpoint (`/api/philosophical-sentences/random?language=...`)
   - Frontend now passes current language to backend when fetching philosophical sentences
   - Display logic updated to show translated text for non-Arabic languages, Arabic text for Arabic language
   - Supports all 9 languages: English, Indonesian, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian
-  - Translation uses existing Gemini AI integration with database caching for efficiency
+  - Translation uses Gemini AI (gemini-2.0-flash-exp) with database JSONB caching for efficiency
   - Fixed MemStorage implementation to include `getTranslatedPhilosophicalSentence` method
   - Updated queryKey to include language parameter for proper cache invalidation
+  - **Translation Improvements**:
+    - Simplified AI prompt from ~150 words to ~10 words for efficiency
+    - Temperature reduced to 0.1 for consistent translations
+    - maxOutputTokens set to 150 (sufficient for short wisdom sentences)
+    - Added retry logic with exponential backoff (3 retries, 1s/2s/4s delays) to handle rate limiting
+    - Error handling prevents storing Arabic text in translation fields
+    - Translation validation: checks that translated text differs from Arabic source before saving
+    - Database cleaned of 2,459 invalid translations
+    - Changed from gemini-2.5-flash to gemini-2.0-flash-exp for better reliability
+    - Security: Removed hard-coded API key, now requires GEMINI_API_KEY environment variable
+  - **Frontend Features**:
+    - Added comprehensive console logging for debugging
+    - Displays translated text when available, falls back to Arabic when translation fails
+    - Smooth language switching with automatic cache invalidation
 - **Logo Updated Across All Pages**: Replaced Quranesh logo with new version and increased size
   - Updated logo file: `quranesh logo (1)_1762444380395.png`
   - Added logo to all major pages: Header, Exercise, SignUp, SignIn, Dashboard, Profile

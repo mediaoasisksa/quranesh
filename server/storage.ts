@@ -364,31 +364,46 @@ export class DatabaseStorage implements IStorage {
 
     // Translation doesn't exist, use Gemini API to translate
     console.log(`Translating philosophical sentence to ${language}...`);
-    const translatedText = await translatePhilosophicalSentence(
-      sentence.arabicText,
-      language,
-    );
+    
+    try {
+      const translatedText = await translatePhilosophicalSentence(
+        sentence.arabicText,
+        language,
+      );
 
-    // Save translation to database
-    const updatedTranslations = {
-      ...translations,
-      [language]: translatedText,
-    };
+      // Validate translation: ensure it's different from Arabic source
+      // This prevents storing Arabic text in translation fields
+      if (translatedText === sentence.arabicText || translatedText.trim() === '') {
+        console.warn(`Invalid translation detected for ${language} - translation matches Arabic source or is empty`);
+        return sentence; // Return without saving invalid translation
+      }
 
-    await db
-      .update(philosophicalSentences)
-      .set({
+      // Save translation to database
+      const updatedTranslations = {
+        ...translations,
+        [language]: translatedText,
+      };
+
+      await db
+        .update(philosophicalSentences)
+        .set({
+          translations: updatedTranslations,
+          lastTranslatedAt: new Date(),
+        })
+        .where(eq(philosophicalSentences.id, id));
+
+      // Return updated sentence
+      return {
+        ...sentence,
         translations: updatedTranslations,
         lastTranslatedAt: new Date(),
-      })
-      .where(eq(philosophicalSentences.id, id));
-
-    // Return updated sentence
-    return {
-      ...sentence,
-      translations: updatedTranslations,
-      lastTranslatedAt: new Date(),
-    };
+      };
+    } catch (error) {
+      console.error(`Failed to translate philosophical sentence to ${language}:`, error);
+      // Return original sentence without translation
+      // Frontend will fallback to Arabic text
+      return sentence;
+    }
   }
 
   async getAllConversationPrompts(): Promise<ConversationPrompt[]> {

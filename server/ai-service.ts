@@ -1,9 +1,12 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
 
-const GEMINI_API_KEY =
-  process.env.GEMINI_API_KEY || "AIzaSyArY6r6fVZEaUIBNZD8_fRzRnjuGJ-TxKE";
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY environment variable is required");
+}
+// Using gemini-2.0-flash-exp for reliable translations
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 interface AIValidationResult {
   isCorrect: boolean;
@@ -1252,6 +1255,49 @@ const languageNames: Record<string, string> = {
  * @param targetLanguage - Target language code (en, id, tr, zh, sw, so, bs, sq)
  * @returns Translated text
  */
+async function translateWithRetry(
+  prompt: string,
+  maxRetries: number = 3,
+  initialDelay: number = 1000
+): Promise<any> {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await axios.post(GEMINI_API_URL, {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 150,
+          topP: 0.95,
+          topK: 40,
+        },
+      });
+      
+      return response;
+    } catch (error) {
+      const isRateLimitError = axios.isAxiosError(error) && 
+        (error.response?.status === 429 || 
+         error.response?.data?.error?.status === 'RESOURCE_EXHAUSTED');
+      
+      if (isRateLimitError && attempt < maxRetries - 1) {
+        const delay = initialDelay * Math.pow(2, attempt);
+        console.log(`Rate limit hit, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      throw error;
+    }
+  }
+}
+
 export async function translatePhilosophicalSentence(
   arabicText: string,
   targetLanguage: string,
@@ -1262,41 +1308,16 @@ export async function translatePhilosophicalSentence(
 
     const languageName = languageNames[targetLanguage] || targetLanguage;
 
-    const prompt = `You are a professional translator specializing in Arabic wisdom and philosophical sentences.
+    // Simplified, concise prompt to reduce token usage
+    const prompt = `Translate this Arabic wisdom to ${languageName}. Be concise and natural:
 
-Task: Translate the following Arabic wisdom sentence into ${languageName}.
-
-Arabic Wisdom Sentence:
 ${arabicText}
 
-Requirements:
-1. Provide a natural, culturally appropriate translation that preserves the philosophical meaning
-2. The translation should be concise and elegant
-3. Maintain the wisdom and depth of the original Arabic
-4. Use simple, clear language that non-Arabic speakers can understand
-5. Return ONLY the translated text, no explanations or additional commentary
-
-Translation in ${languageName}:`;
+Translation:`;
 
     console.log("Translation Prompt:", prompt.substring(0, 200) + "...");
 
-    const response = await axios.post(GEMINI_API_URL, {
-      contents: [
-        {
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.3, // Lower temperature for consistent translations
-        maxOutputTokens: 200,
-        topP: 0.8,
-        topK: 20,
-      },
-    });
+    const response = await translateWithRetry(prompt, 3, 1000);
 
     console.log("Gemini Translation Response Status:", response.status);
     console.log("Gemini Translation Response Data:", JSON.stringify(response.data, null, 2));
@@ -1317,7 +1338,8 @@ Translation in ${languageName}:`;
       console.error("Axios error response:", error.response?.data);
       console.error("Axios error status:", error.response?.status);
     }
-    // Fallback: return the original Arabic text if translation fails
-    return arabicText;
+    // Re-throw the error instead of returning Arabic text
+    // This prevents storing Arabic text in translation fields
+    throw new Error(`Failed to translate to ${targetLanguage}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
