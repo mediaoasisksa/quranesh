@@ -3,6 +3,12 @@
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
 ## Recent Updates (November 6, 2025)
+- **Instruction Text Updated**: Changed from "Quranic verse" to "Quranic words or phrases" across all UI
+  - Updated 8 translation keys across all 9 languages (English, Indonesian, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian)
+  - Affected keys: `consoleFriendScenario`, `conversationPlaceholder`, `roleplayPlaceholder`, `roleplayScenarioText`, `thematicInstructionText`, `thematicInstructionText2`
+  - Provides clearer guidance that users can answer with partial verses, individual words, or phrases from Quran
+  - Consistent with existing AI validation that accepts partial Quranic text
+  - Arabic now says "كلمات أو جمل من القرآن" instead of "آية قرآنية"
 - **Partial Quranic Verse Acceptance**: AI validation now properly accepts partial Quranic verses as correct answers
   - Enhanced AI validation prompts with explicit instructions to accept partial verses, phrases, and short Quranic text
   - Examples: "وما تفعلوا من خير" (partial verse from 2:215), "إن مع العسر يسرا", "والله بصير"
