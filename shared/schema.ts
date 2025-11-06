@@ -130,6 +130,8 @@ export const philosophicalSentences = pgTable("philosophical_sentences", {
   arabicText: text("arabic_text").notNull(),
   difficulty: integer("difficulty").default(1), // 1-5 scale
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
+  translations: jsonb("translations").$type<Record<string, string>>().notNull().default({}), // {"en": "...", "id": "...", "tr": "...", "zh": "...", "sw": "...", "so": "...", "bs": "...", "sq": "..."}
+  lastTranslatedAt: timestamp("last_translated_at"), // Track translation freshness
 });
 
 export const insertPhilosophicalSentenceSchema = createInsertSchema(philosophicalSentences).omit({
