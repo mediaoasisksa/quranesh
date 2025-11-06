@@ -53,9 +53,14 @@ export default function Exercise() {
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
     queryKey: ["/api/philosophical-sentences/random", userId, language],
     queryFn: async () => {
+      console.log(`[Exercise] Fetching philosophical sentence with language: ${language}`);
       const response = await fetch(`/api/philosophical-sentences/random?userId=${userId}&language=${language}`);
       if (!response.ok) throw new Error("Failed to fetch philosophical sentence");
-      return response.json();
+      const data = await response.json();
+      console.log(`[Exercise] Received philosophical sentence:`, data);
+      console.log(`[Exercise] Translations available:`, data.translations);
+      console.log(`[Exercise] Translation for ${language}:`, data.translations?.[language]);
+      return data;
     },
     enabled: !!exerciseType && isTransformationExercise,
   });

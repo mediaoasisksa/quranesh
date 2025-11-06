@@ -1298,8 +1298,12 @@ Translation in ${languageName}:`;
       },
     });
 
+    console.log("Gemini Translation Response Status:", response.status);
+    console.log("Gemini Translation Response Data:", JSON.stringify(response.data, null, 2));
+
     const candidate = response.data.candidates[0];
     if (!candidate.content?.parts?.[0]?.text) {
+      console.error("No valid translation from AI - candidate structure:", JSON.stringify(candidate, null, 2));
       throw new Error("No valid translation from AI");
     }
 
@@ -1309,6 +1313,10 @@ Translation in ${languageName}:`;
     return translation;
   } catch (error) {
     console.error(`Error translating to ${targetLanguage}:`, error);
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error response:", error.response?.data);
+      console.error("Axios error status:", error.response?.status);
+    }
     // Fallback: return the original Arabic text if translation fails
     return arabicText;
   }
