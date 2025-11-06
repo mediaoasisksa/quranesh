@@ -28,7 +28,7 @@ export default function Exercise() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
 
   // Use the actual user ID instead of hardcoded demo user
   const userId = user?.id || "demo-user";
@@ -51,9 +51,9 @@ export default function Exercise() {
 
   // For transformation exercises, fetch philosophical sentences
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
-    queryKey: ["/api/philosophical-sentences/random", userId],
+    queryKey: ["/api/philosophical-sentences/random", userId, language],
     queryFn: async () => {
-      const response = await fetch(`/api/philosophical-sentences/random?userId=${userId}`);
+      const response = await fetch(`/api/philosophical-sentences/random?userId=${userId}&language=${language}`);
       if (!response.ok) throw new Error("Failed to fetch philosophical sentence");
       return response.json();
     },
@@ -310,7 +310,7 @@ export default function Exercise() {
       // Invalidate the appropriate cache based on current exercise type
       if (currentExerciseType === "transformation") {
         await queryClient.invalidateQueries({
-          queryKey: ["/api/philosophical-sentences/random", userId],
+          queryKey: ["/api/philosophical-sentences/random", userId, language],
         });
       } else if (currentExerciseType === "conversation") {
         await queryClient.invalidateQueries({
@@ -589,12 +589,16 @@ export default function Exercise() {
                 {t('philosophicalSentenceLabel')}
               </p>
               <p
-                className="arabic-text text-xl text-foreground mb-3"
-                lang="ar"
-                dir="rtl"
+                className={language === "ar" ? "arabic-text text-xl text-foreground mb-3" : "text-xl text-foreground mb-3"}
+                lang={language === "ar" ? "ar" : language}
+                dir={dir}
                 data-testid="text-transformation-philosophical"
               >
-                💎 {philosophicalSentence?.arabicText || "جاري التحميل..."}
+                💎 {philosophicalSentence ? (
+                  language === "ar" 
+                    ? philosophicalSentence.arabicText 
+                    : (philosophicalSentence.translations as Record<string, string>)?.[language] || philosophicalSentence.arabicText
+                ) : "Loading..."}
               </p>
               <p className="text-sm text-muted-foreground">
                 {t('transformationInstruction')}

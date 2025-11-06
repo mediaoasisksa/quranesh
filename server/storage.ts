@@ -697,6 +697,15 @@ export class MemStorage implements IStorage {
     return unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
   }
 
+  async getTranslatedPhilosophicalSentence(id: string, language: string): Promise<PhilosophicalSentence> {
+    const sentence = this.philosophicalSentences.get(id);
+    if (!sentence) {
+      throw new Error("Philosophical sentence not found");
+    }
+    // For MemStorage, just return the sentence as is (no translation needed)
+    return sentence;
+  }
+
   async getAllConversationPrompts(): Promise<ConversationPrompt[]> {
     return Array.from(this.conversationPrompts.values());
   }
