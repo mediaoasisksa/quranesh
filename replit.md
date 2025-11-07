@@ -2,7 +2,7 @@
 
 This AI-powered Arabic language learning application is designed to assist English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice. It leverages users' existing Quranic knowledge by integrating phrases and verses into interactive exercises, phrase management, and progress tracking. The project aims to combine this knowledge with practical language skills, offering behavioral symbolism to transform Quranic phrases into applicable life lessons.
 
-The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian, and Russian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
+The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, and Albanian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
 
 # User Preferences
 
@@ -11,7 +11,7 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The frontend is built with React and TypeScript using Vite, Wouter for routing, Shadcn/ui for UI components, and Tailwind CSS for styling with Amiri font for Arabic. TanStack Query manages server state, and the browser's Web Speech API provides Arabic text-to-speech. A custom i18n system with Context API supports ten languages (English, Indonesian, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian, Russian), offering automatic RTL/LTR switching and persisting language preferences in localStorage. The application features a colorful Quranesh logo consistently displayed across all pages.
+The frontend is built with React and TypeScript using Vite, Wouter for routing, Shadcn/ui for UI components, and Tailwind CSS for styling with Amiri font for Arabic. TanStack Query manages server state, and the browser's Web Speech API provides Arabic text-to-speech. A custom i18n system with Context API supports nine languages, offering automatic RTL/LTR switching and persisting language preferences in localStorage. The application features a colorful Quranesh logo consistently displayed across all pages.
 
 ## Backend Architecture
 The backend uses Express.js with TypeScript in ESM mode, providing a RESTful API for phrases, exercises, progress, and statistics. Zod schemas handle data validation, and Express middleware manages JSON parsing, CORS, and logging.
