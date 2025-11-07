@@ -41,6 +41,7 @@ export const translations = {
     philosophicalSentenceLabel: "Arabic Wisdom:",
     transformationInstruction: "Write a word, phrase, or sentence used in the Quran:",
     transformationPlaceholder: "Write a word, phrase, or sentence used in the Quran...",
+    translationNotAvailable: "Translation not available yet",
     thematic: "Thematic Practice",
     thematicDesc: "Apply verses to real situations",
     
@@ -290,6 +291,7 @@ export const translations = {
     philosophicalSentenceLabel: "الحكمة العربية:",
     transformationInstruction: "اكتب كلمة أو مفردة أو جملة استخدمها القرآن:",
     transformationPlaceholder: "اكتب كلمة أو مفردة أو جملة استخدمها القرآن...",
+    translationNotAvailable: "الترجمة غير متوفرة بعد",
     thematic: "التدريب الموضوعي",
     thematicDesc: "طبق الآيات على المواقف الحقيقية",
     
@@ -539,6 +541,7 @@ export const translations = {
     philosophicalSentenceLabel: "Kebijaksanaan Arab:",
     transformationInstruction: "Tulis kata, frasa, atau kalimat yang digunakan dalam Al-Quran:",
     transformationPlaceholder: "Tulis kata, frasa, atau kalimat yang digunakan dalam Al-Quran...",
+    translationNotAvailable: "Terjemahan belum tersedia",
     thematic: "Latihan Tematik",
     thematicDesc: "Terapkan ayat ke situasi nyata",
     
@@ -788,6 +791,7 @@ export const translations = {
     philosophicalSentenceLabel: "Arapça Hikmet:",
     transformationInstruction: "Kuran'da kullanılan bir kelime, ifade veya cümle yazın:",
     transformationPlaceholder: "Kuran'da kullanılan bir kelime, ifade veya cümle yazın...",
+    translationNotAvailable: "Çeviri henüz mevcut değil",
     thematic: "Tematik Pratik",
     thematicDesc: "Ayetleri gerçek durumlara uygulayın",
     
@@ -1037,6 +1041,7 @@ export const translations = {
     philosophicalSentenceLabel: "阿拉伯智慧：",
     transformationInstruction: "写一个古兰经中使用的词、短语或句子：",
     transformationPlaceholder: "写一个古兰经中使用的词、短语或句子...",
+    translationNotAvailable: "翻译暂未提供",
     thematic: "主题练习",
     thematicDesc: "将经文应用于实际情况",
     
@@ -1286,6 +1291,7 @@ export const translations = {
     philosophicalSentenceLabel: "Hekima ya Kiarabu:",
     transformationInstruction: "Andika neno, kifungu, au sentensi iliyotumika katika Quran:",
     transformationPlaceholder: "Andika neno, kifungu, au sentensi iliyotumika katika Quran...",
+    translationNotAvailable: "Tafsiri bado haipatikani",
     thematic: "Mazoezi ya Mada",
     thematicDesc: "Tumia aya katika hali halisi",
     
@@ -1535,6 +1541,7 @@ export const translations = {
     philosophicalSentenceLabel: "Xigmadda Carabiga:",
     transformationInstruction: "Qor eray, weedh, ama jumlad Quraanka ku isticmaashay:",
     transformationPlaceholder: "Qor eray, weedh, ama jumlad Quraanka ku isticmaashay...",
+    translationNotAvailable: "Tarjumaadda wali lama helin",
     thematic: "Ku Celcelinta Mawduuciga",
     thematicDesc: "Ku dabaq aayada xaaladaha dhabta ah",
     
@@ -1784,6 +1791,7 @@ export const translations = {
     philosophicalSentenceLabel: "Arapska mudrost:",
     transformationInstruction: "Napiši riječ, frazu ili rečenicu korištenu u Kur'anu:",
     transformationPlaceholder: "Napiši riječ, frazu ili rečenicu korištenu u Kur'anu...",
+    translationNotAvailable: "Prijevod još nije dostupan",
     thematic: "Tematska praksa",
     thematicDesc: "Primijeni ajete na stvarne situacije",
     
@@ -2033,6 +2041,7 @@ export const translations = {
     philosophicalSentenceLabel: "Urtësia Arabe:",
     transformationInstruction: "Shkruani një fjalë, frazë ose fjali të përdorur në Kuran:",
     transformationPlaceholder: "Shkruani një fjalë, frazë ose fjali të përdorur në Kuran...",
+    translationNotAvailable: "Përkthimi ende nuk është i disponueshëm",
     thematic: "Praktika Tematike",
     thematicDesc: "Aplikoni ajetet në situata reale",
     

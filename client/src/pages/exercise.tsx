@@ -53,14 +53,9 @@ export default function Exercise() {
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
     queryKey: ["/api/philosophical-sentences/random", userId, language],
     queryFn: async () => {
-      console.log(`[Exercise] Fetching philosophical sentence with language: ${language}`);
       const response = await fetch(`/api/philosophical-sentences/random?userId=${userId}&language=${language}`);
       if (!response.ok) throw new Error("Failed to fetch philosophical sentence");
-      const data = await response.json();
-      console.log(`[Exercise] Received philosophical sentence:`, data);
-      console.log(`[Exercise] Translations available:`, data.translations);
-      console.log(`[Exercise] Translation for ${language}:`, data.translations?.[language]);
-      return data;
+      return response.json();
     },
     enabled: !!exerciseType && isTransformationExercise,
   });
@@ -593,18 +588,31 @@ export default function Exercise() {
               <p className="text-sm text-muted-foreground mb-2">
                 {t('philosophicalSentenceLabel')}
               </p>
-              <p
-                className={language === "ar" ? "arabic-text text-xl text-foreground mb-3" : "text-xl text-foreground mb-3"}
-                lang={language === "ar" ? "ar" : language}
-                dir={dir}
-                data-testid="text-transformation-philosophical"
-              >
-                💎 {philosophicalSentence ? (
-                  language === "ar" 
-                    ? philosophicalSentence.arabicText 
-                    : (philosophicalSentence.translations as Record<string, string>)?.[language] || philosophicalSentence.arabicText
-                ) : "Loading..."}
-              </p>
+              
+              <div className="space-y-3 mb-3">
+                {/* Always show Arabic text */}
+                <p
+                  className="arabic-text text-xl text-foreground"
+                  lang="ar"
+                  dir="rtl"
+                  data-testid="text-transformation-philosophical-arabic"
+                >
+                  💎 {philosophicalSentence?.arabicText || "Loading..."}
+                </p>
+                
+                {/* Show translation below if available and language is not Arabic */}
+                {philosophicalSentence && language !== "ar" && (
+                  <p
+                    className="text-lg text-muted-foreground/90 font-medium ps-8"
+                    dir={dir}
+                    data-testid="text-transformation-philosophical-translation"
+                  >
+                    {(philosophicalSentence.translations as Record<string, string>)?.[language] || 
+                      `(${t('translationNotAvailable') || 'Translation not available yet'})`}
+                  </p>
+                )}
+              </div>
+              
               <p className="text-sm text-muted-foreground">
                 {t('transformationInstruction')}
               </p>

@@ -2,11 +2,30 @@
 
 This AI-powered Arabic language learning application assists English-speaking Quran memorizers (huffaz) in daily Arabic conversation practice.
 
-## Recent Updates (November 6, 2025)
+## Recent Updates (November 7, 2025)
+- **🎯 Permanent Translation Display Feature**: Philosophical sentences now display translations permanently on screen alongside Arabic text
+  - **What Users See**: Arabic wisdom sentence (with 💎 emoji) displayed at top, with translation shown immediately below in selected language
+  - **Example Display**:
+    ```
+    💎 لا تستهلك يومك في ارض الغير
+       Don't waste your day in someone else's land
+    ```
+  - **Frontend Implementation** (`client/src/pages/exercise.tsx` lines 600-622):
+    - Always displays Arabic text with `data-testid="text-transformation-philosophical-arabic"`
+    - Shows translation below with `data-testid="text-transformation-philosophical-translation"` for non-Arabic languages
+    - Displays localized fallback message "(Translation not available yet)" when translation missing
+  - **Translation Coverage**: 18 philosophical sentences manually translated across all 9 languages (0.7% coverage)
+  - **Translated Examples**:
+    - "لا تستهلك يومك في ارض الغير" → "Don't waste your day in someone else's land" / "不要在别人的土地上浪费你的时间"
+    - "من احسن رعاية موهبته خدم الناس بها" → "Whoever takes good care of their talent serves people with it"
+    - "لا تضع اسمك على ما لا تفخر به" → "Don't put your name on what you're not proud of"
+  - **New Translation Key**: Added `translationNotAvailable` to all 9 languages for fallback messaging
+  - **E2E Testing**: Successfully verified translation display across all languages, confirmed Arabic text + translation shown simultaneously
+
+## Previous Updates (November 6, 2025)
 - **Philosophical Sentence Translation System**: Implemented comprehensive dynamic translation of Arabic wisdom sentences to match selected UI language
   - Added language parameter to philosophical sentence API endpoint (`/api/philosophical-sentences/random?language=...`)
   - Frontend now passes current language to backend when fetching philosophical sentences
-  - Display logic updated to show translated text for non-Arabic languages, Arabic text for Arabic language
   - Supports all 9 languages: English, Indonesian, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian
   - Translation uses Gemini AI (gemini-2.0-flash-exp) with database JSONB caching for efficiency
   - Fixed MemStorage implementation to include `getTranslatedPhilosophicalSentence` method
@@ -21,12 +40,7 @@ This AI-powered Arabic language learning application assists English-speaking Qu
     - Database cleaned of 2,459 invalid translations
     - Changed from gemini-2.5-flash to gemini-2.0-flash-exp for better reliability
     - Security: Removed hard-coded API key, now requires GEMINI_API_KEY environment variable
-  - **Manual Translations Added**: Added 8 fully translated philosophical sentences (all 9 languages) to demonstrate system when Gemini quota available
   - **System Verification**: E2E tested successfully - language switching works smoothly, translations display when cached, Arabic fallback works when translation unavailable
-  - **Frontend Features**:
-    - Added comprehensive console logging for debugging
-    - Displays translated text when available, falls back to Arabic when translation fails
-    - Smooth language switching with automatic cache invalidation
 - **Logo Updated Across All Pages**: Replaced Quranesh logo with new version and increased size
   - Updated logo file: `quranesh logo (1)_1762444380395.png`
   - Added logo to all major pages: Header, Exercise, SignUp, SignIn, Dashboard, Profile
