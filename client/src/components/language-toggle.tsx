@@ -6,7 +6,7 @@ export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
   const toggleLanguage = () => {
-    // Cycle through: en -> id -> tr -> ar -> zh -> sw -> so -> bs -> sq -> en
+    // Cycle through: en -> id -> tr -> ar -> zh -> sw -> so -> bs -> sq -> ru -> en
     if (language === "en") {
       setLanguage("id");
     } else if (language === "id") {
@@ -23,6 +23,8 @@ export default function LanguageToggle() {
       setLanguage("bs");
     } else if (language === "bs") {
       setLanguage("sq");
+    } else if (language === "sq") {
+      setLanguage("ru");
     } else {
       setLanguage("en");
     }
@@ -48,6 +50,8 @@ export default function LanguageToggle() {
         return "Bosanski";
       case "sq":
         return "Shqip";
+      case "ru":
+        return "Русский";
       default:
         return "Language";
     }
