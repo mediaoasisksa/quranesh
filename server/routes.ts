@@ -972,13 +972,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI-powered answer validation
   app.post("/api/validate-answer", async (req, res) => {
     try {
-      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId } = req.body;
+      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId, language } = req.body;
 
       if (!userAnswer || !exerciseType) {
         return res.status(400).json({
           error: "Missing required fields: userAnswer, exerciseType",
         });
       }
+
+      // Get user's language preference (default to English if not provided)
+      const userLanguage = language || "en";
 
       let phraseData = null;
 
@@ -1007,6 +1010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("=== AI VALIDATION DEBUG ===");
       console.log("User Answer:", userAnswer);
       console.log("Exercise Type:", exerciseType);
+      console.log("User Language:", userLanguage);
       console.log("Phrase Data:", phraseData);
       console.log("==========================");
 
@@ -1015,6 +1019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAnswer,
         exerciseType,
         phraseData,
+        userLanguage,
       );
 
       console.log("AI Validation Result:", result);

@@ -14,6 +14,7 @@ interface AIValidationResult {
   feedback: string;
   suggestions: string[];
   suggestedAnswer?: string; // Suggested correct answer in Arabic (shown for 5 seconds when user makes a mistake)
+  connectionExplanation?: string; // Explanation of logical connection between wisdom sentence and Quranic verse (for transformation exercises)
   confidence: number; // 0-1
 }
 
@@ -32,6 +33,7 @@ export async function validateArabicAnswer(
   exerciseType: string,
   context: string,
   expectedAnswer?: string,
+  userLanguage: string = "en",
 ): Promise<AIValidationResult> {
   try {
     console.log("=== GEMINI AI VALIDATION ===");
@@ -46,6 +48,7 @@ export async function validateArabicAnswer(
       exerciseType,
       context,
       expectedAnswer,
+      userLanguage,
     );
     console.log("Generated Prompt:", prompt.substring(0, 200) + "...");
 
@@ -115,6 +118,7 @@ function createValidationPrompt(
   exerciseType: string,
   context: string,
   expectedAnswer?: string,
+  userLanguage: string = "en",
 ): string {
   let specificInstructions = "";
 
@@ -186,6 +190,37 @@ function createValidationPrompt(
       specificInstructions = `Evaluate this Arabic exercise answer for accuracy and relevance.`;
   }
 
+  // Language name mapping for clarity in prompt
+  const languageNameMap: Record<string, string> = {
+    en: "English",
+    id: "Indonesian",
+    tr: "Turkish",
+    ar: "Arabic",
+    zh: "Chinese",
+    sw: "Swahili",
+    so: "Somali",
+    bs: "Bosnian",
+    sq: "Albanian",
+  };
+  
+  const targetLanguageName = languageNameMap[userLanguage] || "English";
+  
+  // Additional instruction for transformation exercises
+  const connectionExplanationInstruction = exerciseType === "transformation" 
+    ? `\n\n🔵 SPECIAL INSTRUCTION FOR TRANSFORMATION EXERCISES:
+If the answer is CORRECT, you MUST provide a "connectionExplanation" field that explains the logical connection between the Arabic wisdom sentence ("${context}") and the Quranic verse provided by the student ("${userAnswer}").
+
+The explanation should:
+- Be written in ${targetLanguageName} language
+- Be clear and insightful (2-4 sentences)
+- Show how both texts convey similar or related wisdom/philosophy
+- Help the student understand the deeper connection
+- Be encouraging and educational
+
+Example (if target language is English):
+"Both texts emphasize the importance of patience and perseverance. The wisdom sentence teaches us that consistent effort leads to growth, while the Quranic verse reminds us that with every difficulty comes ease, reinforcing the same principle of hope through persistence."`
+    : "";
+
   const basePrompt = `You are an expert Arabic teacher specializing in Quranic Arabic. 
 Evaluate this student's answer for an Arabic language exercise.
 
@@ -206,6 +241,7 @@ ${specificInstructions}
 - DO NOT reject answers just because they are "not a complete verse"
 - If the text is from the Quran and relates to the context, mark it as CORRECT
 - Partial verses are just as valid as complete verses!
+${connectionExplanationInstruction}
 
 Please evaluate the answer considering:
 1. Is this authentic Quranic text (complete OR partial)? If YES → mark as correct
@@ -222,7 +258,7 @@ Respond ONLY with a JSON object in this exact format:
   "score": number (0-100),
   "feedback": "string (helpful feedback in English explaining why correct/incorrect)",
   "suggestions": ["string array of specific improvement suggestions"],
-  "suggestedAnswer": "string (if answer is incorrect, provide ONE example of a correct answer in Arabic that would be appropriate)",
+  "suggestedAnswer": "string (if answer is incorrect, provide ONE example of a correct answer in Arabic that would be appropriate)"${exerciseType === "transformation" ? `,\n  "connectionExplanation": "string (REQUIRED for transformation exercises when answer is correct - explain the logical connection in ${targetLanguageName} language)"` : ""},
   "confidence": number (0-1)
 }`;
 
@@ -245,6 +281,7 @@ function parseAIResponse(response: string): AIValidationResult {
       feedback: parsed.feedback || "No feedback provided",
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
       suggestedAnswer: parsed.suggestedAnswer || undefined,
+      connectionExplanation: parsed.connectionExplanation || undefined,
       confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
     };
   } catch (error) {
@@ -1105,6 +1142,7 @@ function fallbackValidation(
     feedback: completeFeedback,
     suggestions,
     suggestedAnswer: !isActuallyCorrect ? suggestedAnswer : undefined,
+    connectionExplanation: undefined,
     confidence: 0.3,
   };
 }
@@ -1114,6 +1152,7 @@ export async function validateExerciseAnswer(
   userAnswer: string,
   exerciseType: string,
   phraseData: any,
+  userLanguage: string = "en",
 ): Promise<AIValidationResult> {
   // For conversation exercises, use English translation as context (what user needs to translate)
   // For other exercises, use Arabic text as context
@@ -1140,6 +1179,7 @@ export async function validateExerciseAnswer(
     exerciseType,
     context,
     expectedAnswer,
+    userLanguage,
   );
 }
 
