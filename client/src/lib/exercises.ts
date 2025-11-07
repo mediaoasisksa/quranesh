@@ -50,6 +50,14 @@ export const exerciseTypes = [
     variant: 'accent' as const,
     category: 'wisdom'
   },
+  {
+    id: 'daily_contextual',
+    titleKey: 'dailyContextual',
+    descriptionKey: 'dailyContextualDesc',
+    icon: '🌟',
+    variant: 'primary' as const,
+    category: 'practical'
+  },
   // Thematic exercise hidden per user request
   // {
   //   id: 'thematic',
