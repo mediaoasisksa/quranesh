@@ -156,5 +156,60 @@ export const insertConversationPromptSchema = createInsertSchema(conversationPro
 export type ConversationPrompt = typeof conversationPrompts.$inferSelect;
 export type InsertConversationPrompt = z.infer<typeof insertConversationPromptSchema>;
 
+// Daily Sentences for contextual Quranic expression matching
+export const dailySentences = pgTable("daily_sentences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  englishText: text("english_text").notNull(),
+  translations: jsonb("translations").$type<Record<string, string>>(), // {"ar": "...", "id": "...", "ur": "...", "tr": "..."}
+  theme: text("theme").notNull(), // patience, gratitude, trust, hope, etc.
+  difficulty: integer("difficulty").default(1), // 1-5 scale (A1-C1)
+  contextNotes: text("context_notes"), // When/how to use this expression
+});
+
+export const insertDailySentenceSchema = createInsertSchema(dailySentences).omit({
+  id: true,
+});
+
+export type DailySentence = typeof dailySentences.$inferSelect;
+export type InsertDailySentence = z.infer<typeof insertDailySentenceSchema>;
+
+// Quranic Expressions - Short phrases extracted from verses (2-6 words)
+export const quranicExpressions = pgTable("quranic_expressions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  arabicText: text("arabic_text").notNull(), // 2-6 words from Quran
+  surahAyah: text("surah_ayah").notNull(), // e.g. "المزمل:10" or "Al-Muzzammil:10"
+  theme: text("theme").notNull(), // patience, trust, gratitude, etc.
+  meaning: text("meaning"), // Brief semantic explanation
+  usageContext: text("usage_context"), // When to use this expression
+  wordCount: integer("word_count").notNull(), // 2-6
+  explanations: jsonb("explanations").$type<Record<string, string>>(), // Explanation in different languages
+});
+
+export const insertQuranicExpressionSchema = createInsertSchema(quranicExpressions).omit({
+  id: true,
+});
+
+export type QuranicExpression = typeof quranicExpressions.$inferSelect;
+export type InsertQuranicExpression = z.infer<typeof insertQuranicExpressionSchema>;
+
+// Daily Sentence Exercises - Generated exercises matching sentences to expressions
+export const dailySentenceExercises = pgTable("daily_sentence_exercises", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  dailySentenceId: text("daily_sentence_id").notNull(),
+  correctExpressionId: text("correct_expression_id").notNull(),
+  distractorIds: jsonb("distractor_ids").$type<string[]>().notNull(), // 2 distractors
+  explanation: jsonb("explanation").$type<Record<string, string>>(), // Explanation in multiple languages
+  learningNote: jsonb("learning_note").$type<Record<string, string>>(), // Detailed linguistic notes
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertDailySentenceExerciseSchema = createInsertSchema(dailySentenceExercises).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type DailySentenceExercise = typeof dailySentenceExercises.$inferSelect;
+export type InsertDailySentenceExercise = z.infer<typeof insertDailySentenceExerciseSchema>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
