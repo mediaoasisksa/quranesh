@@ -484,6 +484,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Daily contextual exercise routes
+  app.get("/api/daily-contextual/random", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      if (!userId || typeof userId !== "string") {
+        return res.status(400).json({ message: "userId is required" });
+      }
+
+      const exerciseData = await storage.getRandomDailyContextualExercise(userId);
+      if (!exerciseData) {
+        return res.status(404).json({ message: "No daily contextual exercises available" });
+      }
+
+      // Shuffle options (correct + 2 distractors)
+      const options = [
+        exerciseData.correctExpression,
+        ...exerciseData.distractors
+      ].sort(() => Math.random() - 0.5);
+
+      res.json({
+        ...exerciseData,
+        options, // Shuffled array of 3 expressions
+      });
+    } catch (error) {
+      console.error("Error fetching daily contextual exercise:", error);
+      res.status(500).json({ message: "Failed to fetch daily contextual exercise" });
+    }
+  });
+
   // Exercise session routes
   app.post("/api/exercise-sessions", async (req, res) => {
     try {

@@ -7,6 +7,9 @@ import {
   questionBanks,
   philosophicalSentences,
   conversationPrompts,
+  dailySentences,
+  quranicExpressions,
+  dailySentenceExercises,
   type User,
   type InsertUser,
   type Phrase,
@@ -23,6 +26,9 @@ import {
   type InsertPhilosophicalSentence,
   type ConversationPrompt,
   type InsertConversationPrompt,
+  type DailySentence,
+  type QuranicExpression,
+  type DailySentenceExercise,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, notInArray } from "drizzle-orm";
@@ -91,6 +97,16 @@ export interface IStorage {
   getConversationPrompt(id: string): Promise<ConversationPrompt | undefined>;
   createConversationPrompt(prompt: InsertConversationPrompt): Promise<ConversationPrompt>;
   getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined>;
+
+  // Daily contextual exercise methods
+  getRandomDailyContextualExercise(userId: string): Promise<{
+    exercise: DailySentenceExercise;
+    sentence: DailySentence;
+    correctExpression: QuranicExpression;
+    distractors: QuranicExpression[];
+  } | undefined>;
+  getDailySentence(id: string): Promise<DailySentence | undefined>;
+  getQuranicExpression(id: string): Promise<QuranicExpression | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -466,6 +482,88 @@ export class DatabaseStorage implements IStorage {
     if (availablePrompts.length === 0) return undefined;
     return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
   }
+
+  // Daily contextual exercise methods
+  async getRandomDailyContextualExercise(userId: string): Promise<{
+    exercise: DailySentenceExercise;
+    sentence: DailySentence;
+    correctExpression: QuranicExpression;
+    distractors: QuranicExpression[];
+  } | undefined> {
+    // Get completed daily contextual exercise IDs to avoid repetition
+    const completedExerciseIds = await db
+      .select({ phraseId: exerciseSessions.phraseId })
+      .from(exerciseSessions)
+      .where(
+        and(
+          eq(exerciseSessions.userId, userId),
+          eq(exerciseSessions.exerciseType, "daily_contextual")
+        )
+      );
+
+    const completedIds = completedExerciseIds.map((session) => session.phraseId);
+
+    // Get available exercises
+    const availableExercises = completedIds.length > 0
+      ? await db
+          .select()
+          .from(dailySentenceExercises)
+          .where(notInArray(dailySentenceExercises.id, completedIds))
+      : await db.select().from(dailySentenceExercises);
+
+    if (availableExercises.length === 0) return undefined;
+
+    // Pick random exercise
+    const exercise = availableExercises[Math.floor(Math.random() * availableExercises.length)];
+
+    // Get sentence, correct expression, and distractors
+    const [sentence] = await db
+      .select()
+      .from(dailySentences)
+      .where(eq(dailySentences.id, exercise.dailySentenceId));
+
+    const [correctExpression] = await db
+      .select()
+      .from(quranicExpressions)
+      .where(eq(quranicExpressions.id, exercise.correctExpressionId));
+
+    const distractorIds = exercise.distractorIds as string[];
+    const distractors = await db
+      .select()
+      .from(quranicExpressions)
+      .where(
+        notInArray(quranicExpressions.id, [exercise.correctExpressionId])
+      );
+
+    const selectedDistractors = distractors.filter(d => distractorIds.includes(d.id));
+
+    if (!sentence || !correctExpression || selectedDistractors.length < 2) {
+      return undefined;
+    }
+
+    return {
+      exercise,
+      sentence,
+      correctExpression,
+      distractors: selectedDistractors,
+    };
+  }
+
+  async getDailySentence(id: string): Promise<DailySentence | undefined> {
+    const [sentence] = await db
+      .select()
+      .from(dailySentences)
+      .where(eq(dailySentences.id, id));
+    return sentence || undefined;
+  }
+
+  async getQuranicExpression(id: string): Promise<QuranicExpression | undefined> {
+    const [expression] = await db
+      .select()
+      .from(quranicExpressions)
+      .where(eq(quranicExpressions.id, id));
+    return expression || undefined;
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -779,6 +877,25 @@ export class MemStorage implements IStorage {
 
     if (availablePrompts.length === 0) return undefined;
     return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+  }
+
+  // Daily contextual exercise methods (placeholder for MemStorage)
+  async getRandomDailyContextualExercise(_userId: string): Promise<{
+    exercise: DailySentenceExercise;
+    sentence: DailySentence;
+    correctExpression: QuranicExpression;
+    distractors: QuranicExpression[];
+  } | undefined> {
+    // MemStorage doesn't support daily contextual exercises
+    return undefined;
+  }
+
+  async getDailySentence(_id: string): Promise<DailySentence | undefined> {
+    return undefined;
+  }
+
+  async getQuranicExpression(_id: string): Promise<QuranicExpression | undefined> {
+    return undefined;
   }
 }
 
