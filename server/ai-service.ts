@@ -1383,3 +1383,97 @@ Translation:`;
     throw new Error(`Failed to translate to ${targetLanguage}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+// Daily Contextual Exercise - Generate explanation for why an expression fits a daily sentence
+export async function generateDailyContextualExplanation(
+  dailySentence: string,
+  correctExpression: string,
+  surahAyah: string,
+  userLanguage: string = "en",
+): Promise<Record<string, string>> {
+  try {
+    console.log("=== GENERATING DAILY CONTEXTUAL EXPLANATION ===");
+    console.log("Daily Sentence:", dailySentence);
+    console.log("Correct Expression:", correctExpression);
+    console.log("Surah/Ayah:", surahAyah);
+    console.log("User Language:", userLanguage);
+
+    const languageName = languageNames[userLanguage] || "English";
+
+    const prompt = `Explain in ${languageName} (2-4 sentences) why the Quranic expression "${correctExpression}" from ${surahAyah} is the most fitting for this daily situation:
+
+Daily Situation: ${dailySentence}
+
+Your explanation should:
+1. Explain the semantic connection
+2. Mention the Quranic context briefly
+3. Explain when to use this expression in daily life
+
+Explanation:`;
+
+    const response = await translateWithRetry(prompt, 3, 1000);
+
+    const candidate = response.data.candidates[0];
+    if (!candidate.content?.parts?.[0]?.text) {
+      throw new Error("No valid explanation from AI");
+    }
+
+    const explanation = candidate.content.parts[0].text.trim();
+
+    // Return explanation in the requested language
+    return {
+      [userLanguage]: explanation
+    };
+  } catch (error) {
+    console.error("Error generating explanation:", error);
+    // Return a fallback explanation
+    return {
+      [userLanguage]: `The Quranic expression "${correctExpression}" from ${surahAyah} is appropriate for this context.`
+    };
+  }
+}
+
+// Generate linguistic note for daily contextual exercise
+export async function generateLinguisticNote(
+  expression: string,
+  surahAyah: string,
+  userLanguage: string = "en",
+): Promise<Record<string, string>> {
+  try {
+    console.log("=== GENERATING LINGUISTIC NOTE ===");
+    console.log("Expression:", expression);
+    console.log("Surah/Ayah:", surahAyah);
+
+    const languageName = languageNames[userLanguage] || "English";
+
+    const prompt = `Provide a brief linguistic note in ${languageName} (3-5 sentences) about this Quranic expression:
+
+Expression: ${expression}
+Source: ${surahAyah}
+
+Include:
+1. Grammar structure
+2. Key vocabulary
+3. Usage context
+
+Note:`;
+
+    const response = await translateWithRetry(prompt, 3, 1000);
+
+    const candidate = response.data.candidates[0];
+    if (!candidate.content?.parts?.[0]?.text) {
+      throw new Error("No valid linguistic note from AI");
+    }
+
+    const note = candidate.content.parts[0].text.trim();
+
+    return {
+      [userLanguage]: note
+    };
+  } catch (error) {
+    console.error("Error generating linguistic note:", error);
+    return {
+      [userLanguage]: `This expression appears in ${surahAyah} and is commonly used in Arabic communication.`
+    };
+  }
+}
