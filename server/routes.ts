@@ -257,6 +257,205 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Translation statistics endpoint
+  app.get("/api/philosophical-sentences/translation-stats", async (req, res) => {
+    try {
+      const { language } = req.query;
+      const targetLanguage = typeof language === "string" ? language : "en";
+      
+      const allSentences = await storage.getAllPhilosophicalSentences();
+      const totalSentences = allSentences.length;
+      
+      // Count sentences with translations for the target language
+      let translatedCount = 0;
+      for (const sentence of allSentences) {
+        if (sentence.translations && typeof sentence.translations === 'object') {
+          const translations = sentence.translations as Record<string, string>;
+          if (translations[targetLanguage] && translations[targetLanguage] !== sentence.arabicText) {
+            translatedCount++;
+          }
+        }
+      }
+      
+      res.json({
+        totalSentences,
+        translatedCount,
+        untranslatedCount: totalSentences - translatedCount,
+        coveragePercentage: totalSentences > 0 ? ((translatedCount / totalSentences) * 100).toFixed(2) : "0.00",
+        language: targetLanguage,
+      });
+    } catch (error) {
+      console.error("Error fetching translation stats:", error);
+      res.status(500).json({ message: "Failed to fetch translation statistics" });
+    }
+  });
+
+  // Bulk translation endpoint (admin only - translates untranslated sentences in batches)
+  app.post("/api/philosophical-sentences/bulk-translate", async (req, res) => {
+    try {
+      const { language, limit = 10 } = req.body;
+      
+      if (!language || typeof language !== "string") {
+        return res.status(400).json({ message: "Language is required" });
+      }
+
+      // Get all sentences
+      const allSentences = await storage.getAllPhilosophicalSentences();
+      
+      // Filter untranslated sentences
+      const untranslatedSentences = allSentences.filter(sentence => {
+        const translations = (sentence.translations || {}) as Record<string, string>;
+        return !translations[language] || translations[language] === sentence.arabicText;
+      });
+
+      if (untranslatedSentences.length === 0) {
+        return res.json({
+          success: true,
+          message: "All sentences are already translated",
+          translated: 0,
+          failed: 0,
+        });
+      }
+
+      // Limit the number of sentences to translate
+      const sentencesToTranslate = untranslatedSentences.slice(0, Math.min(limit, untranslatedSentences.length));
+      
+      const { translatePhilosophicalSentence } = await import("./ai-service");
+      
+      let successCount = 0;
+      let failureCount = 0;
+      const results = [];
+
+      for (const sentence of sentencesToTranslate) {
+        try {
+          console.log(`Translating sentence ${sentence.id} to ${language}...`);
+          const translation = await translatePhilosophicalSentence(sentence.arabicText, language);
+          
+          // Verify translation is different from Arabic text
+          if (translation && translation !== sentence.arabicText) {
+            // Update the sentence with the new translation
+            const updatedTranslations = {
+              ...(sentence.translations || {}),
+              [language]: translation,
+            };
+            
+            await storage.updatePhilosophicalSentence(sentence.id, {
+              translations: updatedTranslations,
+            });
+            
+            successCount++;
+            results.push({
+              id: sentence.id,
+              arabicText: sentence.arabicText,
+              translation,
+              status: "success",
+            });
+            
+            console.log(`✓ Successfully translated sentence ${sentence.id}`);
+          } else {
+            failureCount++;
+            results.push({
+              id: sentence.id,
+              arabicText: sentence.arabicText,
+              status: "failed",
+              error: "Translation same as Arabic text",
+            });
+          }
+          
+          // Add delay between requests to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        } catch (error) {
+          failureCount++;
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          results.push({
+            id: sentence.id,
+            arabicText: sentence.arabicText,
+            status: "failed",
+            error: errorMessage,
+          });
+          console.error(`✗ Failed to translate sentence ${sentence.id}:`, errorMessage);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Bulk translation completed`,
+        translated: successCount,
+        failed: failureCount,
+        totalAttempted: sentencesToTranslate.length,
+        totalUntranslated: untranslatedSentences.length,
+        results,
+      });
+    } catch (error) {
+      console.error("Error in bulk translation:", error);
+      res.status(500).json({ 
+        message: "Failed to perform bulk translation",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Single sentence translation endpoint
+  app.post("/api/philosophical-sentences/:id/translate", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { language } = req.body;
+      
+      if (!language || typeof language !== "string") {
+        return res.status(400).json({ message: "Language is required" });
+      }
+
+      const sentence = await storage.getPhilosophicalSentence(id);
+      if (!sentence) {
+        return res.status(404).json({ message: "Sentence not found" });
+      }
+
+      const { translatePhilosophicalSentence } = await import("./ai-service");
+      
+      try {
+        const translation = await translatePhilosophicalSentence(sentence.arabicText, language);
+        
+        // Verify translation is different from Arabic text
+        if (translation && translation !== sentence.arabicText) {
+          // Update the sentence with the new translation
+          const updatedTranslations = {
+            ...(sentence.translations || {}),
+            [language]: translation,
+          };
+          
+          await storage.updatePhilosophicalSentence(id, {
+            translations: updatedTranslations,
+          });
+          
+          res.json({
+            success: true,
+            id: sentence.id,
+            arabicText: sentence.arabicText,
+            translation,
+            language,
+          });
+        } else {
+          res.status(400).json({
+            success: false,
+            message: "Translation failed: result same as Arabic text",
+          });
+        }
+      } catch (error) {
+        console.error(`Error translating sentence ${id}:`, error);
+        res.status(500).json({
+          success: false,
+          message: error instanceof Error ? error.message : "Translation failed",
+        });
+      }
+    } catch (error) {
+      console.error("Error in single translation:", error);
+      res.status(500).json({ 
+        message: "Failed to translate sentence",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Conversation prompt routes
   app.get("/api/conversation-prompts/random", async (req, res) => {
     try {

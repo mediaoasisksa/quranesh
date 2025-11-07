@@ -15,6 +15,7 @@ import HowItWorks from "@/pages/HowItWorks";
 import Pricing from "@/pages/Pricing";
 import Profile from "@/pages/profile";
 import { PaymentSuccess } from "@/pages/payment-success";
+import TranslationManager from "@/pages/translation-manager";
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={Profile} />
       <Route path="/payment-success" component={PaymentSuccess} />
+      <Route path="/translation-manager" component={TranslationManager} />
       <Route component={NotFound} />
     </Switch>
   );

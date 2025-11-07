@@ -82,6 +82,7 @@ export interface IStorage {
   getAllPhilosophicalSentences(): Promise<PhilosophicalSentence[]>;
   getPhilosophicalSentence(id: string): Promise<PhilosophicalSentence | undefined>;
   createPhilosophicalSentence(sentence: InsertPhilosophicalSentence): Promise<PhilosophicalSentence>;
+  updatePhilosophicalSentence(id: string, data: Partial<PhilosophicalSentence>): Promise<PhilosophicalSentence | undefined>;
   getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined>;
   getTranslatedPhilosophicalSentence(id: string, language: string): Promise<PhilosophicalSentence>;
 
@@ -310,6 +311,18 @@ export class DatabaseStorage implements IStorage {
       .values(insertSentence)
       .returning();
     return sentence;
+  }
+
+  async updatePhilosophicalSentence(
+    id: string,
+    data: Partial<PhilosophicalSentence>,
+  ): Promise<PhilosophicalSentence | undefined> {
+    const [updated] = await db
+      .update(philosophicalSentences)
+      .set(data)
+      .where(eq(philosophicalSentences.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   async getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined> {
@@ -688,6 +701,18 @@ export class MemStorage implements IStorage {
     const sentence: PhilosophicalSentence = { ...insertSentence, id };
     this.philosophicalSentences.set(id, sentence);
     return sentence;
+  }
+
+  async updatePhilosophicalSentence(
+    id: string,
+    data: Partial<PhilosophicalSentence>,
+  ): Promise<PhilosophicalSentence | undefined> {
+    const sentence = this.philosophicalSentences.get(id);
+    if (!sentence) return undefined;
+    
+    const updated = { ...sentence, ...data };
+    this.philosophicalSentences.set(id, updated);
+    return updated;
   }
 
   async getUnusedPhilosophicalSentence(userId: string): Promise<PhilosophicalSentence | undefined> {

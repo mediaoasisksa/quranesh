@@ -20,6 +20,7 @@ import {
   UserCircle,
   LogOut,
   Settings,
+  Languages,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
@@ -195,6 +196,12 @@ export default function Dashboard() {
                       <Link href="/profile" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>{t('settings')}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/translation-manager" className="cursor-pointer">
+                        <Languages className="mr-2 h-4 w-4" />
+                        <span>إدارة الترجمات</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
