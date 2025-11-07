@@ -28,6 +28,17 @@ A PostgreSQL database, managed by Drizzle ORM, stores:
 ## Exercise System Architecture
 The system offers conversation practice, role-play scenarios, and grammar transformation exercises. Exercises are dynamically generated based on user knowledge and difficulty. A non-repetition system prevents duplicate exercises. When database questions are exhausted, Gemini AI generates new Quranic phrases and exercises. The system provides real-time feedback, long-term progress analytics, and adaptive learning. AI validation accepts partial Quranic verses as correct answers, and suggested correct answers are displayed briefly after incorrect submissions. Philosophical sentences include permanent translations and AI-generated explanations of their logical connection to Quranic verses for transformation exercises.
 
+## Translation Management System
+A comprehensive administrative interface at `/translation-manager` enables bulk translation of philosophical sentences. The system provides real-time statistics showing total sentences, translated count, untranslated count, and coverage percentage for each language. Features include:
+- **Bulk Translation**: Configurable batch processing (1-50 sentences) with 1.5-second delays between API calls
+- **Language Support**: Manages translations for 8 languages (English, Indonesian, Turkish, Chinese, Swahili, Somali, Bosnian, Albanian)
+- **Translation Statistics**: Real-time monitoring of translation coverage per language
+- **Single Sentence Translation**: Manual translation option for individual sentences
+- **Error Handling**: Retry logic with exponential backoff for API rate limiting
+- **Validation**: Ensures translated text differs from Arabic source
+- **Progress Tracking**: Real-time updates during batch operations with success/failure indicators
+Accessed via dashboard dropdown menu (Languages icon) for administrative users.
+
 ## Authentication Strategy
 The application uses a full authentication system with JWT tokens and bcrypt password hashing. It supports a demo user and ensures user ID-based data isolation with secure session management.
 
