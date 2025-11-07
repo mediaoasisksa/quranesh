@@ -211,5 +211,48 @@ export const insertDailySentenceExerciseSchema = createInsertSchema(dailySentenc
 export type DailySentenceExercise = typeof dailySentenceExercises.$inferSelect;
 export type InsertDailySentenceExercise = z.infer<typeof insertDailySentenceExerciseSchema>;
 
+// Quran Text - Complete Quran text for local recitation verification
+export const quranText = pgTable("quran_text", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  surahNumber: integer("surah_number").notNull(),
+  ayahNumber: integer("ayah_number").notNull(),
+  arabicText: text("arabic_text").notNull(), // Full Arabic text with diacritics
+  simpleText: text("simple_text").notNull(), // Simplified text for matching (no diacritics)
+  transliteration: text("transliteration"), // Latin script representation
+  surahNameArabic: text("surah_name_arabic").notNull(),
+  surahNameEnglish: text("surah_name_english").notNull(),
+  juzNumber: integer("juz_number"),
+  words: jsonb("words").$type<string[]>(), // Array of individual words for word-by-word matching
+});
+
+export const insertQuranTextSchema = createInsertSchema(quranText).omit({
+  id: true,
+});
+
+export type QuranText = typeof quranText.$inferSelect;
+export type InsertQuranText = z.infer<typeof insertQuranTextSchema>;
+
+// Recitation Sessions - Track user recitation practice
+export const recitationSessions = pgTable("recitation_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  surahNumber: integer("surah_number").notNull(),
+  fromAyah: integer("from_ayah").notNull(),
+  toAyah: integer("to_ayah").notNull(),
+  accuracy: integer("accuracy").default(0), // 0-100
+  wordsRecited: integer("words_recited").default(0),
+  correctWords: integer("correct_words").default(0),
+  duration: integer("duration"), // in seconds
+  completedAt: timestamp("completed_at").default(sql`now()`),
+});
+
+export const insertRecitationSessionSchema = createInsertSchema(recitationSessions).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type RecitationSession = typeof recitationSessions.$inferSelect;
+export type InsertRecitationSession = z.infer<typeof insertRecitationSessionSchema>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
