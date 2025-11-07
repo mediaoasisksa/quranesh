@@ -43,6 +43,7 @@ export default function Exercise() {
   const [isValidating, setIsValidating] = useState(false);
   const [suggestedAnswer, setSuggestedAnswer] = useState<string | null>(null);
   const [showSuggested, setShowSuggested] = useState(false);
+  const [connectionExplanation, setConnectionExplanation] = useState<string | null>(null);
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
@@ -193,6 +194,7 @@ export default function Exercise() {
           phraseId: exerciseType === "thematic" ? null : (exerciseType === "transformation" ? philosophicalSentence?.id : (phraseId || phrase?.id)),
           questionBankId: questionBank?.id,
           philosophicalSentenceId: exerciseType === "transformation" ? philosophicalSentence?.id : undefined,
+          language: language, // Pass user's language for connection explanation
         }),
       });
 
@@ -216,6 +218,13 @@ export default function Exercise() {
         setTimeout(() => {
           setShowSuggested(false);
         }, 5000);
+      }
+
+      // Handle connection explanation for transformation exercises (when answer is correct)
+      if (result.isCorrect && result.connectionExplanation && isTransformationExercise) {
+        setConnectionExplanation(result.connectionExplanation);
+      } else {
+        setConnectionExplanation(null);
       }
 
       // Show appropriate toast based on result
@@ -294,6 +303,7 @@ export default function Exercise() {
     setFeedback("");
     setSuggestedAnswer(null);
     setShowSuggested(false);
+    setConnectionExplanation(null);
   };
 
   const goToNextExercise = async () => {
@@ -759,6 +769,25 @@ export default function Exercise() {
                   data-testid="text-suggested-answer"
                 >
                   {suggestedAnswer}
+                </p>
+              </div>
+            )}
+
+            {/* Logical Connection Explanation - Shows when answer is correct and explanation is available */}
+            {isCorrect && connectionExplanation && isTransformationExercise && (
+              <div 
+                className="mt-4 p-4 rounded-lg border bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 animate-in fade-in duration-300"
+                data-testid="card-connection-explanation"
+              >
+                <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200 mb-2">
+                  {t('logicalConnection')}
+                </p>
+                <p 
+                  className="text-base text-emerald-900 dark:text-emerald-100 leading-relaxed" 
+                  dir={dir}
+                  data-testid="text-connection-explanation"
+                >
+                  {connectionExplanation}
                 </p>
               </div>
             )}
