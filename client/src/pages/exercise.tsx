@@ -22,6 +22,28 @@ import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
+function getLocalizedQuestion(
+  conversationPrompt: any,
+  lang: string
+): string {
+  if (!conversationPrompt) return "...";
+  
+  const langMap: Record<string, string> = {
+    en: conversationPrompt.questionEn || conversationPrompt.question,
+    id: conversationPrompt.questionId || conversationPrompt.question,
+    tr: conversationPrompt.questionTr || conversationPrompt.question,
+    zh: conversationPrompt.questionZh || conversationPrompt.question,
+    sw: conversationPrompt.questionSw || conversationPrompt.question,
+    so: conversationPrompt.questionSo || conversationPrompt.question,
+    bs: conversationPrompt.questionBs || conversationPrompt.question,
+    sq: conversationPrompt.questionSq || conversationPrompt.question,
+    ru: conversationPrompt.questionRu || conversationPrompt.question,
+    ar: conversationPrompt.question,
+  };
+  
+  return langMap[lang] || conversationPrompt.question;
+}
+
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
   const [, setLocation] = useLocation();
@@ -95,6 +117,15 @@ export default function Exercise() {
   const { data: conversationPrompt, isLoading: conversationLoading } = useQuery<{
     id: string;
     question: string;
+    questionEn: string | null;
+    questionId: string | null;
+    questionTr: string | null;
+    questionZh: string | null;
+    questionSw: string | null;
+    questionSo: string | null;
+    questionBs: string | null;
+    questionSq: string | null;
+    questionRu: string | null;
     suggestedVerse: string;
     category: string | null;
     symbolicMeaning?: string | null;
@@ -491,11 +522,11 @@ export default function Exercise() {
                 {t('conversationPromptLabel') || "في هذا الموقف:"}
               </p>
               <p
-                className="arabic-text text-xl text-foreground mb-3"
-                lang="ar"
+                className={language === 'ar' ? "arabic-text text-xl text-foreground mb-3" : "text-xl text-foreground mb-3"}
+                lang={language}
                 data-testid="text-conversation-prompt"
               >
-                {conversationPrompt?.question || "..."}
+                {getLocalizedQuestion(conversationPrompt, language)}
               </p>
             </div>
             {conversationPrompt?.suggestedVerse && (
