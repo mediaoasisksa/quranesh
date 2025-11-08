@@ -147,6 +147,15 @@ export type InsertPhilosophicalSentence = z.infer<typeof insertPhilosophicalSent
 export const conversationPrompts = pgTable("conversation_prompts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   question: text("question").notNull(),
+  questionEn: text("question_en"),
+  questionId: text("question_id"),
+  questionTr: text("question_tr"),
+  questionZh: text("question_zh"),
+  questionSw: text("question_sw"),
+  questionSo: text("question_so"),
+  questionBs: text("question_bs"),
+  questionSq: text("question_sq"),
+  questionRu: text("question_ru"),
   suggestedVerse: text("suggested_verse").notNull(),
   category: text("category"),
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
