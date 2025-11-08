@@ -12,6 +12,9 @@ export const phrases = pgTable("phrases", {
   category: text("category").notNull(), // short, long, commands, proverbs
   difficulty: integer("difficulty").default(1), // 1-5 scale
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation of the phrase
+  isPracticalDailyUse: integer("is_practical_daily_use").default(0), // 1 = practical for daily conversation, 0 = narrative/story context
+  usageDomain: text("usage_domain"), // e.g., "greeting", "time", "request", "gratitude", "apology", "narrative"
+  register: text("register"), // "conversational", "formal", "literary", "poetic"
 });
 
 export const userProgress = pgTable("user_progress", {
@@ -147,6 +150,8 @@ export const conversationPrompts = pgTable("conversation_prompts", {
   suggestedVerse: text("suggested_verse").notNull(),
   category: text("category"),
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
+  isPracticalDailyUse: integer("is_practical_daily_use").default(1), // 1 = practical conversation, 0 = story/narrative context
+  usageDomain: text("usage_domain"), // e.g., "greeting", "time", "request", "offer", "invitation"
 });
 
 export const insertConversationPromptSchema = createInsertSchema(conversationPrompts).omit({

@@ -471,7 +471,7 @@ export class DatabaseStorage implements IStorage {
 
     const completedIds = completedPromptIds.map((session) => session.phraseId);
 
-    // Get all prompts except completed ones
+    // Get all prompts except completed ones, PRIORITIZING practical daily use prompts
     const availablePrompts = completedIds.length > 0
       ? await db
           .select()
@@ -480,7 +480,14 @@ export class DatabaseStorage implements IStorage {
       : await db.select().from(conversationPrompts);
 
     if (availablePrompts.length === 0) return undefined;
-    return availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+
+    // Filter for practical daily use prompts first
+    const practicalPrompts = availablePrompts.filter(p => p.isPracticalDailyUse === 1);
+    
+    // Prefer practical prompts, but fall back to all if none available
+    const promptsToChooseFrom = practicalPrompts.length > 0 ? practicalPrompts : availablePrompts;
+    
+    return promptsToChooseFrom[Math.floor(Math.random() * promptsToChooseFrom.length)];
   }
 
   // Daily contextual exercise methods

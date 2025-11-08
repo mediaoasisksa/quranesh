@@ -132,12 +132,32 @@ function createValidationPrompt(
       - Example: If given "والله غفور رحيم" and asked to replace "رحيم", a good answer would be "والله غفور عزيز"`;
       break;
     case "conversation":
-      specificInstructions = `This is a CONVERSATION exercise. The student must translate an English phrase into Arabic.
-              - The answer should be a complete Arabic translation of the given English phrase
-              - Should include all key concepts from the English text
-              - Should use appropriate Arabic vocabulary and grammar
-              - Should be a natural, complete sentence in Arabic
-              - Example: If asked to translate "God is watching everything you do", a good answer would include الله (God), يرى/يشاهد (watching), كل (everything), and تفعل (do)`;
+      specificInstructions = `This is a CONVERSATION exercise. The student must provide SHORT, PRACTICAL Quranic expressions (2-6 words) that are SUITABLE FOR DAILY CONVERSATION.
+
+CRITICAL REQUIREMENTS:
+1. **PRACTICAL DAILY USE**: The answer MUST be a short Quranic expression that can be used naturally in daily conversation
+2. **CONTEXT APPROPRIATENESS**: The expression must FIT the conversational context, not just reference it
+3. **LENGTH**: 2-6 words maximum - short, practical expressions
+4. **NO STORY REFERENCES**: Reject answers that reference Quranic stories or narrative contexts
+
+EXAMPLES OF WHAT TO REJECT:
+❌ "الساعة آتية" - This refers to the Day of Judgment, NOT suitable for asking about an appointment time
+❌ "ذٰلِكَ مَا كُنَّا نَبْغِ" - This is from the story of Moses and Khidr, NOT for making appointments
+❌ "وَأَلْفَيَا سَيِّدَهَا لَدَى ٱلْبَابِ" - This is from the story of Yusuf, NOT for asking someone to open the door
+
+EXAMPLES OF WHAT TO ACCEPT:
+✅ "إن شاء الله" - Practical, short, used daily for future events
+✅ "جزاك الله خيراً" - Practical, short, used daily for thanks
+✅ "بارك الله فيك" - Practical, short, used daily for blessings
+✅ "على بركة الله" - Practical, short, used daily when starting something
+
+EVALUATION CRITERIA:
+- Can this expression be used naturally in daily conversation? (YES/NO)
+- Is it short and practical (2-6 words)? (YES/NO)
+- Does it FIT the conversational context? (YES/NO)
+- Is it free from story/narrative references? (YES/NO)
+
+If ANY criterion is NO, mark the answer as INCORRECT and suggest a practical alternative.`;
       break;
     case "completion":
       specificInstructions = `This is a COMPLETION exercise. The student must complete a Quranic verse or phrase.
