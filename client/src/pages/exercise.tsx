@@ -498,6 +498,20 @@ export default function Exercise() {
                 {conversationPrompt?.question || "..."}
               </p>
             </div>
+            {conversationPrompt?.suggestedVerse && (
+              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30">
+                <p className="text-sm font-medium text-primary mb-2">
+                  {t('suggestedVerse') || "العبارة القرآنية المقترحة:"}
+                </p>
+                <p 
+                  className="arabic-text text-lg text-foreground" 
+                  lang="ar"
+                  data-testid="text-conversation-verse"
+                >
+                  {conversationPrompt.suggestedVerse}
+                </p>
+              </div>
+            )}
             <p className="text-foreground">
               {t('conversationInstruction') || "اكتب كلمة أو مفردة أو جملة استخدمها القرآن:"}
             </p>
@@ -509,16 +523,6 @@ export default function Exercise() {
               disabled={isAnswered}
               data-testid="textarea-conversation-answer"
             />
-            {isAnswered && conversationPrompt?.suggestedVerse && (
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-                <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">
-                  {t('suggestedVerse') || "آية مقترحة:"}
-                </p>
-                <p className="arabic-text text-lg text-green-900 dark:text-green-100" lang="ar">
-                  {conversationPrompt.suggestedVerse}
-                </p>
-              </div>
-            )}
           </div>
         );
 
