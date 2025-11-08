@@ -4,6 +4,33 @@ This AI-powered Arabic language learning application is designed to assist Engli
 
 The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian, and Russian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
 
+## Recent Major Updates (November 8, 2025)
+
+### Practical Expression Classification System
+Implemented a comprehensive classification system to ensure conversation exercises use contextually appropriate, practical Quranic expressions for daily use:
+
+- **Database Schema Enhancement**: Added three new classification fields to `phrases` and `conversation_prompts` tables:
+  - `isPracticalDailyUse`: Binary flag (1 = practical for daily conversation, 0 = narrative/story context)
+  - `usageDomain`: Categories like "greeting", "time", "request", "gratitude", "blessing", "apology"
+  - `register`: Linguistic register ("conversational", "formal", "literary", "poetic")
+
+- **Smart Selection System**: Updated random prompt selection to prioritize short (2-6 words), practical expressions over long narrative verses. Filtered out 14 long expressions (>6 words) from active selection pool, maintaining 158 short practical expressions.
+
+- **Enhanced AI Validation**: Improved Gemini AI validation with strict contextual appropriateness criteria:
+  - Rejects story-based or eschatological verses (e.g., "الساعة آتية" for appointments)
+  - Validates conversational suitability and natural daily usage
+  - Provides detailed feedback on why expressions don't fit specific contexts
+  - Enforces 2-6 word length limit for conversation exercises
+
+- **Curated Seed Data**: Created 10 practical conversation prompts and 5 essential phrases:
+  - "إن شاء الله" (If Allah wills) - future plans
+  - "جزاك الله خيراً" (May Allah reward you) - gratitude
+  - "بارك الله فيك" (May Allah bless you) - blessing
+  - "الحمد لله" (Praise be to Allah) - responding to good news
+  - "ما شاء الله" (What Allah has willed) - admiration
+
+- **UI Improvement**: Fixed conversation exercise display to show suggested verse immediately (before answering) instead of after validation.
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
