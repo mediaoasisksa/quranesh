@@ -83,7 +83,7 @@ async function translateAllQuestions() {
           continue;
         }
         let retries = 0;
-        const maxRetries = 3;
+        const maxRetries = 5;
         
         while (retries <= maxRetries) {
           try {
@@ -92,22 +92,21 @@ async function translateAllQuestions() {
             translations[`question_${langCode}`] = translation;
             console.log(`    ✓ ${langName}: ${translation}`);
             
-            await new Promise(resolve => setTimeout(resolve, 4000));
+            await new Promise(resolve => setTimeout(resolve, 6000));
             break;
           } catch (error: any) {
             if (error.response && error.response.status === 429 && retries < maxRetries) {
               retries++;
-              const waitTime = 15000 * retries;
+              const waitTime = 20000 * retries;
               console.log(`    ⏸️  Rate limit (attempt ${retries}/${maxRetries}), waiting ${waitTime/1000}s...`);
               await new Promise(resolve => setTimeout(resolve, waitTime));
             } else if (retries < maxRetries) {
               retries++;
-              console.log(`    ⚠️  Error (attempt ${retries}/${maxRetries}), retrying...`);
-              await new Promise(resolve => setTimeout(resolve, 5000));
+              console.log(`    ⚠️  Error (attempt ${retries}/${maxRetries}): ${error.message || 'Unknown error'}, retrying...`);
+              await new Promise(resolve => setTimeout(resolve, 8000));
             } else {
-              console.error(`    ✗ Failed to translate to ${langName} after ${maxRetries} retries`);
-              errorCount++;
-              break;
+              console.error(`    ✗ Failed to translate to ${langName} after ${maxRetries} retries:`, error.message || error);
+              throw error;
             }
           }
         }
