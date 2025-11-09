@@ -50,43 +50,65 @@ Translation:`;
 async function translateAllQuestions() {
   console.log("🌍 Starting translation of conversation prompts...\n");
 
-  const allPrompts = await db.select().from(conversationPrompts).limit(10);
-  console.log(`📊 Found ${allPrompts.length} prompts to translate (TESTING WITH FIRST 10)\n`);
+  const allPrompts = await db.select().from(conversationPrompts);
+  console.log(`📊 Found ${allPrompts.length} prompts to translate\n`);
 
   let successCount = 0;
   let errorCount = 0;
 
   for (let i = 0; i < allPrompts.length; i++) {
     const prompt = allPrompts[i];
+    
+    const hasAllTranslations = 
+      prompt.questionEn && prompt.questionId && prompt.questionTr && 
+      prompt.questionZh && prompt.questionSw && prompt.questionSo && 
+      prompt.questionBs && prompt.questionSq && prompt.questionRu;
+    
+    if (hasAllTranslations) {
+      console.log(`\n[${i + 1}/${allPrompts.length}] ✅ Already translated: ${prompt.question}`);
+      successCount++;
+      continue;
+    }
+    
     console.log(`\n[${i + 1}/${allPrompts.length}] Processing: ${prompt.question}`);
 
     try {
       const translations: Record<string, string> = {};
 
       for (const [langCode, langName] of Object.entries(LANGUAGES)) {
-        try {
-          console.log(`  ↳ Translating to ${langName}...`);
-          const translation = await translateQuestion(prompt.question, langCode);
-          translations[`question_${langCode}`] = translation;
-          console.log(`    ✓ ${langName}: ${translation}`);
-          
-          await new Promise(resolve => setTimeout(resolve, 3000));
-        } catch (error: any) {
-          console.error(`    ✗ Failed to translate to ${langName}:`, error);
-          
-          if (error.response && error.response.status === 429) {
-            console.log(`    ⏸️  Rate limit hit, waiting 10 seconds...`);
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            try {
-              const retryTranslation = await translateQuestion(prompt.question, langCode);
-              translations[`question_${langCode}`] = retryTranslation;
-              console.log(`    ✓ Retry successful for ${langName}: ${retryTranslation}`);
-            } catch (retryError) {
-              console.error(`    ✗ Retry failed for ${langName}`);
+        const existingField = `question${langCode.charAt(0).toUpperCase() + langCode.slice(1)}` as keyof typeof prompt;
+        if (prompt[existingField]) {
+          console.log(`  ↳ ${langName}: Already exists ✓`);
+          translations[`question_${langCode}`] = prompt[existingField] as string;
+          continue;
+        }
+        let retries = 0;
+        const maxRetries = 3;
+        
+        while (retries <= maxRetries) {
+          try {
+            console.log(`  ↳ Translating to ${langName}...`);
+            const translation = await translateQuestion(prompt.question, langCode);
+            translations[`question_${langCode}`] = translation;
+            console.log(`    ✓ ${langName}: ${translation}`);
+            
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            break;
+          } catch (error: any) {
+            if (error.response && error.response.status === 429 && retries < maxRetries) {
+              retries++;
+              const waitTime = 15000 * retries;
+              console.log(`    ⏸️  Rate limit (attempt ${retries}/${maxRetries}), waiting ${waitTime/1000}s...`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+            } else if (retries < maxRetries) {
+              retries++;
+              console.log(`    ⚠️  Error (attempt ${retries}/${maxRetries}), retrying...`);
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            } else {
+              console.error(`    ✗ Failed to translate to ${langName} after ${maxRetries} retries`);
               errorCount++;
+              break;
             }
-          } else {
-            errorCount++;
           }
         }
       }
