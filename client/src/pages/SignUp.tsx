@@ -118,7 +118,7 @@ const SignUp = () => {
             <img 
               src={logoImage} 
               alt="Quranesh Logo" 
-              className="h-20 w-auto object-contain hover:opacity-90 transition-opacity"
+              className="h-24 w-auto object-contain hover:opacity-90 transition-opacity"
             />
           </Link>
         </div>

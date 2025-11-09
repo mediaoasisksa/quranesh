@@ -92,7 +92,7 @@ export default function TranslationManager() {
               <img 
                 src={logoImage} 
                 alt="Quranesh Logo" 
-                className="h-12 cursor-pointer hover:opacity-80 transition-opacity"
+                className="h-20 cursor-pointer hover:opacity-80 transition-opacity"
                 data-testid="img-logo"
               />
             </Link>

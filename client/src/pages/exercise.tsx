@@ -866,7 +866,7 @@ export default function Exercise() {
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-24">
             <Button
               variant="ghost"
               onClick={() => setLocation("/dashboard")}
@@ -890,7 +890,7 @@ export default function Exercise() {
               <img 
                 src={logoImage} 
                 alt="Quranesh Logo" 
-                className="h-14 w-auto object-contain"
+                className="h-20 w-auto object-contain"
                 data-testid="img-logo"
               />
             </div>

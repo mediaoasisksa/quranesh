@@ -6,6 +6,23 @@ The application features comprehensive content with thousands of Quranic phrases
 
 ## Recent Major Updates (November 8-9, 2025)
 
+### Logo Size Enhancement (November 9, 2025)
+Increased logo size across all pages for better brand visibility:
+
+- **Size Hierarchy**: Implemented consistent logo sizing:
+  - Public pages (Header, SignIn, SignUp): h-24 (96px) - increased from h-16/h-20
+  - Internal pages (Dashboard, Exercise, Profile, Translation Manager): h-20 (80px) - increased from h-10/h-12/h-14
+  
+- **Container Adjustments**: Updated header containers to accommodate larger logos:
+  - Dashboard header: h-24 (from h-16)
+  - Exercise header: h-24 (from h-16)
+  - Main site header: py-5 (from py-4)
+
+- **Testing**: End-to-end tests confirmed:
+  - No layout regressions or overflow issues
+  - Logo displays correctly across all pages
+  - Consistent visual hierarchy maintained
+
 ### Multilingual Conversation Prompts (November 9, 2025)
 Implemented translation system for conversation prompts to display in user's selected UI language:
 
