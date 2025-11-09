@@ -27,8 +27,13 @@ Implemented translation system for conversation prompts to display in user's sel
   - Remaining 168 prompts pending due to API rate limits
   - Script available for continued batch translation: `tsx server/translate-conversation-prompts.ts`
 
-- **Known Issue**: Backend randomly selects from all 172 prompts, often showing untranslated (Arabic-only) questions
-  - Solution pending: Filter selection by available translations or complete remaining translations
+- **Language Filtering System** (Implemented):
+  - Backend filters prompts by available translations for selected UI language
+  - Non-Arabic users see ONLY translated prompts (prevents Arabic-only fallback)
+  - Arabic users see all prompts (no filtering applied)
+  - Graceful fallback to all prompts if no translations exist for a language
+  - Query includes language parameter: `/api/conversation-prompts/random?userId=X&language=en`
+  - Testing confirmed: English users see only 4 translated prompts in rotation
 
 ### Practical Expression Classification System (November 8, 2025)
 Implemented a comprehensive classification system to ensure conversation exercises use contextually appropriate, practical Quranic expressions for daily use:
