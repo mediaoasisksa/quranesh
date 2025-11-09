@@ -459,12 +459,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Conversation prompt routes
   app.get("/api/conversation-prompts/random", async (req, res) => {
     try {
-      const { userId } = req.query;
+      const { userId, language } = req.query;
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({ message: "userId is required" });
       }
 
-      const prompt = await storage.getRandomConversationPrompt(userId);
+      const lang = typeof language === "string" ? language : "ar";
+      const prompt = await storage.getRandomConversationPrompt(userId, lang);
       if (!prompt) {
         return res.status(404).json({ message: "No conversation prompts available" });
       }

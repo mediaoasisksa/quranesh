@@ -457,7 +457,7 @@ export class DatabaseStorage implements IStorage {
     return prompt;
   }
 
-  async getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined> {
+  async getRandomConversationPrompt(userId: string, language: string = "ar"): Promise<ConversationPrompt | undefined> {
     // Get all conversation prompts that the user hasn't completed yet
     const completedPromptIds = await db
       .select({ phraseId: exerciseSessions.phraseId })
@@ -485,7 +485,30 @@ export class DatabaseStorage implements IStorage {
     const practicalPrompts = availablePrompts.filter(p => p.isPracticalDailyUse === 1);
     
     // Prefer practical prompts, but fall back to all if none available
-    const promptsToChooseFrom = practicalPrompts.length > 0 ? practicalPrompts : availablePrompts;
+    let promptsToChooseFrom = practicalPrompts.length > 0 ? practicalPrompts : availablePrompts;
+    
+    // Filter by language if not Arabic
+    if (language !== "ar") {
+      const langFieldMap: Record<string, keyof ConversationPrompt> = {
+        en: "questionEn",
+        id: "questionId",
+        tr: "questionTr",
+        zh: "questionZh",
+        sw: "questionSw",
+        so: "questionSo",
+        bs: "questionBs",
+        sq: "questionSq",
+        ru: "questionRu",
+      };
+      
+      const langField = langFieldMap[language];
+      if (langField) {
+        const translatedPrompts = promptsToChooseFrom.filter(p => p[langField] != null);
+        if (translatedPrompts.length > 0) {
+          promptsToChooseFrom = translatedPrompts;
+        }
+      }
+    }
     
     return promptsToChooseFrom[Math.floor(Math.random() * promptsToChooseFrom.length)];
   }

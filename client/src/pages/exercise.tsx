@@ -130,9 +130,9 @@ export default function Exercise() {
     category: string | null;
     symbolicMeaning?: string | null;
   }>({
-    queryKey: ["/api/conversation-prompts/random", userId],
+    queryKey: ["/api/conversation-prompts/random", userId, language],
     queryFn: async () => {
-      const response = await fetch(`/api/conversation-prompts/random?userId=${userId}`);
+      const response = await fetch(`/api/conversation-prompts/random?userId=${userId}&language=${language}`);
       if (!response.ok) throw new Error("Failed to fetch conversation prompt");
       return response.json();
     },
