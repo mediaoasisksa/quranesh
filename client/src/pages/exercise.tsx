@@ -407,7 +407,11 @@ export default function Exercise() {
         });
       } else if (currentExerciseType === "conversation") {
         await queryClient.invalidateQueries({
-          queryKey: ["/api/conversation-prompts/random", userId],
+          queryKey: ["/api/conversation-prompts/random", userId, language],
+        });
+      } else if (currentExerciseType === "daily_contextual") {
+        await queryClient.invalidateQueries({
+          queryKey: ["/api/daily-contextual/random", userId],
         });
       } else {
         await queryClient.invalidateQueries({

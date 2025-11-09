@@ -92,12 +92,12 @@ async function translateAllQuestions() {
             translations[`question_${langCode}`] = translation;
             console.log(`    ✓ ${langName}: ${translation}`);
             
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            await new Promise(resolve => setTimeout(resolve, 12000));
             break;
           } catch (error: any) {
             if (error.response && error.response.status === 429 && retries < maxRetries) {
               retries++;
-              const waitTime = 30000 * retries;
+              const waitTime = 60000 * Math.pow(2, retries - 1);
               console.log(`    ⏸️  Rate limit (attempt ${retries}/${maxRetries}), waiting ${waitTime/1000}s...`);
               await new Promise(resolve => setTimeout(resolve, waitTime));
             } else if (retries < maxRetries) {
