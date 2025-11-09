@@ -51,7 +51,7 @@ export default function Dashboard() {
   );
   const { isAuthenticated, user, signOut } = useAuth();
   const [, setLocation] = useLocation();
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const { toast } = useToast();
 
   // Use the actual user ID instead of hardcoded demo user
@@ -266,6 +266,39 @@ export default function Dashboard() {
                 />
               );
             })}
+            
+            {/* Real-Life Examples Card */}
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950"
+              onClick={() => setLocation("/real-life-examples")}
+              data-testid="card-real-life-examples"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-2 text-amber-900 dark:text-amber-100">
+                      {language === "ar" ? "أمثلة من الحياة" : "Real-Life Examples"}
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
+                      {language === "ar" 
+                        ? "أمثلة طريفة وذكية لاستخدام القرآن في الحياة اليومية"
+                        : "Humorous examples of using Quran verses in daily life"
+                      }
+                    </p>
+                  </div>
+                  <span className="text-4xl">😄</span>
+                </div>
+                <Button 
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocation("/real-life-examples");
+                  }}
+                >
+                  {language === "ar" ? "تصفح الأمثلة" : "Browse Examples"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
