@@ -4,9 +4,33 @@ This AI-powered Arabic language learning application is designed to assist Engli
 
 The application features comprehensive content with thousands of Quranic phrases, philosophical sentences, and conversation prompts. It supports multiple languages for the UI and content, including English, Bahasa Indonesia, Turkish, Arabic, Chinese, Swahili, Somali, Bosnian, Albanian, and Russian. Key capabilities include dynamic exercise generation, an adaptive learning system, and a robust progress tracking mechanism.
 
-## Recent Major Updates (November 8, 2025)
+## Recent Major Updates (November 8-9, 2025)
 
-### Practical Expression Classification System
+### Multilingual Conversation Prompts (November 9, 2025)
+Implemented translation system for conversation prompts to display in user's selected UI language:
+
+- **Database Schema**: Added 9 translation fields to `conversation_prompts` table:
+  - `question_en`, `question_id`, `question_tr`, `question_zh`, `question_sw`, `question_so`, `question_bs`, `question_sq`, `question_ru`
+  - Enables displaying questions in English, Indonesian, Turkish, Chinese, Swahili, Somali, Bosnian, Albanian, Russian
+
+- **Frontend Localization**: Enhanced exercise page with `getLocalizedQuestion()` helper:
+  - Displays question in user's UI language with fallback to Arabic if translation unavailable
+  - Supports all 10 languages with language-specific rendering
+
+- **Translation Automation**: Created `server/translate-conversation-prompts.ts` script:
+  - Batch translation using Gemini AI with retry logic and exponential backoff
+  - Skips already translated prompts to resume efficiently after interruptions
+  - 4-second delays between API calls to handle rate limits
+  - Validates translations differ from Arabic source
+
+- **Current Status**: 4 out of 172 prompts fully translated (all 9 languages)
+  - Remaining 168 prompts pending due to API rate limits
+  - Script available for continued batch translation: `tsx server/translate-conversation-prompts.ts`
+
+- **Known Issue**: Backend randomly selects from all 172 prompts, often showing untranslated (Arabic-only) questions
+  - Solution pending: Filter selection by available translations or complete remaining translations
+
+### Practical Expression Classification System (November 8, 2025)
 Implemented a comprehensive classification system to ensure conversation exercises use contextually appropriate, practical Quranic expressions for daily use:
 
 - **Database Schema Enhancement**: Added three new classification fields to `phrases` and `conversation_prompts` tables:
