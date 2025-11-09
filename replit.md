@@ -6,6 +6,43 @@ The application features comprehensive content with thousands of Quranic phrases
 
 ## Recent Major Updates (November 8-9, 2025)
 
+### Real-Life Quran Examples Feature (November 9, 2025)
+Implemented a new section showcasing humorous and clever uses of Quranic verses in everyday situations:
+
+- **Database Schema**: Created `real_life_examples` table with:
+  - Bilingual situation descriptions (Arabic/English)
+  - Quranic verse in Arabic with Surah reference
+  - Bilingual humor notes explaining why it's funny/clever
+  - Category classification (humor, wisdom, practical)
+  - JSONB translations field for future language expansion
+  
+- **Frontend Features**:
+  - Dedicated `/real-life-examples` page with search and category filtering
+  - Expandable cards displaying situation, verse, and humor explanation
+  - Copy-to-clipboard functionality for Quranic verses
+  - Amber/orange theme with emoji 😄 for playful branding
+  - RTL support for Arabic content
+  - Dashboard navigation card for easy access
+
+- **AI Content Generation**: Created `server/generate-real-life-examples.ts` script:
+  - Uses Gemini AI to generate contextually appropriate examples
+  - 5-second delays between API calls for rate limiting
+  - Validates uniqueness and appropriate humor level
+  - Target: 100 diverse examples covering daily life scenarios
+  
+- **Current Status**: 10 examples generated covering scenarios like:
+  - Family situations (children asking for food, checking homework)
+  - Social contexts (friends borrowing money, dealing with lateness)
+  - Work scenarios (meeting management, colleague requests)
+  - Educational settings (classroom situations)
+
+- **Testing**: End-to-end tests confirmed:
+  - Navigation from dashboard works correctly
+  - Search filtering functions properly
+  - Category filtering displays relevant examples
+  - Card expansion reveals full content
+  - Copy functionality triggers success toast notification
+
 ### Logo Size Enhancement (November 9, 2025)
 Increased logo size across all pages for better brand visibility:
 
