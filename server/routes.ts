@@ -8,6 +8,7 @@ import {
   insertDailyStatsSchema,
   insertQuestionBankSchema,
   insertPhilosophicalSentenceSchema,
+  insertRealLifeExampleSchema,
   insertUserSchema,
   signupSchema,
   signinSchema,
@@ -1264,6 +1265,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         suggestions: ["Check your Arabic spelling and grammar"],
         confidence: 0,
       });
+    }
+  });
+
+  // Real-life examples routes
+  app.get("/api/real-life-examples", async (_req, res) => {
+    try {
+      const examples = await storage.getAllRealLifeExamples();
+      res.json(examples);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch real-life examples" });
+    }
+  });
+
+  app.get("/api/real-life-examples/:id", async (req, res) => {
+    try {
+      const example = await storage.getRealLifeExample(req.params.id);
+      if (!example) {
+        return res.status(404).json({ message: "Example not found" });
+      }
+      res.json(example);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch example" });
+    }
+  });
+
+  app.get("/api/real-life-examples/category/:category", async (req, res) => {
+    try {
+      const examples = await storage.getRealLifeExamplesByCategory(req.params.category);
+      res.json(examples);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch examples by category" });
+    }
+  });
+
+  app.post("/api/real-life-examples", async (req, res) => {
+    try {
+      const validatedData = insertRealLifeExampleSchema.parse(req.body);
+      const newExample = await storage.createRealLifeExample(validatedData);
+      res.status(201).json(newExample);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Invalid example data" });
     }
   });
 

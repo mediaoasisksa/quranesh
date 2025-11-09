@@ -270,3 +270,30 @@ export type InsertRecitationSession = z.infer<typeof insertRecitationSessionSche
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Real-Life Quran Examples - Humorous/clever examples of using Quran in daily situations
+export const realLifeExamples = pgTable("real_life_examples", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  situationAr: text("situation_ar").notNull(), // Arabic description of the situation
+  situationEn: text("situation_en").notNull(), // English description
+  verseArabic: text("verse_arabic").notNull(), // The Quranic verse used
+  verseTranslation: text("verse_translation").notNull(), // English translation of the verse
+  surahReference: text("surah_reference").notNull(), // e.g., "الكهف:19" or "Al-Kahf:19"
+  humorNoteAr: text("humor_note_ar"), // Why this is funny/clever in Arabic
+  humorNoteEn: text("humor_note_en"), // Why this is funny/clever in English
+  translations: jsonb("translations").$type<{
+    situation?: Record<string, string>; // Situation in multiple languages
+    humorNote?: Record<string, string>; // Humor note in multiple languages
+  }>(),
+  category: text("category"), // e.g., "family", "work", "friends", "daily_life"
+  popularity: integer("popularity").default(0), // Like/view count
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertRealLifeExampleSchema = createInsertSchema(realLifeExamples).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type RealLifeExample = typeof realLifeExamples.$inferSelect;
+export type InsertRealLifeExample = z.infer<typeof insertRealLifeExampleSchema>;

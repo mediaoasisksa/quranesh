@@ -10,6 +10,7 @@ import {
   dailySentences,
   quranicExpressions,
   dailySentenceExercises,
+  realLifeExamples,
   type User,
   type InsertUser,
   type Phrase,
@@ -29,6 +30,8 @@ import {
   type DailySentence,
   type QuranicExpression,
   type DailySentenceExercise,
+  type RealLifeExample,
+  type InsertRealLifeExample,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, notInArray } from "drizzle-orm";
@@ -107,6 +110,12 @@ export interface IStorage {
   } | undefined>;
   getDailySentence(id: string): Promise<DailySentence | undefined>;
   getQuranicExpression(id: string): Promise<QuranicExpression | undefined>;
+
+  // Real-life example methods
+  getAllRealLifeExamples(): Promise<RealLifeExample[]>;
+  getRealLifeExample(id: string): Promise<RealLifeExample | undefined>;
+  createRealLifeExample(example: InsertRealLifeExample): Promise<RealLifeExample>;
+  getRealLifeExamplesByCategory(category: string): Promise<RealLifeExample[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -594,6 +603,35 @@ export class DatabaseStorage implements IStorage {
       .where(eq(quranicExpressions.id, id));
     return expression || undefined;
   }
+
+  // Real-life example methods
+  async getAllRealLifeExamples(): Promise<RealLifeExample[]> {
+    return await db.select().from(realLifeExamples).orderBy(desc(realLifeExamples.popularity));
+  }
+
+  async getRealLifeExample(id: string): Promise<RealLifeExample | undefined> {
+    const [example] = await db
+      .select()
+      .from(realLifeExamples)
+      .where(eq(realLifeExamples.id, id));
+    return example || undefined;
+  }
+
+  async createRealLifeExample(insertExample: InsertRealLifeExample): Promise<RealLifeExample> {
+    const [example] = await db
+      .insert(realLifeExamples)
+      .values(insertExample)
+      .returning();
+    return example;
+  }
+
+  async getRealLifeExamplesByCategory(category: string): Promise<RealLifeExample[]> {
+    return await db
+      .select()
+      .from(realLifeExamples)
+      .where(eq(realLifeExamples.category, category))
+      .orderBy(desc(realLifeExamples.popularity));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -926,6 +964,23 @@ export class MemStorage implements IStorage {
 
   async getQuranicExpression(_id: string): Promise<QuranicExpression | undefined> {
     return undefined;
+  }
+
+  // Real-life example methods (stub for MemStorage)
+  async getAllRealLifeExamples(): Promise<RealLifeExample[]> {
+    return [];
+  }
+
+  async getRealLifeExample(_id: string): Promise<RealLifeExample | undefined> {
+    return undefined;
+  }
+
+  async createRealLifeExample(_example: InsertRealLifeExample): Promise<RealLifeExample> {
+    throw new Error("MemStorage doesn't support real-life examples");
+  }
+
+  async getRealLifeExamplesByCategory(_category: string): Promise<RealLifeExample[]> {
+    return [];
   }
 }
 
