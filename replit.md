@@ -22,6 +22,8 @@ A PostgreSQL database, managed by Drizzle ORM, stores phrases, conversation prom
 ## Exercise System Architecture
 The system offers conversation practice, role-play, and grammar transformation exercises, dynamically generated based on user knowledge and difficulty. A non-repetition system prevents duplicate exercises while allowing repetition after all exercises are completed to ensure continuous practice availability. Gemini AI generates new Quranic phrases and exercises when needed and validates answers, accepting partial verses. Real-time feedback, long-term analytics, and adaptive learning are core components. The system prioritizes short, practical Quranic expressions for conversation exercises.
 
+Daily contextual exercises feature 4 multiple-choice options (1 correct Quranic expression + 3 thematically-varied distractors). Schema validation enforces exactly 3 distractors per exercise. The seed script programmatically selects the 3rd distractor from a pool of thematically-distinct expressions to maintain exercise quality and prevent theme overlap.
+
 ## Translation Management System
 An administrative `/translation-manager` interface allows bulk translation of philosophical sentences and conversation prompts into 9 languages using Gemini AI. It provides real-time statistics on translation coverage, supports single-sentence translation, and includes robust error handling with retry logic and validation.
 
