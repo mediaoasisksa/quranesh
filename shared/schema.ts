@@ -211,7 +211,7 @@ export const dailySentenceExercises = pgTable("daily_sentence_exercises", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   dailySentenceId: text("daily_sentence_id").notNull(),
   correctExpressionId: text("correct_expression_id").notNull(),
-  distractorIds: jsonb("distractor_ids").$type<string[]>().notNull(), // 2 distractors
+  distractorIds: jsonb("distractor_ids").$type<string[]>().notNull(), // 3 distractors
   explanation: jsonb("explanation").$type<Record<string, string>>(), // Explanation in multiple languages
   learningNote: jsonb("learning_note").$type<Record<string, string>>(), // Detailed linguistic notes
   createdAt: timestamp("created_at").default(sql`now()`),
@@ -220,6 +220,8 @@ export const dailySentenceExercises = pgTable("daily_sentence_exercises", {
 export const insertDailySentenceExerciseSchema = createInsertSchema(dailySentenceExercises).omit({
   id: true,
   createdAt: true,
+}).extend({
+  distractorIds: z.array(z.string()).length(3, "Must have exactly 3 distractors")
 });
 
 export type DailySentenceExercise = typeof dailySentenceExercises.$inferSelect;
