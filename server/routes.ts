@@ -499,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No daily contextual exercises available" });
       }
 
-      // Shuffle options (correct + 2 distractors)
+      // Shuffle options (correct + 3 distractors = 4 total options)
       const options = [
         exerciseData.correctExpression,
         ...exerciseData.distractors
@@ -507,7 +507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         ...exerciseData,
-        options, // Shuffled array of 3 expressions
+        options, // Shuffled array of 4 expressions
       });
     } catch (error) {
       console.error("Error fetching daily contextual exercise:", error);
