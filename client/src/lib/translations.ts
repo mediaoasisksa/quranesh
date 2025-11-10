@@ -192,6 +192,9 @@ export const translations = {
     aiPoweredTutor: "AI-Powered Arabic Tutor",
     readyToPractice: "Ready to practice",
     todaysPerformance: "Today's performance",
+    realLifeExamplesTitle: "Quranic Expressions in Daily Life",
+    realLifeExamplesDesc: "Practical examples of using Quranic verses and phrases in everyday situations",
+    browseExamples: "Browse Examples",
     
     // Payment
     selectPaymentMethod: "Select Payment Method",
@@ -456,6 +459,9 @@ export const translations = {
     aiPoweredTutor: "مدرس العربية المدعوم بالذكاء الاصطناعي",
     readyToPractice: "جاهز للتمرين",
     todaysPerformance: "أداء اليوم",
+    realLifeExamplesTitle: "استخدامات قرآنية في الحياة",
+    realLifeExamplesDesc: "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية",
+    browseExamples: "تصفح الأمثلة",
     
     // Payment
     selectPaymentMethod: "اختر طريقة الدفع",
@@ -720,6 +726,9 @@ export const translations = {
     aiPoweredTutor: "Tutor Arab Bertenaga AI",
     readyToPractice: "Siap untuk berlatih",
     todaysPerformance: "Kinerja hari ini",
+    realLifeExamplesTitle: "Ungkapan-Ungkapan Qur'an dalam Kehidupan Sehari-hari",
+    realLifeExamplesDesc: "Contoh praktis penggunaan ayat dan frasa Qur'an dalam situasi sehari-hari",
+    browseExamples: "Jelajahi Contoh",
     
     // Payment
     selectPaymentMethod: "Pilih Metode Pembayaran",
@@ -984,6 +993,9 @@ export const translations = {
     aiPoweredTutor: "Yapay Zeka Destekli Arapça Öğretmen",
     readyToPractice: "Pratik yapmaya hazır",
     todaysPerformance: "Bugünün performansı",
+    realLifeExamplesTitle: "Günlük Hayatta Kur'an İfadeleri",
+    realLifeExamplesDesc: "Günlük durumlarda Kur'an ayetleri ve ifadelerini kullanmanın pratik örnekleri",
+    browseExamples: "Örnekleri İncele",
     
     // Payment
     selectPaymentMethod: "Ödeme Yöntemini Seçin",
@@ -1248,6 +1260,9 @@ export const translations = {
     aiPoweredTutor: "AI 驱动的阿拉伯语导师",
     readyToPractice: "准备练习",
     todaysPerformance: "今日表现",
+    realLifeExamplesTitle: "日常生活中的古兰经表达",
+    realLifeExamplesDesc: "在日常情况下使用古兰经经文和短语的实际例子",
+    browseExamples: "浏览示例",
     
     // Payment
     selectPaymentMethod: "选择支付方式",
@@ -1511,6 +1526,9 @@ export const translations = {
     aiPoweredTutor: "Mwalimu wa Kiarabu wa AI",
     readyToPractice: "Tayari kufanya mazoezi",
     todaysPerformance: "Utendaji wa leo",
+    realLifeExamplesTitle: "Maneno ya Qur'an katika Maisha ya Kila Siku",
+    realLifeExamplesDesc: "Mifano ya vitendo ya kutumia aya na maneno ya Qur'an katika hali za kila siku",
+    browseExamples: "Angalia Mifano",
     or: "au",
     
     // Payment
@@ -1775,6 +1793,9 @@ export const translations = {
     aiPoweredTutor: "Macalinka Carabiga ee AI",
     readyToPractice: "Diyaar u ah ku celcelinta",
     todaysPerformance: "Waxqabadka maanta",
+    realLifeExamplesTitle: "Tibaaxaha Quraanka Nolosha Maalinlaha",
+    realLifeExamplesDesc: "Tusaalooyin ku saabsan sida loo isticmaalo aayado iyo weedhaha Quraanka xaalado maalinle",
+    browseExamples: "Fiiri Tusaalaha",
     or: "ama",
     
     // Payment
@@ -2040,6 +2061,9 @@ export const translations = {
     aiPoweredTutor: "AI-podržani tutor arapskog jezika",
     readyToPractice: "Spreman za vježbanje",
     todaysPerformance: "Današnja izvedba",
+    realLifeExamplesTitle: "Kuranski Izrazi u Svakodnevnom Životu",
+    realLifeExamplesDesc: "Praktični primjeri korištenja kur'anskih ajeta i fraza u svakodnevnim situacijama",
+    browseExamples: "Pregledaj Primjere",
     
     // Payment
     selectPaymentMethod: "Odaberi način plaćanja",
@@ -2304,6 +2328,9 @@ export const translations = {
     aiPoweredTutor: "Mësues i Arabishtes i Mundësuar nga AI",
     readyToPractice: "Gati për të praktikuar",
     todaysPerformance: "Performanca e sotme",
+    realLifeExamplesTitle: "Shprehje Kuranore në Jetën e Përditshme",
+    realLifeExamplesDesc: "Shembuj praktikë të përdorimit të ajeteve dhe frazave kuranore në situata të përditshme",
+    browseExamples: "Shfletoni Shembujt",
     
     // Payment
     selectPaymentMethod: "Zgjidhni Metodën e Pagesës",
@@ -2568,6 +2595,9 @@ export const translations = {
     aiPoweredTutor: "ИИ-репетитор",
     readyToPractice: "Готов к практике",
     todaysPerformance: "Сегодняшняя производительность",
+    realLifeExamplesTitle: "Коранические Выражения в Повседневной Жизни",
+    realLifeExamplesDesc: "Практические примеры использования коранических аятов и фраз в повседневных ситуациях",
+    browseExamples: "Просмотреть Примеры",
     
     // Profile
     profile: "Профиль",
