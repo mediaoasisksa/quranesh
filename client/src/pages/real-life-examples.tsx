@@ -36,6 +36,32 @@ export default function RealLifeExamplesPage() {
     return matchesSearch && matchesCategory;
   });
 
+  const getLocalizedSituation = (example: RealLifeExample): string => {
+    if (language === "ar") return example.situationAr;
+    if (language === "en") return example.situationEn;
+    
+    // Try to get translation from JSONB field
+    if (example.translations?.situation?.[language]) {
+      return example.translations.situation[language];
+    }
+    
+    // Fallback to English
+    return example.situationEn;
+  };
+
+  const getLocalizedUsageNote = (example: RealLifeExample): string => {
+    if (language === "ar") return example.usageNoteAr || "";
+    if (language === "en") return example.usageNoteEn || "";
+    
+    // Try to get translation from JSONB field
+    if (example.translations?.usageNote?.[language]) {
+      return example.translations.usageNote[language];
+    }
+    
+    // Fallback to English
+    return example.usageNoteEn || "";
+  };
+
   const copyVerse = (verse: string, id: string) => {
     navigator.clipboard.writeText(verse);
     setCopiedId(id);
@@ -153,7 +179,7 @@ export default function RealLifeExamplesPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-lg">
-                      {language === "ar" ? example.situationAr : example.situationEn}
+                      {getLocalizedSituation(example)}
                     </CardTitle>
                     {example.category && (
                       <Badge variant="secondary" className="shrink-0">
@@ -199,11 +225,11 @@ export default function RealLifeExamplesPage() {
                   </div>
 
                   {/* Usage Note */}
-                  {(example.usageNoteAr || example.usageNoteEn) && (
+                  {(example.usageNoteAr || example.usageNoteEn || getLocalizedUsageNote(example)) && (
                     <div className="flex items-start gap-2">
                       <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                       <p className="text-sm text-muted-foreground">
-                        {language === "ar" ? example.usageNoteAr : example.usageNoteEn}
+                        {getLocalizedUsageNote(example)}
                       </p>
                     </div>
                   )}
