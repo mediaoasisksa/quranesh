@@ -31,11 +31,12 @@ Implemented a respectful section showcasing practical uses of Quranic verses and
   - Generates respectful, everyday usage scenarios
   - Validates uniqueness and appropriateness
   
-- **Current Examples** (4 total after cleanup):
+- **Current Examples** (5 total after cleanup):
   - Mother praying wants son to go to door: "فَأَلْفَيَا سَيِّدَهَا لَدَى الْبَابِ" (يوسف:25)
   - Mother praying reminds son of appointment: "اقْتَرَبَتِ السَّاعَةُ" (القمر:1)
-  - Friend calling late at night
-  - Friend calls about lost keys
+  - Friend asking when to meet: "وَالصُّبْحِ إِذَا تَنَفَّسَ" (التكوير:18)
+  - Wife complaining about life: "اذْكُرُوا نِعْمَتَ اللَّهِ عَلَيْكُمْ" (آل عمران:103)
+  - Friend calls late at night about keys: "وَجَعَلْنَا اللَّيْلَ لِبَاسًا" (النبأ:10)
 
 - **Respectful Refactoring** (November 10, 2025):
   - Removed all humor-related terminology and emoji 😄
