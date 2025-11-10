@@ -21,6 +21,7 @@ import {
   LogOut,
   Settings,
   Languages,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
@@ -267,29 +268,29 @@ export default function Dashboard() {
               );
             })}
             
-            {/* Real-Life Examples Card */}
+            {/* Quranic Expressions in Daily Life Card */}
             <Card 
-              className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950"
+              className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-primary/20 dark:border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20"
               onClick={() => setLocation("/real-life-examples")}
               data-testid="card-real-life-examples"
             >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2 text-amber-900 dark:text-amber-100">
-                      {language === "ar" ? "أمثلة من الحياة" : "Real-Life Examples"}
+                    <h3 className="text-xl font-bold mb-2 text-foreground">
+                      {language === "ar" ? "استخدامات قرآنية في الحياة" : "Quranic Expressions in Daily Life"}
                     </h3>
-                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
                       {language === "ar" 
-                        ? "أمثلة طريفة وذكية لاستخدام القرآن في الحياة اليومية"
-                        : "Humorous examples of using Quran verses in daily life"
+                        ? "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية"
+                        : "Practical examples of using Quranic verses and phrases in everyday situations"
                       }
                     </p>
                   </div>
-                  <span className="text-4xl">😄</span>
+                  <BookOpen className="h-10 w-10 text-primary shrink-0" />
                 </div>
                 <Button 
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={(e) => {
                     e.stopPropagation();
                     setLocation("/real-life-examples");

@@ -6,42 +6,51 @@ The application features comprehensive content with thousands of Quranic phrases
 
 ## Recent Major Updates (November 8-9, 2025)
 
-### Real-Life Quran Examples Feature (November 9, 2025)
-Implemented a new section showcasing humorous and clever uses of Quranic verses in everyday situations:
+### Quranic Expressions in Daily Life Feature (November 9-10, 2025)
+Implemented a respectful section showcasing practical uses of Quranic verses and phrases in everyday situations:
 
 - **Database Schema**: Created `real_life_examples` table with:
   - Bilingual situation descriptions (Arabic/English)
   - Quranic verse in Arabic with Surah reference
-  - Bilingual humor notes explaining why it's funny/clever
-  - Category classification (humor, wisdom, practical)
+  - Bilingual usage notes explaining how the verse is applied (`usage_note_ar/en`)
+  - Category classification (family, work, friends, practical)
   - JSONB translations field for future language expansion
   
 - **Frontend Features**:
-  - Dedicated `/real-life-examples` page with search and category filtering
-  - Expandable cards displaying situation, verse, and humor explanation
+  - Dedicated `/real-life-examples` page titled "Quranic Expressions in Daily Life"
+  - Search and category filtering functionality
+  - BookOpen icon throughout (professional, respectful design)
+  - Primary color theme (removed amber/orange)
   - Copy-to-clipboard functionality for Quranic verses
-  - Amber/orange theme with emoji 😄 for playful branding
   - RTL support for Arabic content
-  - Dashboard navigation card for easy access
+  - Dashboard navigation card with respectful branding
 
 - **AI Content Generation**: Created `server/generate-real-life-examples.ts` script:
-  - Uses Gemini AI to generate contextually appropriate examples
+  - Uses Gemini AI to generate contextually appropriate, practical examples
   - 5-second delays between API calls for rate limiting
-  - Validates uniqueness and appropriate humor level
-  - Target: 100 diverse examples covering daily life scenarios
+  - Generates respectful, everyday usage scenarios
+  - Validates uniqueness and appropriateness
   
-- **Current Status**: 10 examples generated covering scenarios like:
-  - Family situations (children asking for food, checking homework)
-  - Social contexts (friends borrowing money, dealing with lateness)
-  - Work scenarios (meeting management, colleague requests)
-  - Educational settings (classroom situations)
+- **Current Examples** (4 total after cleanup):
+  - Mother praying wants son to go to door: "فَأَلْفَيَا سَيِّدَهَا لَدَى الْبَابِ" (يوسف:25)
+  - Mother praying reminds son of appointment: "اقْتَرَبَتِ السَّاعَةُ" (القمر:1)
+  - Friend calling late at night
+  - Friend calls about lost keys
+
+- **Respectful Refactoring** (November 10, 2025):
+  - Removed all humor-related terminology and emoji 😄
+  - Renamed database columns: `humor_note_*` → `usage_note_*`
+  - Updated all frontend components to use "Usage Note" instead of "Humor Note"
+  - Changed theme from playful (amber) to respectful (primary colors)
+  - Deleted duplicate and inappropriate examples
+  - Updated AI generation prompts to create "practical" not "humorous" content
 
 - **Testing**: End-to-end tests confirmed:
-  - Navigation from dashboard works correctly
-  - Search filtering functions properly
-  - Category filtering displays relevant examples
-  - Card expansion reveals full content
-  - Copy functionality triggers success toast notification
+  - No humor terminology or emoji anywhere in the feature
+  - Dashboard card displays respectful title and BookOpen icon
+  - Search and filtering work correctly with new field names
+  - New mother praying examples display and search properly
+  - Copy functionality works as expected
 
 ### Logo Size Enhancement (November 9, 2025)
 Increased logo size across all pages for better brand visibility:

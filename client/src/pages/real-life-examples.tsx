@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, BookOpen, Laugh, Search, Copy, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, Search, Copy, Check } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { useLanguage } from "@/contexts/language-context";
 import { useState } from "react";
@@ -80,13 +80,13 @@ export default function RealLifeExamplesPage() {
         {/* Title Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
-            <Laugh className="h-10 w-10 text-primary" />
-            {language === "ar" ? "أمثلة من الحياة" : "Real-Life Examples"}
+            <BookOpen className="h-10 w-10 text-primary" />
+            {language === "ar" ? "استخدامات قرآنية في الحياة" : "Quranic Expressions in Daily Life"}
           </h1>
           <p className="text-muted-foreground text-lg">
             {language === "ar" 
-              ? "أمثلة طريفة وذكية لاستخدام آيات القرآن في المواقف اليومية"
-              : "Humorous and clever examples of using Quran verses in everyday situations"
+              ? "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية"
+              : "Practical examples of using Quranic verses and phrases in everyday situations"
             }
           </p>
         </div>
@@ -201,12 +201,12 @@ export default function RealLifeExamplesPage() {
                     </p>
                   </div>
 
-                  {/* Humor Note */}
-                  {(example.humorNoteAr || example.humorNoteEn) && (
+                  {/* Usage Note */}
+                  {(example.usageNoteAr || example.usageNoteEn) && (
                     <div className="flex items-start gap-2">
-                      <Laugh className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                      <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                       <p className="text-sm text-muted-foreground">
-                        {language === "ar" ? example.humorNoteAr : example.humorNoteEn}
+                        {language === "ar" ? example.usageNoteAr : example.usageNoteEn}
                       </p>
                     </div>
                   )}

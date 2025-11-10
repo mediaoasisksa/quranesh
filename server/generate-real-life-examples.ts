@@ -10,7 +10,7 @@ if (!GEMINI_API_KEY) {
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 async function generateRealLifeExample(exampleNumber: number): Promise<any> {
-  const prompt = `Generate a humorous/clever real-life example of someone using a Quran verse in everyday conversation.
+  const prompt = `Generate a practical real-life example of someone using a Quranic verse or phrase in everyday conversation.
 
 Example format:
 - Situation (Arabic): أم يطلب منها أبناؤها أن تطبخ لهم
@@ -18,17 +18,17 @@ Example format:
 - Verse (Arabic): فَابْعَثُوا أَحَدَكُم بِوَرِقِكُمْ هَٰذِهِ إِلَى الْمَدِينَةِ
 - Verse Translation: So send one of you with this money to the city
 - Surah Reference: الكهف:19
-- Humor Note (Arabic): الأم تستخدم الآية للإشارة إلى أن الأطفال يستطيعون شراء الطعام بأنفسهم
-- Humor Note (English): The mother uses the verse to suggest that the children can buy food themselves
+- Usage Note (Arabic): الأم تستخدم الآية للإشارة إلى أن الأطفال يستطيعون شراء الطعام بأنفسهم
+- Usage Note (English): The mother uses the verse to suggest that the children can buy food themselves
 - Category: family
 
 Requirements:
-1. Must be contextually appropriate and funny
+1. Must be contextually appropriate and practical
 2. Verse should fit the situation naturally
 3. Common everyday situations (family, work, friends, daily life)
 4. Verse should be short (2-10 words)
 5. Return ONLY a valid JSON object with these keys:
-   situationAr, situationEn, verseArabic, verseTranslation, surahReference, humorNoteAr, humorNoteEn, category
+   situationAr, situationEn, verseArabic, verseTranslation, surahReference, usageNoteAr, usageNoteEn, category
 
 Generate example #${exampleNumber}:`;
 
@@ -95,8 +95,8 @@ async function main() {
         verseArabic: data.verseArabic,
         verseTranslation: data.verseTranslation,
         surahReference: data.surahReference,
-        humorNoteAr: data.humorNoteAr,
-        humorNoteEn: data.humorNoteEn,
+        usageNoteAr: data.usageNoteAr,
+        usageNoteEn: data.usageNoteEn,
         category: data.category || "daily_life",
         popularity: 0,
         translations: null,
