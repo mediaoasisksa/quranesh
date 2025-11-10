@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { dailySentences, quranicExpressions, dailySentenceExercises } from "@shared/schema";
+import { sql } from "drizzle-orm";
 
 async function seed50Exercises() {
   console.log("🌱 Seeding 50 daily contextual exercises...\n");
@@ -436,15 +437,36 @@ async function seed50Exercises() {
       // Insert correct expression
       const [correct] = await db.insert(quranicExpressions).values(exercise.correct).returning();
       
-      // Insert distractors
+      // Insert first 2 distractors
       const [distractor1] = await db.insert(quranicExpressions).values(exercise.distractors[0]).returning();
       const [distractor2] = await db.insert(quranicExpressions).values(exercise.distractors[1]).returning();
       
-      // Create exercise
+      // Generate 3rd distractor - pick from already inserted expressions (excluding current correct + distractors)
+      const allExpressions = [
+        { arabicText: "سبحان الله", surahAyah: "derived", theme: "glorification", meaning: "Glory to Allah", usageContext: "Praising Allah", wordCount: 2 },
+        { arabicText: "لا حول ولا قوة إلا بالله", surahAyah: "الكهف:39", theme: "reliance", meaning: "No power except by Allah", usageContext: "Acknowledging dependence", wordCount: 6 },
+        { arabicText: "إنا لله", surahAyah: "البقرة:156", theme: "patience", meaning: "We belong to Allah", usageContext: "In calamity", wordCount: 2 },
+        { arabicText: "توكلت على الله", surahAyah: "الأعراف:89", theme: "trust", meaning: "I have relied upon Allah", usageContext: "Placing trust", wordCount: 3 },
+        { arabicText: "ربنا افتح بيننا", surahAyah: "الأعراف:89", theme: "judgment", meaning: "Our Lord decide between us", usageContext: "Seeking judgment", wordCount: 3 }
+      ];
+      
+      // Pick a distractor that's different from the correct theme
+      const distractor3Data = allExpressions.find(e => 
+        e.theme !== exercise.correct.theme &&
+        e.theme !== exercise.distractors[0].theme &&
+        e.theme !== exercise.distractors[1].theme &&
+        e.arabicText !== exercise.correct.arabicText &&
+        e.arabicText !== exercise.distractors[0].arabicText &&
+        e.arabicText !== exercise.distractors[1].arabicText
+      ) || allExpressions[Math.floor(Math.random() * allExpressions.length)];
+      
+      const [distractor3] = await db.insert(quranicExpressions).values(distractor3Data).returning();
+      
+      // Create exercise with 3 distractors
       await db.insert(dailySentenceExercises).values({
         dailySentenceId: sentence.id,
         correctExpressionId: correct.id,
-        distractorIds: [distractor1.id, distractor2.id],
+        distractorIds: [distractor1.id, distractor2.id, distractor3.id],
         explanation: {
           en: `The expression "${exercise.correct.arabicText}" is commonly used when ${exercise.sentence.englishText.toLowerCase()}.`,
           ar: `يُستخدم التعبير "${exercise.correct.arabicText}" عادة في ${exercise.sentence.theme}.`
