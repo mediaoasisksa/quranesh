@@ -576,12 +576,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(quranicExpressions)
       .where(
-        notInArray(quranicExpressions.id, [exercise.correctExpressionId])
+        inArray(quranicExpressions.id, distractorIds)
       );
 
-    const selectedDistractors = distractors.filter(d => distractorIds.includes(d.id));
-
-    if (!sentence || !correctExpression || selectedDistractors.length < 2) {
+    if (!sentence || !correctExpression || distractors.length < 3) {
       return undefined;
     }
 
@@ -589,7 +587,7 @@ export class DatabaseStorage implements IStorage {
       exercise,
       sentence,
       correctExpression,
-      distractors: selectedDistractors,
+      distractors,
     };
   }
 
