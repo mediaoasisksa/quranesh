@@ -195,6 +195,9 @@ export const translations = {
     realLifeExamplesTitle: "Quranic Expressions in Daily Life",
     realLifeExamplesDesc: "Practical examples of using Quranic verses and phrases in everyday situations",
     browseExamples: "Browse Examples",
+    searchExamples: "Search examples...",
+    noExamplesFound: "No examples found",
+    showingExamples: "Showing {count} of {total} examples",
     
     // Payment
     selectPaymentMethod: "Select Payment Method",
@@ -462,6 +465,9 @@ export const translations = {
     realLifeExamplesTitle: "استخدامات قرآنية في الحياة",
     realLifeExamplesDesc: "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية",
     browseExamples: "تصفح الأمثلة",
+    searchExamples: "ابحث في الأمثلة...",
+    noExamplesFound: "لا توجد أمثلة",
+    showingExamples: "عرض {count} من {total} مثال",
     
     // Payment
     selectPaymentMethod: "اختر طريقة الدفع",
@@ -729,6 +735,9 @@ export const translations = {
     realLifeExamplesTitle: "Ungkapan-Ungkapan Qur'an dalam Kehidupan Sehari-hari",
     realLifeExamplesDesc: "Contoh praktis penggunaan ayat dan frasa Qur'an dalam situasi sehari-hari",
     browseExamples: "Jelajahi Contoh",
+    searchExamples: "Cari contoh...",
+    noExamplesFound: "Tidak ada contoh ditemukan",
+    showingExamples: "Menampilkan {count} dari {total} contoh",
     
     // Payment
     selectPaymentMethod: "Pilih Metode Pembayaran",
@@ -996,6 +1005,9 @@ export const translations = {
     realLifeExamplesTitle: "Günlük Hayatta Kur'an İfadeleri",
     realLifeExamplesDesc: "Günlük durumlarda Kur'an ayetleri ve ifadelerini kullanmanın pratik örnekleri",
     browseExamples: "Örnekleri İncele",
+    searchExamples: "Örnekleri ara...",
+    noExamplesFound: "Örnek bulunamadı",
+    showingExamples: "{total} örnekten {count} tanesi gösteriliyor",
     
     // Payment
     selectPaymentMethod: "Ödeme Yöntemini Seçin",
@@ -1263,6 +1275,9 @@ export const translations = {
     realLifeExamplesTitle: "日常生活中的古兰经表达",
     realLifeExamplesDesc: "在日常情况下使用古兰经经文和短语的实际例子",
     browseExamples: "浏览示例",
+    searchExamples: "搜索示例...",
+    noExamplesFound: "未找到示例",
+    showingExamples: "显示 {total} 个中的 {count} 个示例",
     
     // Payment
     selectPaymentMethod: "选择支付方式",
@@ -1529,6 +1544,9 @@ export const translations = {
     realLifeExamplesTitle: "Maneno ya Qur'an katika Maisha ya Kila Siku",
     realLifeExamplesDesc: "Mifano ya vitendo ya kutumia aya na maneno ya Qur'an katika hali za kila siku",
     browseExamples: "Angalia Mifano",
+    searchExamples: "Tafuta mifano...",
+    noExamplesFound: "Hakuna mifano iliyopatikana",
+    showingExamples: "Inaonyesha {count} kati ya {total} mifano",
     or: "au",
     
     // Payment
@@ -1796,6 +1814,9 @@ export const translations = {
     realLifeExamplesTitle: "Tibaaxaha Quraanka Nolosha Maalinlaha",
     realLifeExamplesDesc: "Tusaalooyin ku saabsan sida loo isticmaalo aayado iyo weedhaha Quraanka xaalado maalinle",
     browseExamples: "Fiiri Tusaalaha",
+    searchExamples: "Raadi tusaalooyin...",
+    noExamplesFound: "Tusaalooyiin la heli waayay",
+    showingExamples: "Muujinaya {count} ka mid ah {total} tusaalooyin",
     or: "ama",
     
     // Payment
@@ -2064,6 +2085,9 @@ export const translations = {
     realLifeExamplesTitle: "Kuranski Izrazi u Svakodnevnom Životu",
     realLifeExamplesDesc: "Praktični primjeri korištenja kur'anskih ajeta i fraza u svakodnevnim situacijama",
     browseExamples: "Pregledaj Primjere",
+    searchExamples: "Pretraži primjere...",
+    noExamplesFound: "Nema pronađenih primjera",
+    showingExamples: "Prikazuje se {count} od {total} primjera",
     
     // Payment
     selectPaymentMethod: "Odaberi način plaćanja",
@@ -2331,6 +2355,9 @@ export const translations = {
     realLifeExamplesTitle: "Shprehje Kuranore në Jetën e Përditshme",
     realLifeExamplesDesc: "Shembuj praktikë të përdorimit të ajeteve dhe frazave kuranore në situata të përditshme",
     browseExamples: "Shfletoni Shembujt",
+    searchExamples: "Kërkoni shembuj...",
+    noExamplesFound: "Nuk u gjetën shembuj",
+    showingExamples: "Duke treguar {count} nga {total} shembuj",
     
     // Payment
     selectPaymentMethod: "Zgjidhni Metodën e Pagesës",
@@ -2598,6 +2625,9 @@ export const translations = {
     realLifeExamplesTitle: "Коранические Выражения в Повседневной Жизни",
     realLifeExamplesDesc: "Практические примеры использования коранических аятов и фраз в повседневных ситуациях",
     browseExamples: "Просмотреть Примеры",
+    searchExamples: "Поиск примеров...",
+    noExamplesFound: "Примеры не найдены",
+    showingExamples: "Показано {count} из {total} примеров",
     
     // Profile
     profile: "Профиль",

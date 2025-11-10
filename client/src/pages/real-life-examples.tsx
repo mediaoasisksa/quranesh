@@ -81,13 +81,10 @@ export default function RealLifeExamplesPage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
             <BookOpen className="h-10 w-10 text-primary" />
-            {language === "ar" ? "استخدامات قرآنية في الحياة" : "Quranic Expressions in Daily Life"}
+            {t('realLifeExamplesTitle')}
           </h1>
           <p className="text-muted-foreground text-lg">
-            {language === "ar" 
-              ? "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية"
-              : "Practical examples of using Quranic verses and phrases in everyday situations"
-            }
+            {t('realLifeExamplesDesc')}
           </p>
         </div>
 
@@ -97,7 +94,7 @@ export default function RealLifeExamplesPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
             <Input
               type="text"
-              placeholder={language === "ar" ? "ابحث في الأمثلة..." : "Search examples..."}
+              placeholder={t('searchExamples')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -112,7 +109,7 @@ export default function RealLifeExamplesPage() {
               size="sm"
               data-testid="button-filter-all"
             >
-              {language === "ar" ? "الكل" : "All"}
+              {t('all')}
             </Button>
             {categories.map(category => (
               <Button
@@ -133,7 +130,7 @@ export default function RealLifeExamplesPage() {
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
             <p className="mt-4 text-muted-foreground">
-              {language === "ar" ? "جاري التحميل..." : "Loading..."}
+              {t('loading')}
             </p>
           </div>
         ) : filteredExamples.length === 0 ? (
@@ -141,7 +138,7 @@ export default function RealLifeExamplesPage() {
             <CardContent className="py-12 text-center">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-lg text-muted-foreground">
-                {language === "ar" ? "لا توجد أمثلة" : "No examples found"}
+                {t('noExamplesFound')}
               </p>
             </CardContent>
           </Card>
@@ -219,10 +216,7 @@ export default function RealLifeExamplesPage() {
         {/* Total Count */}
         {!isLoading && filteredExamples.length > 0 && (
           <div className="text-center mt-8 text-sm text-muted-foreground">
-            {language === "ar" 
-              ? `عرض ${filteredExamples.length} من ${examples.length} مثال`
-              : `Showing ${filteredExamples.length} of ${examples.length} examples`
-            }
+            {t('showingExamples').replace('{count}', String(filteredExamples.length)).replace('{total}', String(examples.length))}
           </div>
         )}
       </main>
