@@ -112,11 +112,7 @@ async function main() {
   
   console.log(`Found ${examples.length} examples to translate\n`);
   
-  // Test with first example only
-  const exampleToTranslate = examples.slice(0, 1);
-  console.log(`Testing with ${exampleToTranslate.length} example(s)\n`);
-  
-  for (const example of exampleToTranslate) {
+  for (const example of examples) {
     console.log(`\nProcessing: ${example.situationEn.substring(0, 60)}...`);
     console.log(`ID: ${example.id}`);
     
