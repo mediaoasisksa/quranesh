@@ -34,7 +34,7 @@ import {
   type InsertRealLifeExample,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, notInArray } from "drizzle-orm";
+import { eq, desc, and, notInArray, inArray } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { translatePhilosophicalSentence } from "./ai-service";
 
