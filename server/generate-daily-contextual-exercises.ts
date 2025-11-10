@@ -12,9 +12,9 @@ const THEMES = [
   "contentment", "perseverance", "compassion", "sincerity", "justice", "generosity"
 ];
 
-const TOTAL_EXERCISES = 300;
-const BATCH_SIZE = 10; // Generate 10 exercises at a time to avoid rate limits
-const DELAY_BETWEEN_BATCHES = 5000; // 5 seconds delay between batches
+const TOTAL_EXERCISES = 50;
+const BATCH_SIZE = 5; // Generate 5 exercises at a time to avoid rate limits
+const DELAY_BETWEEN_BATCHES = 10000; // 10 seconds delay between batches
 
 interface GeneratedExercise {
   sentence: InsertDailySentence;
