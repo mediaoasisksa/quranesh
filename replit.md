@@ -46,12 +46,19 @@ Implemented a respectful section showcasing practical uses of Quranic verses and
   - Deleted duplicate and inappropriate examples
   - Updated AI generation prompts to create "practical" not "humorous" content
 
+- **Multilingual Support** (November 10, 2025):
+  - Added complete translations for all 10 languages (English, Arabic, Indonesian, Turkish, Chinese, Swahili, Somali, Bosnian, Albanian, Russian)
+  - Updated Dashboard card to use translation system instead of hardcoded language check
+  - Updated Real-Life Examples page to use translation system throughout
+  - Added translation keys: realLifeExamplesTitle, realLifeExamplesDesc, browseExamples, searchExamples, noExamplesFound, showingExamples
+
 - **Testing**: End-to-end tests confirmed:
   - No humor terminology or emoji anywhere in the feature
   - Dashboard card displays respectful title and BookOpen icon
   - Search and filtering work correctly with new field names
   - New mother praying examples display and search properly
   - Copy functionality works as expected
+  - Translations work correctly across all tested languages (Chinese, Indonesian, Turkish, Swahili)
 
 ### Logo Size Enhancement (November 9, 2025)
 Increased logo size across all pages for better brand visibility:
