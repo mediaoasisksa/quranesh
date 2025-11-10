@@ -278,13 +278,10 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold mb-2 text-foreground">
-                      {language === "ar" ? "استخدامات قرآنية في الحياة" : "Quranic Expressions in Daily Life"}
+                      {t('realLifeExamplesTitle')}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      {language === "ar" 
-                        ? "أمثلة عملية لاستخدام آيات وجمل قرآنية في المواقف اليومية"
-                        : "Practical examples of using Quranic verses and phrases in everyday situations"
-                      }
+                      {t('realLifeExamplesDesc')}
                     </p>
                   </div>
                   <BookOpen className="h-10 w-10 text-primary shrink-0" />
@@ -296,7 +293,7 @@ export default function Dashboard() {
                     setLocation("/real-life-examples");
                   }}
                 >
-                  {language === "ar" ? "تصفح الأمثلة" : "Browse Examples"}
+                  {t('browseExamples')}
                 </Button>
               </CardContent>
             </Card>
