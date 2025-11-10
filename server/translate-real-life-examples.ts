@@ -112,7 +112,11 @@ async function main() {
   
   console.log(`Found ${examples.length} examples to translate\n`);
   
-  for (const example of examples) {
+  // Test with first example only
+  const exampleToTranslate = examples.slice(0, 1);
+  console.log(`Testing with ${exampleToTranslate.length} example(s)\n`);
+  
+  for (const example of exampleToTranslate) {
     console.log(`\nProcessing: ${example.situationEn.substring(0, 60)}...`);
     console.log(`ID: ${example.id}`);
     
@@ -122,40 +126,67 @@ async function main() {
       usageNote: {}
     };
     
-    // Translate to all languages
+    // Translate to all languages with retry logic
     for (const [langCode, langName] of Object.entries(languages)) {
-      try {
-        const translated = await translateExample(
-          example.id,
-          example.situationEn,
-          example.usageNoteEn || "",
-          langCode,
-          langName
-        );
-        
-        translations.situation![langCode] = translated.situation;
-        translations.usageNote![langCode] = translated.usageNote;
-        
-      } catch (error) {
-        console.error(`Failed to translate example ${example.id} to ${langName}`);
-        // Continue with next language
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          const translated = await translateExample(
+            example.id,
+            example.situationEn,
+            example.usageNoteEn || "",
+            langCode,
+            langName
+          );
+          
+          if (!translations.situation) translations.situation = {};
+          if (!translations.usageNote) translations.usageNote = {};
+          
+          translations.situation[langCode] = translated.situation;
+          translations.usageNote[langCode] = translated.usageNote;
+          
+          break; // Success, move to next language
+        } catch (error: any) {
+          retryCount++;
+          if (error?.response?.status === 429 && retryCount < maxRetries) {
+            const waitTime = Math.pow(2, retryCount) * 5000; // Exponential backoff: 10s, 20s, 40s
+            console.log(`    Rate limit hit, waiting ${waitTime/1000}s before retry ${retryCount}/${maxRetries}...`);
+            await delay(waitTime);
+          } else {
+            console.error(`Failed to translate example ${example.id} to ${langName} after ${retryCount} attempts`);
+            break; // Move to next language after max retries
+          }
+        }
       }
+      
+      // Extra delay between languages to avoid rate limits
+      await delay(3000);
     }
     
     // Update the database with translations
-    try {
-      await db
-        .update(realLifeExamples)
-        .set({ translations })
-        .where(eq(realLifeExamples.id, example.id));
-      
-      console.log(`  ✓ Updated database for example ${example.id}`);
-    } catch (error) {
-      console.error(`  ✗ Failed to update database for example ${example.id}:`, error);
+    const successfulLangs = Object.keys(translations.situation || {}).length;
+    console.log(`\n  Translated to ${successfulLangs}/8 languages`);
+    
+    if (successfulLangs > 0) {
+      try {
+        await db
+          .update(realLifeExamples)
+          .set({ translations })
+          .where(eq(realLifeExamples.id, example.id));
+        
+        console.log(`  ✓ Updated database with ${successfulLangs} language translations`);
+        console.log(`  Languages: ${Object.keys(translations.situation || {}).join(', ')}`);
+      } catch (error) {
+        console.error(`  ✗ Failed to update database for example ${example.id}:`, error);
+      }
+    } else {
+      console.log(`  ⚠ No translations saved for this example`);
     }
     
-    console.log("  Waiting 3 seconds before next example...\n");
-    await delay(3000);
+    console.log("  Waiting 5 seconds before next example...\n");
+    await delay(5000);
   }
   
   console.log("\n✓ Translation complete!");
