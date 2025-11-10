@@ -400,21 +400,21 @@ export default function Exercise() {
       // Reset the exercise state
       resetExercise();
 
-      // Invalidate the appropriate cache based on current exercise type
+      // Remove the appropriate cache entries based on current exercise type
       if (currentExerciseType === "transformation") {
-        await queryClient.invalidateQueries({
+        queryClient.removeQueries({
           queryKey: ["/api/philosophical-sentences/random", userId, language],
         });
       } else if (currentExerciseType === "conversation") {
-        await queryClient.invalidateQueries({
+        queryClient.removeQueries({
           queryKey: ["/api/conversation-prompts/random", userId, language],
         });
       } else if (currentExerciseType === "daily_contextual") {
-        await queryClient.invalidateQueries({
+        queryClient.removeQueries({
           queryKey: ["/api/daily-contextual/random", userId],
         });
       } else {
-        await queryClient.invalidateQueries({
+        queryClient.removeQueries({
           queryKey: ["/api/phrases/random", currentExerciseType, userId],
         });
       }
