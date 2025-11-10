@@ -542,13 +542,18 @@ export class DatabaseStorage implements IStorage {
 
     const completedIds = completedExerciseIds.map((session) => session.phraseId);
 
-    // Get available exercises
-    const availableExercises = completedIds.length > 0
+    // Get available exercises (not yet completed)
+    let availableExercises = completedIds.length > 0
       ? await db
           .select()
           .from(dailySentenceExercises)
           .where(notInArray(dailySentenceExercises.id, completedIds))
       : await db.select().from(dailySentenceExercises);
+
+    // If all exercises are completed, allow repetition - get all exercises
+    if (availableExercises.length === 0) {
+      availableExercises = await db.select().from(dailySentenceExercises);
+    }
 
     if (availableExercises.length === 0) return undefined;
 
