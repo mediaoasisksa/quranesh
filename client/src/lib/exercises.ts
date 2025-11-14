@@ -1,13 +1,12 @@
 export const exerciseTypes = [
-  // Substitution exercise hidden per user request
-  // {
-  //   id: 'substitution',
-  //   titleKey: 'substitution',
-  //   descriptionKey: 'substitutionDesc',
-  //   icon: '🔄',
-  //   variant: 'primary' as const,
-  //   category: 'interactive'
-  // },
+  {
+    id: 'daily_contextual',
+    titleKey: 'dailyContextual',
+    descriptionKey: 'dailyContextualDesc',
+    icon: '🌟',
+    variant: 'primary' as const,
+    category: 'practical'
+  },
   {
     id: 'conversation',
     titleKey: 'conversation',
@@ -16,24 +15,6 @@ export const exerciseTypes = [
     variant: 'secondary' as const,
     category: 'practical'
   },
-  // Completion exercise hidden per user request
-  // {
-  //   id: 'completion',
-  //   titleKey: 'completion',
-  //   descriptionKey: 'completionDesc',
-  //   icon: '🧩',
-  //   variant: 'accent' as const,
-  //   category: 'memory'
-  // },
-  // Comparison exercise hidden per user request
-  // {
-  //   id: 'comparison',
-  //   titleKey: 'comparison',
-  //   descriptionKey: 'comparisonDesc',
-  //   icon: '⚖️',
-  //   variant: 'primary' as const,
-  //   category: 'analysis'
-  // },
   {
     id: 'roleplay',
     titleKey: 'roleplay',
@@ -49,14 +30,6 @@ export const exerciseTypes = [
     icon: '💎',
     variant: 'accent' as const,
     category: 'wisdom'
-  },
-  {
-    id: 'daily_contextual',
-    titleKey: 'dailyContextual',
-    descriptionKey: 'dailyContextualDesc',
-    icon: '🌟',
-    variant: 'primary' as const,
-    category: 'practical'
   },
   // Thematic exercise hidden per user request
   // {
