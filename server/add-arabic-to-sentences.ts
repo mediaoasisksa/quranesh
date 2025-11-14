@@ -1,8 +1,9 @@
 import { db } from "./db";
 import { dailySentences } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-002:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 async function translateToArabic(englishText: string): Promise<string> {
   const prompt = `Translate this English sentence to natural, fluent Arabic. Provide ONLY the Arabic translation, nothing else:
@@ -66,7 +67,7 @@ async function addArabicToAllSentences() {
         await db
           .update(dailySentences)
           .set({ arabicText })
-          .where({ id: sentence.id } as any);
+          .where(eq(dailySentences.id, sentence.id));
 
         console.log(`[${i + 1}/${toProcess.length}] ✓ Translated: ${sentence.englishText.substring(0, 40)}...`);
         console.log(`   → ${arabicText}\n`);
