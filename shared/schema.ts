@@ -173,8 +173,9 @@ export type InsertConversationPrompt = z.infer<typeof insertConversationPromptSc
 // Daily Sentences for contextual Quranic expression matching
 export const dailySentences = pgTable("daily_sentences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  arabicText: text("arabic_text"),
   englishText: text("english_text").notNull(),
-  translations: jsonb("translations").$type<Record<string, string>>(), // {"ar": "...", "id": "...", "ur": "...", "tr": "..."}
+  translations: jsonb("translations").$type<Record<string, string>>(), // {"id": "...", "ur": "...", "tr": "...", "zh": "...", "sw": "...", "so": "...", "bs": "...", "sq": "...", "ru": "..."}
   theme: text("theme").notNull(), // patience, gratitude, trust, hope, etc.
   difficulty: integer("difficulty").default(1), // 1-5 scale (A1-C1)
   contextNotes: text("context_notes"), // When/how to use this expression
