@@ -26,6 +26,8 @@ Daily contextual exercises are the **primary/default exercise type**, displayed 
 
 **Psychological Daily Exercises**: A specialized set of 55+ exercises designed with psychological depth, where answers are understood through nuances and hints (ظلال وتلميحات) in Quranic verses. These exercises cover 11 psychological themes: anxiety, depression, self-doubt, loneliness, anger, guilt, fear, grief, hope, acceptance, and healing. Each exercise presents emotionally resonant scenarios paired with Quranic guidance that addresses mental and emotional well-being, providing spiritual wisdom for psychological challenges.
 
+**Philosophical Match Exercise**: This exercise pairs universal wisdom and proverbs (2,400+ entries) with Quranic verses. The wisdom entries are carefully curated to contain ONLY universal philosophical wisdom and proverbs—NO Quranic verses or direct Quran references are permitted in the wisdom field. Users match the displayed wisdom with appropriate Quranic words, phrases, or verses. The label is simplified to "Wisdom:" (الحكمة:) without qualifiers to maintain respect and clarity. A data cleanup was performed to remove 25+ entries containing Quranic verses or direct Quran references, ensuring the exercise design integrity where wisdom entries remain secular proverbs that users thoughtfully connect to Quranic teachings.
+
 ## Translation Management System
 An administrative `/translation-manager` interface allows bulk translation of philosophical sentences and conversation prompts into 9 languages using Gemini AI. It provides real-time statistics on translation coverage, supports single-sentence translation, and includes robust error handling with retry logic and validation.
 
