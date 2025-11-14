@@ -74,8 +74,8 @@ async function addArabicToAllSentences() {
         
         successCount++;
 
-        // Add a delay to avoid rate limiting (3 seconds for safety)
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // Add a delay to avoid rate limiting (5 seconds for safety - API limit is 15 RPM)
+        await new Promise(resolve => setTimeout(resolve, 5000));
       } catch (error: any) {
         console.error(`[${i + 1}/${toProcess.length}] ✗ Error translating: ${sentence.englishText}`);
         console.error(`   Error: ${error.message || error}\n`);
