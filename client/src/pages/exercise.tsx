@@ -746,12 +746,14 @@ export default function Exercise() {
                 {t('dailySentenceLabel')}
               </p>
               <p
-                className="text-xl font-medium text-foreground mb-2"
+                className="arabic-text text-2xl font-medium text-foreground mb-2 text-right"
+                dir="rtl"
+                lang="ar"
                 data-testid="text-daily-sentence"
               >
-                {sentence?.englishText || "Loading..."}
+                {sentence?.arabicText || sentence?.englishText || "Loading..."}
               </p>
-              {sentence?.translations && language !== "en" && (
+              {sentence?.translations && language !== "en" && language !== "ar" && (
                 <p className="text-lg text-muted-foreground/90 mt-2">
                   {(sentence.translations as Record<string, string>)[language]}
                 </p>
