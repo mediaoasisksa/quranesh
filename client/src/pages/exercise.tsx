@@ -796,9 +796,11 @@ export default function Exercise() {
                           <p className="arabic-text text-lg font-semibold mb-1" lang="ar" dir="rtl">
                             {option.arabicText}
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            {option.surahAyah}
-                          </p>
+                          {option.surahAyah && option.surahAyah !== 'derived' && (
+                            <p className="text-sm text-muted-foreground">
+                              {option.surahAyah}
+                            </p>
+                          )}
                         </div>
                         <div className="mr-4">
                           {showFeedback && isCorrectOption && (
