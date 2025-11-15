@@ -745,18 +745,36 @@ export default function Exercise() {
               <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">
                 {t('dailySentenceLabel')}
               </p>
-              <p
-                className="arabic-text text-2xl font-medium text-foreground mb-2 text-right"
-                dir="rtl"
-                lang="ar"
-                data-testid="text-daily-sentence"
-              >
-                {sentence?.arabicText || sentence?.englishText || "Loading..."}
-              </p>
-              {sentence?.translations && language !== "en" && language !== "ar" && (
-                <p className="text-lg text-muted-foreground/90 mt-2">
-                  {(sentence.translations as Record<string, string>)[language]}
+              {language === "ar" ? (
+                <p
+                  className="arabic-text text-2xl font-medium text-foreground"
+                  dir="rtl"
+                  lang="ar"
+                  data-testid="text-daily-sentence"
+                >
+                  {sentence?.arabicText || sentence?.englishText || "Loading..."}
                 </p>
+              ) : language === "en" ? (
+                <p
+                  className="text-2xl font-medium text-foreground"
+                  data-testid="text-daily-sentence"
+                >
+                  {sentence?.englishText || "Loading..."}
+                </p>
+              ) : (
+                <>
+                  <p
+                    className="text-2xl font-medium text-foreground mb-2"
+                    data-testid="text-daily-sentence"
+                  >
+                    {(sentence?.translations as Record<string, string>)?.[language] || sentence?.englishText || "Translation not available"}
+                  </p>
+                  {sentence?.arabicText && (
+                    <p className="arabic-text text-lg text-muted-foreground/70 mt-2 text-right" dir="rtl" lang="ar">
+                      {sentence.arabicText}
+                    </p>
+                  )}
+                </>
               )}
             </div>
 
