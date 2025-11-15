@@ -132,12 +132,12 @@ function createValidationPrompt(
       - Example: If given "والله غفور رحيم" and asked to replace "رحيم", a good answer would be "والله غفور عزيز"`;
       break;
     case "conversation":
-      specificInstructions = `This is a CONVERSATION exercise. The student must provide SHORT, PRACTICAL Quranic expressions (2-6 words) that are SUITABLE FOR DAILY CONVERSATION.
+      specificInstructions = `This is a CONVERSATION exercise. The student must provide PRACTICAL Quranic expressions or authentic Islamic phrases that are SUITABLE FOR DAILY CONVERSATION.
 
 CRITICAL REQUIREMENTS:
-1. **PRACTICAL DAILY USE**: The answer MUST be a short Quranic expression that can be used naturally in daily conversation
+1. **PRACTICAL DAILY USE**: The answer MUST be a Quranic expression or Islamic phrase that can be used naturally in daily conversation
 2. **CONTEXT APPROPRIATENESS**: The expression must FIT the conversational context, not just reference it
-3. **LENGTH**: 2-6 words maximum - short, practical expressions
+3. **AUTHENTIC ISLAMIC TEXT**: Must be from Quran, Hadith, or widely-used Islamic expressions
 4. **NO STORY REFERENCES**: Reject answers that reference Quranic stories or narrative contexts
 
 EXAMPLES OF WHAT TO REJECT:
@@ -147,13 +147,16 @@ EXAMPLES OF WHAT TO REJECT:
 
 EXAMPLES OF WHAT TO ACCEPT:
 ✅ "إن شاء الله" - Practical, short, used daily for future events
-✅ "جزاك الله خيراً" - Practical, short, used daily for thanks
-✅ "بارك الله فيك" - Practical, short, used daily for blessings
-✅ "على بركة الله" - Practical, short, used daily when starting something
+✅ "جزاك الله خيراً" - Practical, commonly used for thanks
+✅ "بارك الله فيك" - Practical, used daily for blessings
+✅ "على بركة الله" - Practical, used when starting something
+✅ "رضينا بالله ربا والإسلام دينا ومحمدا رسولا" - Authentic hadith, expresses contentment/satisfaction
+✅ "لا حول ولا قوة إلا بالله" - Commonly used in difficult situations
+✅ "حسبنا الله ونعم الوكيل" - Used to express trust in Allah
 
 EVALUATION CRITERIA:
-- Can this expression be used naturally in daily conversation? (YES/NO)
-- Is it short and practical (2-6 words)? (YES/NO)
+- Is this an authentic Quranic verse, hadith, or widely-used Islamic expression? (YES/NO)
+- Can it be used naturally in daily conversation? (YES/NO)
 - Does it FIT the conversational context? (YES/NO)
 - Is it free from story/narrative references? (YES/NO)
 
