@@ -1,0 +1,164 @@
+import { db } from "./db";
+import { conversationPrompts } from "@shared/schema";
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+
+interface ConversationPrompt {
+  question: string;
+  question_en: string;
+  suggested_verse: string;
+  category?: string;
+  usage_domain?: string;
+}
+
+async function generateConversationPrompts(count: number): Promise<ConversationPrompt[]> {
+  const prompt = `Generate ${count} conversation practice prompts for Arabic learners who have memorized the Quran.
+
+Each prompt should:
+1. Be a practical daily conversation question in English
+2. Have a natural Arabic translation
+3. Include a suggested Quranic verse or phrase that would be an appropriate response
+4. Cover diverse daily situations (greetings, time, requests, offers, invitations, emotions, work, family, health, etc.)
+
+Return ONLY a valid JSON array with this exact structure:
+[
+  {
+    "question": "Arabic question",
+    "question_en": "English question",
+    "suggested_verse": "Quranic verse or phrase in Arabic",
+    "category": "category name",
+    "usage_domain": "domain (e.g., greeting, time, request, offer, invitation)"
+  }
+]
+
+IMPORTANT:
+- Generate exactly ${count} unique prompts
+- Make questions practical and conversational
+- Ensure suggested verses are authentic Quranic text
+- Vary the categories and domains
+- Return ONLY the JSON array, no other text`;
+
+  try {
+    const response = await fetch(GEMINI_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.9,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`API error: ${JSON.stringify(errorData)}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates[0].content.parts[0].text.trim();
+    
+    // Remove markdown code blocks if present
+    const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    const prompts = JSON.parse(cleanedText);
+    
+    if (!Array.isArray(prompts)) {
+      throw new Error('Response is not an array');
+    }
+    
+    return prompts;
+  } catch (error) {
+    console.error(`Failed to generate prompts:`, error);
+    throw error;
+  }
+}
+
+async function addConversationPrompts() {
+  console.log("🔄 Generating and adding 100 new conversation prompts...\n");
+
+  const BATCH_SIZE = 20; // Generate in batches to avoid timeouts
+  const TOTAL_COUNT = 100;
+  const batches = Math.ceil(TOTAL_COUNT / BATCH_SIZE);
+
+  try {
+    let totalSuccess = 0;
+    let totalErrors = 0;
+
+    for (let batch = 0; batch < batches; batch++) {
+      const batchCount = Math.min(BATCH_SIZE, TOTAL_COUNT - (batch * BATCH_SIZE));
+      
+      console.log(`\n📦 Batch ${batch + 1}/${batches}: Generating ${batchCount} prompts...`);
+
+      try {
+        const prompts = await generateConversationPrompts(batchCount);
+        
+        console.log(`✓ Generated ${prompts.length} prompts\n`);
+
+        // Insert into database
+        for (let i = 0; i < prompts.length; i++) {
+          const prompt = prompts[i];
+          
+          try {
+            await db.insert(conversationPrompts).values({
+              question: prompt.question,
+              questionEn: prompt.question_en,
+              suggestedVerse: prompt.suggested_verse,
+              category: prompt.category || null,
+              usageDomain: prompt.usage_domain || null,
+              isPracticalDailyUse: 1,
+            });
+
+            console.log(`[${i + 1}/${prompts.length}] ✓ Added: ${prompt.question_en.substring(0, 50)}...`);
+            totalSuccess++;
+          } catch (error: any) {
+            console.error(`[${i + 1}/${prompts.length}] ✗ Error inserting prompt: ${error.message}`);
+            totalErrors++;
+          }
+        }
+
+        // Add delay between batches to avoid rate limiting
+        if (batch < batches - 1) {
+          console.log('\n⏳ Waiting 10 seconds before next batch...');
+          await new Promise(resolve => setTimeout(resolve, 10000));
+        }
+
+      } catch (error: any) {
+        console.error(`\n✗ Error in batch ${batch + 1}:`, error.message);
+        totalErrors += batchCount;
+        
+        // If we hit rate limit, stop processing
+        if (error.message?.includes('429') || error.message?.includes('quota')) {
+          console.error('\n⚠️  Rate limit reached. Stopping processing.');
+          break;
+        }
+      }
+    }
+
+    console.log(`\n✅ Process complete!`);
+    console.log(`   Successfully added: ${totalSuccess} prompts`);
+    console.log(`   Errors: ${totalErrors}`);
+
+    // Show final count
+    const totalPrompts = await db.select().from(conversationPrompts);
+    console.log(`   Total conversation prompts in database: ${totalPrompts.length}`);
+
+  } catch (error) {
+    console.error("❌ Fatal error:", error);
+    process.exit(1);
+  }
+}
+
+addConversationPrompts()
+  .then(() => {
+    console.log("\n🎉 All done!");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("❌ Script failed:", error);
+    process.exit(1);
+  });
