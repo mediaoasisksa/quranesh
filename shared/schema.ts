@@ -170,6 +170,31 @@ export const insertConversationPromptSchema = createInsertSchema(conversationPro
 export type ConversationPrompt = typeof conversationPrompts.$inferSelect;
 export type InsertConversationPrompt = z.infer<typeof insertConversationPromptSchema>;
 
+// Roleplay Scenarios - Psychological scenarios for roleplay exercises
+export const roleplayScenarios = pgTable("roleplay_scenarios", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  scenario: text("scenario").notNull(), // Arabic scenario text
+  scenarioEn: text("scenario_en"),
+  scenarioId: text("scenario_id"),
+  scenarioTr: text("scenario_tr"),
+  scenarioZh: text("scenario_zh"),
+  scenarioSw: text("scenario_sw"),
+  scenarioSo: text("scenario_so"),
+  scenarioBs: text("scenario_bs"),
+  scenarioSq: text("scenario_sq"),
+  scenarioRu: text("scenario_ru"),
+  theme: text("theme").notNull(), // anxiety, depression, hope, faith, etc.
+  psychologicalDepth: text("psychological_depth"), // Description of the psychological aspect
+  difficulty: integer("difficulty").default(1), // 1-5 scale
+});
+
+export const insertRoleplayScenarioSchema = createInsertSchema(roleplayScenarios).omit({
+  id: true,
+});
+
+export type RoleplayScenario = typeof roleplayScenarios.$inferSelect;
+export type InsertRoleplayScenario = z.infer<typeof insertRoleplayScenarioSchema>;
+
 // Daily Sentences for contextual Quranic expression matching
 export const dailySentences = pgTable("daily_sentences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
