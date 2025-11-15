@@ -44,6 +44,28 @@ function getLocalizedQuestion(
   return langMap[lang] || conversationPrompt.question;
 }
 
+function getLocalizedScenario(
+  roleplayScenario: any,
+  lang: string
+): string {
+  if (!roleplayScenario) return "...";
+  
+  const langMap: Record<string, string> = {
+    en: roleplayScenario.scenarioEn || roleplayScenario.scenario,
+    id: roleplayScenario.scenarioId || roleplayScenario.scenario,
+    tr: roleplayScenario.scenarioTr || roleplayScenario.scenario,
+    zh: roleplayScenario.scenarioZh || roleplayScenario.scenario,
+    sw: roleplayScenario.scenarioSw || roleplayScenario.scenario,
+    so: roleplayScenario.scenarioSo || roleplayScenario.scenario,
+    bs: roleplayScenario.scenarioBs || roleplayScenario.scenario,
+    sq: roleplayScenario.scenarioSq || roleplayScenario.scenario,
+    ru: roleplayScenario.scenarioRu || roleplayScenario.scenario,
+    ar: roleplayScenario.scenario,
+  };
+  
+  return langMap[lang] || roleplayScenario.scenario;
+}
+
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
   const [, setLocation] = useLocation();
@@ -73,6 +95,7 @@ export default function Exercise() {
   const isThematicExercise = exerciseType === "thematic";
   const isTransformationExercise = exerciseType === "transformation";
   const isConversationExercise = exerciseType === "conversation";
+  const isRoleplayExercise = exerciseType === "roleplay";
   const isDailyContextualExercise = exerciseType === "daily_contextual";
 
   // For transformation exercises, fetch philosophical sentences
@@ -139,6 +162,31 @@ export default function Exercise() {
     enabled: !!exerciseType && isConversationExercise,
   });
 
+  const { data: roleplayScenario, isLoading: roleplayLoading } = useQuery<{
+    id: string;
+    scenario: string;
+    scenarioEn: string | null;
+    scenarioId: string | null;
+    scenarioTr: string | null;
+    scenarioZh: string | null;
+    scenarioSw: string | null;
+    scenarioSo: string | null;
+    scenarioBs: string | null;
+    scenarioSq: string | null;
+    scenarioRu: string | null;
+    theme: string;
+    psychologicalDepth?: string | null;
+    difficulty?: number | null;
+  }>({
+    queryKey: ["/api/roleplay-scenarios/random", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/roleplay-scenarios/random?userId=${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch roleplay scenario");
+      return response.json();
+    },
+    enabled: !!exerciseType && isRoleplayExercise,
+  });
+
   const { data: dailyContextualExercise, isLoading: dailyContextualLoading } = useQuery<any>({
     queryKey: ["/api/daily-contextual/random", userId],
     queryFn: async () => {
@@ -149,8 +197,8 @@ export default function Exercise() {
     enabled: !!exerciseType && isDailyContextualExercise,
   });
 
-  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isConversationExercise ? conversationLoading : (isDailyContextualExercise ? dailyContextualLoading : phraseLoading)));
-  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isConversationExercise ? conversationPrompt : (isDailyContextualExercise ? dailyContextualExercise : phrase)));
+  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isConversationExercise ? conversationLoading : (isRoleplayExercise ? roleplayLoading : (isDailyContextualExercise ? dailyContextualLoading : phraseLoading))));
+  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isConversationExercise ? conversationPrompt : (isRoleplayExercise ? roleplayScenario : (isDailyContextualExercise ? dailyContextualExercise : phrase))));
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -368,6 +416,8 @@ export default function Exercise() {
         ? philosophicalSentence.id
         : isConversationExercise && conversationPrompt
         ? conversationPrompt.id
+        : isRoleplayExercise && roleplayScenario
+        ? roleplayScenario.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
       userId: userId,
@@ -408,6 +458,10 @@ export default function Exercise() {
       } else if (currentExerciseType === "conversation") {
         queryClient.removeQueries({
           queryKey: ["/api/conversation-prompts/random", userId, language],
+        });
+      } else if (currentExerciseType === "roleplay") {
+        queryClient.removeQueries({
+          queryKey: ["/api/roleplay-scenarios/random", userId],
         });
       } else if (currentExerciseType === "daily_contextual") {
         queryClient.removeQueries({
@@ -657,15 +711,15 @@ export default function Exercise() {
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
+              <div className="flex items-start space-x-3 rtl:space-x-reverse">
                 <span className="text-2xl">👥</span>
-                <div>
+                <div className="flex-1">
                   <p className="text-foreground font-medium mb-2">{t('scenario')}:</p>
                   <p
-                    className="text-foreground"
+                    className={`text-foreground ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     data-testid="text-roleplay-scenario"
                   >
-                    {t('roleplayScenarioText')}
+                    {roleplayScenario ? getLocalizedScenario(roleplayScenario, language) : t('roleplayScenarioText')}
                   </p>
                 </div>
               </div>
