@@ -486,6 +486,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Roleplay scenario routes
+  app.get("/api/roleplay-scenarios/random", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      if (!userId || typeof userId !== "string") {
+        return res.status(400).json({ message: "userId is required" });
+      }
+
+      const scenario = await storage.getRandomRoleplayScenario(userId);
+      if (!scenario) {
+        return res.status(404).json({ message: "No roleplay scenarios available" });
+      }
+      res.json(scenario);
+    } catch (error) {
+      console.error("Error fetching roleplay scenario:", error);
+      res.status(500).json({ message: "Failed to fetch roleplay scenario" });
+    }
+  });
+
+  app.get("/api/roleplay-scenarios", async (req, res) => {
+    try {
+      const scenarios = await storage.getAllRoleplayScenarios();
+      res.json(scenarios);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch roleplay scenarios" });
+    }
+  });
+
   // Daily contextual exercise routes
   app.get("/api/daily-contextual/random", async (req, res) => {
     try {
