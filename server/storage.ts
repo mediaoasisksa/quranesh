@@ -11,6 +11,7 @@ import {
   quranicExpressions,
   dailySentenceExercises,
   realLifeExamples,
+  roleplayScenarios,
   type User,
   type InsertUser,
   type Phrase,
@@ -32,6 +33,8 @@ import {
   type DailySentenceExercise,
   type RealLifeExample,
   type InsertRealLifeExample,
+  type RoleplayScenario,
+  type InsertRoleplayScenario,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, notInArray, inArray } from "drizzle-orm";
@@ -116,6 +119,12 @@ export interface IStorage {
   getRealLifeExample(id: string): Promise<RealLifeExample | undefined>;
   createRealLifeExample(example: InsertRealLifeExample): Promise<RealLifeExample>;
   getRealLifeExamplesByCategory(category: string): Promise<RealLifeExample[]>;
+
+  // Roleplay scenario methods
+  getAllRoleplayScenarios(): Promise<RoleplayScenario[]>;
+  getRoleplayScenario(id: string): Promise<RoleplayScenario | undefined>;
+  createRoleplayScenario(scenario: InsertRoleplayScenario): Promise<RoleplayScenario>;
+  getRandomRoleplayScenario(userId: string): Promise<RoleplayScenario | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -635,6 +644,65 @@ export class DatabaseStorage implements IStorage {
       .where(eq(realLifeExamples.category, category))
       .orderBy(desc(realLifeExamples.popularity));
   }
+
+  // Roleplay scenario methods
+  async getAllRoleplayScenarios(): Promise<RoleplayScenario[]> {
+    return await db.select().from(roleplayScenarios);
+  }
+
+  async getRoleplayScenario(id: string): Promise<RoleplayScenario | undefined> {
+    const [scenario] = await db
+      .select()
+      .from(roleplayScenarios)
+      .where(eq(roleplayScenarios.id, id));
+    return scenario || undefined;
+  }
+
+  async createRoleplayScenario(insertScenario: InsertRoleplayScenario): Promise<RoleplayScenario> {
+    const [scenario] = await db
+      .insert(roleplayScenarios)
+      .values(insertScenario)
+      .returning();
+    return scenario;
+  }
+
+  async getRandomRoleplayScenario(userId: string): Promise<RoleplayScenario | undefined> {
+    // Get all completed roleplay scenario IDs for this user
+    const completedScenarioIds = (
+      await db
+        .select({ phraseId: exerciseSessions.phraseId })
+        .from(exerciseSessions)
+        .where(
+          and(
+            eq(exerciseSessions.userId, userId),
+            eq(exerciseSessions.exerciseType, "roleplay")
+          )
+        )
+    ).map((session) => session.phraseId);
+
+    // Get a random scenario that hasn't been completed
+    let availableScenarios;
+    if (completedScenarioIds.length > 0) {
+      availableScenarios = await db
+        .select()
+        .from(roleplayScenarios)
+        .where(notInArray(roleplayScenarios.id, completedScenarioIds));
+    } else {
+      availableScenarios = await db.select().from(roleplayScenarios);
+    }
+
+    // If all scenarios have been completed, allow repetition
+    if (availableScenarios.length === 0) {
+      availableScenarios = await db.select().from(roleplayScenarios);
+    }
+
+    if (availableScenarios.length === 0) return undefined;
+
+    // Return random scenario
+    return availableScenarios[
+      Math.floor(Math.random() * availableScenarios.length)
+    ];
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -984,6 +1052,23 @@ export class MemStorage implements IStorage {
 
   async getRealLifeExamplesByCategory(_category: string): Promise<RealLifeExample[]> {
     return [];
+  }
+
+  // Roleplay scenario methods (stub for MemStorage)
+  async getAllRoleplayScenarios(): Promise<RoleplayScenario[]> {
+    return [];
+  }
+
+  async getRoleplayScenario(_id: string): Promise<RoleplayScenario | undefined> {
+    return undefined;
+  }
+
+  async createRoleplayScenario(_scenario: InsertRoleplayScenario): Promise<RoleplayScenario> {
+    throw new Error("MemStorage doesn't support roleplay scenarios");
+  }
+
+  async getRandomRoleplayScenario(_userId: string): Promise<RoleplayScenario | undefined> {
+    return undefined;
   }
 }
 
