@@ -2,7 +2,7 @@ import { db } from "./db";
 import { conversationPrompts } from "@shared/schema";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 interface ConversationPrompt {
   question: string;
@@ -81,7 +81,7 @@ IMPORTANT:
 async function addConversationPrompts() {
   console.log("🔄 Generating and adding 100 new conversation prompts...\n");
 
-  const BATCH_SIZE = 20; // Generate in batches to avoid timeouts
+  const BATCH_SIZE = 10; // Generate in smaller batches to avoid rate limits
   const TOTAL_COUNT = 100;
   const batches = Math.ceil(TOTAL_COUNT / BATCH_SIZE);
 
@@ -121,10 +121,10 @@ async function addConversationPrompts() {
           }
         }
 
-        // Add delay between batches to avoid rate limiting
+        // Add delay between batches to avoid rate limiting (15 RPM = 4 seconds per request)
         if (batch < batches - 1) {
-          console.log('\n⏳ Waiting 10 seconds before next batch...');
-          await new Promise(resolve => setTimeout(resolve, 10000));
+          console.log('\n⏳ Waiting 30 seconds before next batch...');
+          await new Promise(resolve => setTimeout(resolve, 30000));
         }
 
       } catch (error: any) {
