@@ -138,7 +138,8 @@ CRITICAL REQUIREMENTS:
 1. **PRACTICAL DAILY USE**: The answer MUST be a Quranic expression or Islamic phrase that can be used naturally in daily conversation
 2. **CONTEXT APPROPRIATENESS**: The expression must FIT the conversational context, not just reference it
 3. **AUTHENTIC ISLAMIC TEXT**: Must be from Quran, Hadith, or widely-used Islamic expressions
-4. **NO STORY REFERENCES**: Reject answers that reference Quranic stories or narrative contexts
+4. **CONCISE & PRACTICAL**: While no strict word limit, prefer expressions that are practical and memorable (ideally under ~20 words)
+5. **NO STORY REFERENCES**: Reject answers that reference Quranic stories or narrative contexts
 
 EXAMPLES OF WHAT TO REJECT:
 ❌ "الساعة آتية" - This refers to the Day of Judgment, NOT suitable for asking about an appointment time
