@@ -255,7 +255,7 @@ export default function Exercise() {
   }
 
   const checkAnswer = async () => {
-    // Handle daily_contextual exercises differently (multiple choice)
+    // Handle daily_contextual exercises with AI semantic validation
     if (isDailyContextualExercise) {
       if (!selectedOption) {
         toast({
@@ -266,29 +266,99 @@ export default function Exercise() {
         return;
       }
 
-      const correctId = dailyContextualExercise?.correctExpression?.id;
-      const correct = selectedOption === correctId;
-      
-      setIsCorrect(correct);
-      setIsAnswered(true);
+      setIsValidating(true);
 
-      // Submit session
-      submitSessionMutation.mutate({
-        userId,
-        exerciseType: "daily_contextual",
-        phraseId: dailyContextualExercise?.exercise?.id || "unknown",
-        userAnswer: selectedOption,
-        correctAnswer: correctId,
-        isCorrect: correct ? "true" : "false",
-      });
+      try {
+        // Find the selected expression object
+        const selectedExpression = dailyContextualExercise?.options?.find(
+          (opt: any) => opt.id === selectedOption
+        );
 
-      toast({
-        title: correct ? t('correct') : t('incorrect'),
-        description: correct 
-          ? "Great job! You selected the right Quranic expression." 
-          : "Not quite right. Review the explanation below.",
-        variant: correct ? "default" : "destructive",
-      });
+        if (!selectedExpression) {
+          throw new Error("Selected expression not found");
+        }
+
+        // Get context information
+        const sentence = dailyContextualExercise?.sentence;
+        const sentenceText = language === 'ar' 
+          ? sentence?.arabicText 
+          : (language === 'en' 
+              ? sentence?.englishText 
+              : (sentence?.translations?.[language] || sentence?.englishText || sentence?.arabicText));
+
+        // Call AI validation with semantic analysis
+        const response = await fetch("/api/validate-answer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userAnswer: selectedExpression.arabicText,
+            exerciseType: "daily_contextual",
+            phraseId: dailyContextualExercise?.exercise?.id,
+            context: `Daily situation: ${sentenceText}\n\nSelected expression: ${selectedExpression.arabicText} (${selectedExpression.surahAyah})`,
+            language: language,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Validation failed");
+        }
+
+        const result = await response.json();
+        
+        setIsCorrect(result.isCorrect);
+        setFeedback(result.feedback);
+        setIsAnswered(true);
+
+        // Submit session
+        const correctId = dailyContextualExercise?.correctExpression?.id;
+        submitSessionMutation.mutate({
+          userId,
+          exerciseType: "daily_contextual",
+          phraseId: dailyContextualExercise?.exercise?.id || "unknown",
+          userAnswer: selectedOption,
+          correctAnswer: correctId,
+          isCorrect: result.isCorrect ? "true" : "false",
+        });
+
+        toast({
+          title: result.isCorrect ? t('correct') : t('incorrect'),
+          description: result.feedback || (result.isCorrect 
+            ? "Excellent! Your semantic understanding is correct." 
+            : "Not quite right. Review the semantic analysis below."),
+          variant: result.isCorrect ? "default" : "destructive",
+        });
+
+      } catch (error) {
+        console.error("AI validation error:", error);
+        
+        // Fallback to simple comparison if AI fails
+        const correctId = dailyContextualExercise?.correctExpression?.id;
+        const correct = selectedOption === correctId;
+        
+        setIsCorrect(correct);
+        setIsAnswered(true);
+
+        submitSessionMutation.mutate({
+          userId,
+          exerciseType: "daily_contextual",
+          phraseId: dailyContextualExercise?.exercise?.id || "unknown",
+          userAnswer: selectedOption,
+          correctAnswer: correctId,
+          isCorrect: correct ? "true" : "false",
+        });
+
+        toast({
+          title: correct ? t('correct') : t('incorrect'),
+          description: correct 
+            ? "Great job! You selected the right Quranic expression." 
+            : "Not quite right. Review the explanation below.",
+          variant: correct ? "default" : "destructive",
+        });
+      } finally {
+        setIsValidating(false);
+      }
 
       return;
     }

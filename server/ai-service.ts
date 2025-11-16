@@ -210,6 +210,35 @@ If ANY criterion is NO, mark the answer as INCORRECT and suggest a practical alt
       - Should demonstrate understanding of the theme
       - Should use authentic Quranic text`;
       break;
+    case "daily_contextual":
+      specificInstructions = `This is a DAILY CONTEXTUAL exercise. The student must select the most fitting Quranic expression for a daily-life situation.
+
+CRITICAL - SEMANTIC MEANING ANALYSIS REQUIRED:
+This is a language learning application for Arabic learners. The focus is on understanding **SEMANTIC MEANING** and **CONTEXTUAL APPROPRIATENESS**, not exact match memorization.
+
+EVALUATION CRITERIA (as an Arabic language scholar):
+1. **SEMANTIC ANALYSIS**: Deeply analyze the Arabic meaning and implications of the selected expression
+2. **CONTEXTUAL FIT**: Does this expression ADDRESS THE SITUATION'S NEED?
+   - Example: If situation is "Help me overcome my shortcomings" (ساعدني في التغلب على أوجه قصوري)
+     * "رَبَّنا أَتمِم لَنا نورَنا" = CORRECT (completing light = addressing shortcoming)
+     * "رَبَّنا آتِنا مِن لَدُنكَ وَلِيّاً" = ALSO CORRECT (asking for protector = addressing weakness/shortcoming)
+     * Both address the core concept of needing help to overcome deficiency
+3. **LINGUISTIC REASONING**: Analyze word meanings, derivatives, and semantic fields
+4. **MULTIPLE VALID ANSWERS**: Accept ALL semantically appropriate expressions, not just one "correct" answer
+
+ACCEPT if:
+✅ The expression's meaning relates to the situation's need (even indirectly)
+✅ The semantic field overlaps (e.g., قصور/shortcoming relates to طلب الولي/seeking help)
+✅ The expression addresses the same emotional/spiritual need
+✅ A native Arabic speaker would find it contextually appropriate
+
+REJECT only if:
+❌ The expression is completely unrelated to the situation
+❌ It contradicts the situation's intent
+❌ It's not authentic Quranic text
+
+Think like an Arabic language professor teaching vocabulary through meanings and contexts, NOT like a strict test grader looking for exact matches.`;
+      break;
     default:
       specificInstructions = `Evaluate this Arabic exercise answer for accuracy and relevance.`;
   }
