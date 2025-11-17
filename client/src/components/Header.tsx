@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings,
   UserCircle,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -90,6 +91,12 @@ const Header = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href="/analytics" className="cursor-pointer">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Analytics</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/profile" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
@@ -171,6 +178,12 @@ const Header = () => {
                       <Button variant="ghost" className="justify-start w-full">
                         <User className="mr-2 h-4 w-4" />
                         {t('dashboard')}
+                      </Button>
+                    </Link>
+                    <Link href="/analytics">
+                      <Button variant="ghost" className="justify-start w-full">
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        Analytics
                       </Button>
                     </Link>
                     <Link href="/profile">
