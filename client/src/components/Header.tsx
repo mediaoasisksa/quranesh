@@ -57,6 +57,15 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            {isAuthenticated && (
+              <Link
+                href="/analytics"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>Analytics</span>
+              </Link>
+            )}
           </div>
 
           {/* Desktop CTA */}
