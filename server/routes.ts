@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
 import {
   insertPhraseSchema,
   insertExerciseSessionSchema,
@@ -12,6 +13,11 @@ import {
   insertUserSchema,
   signupSchema,
   signinSchema,
+  users as usersTable,
+  exerciseSessions,
+  phrases as quranicPhrases,
+  type User,
+  type ExerciseSession,
 } from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -1334,6 +1340,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newExample);
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Invalid example data" });
+    }
+  });
+
+  // Admin Analytics Endpoints
+  app.get("/api/admin/analytics/overview", async (_req, res) => {
+    try {
+      // Get total users count
+      const users = await db.select({ id: usersTable.id }).from(usersTable);
+      const totalUsers = users.length;
+
+      // Get total exercises completed
+      const sessions = await db.select().from(exerciseSessions);
+      const totalExercises = sessions.length;
+
+      // Get unique active users (users who completed at least one exercise)
+      const activeUsers = new Set(sessions.map(s => s.userId));
+      const totalActiveUsers = activeUsers.size;
+
+      // Calculate engagement rate
+      const engagementRate = totalUsers > 0 
+        ? Math.round((totalActiveUsers / totalUsers) * 100) 
+        : 0;
+
+      // Get total phrases
+      const phrases = await db.select({ id: quranicPhrases.id }).from(quranicPhrases);
+      const totalPhrases = phrases.length;
+
+      // Get today's stats
+      const today = new Date().toISOString().split("T")[0];
+      const todaySessions = sessions.filter((session) => {
+        if (!session.completedAt) return false;
+        const sessionDate = new Date(session.completedAt).toISOString().split("T")[0];
+        return sessionDate === today;
+      });
+
+      res.json({
+        totalUsers,
+        totalActiveUsers,
+        engagementRate,
+        totalExercises,
+        totalPhrases,
+        todayExercises: todaySessions.length,
+      });
+    } catch (error) {
+      console.error("Admin overview error:", error);
+      res.status(500).json({ message: "Failed to fetch admin overview" });
+    }
+  });
+
+  app.get("/api/admin/analytics/exercise-engagement", async (_req, res) => {
+    try {
+      const sessions = await db.select().from(exerciseSessions);
+      
+      // Group sessions by exercise type
+      const exerciseStats: Record<string, {
+        count: number;
+        correctCount: number;
+        accuracy: number;
+        uniqueUsers: Set<string>;
+      }> = {};
+
+      sessions.forEach((session) => {
+        if (!exerciseStats[session.exerciseType]) {
+          exerciseStats[session.exerciseType] = {
+            count: 0,
+            correctCount: 0,
+            accuracy: 0,
+            uniqueUsers: new Set(),
+          };
+        }
+
+        exerciseStats[session.exerciseType].count++;
+        exerciseStats[session.exerciseType].uniqueUsers.add(session.userId);
+        
+        if (session.isCorrect === "true") {
+          exerciseStats[session.exerciseType].correctCount++;
+        }
+      });
+
+      // Calculate accuracy for each exercise type
+      const result = Object.entries(exerciseStats).map(([type, stats]) => ({
+        exerciseType: type,
+        totalSessions: stats.count,
+        uniqueUsers: stats.uniqueUsers.size,
+        correctSessions: stats.correctCount,
+        accuracy: stats.count > 0 ? Math.round((stats.correctCount / stats.count) * 100) : 0,
+        participationRate: sessions.length > 0 
+          ? Math.round((stats.count / sessions.length) * 100) 
+          : 0,
+      }));
+
+      res.json(result);
+    } catch (error) {
+      console.error("Exercise engagement error:", error);
+      res.status(500).json({ message: "Failed to fetch exercise engagement" });
+    }
+  });
+
+  app.get("/api/admin/analytics/user-activity", async (_req, res) => {
+    try {
+      const sessions = await db.select().from(exerciseSessions);
+      const users = await db.select().from(usersTable);
+
+      // Calculate user activity by date (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const dailyActivity: Record<string, {
+        date: string;
+        activeUsers: Set<string>;
+        totalSessions: number;
+      }> = {};
+
+      sessions.forEach((session) => {
+        if (!session.completedAt) return;
+        
+        const sessionDate = new Date(session.completedAt);
+        if (sessionDate < thirtyDaysAgo) return;
+
+        const dateKey = sessionDate.toISOString().split("T")[0];
+        
+        if (!dailyActivity[dateKey]) {
+          dailyActivity[dateKey] = {
+            date: dateKey,
+            activeUsers: new Set(),
+            totalSessions: 0,
+          };
+        }
+
+        dailyActivity[dateKey].activeUsers.add(session.userId);
+        dailyActivity[dateKey].totalSessions++;
+      });
+
+      const result = Object.values(dailyActivity)
+        .map(activity => ({
+          date: activity.date,
+          activeUsers: activity.activeUsers.size,
+          totalSessions: activity.totalSessions,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      res.json({
+        totalUsers: users.length,
+        dailyActivity: result,
+      });
+    } catch (error) {
+      console.error("User activity error:", error);
+      res.status(500).json({ message: "Failed to fetch user activity" });
+    }
+  });
+
+  app.get("/api/admin/analytics/top-users", async (_req, res) => {
+    try {
+      const sessions = await db.select().from(exerciseSessions);
+      
+      // Count sessions per user
+      const userStats: Record<string, {
+        userId: string;
+        totalSessions: number;
+        correctSessions: number;
+      }> = {};
+
+      sessions.forEach((session) => {
+        if (!userStats[session.userId]) {
+          userStats[session.userId] = {
+            userId: session.userId,
+            totalSessions: 0,
+            correctSessions: 0,
+          };
+        }
+
+        userStats[session.userId].totalSessions++;
+        if (session.isCorrect === "true") {
+          userStats[session.userId].correctSessions++;
+        }
+      });
+
+      // Get user details
+      const users = await db.select().from(usersTable);
+      const userMap = new Map(users.map(u => [u.id, u]));
+
+      // Calculate and sort by total sessions
+      const result = Object.values(userStats)
+        .map(stats => {
+          const user = userMap.get(stats.userId);
+          return {
+            userId: stats.userId,
+            username: user ? `${user.firstName} ${user.lastName}` : "Unknown",
+            email: user?.email,
+            totalSessions: stats.totalSessions,
+            accuracy: stats.totalSessions > 0 
+              ? Math.round((stats.correctSessions / stats.totalSessions) * 100) 
+              : 0,
+          };
+        })
+        .sort((a, b) => b.totalSessions - a.totalSessions)
+        .slice(0, 10); // Top 10 users
+
+      res.json(result);
+    } catch (error) {
+      console.error("Top users error:", error);
+      res.status(500).json({ message: "Failed to fetch top users" });
     }
   });
 
