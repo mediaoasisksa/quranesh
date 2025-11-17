@@ -27,9 +27,9 @@ const Header = () => {
   const { dir, t } = useLanguage();
 
   const navigation = [
-    { name: "Features", href: "/features" },
-    { name: "How It Works", href: "/how-it-works" },
-    { name: "Pricing", href: "/pricing" },
+    { name: t('features'), href: "/features" },
+    { name: t('howItWorks'), href: "/how-it-works" },
+    { name: t('pricing'), href: "/pricing" },
   ];
 
   return (
