@@ -41,7 +41,7 @@ declare global {
 
 export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: PaymentFormProps) {
   const { t } = useLanguage();
-  
+
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     email: '',
     givenName: '',
@@ -86,7 +86,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       console.log('Payment method state:', paymentMethod);
       console.log('Plan ID:', selectedPlan.id);
       console.log('Customer details:', customerDetails);
-      
+
       const response = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: {
@@ -124,16 +124,16 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       console.log('Widget URL:', data.widgetUrl);
       console.log('Integrity hash:', data.integrity);
       console.log('Callback URL:', data.callbackUrl);
-      
+
       const script = document.createElement('script');
       script.src = `${data.widgetUrl}/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
-      
+
       // Add security attributes as per HyperPay documentation
       if (data.integrity) {
         script.integrity = data.integrity;
         script.crossOrigin = 'anonymous';
       }
-      
+
       script.onload = () => {
         console.log('HyperPay widget script loaded successfully');
         setIsLoading(false);
@@ -176,8 +176,8 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold text-lg">{selectedPlan.name}</h3>
             <p className="text-2xl font-bold text-green-600">
-              {selectedPlan.price} {selectedPlan.currency}
-              <span className="text-sm font-normal text-gray-600">/{selectedPlan.duration}</span>
+              ${selectedPlan.price} {selectedPlan.currency}
+              <span className="text-sm font-normal text-gray-600"> - One-time payment</span>
             </p>
             <ul className="mt-2 text-sm text-gray-600">
               {selectedPlan.features.map((feature, index) => (
@@ -368,7 +368,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                   {t('processingPayment')}
                 </>
               ) : (
-                `${t('pay')} ${selectedPlan.price} ${selectedPlan.currency}`
+                `Pay $${selectedPlan.price} ${selectedPlan.currency} - One-time Payment`
               )}
             </Button>
           )}

@@ -1,53 +1,15 @@
 {
   "plans": [
     {
-      "id": "basic",
-      "name": "Basic",
-      "price": 0,
-      "currency": "SAR",
-      "duration": "free",
+      "id": "certificate",
+      "name": "Official Performance Certificate",
+      "price": 10,
+      "currency": "USD",
+      "duration": "one-time",
       "features": [
-        "Access to 100 basic Quranic sentences",
-        "2 exercise types (Substitution & Completion)",
-        "Basic progress tracking",
-        "Community forum access",
-        "Mobile app access"
-      ]
-    },
-    {
-      "id": "standard",
-      "name": "Standard",
-      "price": 1,
-      "currency": "SAR",
-      "duration": "month",
-      "features": [
-        "Access to 1000+ Quranic sentences",
-        "All 6 exercise types",
-        "Advanced AI conversation partner",
-        "Detailed progress analytics",
-        "Pronunciation correction",
-        "Weekly progress reports",
-        "Priority community support",
-        "Offline mode access"
-      ]
-    },
-    {
-      "id": "premium",
-      "name": "Premium",
-      "price": 150,
-      "currency": "SAR",
-      "duration": "month",
-      "features": [
-        "Access to full Quranic database (5000+ sentences)",
-        "Unlimited AI interactions",
-        "Advanced speech recognition",
-        "Personal AI tutor with memory",
-        "Custom learning paths",
-        "Live pronunciation sessions",
-        "1-on-1 monthly coaching calls",
-        "Advanced analytics dashboard",
-        "Priority customer support",
-        "Early access to new features"
+        "Official acknowledgment of your Arabic language performance",
+        "Digital certificate suitable for professional portfolios",
+        "Verification link for employers and institutions"
       ]
     }
   ]
