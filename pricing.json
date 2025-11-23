@@ -3,8 +3,8 @@
     {
       "id": "certificate",
       "name": "Official Performance Certificate",
-      "price": 10,
-      "currency": "USD",
+      "price": 40,
+      "currency": "SAR",
       "duration": "one-time",
       "features": [
         "Official acknowledgment of your Arabic language performance",
