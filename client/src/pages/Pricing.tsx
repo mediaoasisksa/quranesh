@@ -128,7 +128,7 @@ const Pricing = () => {
                     </CardTitle>
                     <div className="mb-4">
                       <span className="text-5xl font-bold text-foreground">
-                        ${pricingPlans[0].price}
+                        {pricingPlans[0].price}
                       </span>
                       <span className="text-xl text-muted-foreground ml-2">
                         {pricingPlans[0].currency}
@@ -170,7 +170,7 @@ const Pricing = () => {
                         handlePlanSelect(pricingPlans[0]);
                       }}
                     >
-                      Get Your Certificate - ${pricingPlans[0].price} {pricingPlans[0].currency}
+                      Get Your Certificate - {pricingPlans[0].price} {pricingPlans[0].currency}
                     </Button>
                   </CardContent>
                 </Card>
