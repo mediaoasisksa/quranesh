@@ -15,11 +15,14 @@ const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English" },
   { code: "id", name: "Indonesian" },
   { code: "tr", name: "Turkish" },
+  { code: "ar", name: "Arabic" },
+  { code: "ur", name: "Urdu" },
   { code: "zh", name: "Chinese" },
   { code: "sw", name: "Swahili" },
   { code: "so", name: "Somali" },
   { code: "bs", name: "Bosnian" },
   { code: "sq", name: "Albanian" },
+  { code: "ru", name: "Russian" },
 ];
 
 export default function TranslationManager() {

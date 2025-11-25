@@ -13,7 +13,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem("app-language");
-    return (saved === "ar" || saved === "en" || saved === "id" || saved === "tr" || saved === "zh" || saved === "sw" || saved === "so" || saved === "bs" || saved === "sq") ? saved : "en";
+    return (saved === "ar" || saved === "en" || saved === "id" || saved === "tr" || saved === "zh" || saved === "sw" || saved === "so" || saved === "bs" || saved === "sq" || saved === "ur" || saved === "ru") ? saved : "en";
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return translations[language][key] || key;
   };
 
-  const dir = language === "ar" ? "rtl" : "ltr";
+  const dir = (language === "ar" || language === "ur") ? "rtl" : "ltr";
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>
