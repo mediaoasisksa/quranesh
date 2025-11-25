@@ -156,6 +156,7 @@ export const conversationPrompts = pgTable("conversation_prompts", {
   questionBs: text("question_bs"),
   questionSq: text("question_sq"),
   questionRu: text("question_ru"),
+  questionUr: text("question_ur"),
   suggestedVerse: text("suggested_verse").notNull(),
   category: text("category"),
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation

@@ -1,0 +1,99 @@
+ثلاث لغات: الألبانية، السواحيلية، والأوردو   Si thuhet: Jam njeri?
+Je, unasemaje: Mimi ni mwanadamu?
+انسان ہوں کیسے کہیں؟
+الجواب: إِنَّمَا أَنَا بَشَرٌ
+
+Si thuhet: Thuaj të vërtetën është?
+Je, unasemaje: Sema ukweli ni...?
+سچ کہنا ہے کیسے کہیں؟
+الجواب: قُلْ إِنَّمَا الْعِلْمُ
+
+Si pyet: Të shkojmë në shpellë?
+Je, unauliza: Tuelekee pangoni?
+غار چلیں؟ کیسے پوچھیں؟
+الجواب: إِلَى الْكَهْفِ
+
+Si thuhet: Zoti ua shtoi diturinë?
+Je, unasemaje: Mungu aliwazidishia maarifa?
+اللہ نے علم بڑھایا کیسے کہیں؟
+الجواب: فَزِدْنَاهُمْ هُدًى
+
+Si thuhet: E gjithë dituria është tek Allahu?
+Je, unasemaje: Elimu yote iko kwa Mungu?
+سب علم اللہ کے پاس ہے کیسے کہیں؟
+الجواب: وَعِندَهُ أُمُّ الْكِتَابِ
+
+Si thuhet: Zoti ynë e di më mirë?
+Je, unasemaje: Mola wetu anajua vyema?
+ہمارا رب بہتر جانتا ہے کیسے کہیں؟
+الجواب: رَبِّي أَعْلَمُ
+
+Si thuhet: Dua një dalje?
+Je, unasemaje: Nataka njia ya kutokea?
+میں راستہ چاہتا ہوں کیسے کہیں؟
+الجواب: فَأْوُوا إِلَى الْكَهْفِ
+
+Si pyet: A mund të kërkojë ushqim për ne?
+Je, unauliza: Akitafute chakula chema?
+ہمارے لئے کھانا تلاش کرے؟ کیسے پوچھیں؟
+الجواب: فَلْيَنظُرْ أَيُّهَا أَزْكَى طَعَامًا
+
+Si thuhet: Dërgoni një prej jush?
+Je, unasemaje: Mmtume mmoja wenu?
+اپنے میں سے کسی کو بھیجیں؟ کیسے کہیں؟
+الجواب: فَابْعَثُوا أَحَدَكُم
+
+Si thuhet: Fshihu, mos u tregoni?
+Je, unasemaje: Jifiche msionekane?
+چھپ جاؤ، ظاہر نہ کرو؟ کیسے کہیں؟
+الجواب: وَلَا يُشْعِرَنَّ بِكُمْ أَحَدًا
+
+Si thuhet: Le të gjykojë Zoti mes nesh?
+Je, unasemaje: Mola atuhukumu kati yetu?
+اللہ ہمارے درمیان فیصلہ کرے کیسے کہیں؟
+الجواب: فَلْيَحْكُمْ بَيْنَنَا رَبُّنَا
+
+Si thuhet: A doni të ndryshoni?
+Je, unasemaje: Mnataka kubadilisha?
+کیا تم بدلنا چاہتے ہو؟ کیسے کہیں؟
+الجواب: أَفَتُرِيدُونَ أَنْ تَبْدِلُوا
+
+Si thuhet: Nuk mund t’ju ruaj?
+Je, unasemaje: Siwezi kuwalinda?
+میں تمہیں بچا نہیں سکتا کیسے کہیں؟
+الجواب: وَمَا أَنَا عَلَيْهِمْ بِحَفِيظٍ
+
+Si thuhet: Askush nuk i di?
+Je, unasemaje: Hakuna anayejua?
+کوئی نہیں جانتا کیسے کہیں؟
+الجواب: مَا يَعْلَمُهُمْ
+
+Si thuhet: Bëj punë të mirë?
+Je, unasemaje: Fanya kazi njema?
+اچھا عمل کرو کیسے کہیں؟
+الجواب: فَلْيَعْمَلْ عَمَلًا صَالِحًا
+
+Si thuhet: Mos i bashkëngjit Zotit?
+Je, unasemaje: Usimshirikishe Mungu?
+اللہ کے ساتھ کسی کو شریک نہ کرو کیسے کہیں؟
+الجواب: وَلَا يُشْرِكْ
+
+Si thuhet: Mos pyet shumë?
+Je, unasemaje: Usiulize sana?
+زیادہ سوال نہ کرو کیسے کہیں؟
+الجواب: فَلَا تُمَارِ فِيهِمْ
+
+Si thuhet: Mos thuaj do ta bëj nesër?
+Je, unasemaje: Usiseme nitafanya kesho?
+کل کروں گا نہ کہو کیسے کہیں؟
+الجواب: وَلَا تَقُولَنَّ لِشَيْءٍ إِنِّي فَاعِلٌ ذَٰلِكَ غَدًا
+
+Si thuhet: Thuaj inshallah?
+Je, unasemaje: Sema inshallah?
+ان شاء اللہ کہو کیسے کہیں؟
+الجواب: إِلَّا أَنْ يَشَاءَ اللَّهُ
+
+Si thuhet: Përmende Zotin tënd?
+Je, unasemaje: Mtaje Mola wako?
+اپنے رب کو یاد کرو کیسے کہیں؟
+الجواب: وَاذْكُرْ رَبَّكَ
