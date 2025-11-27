@@ -46,7 +46,7 @@ const Hero = () => {
               className="text-xl md:text-2xl font-bold text-foreground mb-4"
               dir="rtl"
             >
-              «خَيْرُكُمْ مِنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمه»
+              «إِنَّا أَنزَلْنَاهُ قُرْآنًا عَرَبِيًّا لَّعَلَّكُمْ تَعْقِلُونَ»
             </p>
             <p className="text-lg text-foreground">
               {t('quranicQuote')}
