@@ -12,100 +12,102 @@ import {
   Repeat,
   Users,
 } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 const HowItWorks = () => {
+  const { t, dir } = useLanguage();
+
   const steps = [
     {
       step: "01",
       icon: User,
-      title: "Create Your Profile",
+      title: t('createProfile') || "Create Your Profile",
       description:
-        "Sign up and tell us about your Quran memorization level and Arabic learning goals.",
+        t('createProfileDesc') || "Sign up and tell us about your Quran memorization level and Arabic learning goals.",
       details:
-        "We'll assess your current knowledge and customize your learning path accordingly.",
+        t('createProfileDetails') || "We'll assess your current knowledge and customize your learning path accordingly.",
     },
     {
       step: "02",
       icon: BookOpen,
-      title: "Access Quranic Database",
+      title: t('accessDatabase') || "Access Quranic Database",
       description:
-        "Explore our comprehensive database of Quranic sentences organized by complexity and usage.",
+        t('accessDatabaseDesc') || "Explore our comprehensive database of Quranic sentences organized by complexity and usage.",
       details:
-        "Each verse comes with Arabic text, English translation, and real-life context examples.",
+        t('accessDatabaseDetails') || "Each verse comes with Arabic text, English translation, and real-life context examples.",
     },
     {
       step: "03",
       icon: MessageSquare,
-      title: "Practice with AI",
+      title: t('practiceWithAI') || "Practice with AI",
       description:
-        "Engage in interactive exercises and conversations with our AI tutor.",
+        t('practiceWithAIDesc') || "Engage in interactive exercises and conversations with our AI tutor.",
       details:
-        "Practice pronunciation, sentence construction, and use Quranic expressions in daily scenarios.",
+        t('practiceWithAIDetails') || "Practice pronunciation, sentence construction, and use Quranic expressions in daily scenarios.",
     },
     {
       step: "04",
       icon: BarChart3,
-      title: "Track Progress",
+      title: t('trackProgress') || "Track Progress",
       description:
-        "Monitor your learning journey with detailed analytics and weekly reports.",
+        t('trackProgressDesc') || "Monitor your learning journey with detailed analytics and weekly reports.",
       details:
-        "See which verses you've mastered and get recommendations for continued learning.",
+        t('trackProgressDetails') || "See which verses you've mastered and get recommendations for continued learning.",
     },
   ];
 
   const exercises = [
     {
       icon: Repeat,
-      title: "Substitution Drill",
+      title: t('substitutionDrill') || "Substitution Drill",
       description:
-        "Replace words in Quranic phrases to understand structure and meaning.",
+        t('substitutionDrillDesc') || "Replace words in Quranic phrases to understand structure and meaning.",
     },
     {
       icon: MessageSquare,
-      title: "Dialogue Practice",
+      title: t('dialoguePractice') || "Dialogue Practice",
       description:
-        "AI asks questions in English, you respond using appropriate Quranic expressions.",
+        t('dialoguePracticeDesc') || "AI asks questions in English, you respond using appropriate Quranic expressions.",
     },
     {
       icon: BookOpen,
-      title: "Completion Exercise",
+      title: t('completionExercise') || "Completion Exercise",
       description:
-        "Complete verses when given the beginning, testing your memorization and understanding.",
+        t('completionExerciseDesc') || "Complete verses when given the beginning, testing your memorization and understanding.",
     },
     {
       icon: Users,
-      title: "Role Play",
+      title: t('rolePlay') || "Role Play",
       description:
-        "Use Quranic verses in real-life emotional and interactive scenarios.",
+        t('rolePlayDesc') || "Use Quranic verses in real-life emotional and interactive scenarios.",
     },
     {
       icon: Trophy,
-      title: "Comparison",
+      title: t('comparison') || "Comparison",
       description:
-        "Explain differences between similar verses to deepen comprehension.",
+        t('comparisonDesc') || "Explain differences between similar verses to deepen comprehension.",
     },
     {
       icon: ArrowRight,
-      title: "Transformation",
+      title: t('transformation') || "Transformation",
       description:
-        "Convert statements into questions and vice versa using Quranic Arabic.",
+        t('transformationDesc') || "Convert statements into questions and vice versa using Quranic Arabic.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={dir}>
       <Header />
       <main className="pt-20">
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-6 text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              How Quranic
-              <span className="text-primary"> Works</span>
+              {t('howWorks') || "How Quranic"}
+              <span className="text-primary"> {t('works') || "Works"}</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              A simple, structured approach to learning practical Arabic through
-              the Quran you've already memorized.
+              {t('howWorksDesc') || "A simple, structured approach to learning practical Arabic through the Quran you've already memorized."}
             </p>
           </div>
         </section>
@@ -115,11 +117,10 @@ const HowItWorks = () => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Your Learning Journey
+                {t('yourLearningJourney') || "Your Learning Journey"}
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Follow these simple steps to transform your Quranic memorization
-                into practical Arabic skills.
+                {t('followSteps') || "Follow these simple steps to transform your Quranic memorization into practical Arabic skills."}
               </p>
             </div>
 
@@ -166,11 +167,10 @@ const HowItWorks = () => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Interactive Exercise Types
+                {t('exerciseTypes') || "Interactive Exercise Types"}
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Engage with diverse exercise formats designed to reinforce your
-                learning and build practical skills.
+                {t('exerciseTypesDesc') || "Engage with diverse exercise formats designed to reinforce your learning and build practical skills."}
               </p>
             </div>
 
@@ -203,11 +203,10 @@ const HowItWorks = () => {
         <section className="py-20">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Ready to Begin Your Journey?
+              {t('readyToBegin') || "Ready to Begin Your Journey?"}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Start transforming your Quranic memorization into practical Arabic
-              communication skills today.
+              {t('readyToBeginDesc') || "Start transforming your Quranic memorization into practical Arabic communication skills today."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -215,14 +214,14 @@ const HowItWorks = () => {
                 size="lg"
                 onClick={() => (window.location.href = "/signup")}
               >
-                Start Learning Now
+                {t('startLearningNow') || "Start Learning Now"}
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => (window.location.href = "/features")}
               >
-                Explore Features
+                {t('exploreFeatures') || "Explore Features"}
               </Button>
             </div>
           </div>

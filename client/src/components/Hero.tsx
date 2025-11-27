@@ -40,19 +40,6 @@ const Hero = () => {
             />
           </div>
 
-          {/* Arabic Quote */}
-          <div className="text-center mb-6">
-            <p
-              className="text-xl md:text-2xl font-bold text-foreground mb-4"
-              dir="rtl"
-            >
-              «إِنَّا أَنزَلْنَاهُ قُرْآنًا عَرَبِيًّا لَّعَلَّكُمْ تَعْقِلُونَ»
-            </p>
-            <p className="text-lg text-foreground">
-              {t('quranicQuote')}
-            </p>
-          </div>
-
           {/* CTA Buttons */}
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
