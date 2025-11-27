@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
+import heroImage from "@assets/generated_images/quranic_book_with_flowing_arabic_letters.png";
 
 const Hero = () => {
   const { isAuthenticated } = useAuth();
@@ -29,30 +30,14 @@ const Hero = () => {
             </h1>
           </div>
 
-          {/* Lottie Animation with Decorative Lines */}
-          <div className="flex items-center justify-center mb-1 relative">
-            {/* Left Decorative Line */}
-            <div className="hidden md:block absolute left-0 top-1/2 transform -translate-y-1/2">
-              <div className="w-16 h-px bg-black opacity-30"></div>
-              <div className="w-12 h-px bg-black opacity-20 mt-2"></div>
-              <div className="w-8 h-px bg-black opacity-10 mt-2"></div>
-            </div>
-
-            {/* Animation */}
-            <dotlottie-wc
-              src="https://lottie.host/cad9aaea-db6b-4f60-b409-69f1fafe1740/whCL9cRnjS.lottie"
-              style={{ width: "300px", height: "300px" }}
-              speed="1"
-              autoplay
-              loop
-            ></dotlottie-wc>
-
-            {/* Right Decorative Line */}
-            <div className="hidden md:block absolute right-0 top-1/2 transform -translate-y-1/2">
-              <div className="w-16 h-px bg-black opacity-30"></div>
-              <div className="w-12 h-px bg-black opacity-20 mt-2"></div>
-              <div className="w-8 h-px bg-black opacity-10 mt-2"></div>
-            </div>
+          {/* Quranic Book Image with Arabic Letters */}
+          <div className="flex items-center justify-center mb-8">
+            <img
+              src={heroImage}
+              alt="Quranic Arabic with flowing letters - Quranic book and Arabic calligraphy"
+              className="w-full max-w-3xl h-auto rounded-xl shadow-2xl"
+              data-testid="img-hero-quranic"
+            />
           </div>
 
           {/* Arabic Quote */}
