@@ -326,3 +326,48 @@ export const insertRealLifeExampleSchema = createInsertSchema(realLifeExamples).
 
 export type RealLifeExample = typeof realLifeExamples.$inferSelect;
 export type InsertRealLifeExample = z.infer<typeof insertRealLifeExampleSchema>;
+
+// Daily Quranic Elements - 100 words/phrases extracted daily for language learning
+export const dailyQuranicElements = pgTable("daily_quranic_elements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  surah: text("surah").notNull(), // اسم السورة
+  ayah: integer("ayah").notNull(), // رقم الآية
+  phraseAr: text("phrase_ar").notNull(), // الكلمة أو العبارة بالعربية
+  translit: text("translit").notNull(), // كتابة تقريبية بالحروف اللاتينية
+  literalMeaning: text("literal_meaning").notNull(), // معنى حرفي مختصر بالإنجليزية
+  arabicExplanation: text("arabic_explanation").notNull(), // شرح عربي مبسط للمعنى اللغوي
+  grammarNote: text("grammar_note").notNull(), // ملاحظة نحوية/صرفية
+  exampleSimple: text("example_simple").notNull(), // مثال عربي معاصر
+  grammarType: text("grammar_type"), // جملة اسمية، فعلية، نداء، شرط، استفهام، إلخ
+  wordCount: integer("word_count").default(1), // عدد الكلمات (1-6)
+  batchDate: text("batch_date").notNull(), // تاريخ الدفعة YYYY-MM-DD
+  batchNumber: integer("batch_number").notNull(), // رقم العنصر في الدفعة (1-100)
+  isUsed: integer("is_used").default(0), // 1 = تم عرضه للمستخدم
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertDailyQuranicElementSchema = createInsertSchema(dailyQuranicElements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type DailyQuranicElement = typeof dailyQuranicElements.$inferSelect;
+export type InsertDailyQuranicElement = z.infer<typeof insertDailyQuranicElementSchema>;
+
+// Used Quranic Phrases - Track which phrases have been used to avoid repetition
+export const usedQuranicPhrases = pgTable("used_quranic_phrases", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  phraseAr: text("phrase_ar").notNull().unique(), // العبارة المستخدمة
+  surah: text("surah").notNull(),
+  ayah: integer("ayah").notNull(),
+  usedOn: text("used_on").notNull(), // تاريخ الاستخدام YYYY-MM-DD
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertUsedQuranicPhraseSchema = createInsertSchema(usedQuranicPhrases).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type UsedQuranicPhrase = typeof usedQuranicPhrases.$inferSelect;
+export type InsertUsedQuranicPhrase = z.infer<typeof insertUsedQuranicPhraseSchema>;

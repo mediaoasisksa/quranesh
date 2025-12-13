@@ -1545,6 +1545,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Daily Quranic Elements API
+  app.get("/api/daily-quranic-elements", async (req, res) => {
+    try {
+      const { dailyQuranicElements } = await import("@shared/schema");
+      const { desc, eq } = await import("drizzle-orm");
+      
+      const date = req.query.date as string || new Date().toISOString().split('T')[0];
+      
+      const elements = await db.select()
+        .from(dailyQuranicElements)
+        .where(eq(dailyQuranicElements.batchDate, date))
+        .orderBy(dailyQuranicElements.batchNumber);
+      
+      res.json({
+        date,
+        count: elements.length,
+        elements
+      });
+    } catch (error) {
+      console.error("Daily elements error:", error);
+      res.status(500).json({ message: "Failed to fetch daily elements" });
+    }
+  });
+
+  app.get("/api/daily-quranic-elements/stats", async (req, res) => {
+    try {
+      const { dailyQuranicElements, usedQuranicPhrases } = await import("@shared/schema");
+      const { sql } = await import("drizzle-orm");
+      
+      const totalElements = await db.select({ count: sql<number>`count(*)` })
+        .from(dailyQuranicElements);
+      
+      const totalUsed = await db.select({ count: sql<number>`count(*)` })
+        .from(usedQuranicPhrases);
+      
+      const batchDates = await db.select({ 
+        batchDate: dailyQuranicElements.batchDate,
+        count: sql<number>`count(*)`
+      })
+        .from(dailyQuranicElements)
+        .groupBy(dailyQuranicElements.batchDate)
+        .orderBy(sql`batch_date DESC`)
+        .limit(10);
+      
+      res.json({
+        totalElements: totalElements[0]?.count || 0,
+        totalUsedPhrases: totalUsed[0]?.count || 0,
+        recentBatches: batchDates
+      });
+    } catch (error) {
+      console.error("Stats error:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  app.post("/api/admin/run-daily-job", async (_req, res) => {
+    try {
+      const { runJobManually } = await import("./scheduler");
+      const result = await runJobManually();
+      res.json(result);
+    } catch (error) {
+      console.error("Manual job error:", error);
+      res.status(500).json({ message: "Failed to run daily job" });
+    }
+  });
+
+  app.get("/api/admin/scheduler-status", async (_req, res) => {
+    try {
+      const { getSchedulerStatus } = await import("./scheduler");
+      const status = getSchedulerStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Scheduler status error:", error);
+      res.status(500).json({ message: "Failed to get scheduler status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
