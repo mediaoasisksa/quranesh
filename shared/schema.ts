@@ -371,3 +371,123 @@ export const insertUsedQuranicPhraseSchema = createInsertSchema(usedQuranicPhras
 
 export type UsedQuranicPhrase = typeof usedQuranicPhrases.$inferSelect;
 export type InsertUsedQuranicPhrase = z.infer<typeof insertUsedQuranicPhraseSchema>;
+
+// ==================== DIPLOMA SYSTEM ====================
+// 12-Week Arabic Language Diploma using Quranic vocabulary as linguistic corpus
+
+// Diploma Weeks - 12 weeks structure
+export const diplomaWeeks = pgTable("diploma_weeks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  weekNumber: integer("week_number").notNull().unique(), // 1-12
+  titleAr: text("title_ar").notNull(), // عنوان الأسبوع بالعربية
+  titleEn: text("title_en").notNull(), // English title
+  descriptionAr: text("description_ar").notNull(), // وصف الأسبوع
+  descriptionEn: text("description_en").notNull(),
+  lessonContentAr: text("lesson_content_ar").notNull(), // محتوى الدرس الرئيسي
+  lessonContentEn: text("lesson_content_en").notNull(),
+  translations: jsonb("translations").$type<Record<string, { title: string; description: string; lessonContent: string }>>(),
+  grammarFocus: text("grammar_focus"), // التركيز النحوي
+  orderIndex: integer("order_index").default(0),
+});
+
+export const insertDiplomaWeekSchema = createInsertSchema(diplomaWeeks).omit({
+  id: true,
+});
+
+export type DiplomaWeek = typeof diplomaWeeks.$inferSelect;
+export type InsertDiplomaWeek = z.infer<typeof insertDiplomaWeekSchema>;
+
+// Diploma Vocabulary - مفردات كل أسبوع (10-20 كلمة)
+export const diplomaVocabulary = pgTable("diploma_vocabulary", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  weekId: text("week_id").notNull(), // Foreign key to diplomaWeeks
+  wordAr: text("word_ar").notNull(), // الكلمة بالعربية
+  root: text("root"), // الجذر الثلاثي
+  translit: text("translit").notNull(), // الكتابة اللاتينية
+  meaningEn: text("meaning_en").notNull(), // المعنى بالإنجليزية
+  meaningAr: text("meaning_ar").notNull(), // الشرح بالعربية
+  derivations: jsonb("derivations").$type<Array<{ word: string; meaning: string }>>(), // اشتقاقات
+  exampleQuranic: text("example_quranic"), // مثال قرآني (كنص لغوي)
+  exampleModern: text("example_modern"), // مثال حياتي معاصر
+  translations: jsonb("translations").$type<Record<string, { meaning: string; example: string }>>(),
+  orderIndex: integer("order_index").default(0),
+});
+
+export const insertDiplomaVocabularySchema = createInsertSchema(diplomaVocabulary).omit({
+  id: true,
+});
+
+export type DiplomaVocabulary = typeof diplomaVocabulary.$inferSelect;
+export type InsertDiplomaVocabulary = z.infer<typeof insertDiplomaVocabularySchema>;
+
+// Diploma Exercises - تمارين (نموذجين فقط: A=فراغات، B=ترتيب)
+export const diplomaExercises = pgTable("diploma_exercises", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  weekId: text("week_id").notNull(),
+  exerciseType: text("exercise_type").notNull(), // "fill_blanks" (A) or "reorder" (B)
+  questionAr: text("question_ar").notNull(), // السؤال بالعربية
+  questionEn: text("question_en"), // الترجمة
+  // For fill_blanks: sentence with ____ blanks
+  sentenceWithBlanks: text("sentence_with_blanks"),
+  // For fill_blanks: word bank
+  wordBank: jsonb("word_bank").$type<string[]>(),
+  // For reorder: shuffled words
+  shuffledWords: jsonb("shuffled_words").$type<string[]>(),
+  // Correct answer
+  correctAnswer: text("correct_answer").notNull(),
+  // Alternative correct answers (semantic variations)
+  alternativeAnswers: jsonb("alternative_answers").$type<string[]>(),
+  explanation: text("explanation"), // شرح الإجابة
+  translations: jsonb("translations").$type<Record<string, { question: string; explanation: string }>>(),
+  isQuiz: integer("is_quiz").default(0), // 1 = جزء من الاختبار الأسبوعي
+  orderIndex: integer("order_index").default(0),
+});
+
+export const insertDiplomaExerciseSchema = createInsertSchema(diplomaExercises).omit({
+  id: true,
+});
+
+export type DiplomaExercise = typeof diplomaExercises.$inferSelect;
+export type InsertDiplomaExercise = z.infer<typeof insertDiplomaExerciseSchema>;
+
+// User Diploma Progress - تقدم المستخدم في الدبلوم
+export const userDiplomaProgress = pgTable("user_diploma_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  currentWeek: integer("current_week").default(1), // الأسبوع الحالي (1-12)
+  completedWeeks: jsonb("completed_weeks").$type<number[]>().default([]), // الأسابيع المكتملة
+  completedExercises: jsonb("completed_exercises").$type<string[]>().default([]), // التمارين المكتملة
+  quizScores: jsonb("quiz_scores").$type<Record<number, number>>().default({}), // درجات الاختبارات
+  enrolledAt: timestamp("enrolled_at").default(sql`now()`),
+  lastAccessedAt: timestamp("last_accessed_at").default(sql`now()`),
+  completionPercentage: integer("completion_percentage").default(0),
+  isCompleted: integer("is_completed").default(0),
+});
+
+export const insertUserDiplomaProgressSchema = createInsertSchema(userDiplomaProgress).omit({
+  id: true,
+  enrolledAt: true,
+  lastAccessedAt: true,
+});
+
+export type UserDiplomaProgress = typeof userDiplomaProgress.$inferSelect;
+export type InsertUserDiplomaProgress = z.infer<typeof insertUserDiplomaProgressSchema>;
+
+// Diploma Exercise Attempts - محاولات التمارين
+export const diplomaExerciseAttempts = pgTable("diploma_exercise_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  exerciseId: text("exercise_id").notNull(),
+  weekNumber: integer("week_number").notNull(),
+  userAnswer: text("user_answer").notNull(),
+  isCorrect: integer("is_correct").notNull(), // 1 = صحيح، 0 = خطأ
+  attemptedAt: timestamp("attempted_at").default(sql`now()`),
+});
+
+export const insertDiplomaExerciseAttemptSchema = createInsertSchema(diplomaExerciseAttempts).omit({
+  id: true,
+  attemptedAt: true,
+});
+
+export type DiplomaExerciseAttempt = typeof diplomaExerciseAttempts.$inferSelect;
+export type InsertDiplomaExerciseAttempt = z.infer<typeof insertDiplomaExerciseAttemptSchema>;
