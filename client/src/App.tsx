@@ -18,6 +18,7 @@ import { PaymentSuccess } from "@/pages/payment-success";
 import TranslationManager from "@/pages/translation-manager";
 import RealLifeExamplesPage from "@/pages/real-life-examples";
 import Analytics from "@/pages/Analytics";
+import DiplomaPage from "@/pages/diploma";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/exercise/:type/:phraseId?" component={Exercise} />
       <Route path="/real-life-examples" component={RealLifeExamplesPage} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/diploma" component={DiplomaPage} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={Profile} />

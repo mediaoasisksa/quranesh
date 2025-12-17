@@ -16,8 +16,17 @@ import {
   users as usersTable,
   exerciseSessions,
   phrases as quranicPhrases,
+  diplomaWeeks,
+  diplomaVocabulary,
+  diplomaExercises,
+  userDiplomaProgress,
+  diplomaExerciseAttempts,
   type User,
   type ExerciseSession,
+  type DiplomaWeek,
+  type DiplomaVocabulary,
+  type DiplomaExercise,
+  type UserDiplomaProgress,
 } from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -1619,6 +1628,266 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Scheduler status error:", error);
       res.status(500).json({ message: "Failed to get scheduler status" });
+    }
+  });
+
+  // ==================== DIPLOMA API ROUTES ====================
+  
+  // Get all diploma weeks
+  app.get("/api/diploma/weeks", async (_req, res) => {
+    try {
+      const { asc } = await import("drizzle-orm");
+      const weeks = await db.select()
+        .from(diplomaWeeks)
+        .orderBy(asc(diplomaWeeks.weekNumber));
+      res.json(weeks);
+    } catch (error) {
+      console.error("Diploma weeks error:", error);
+      res.status(500).json({ message: "Failed to fetch diploma weeks" });
+    }
+  });
+  
+  // Get single week with vocabulary and exercises
+  app.get("/api/diploma/weeks/:weekNumber", async (req, res) => {
+    try {
+      const weekNumber = parseInt(req.params.weekNumber);
+      const { eq, asc } = await import("drizzle-orm");
+      
+      const [week] = await db.select()
+        .from(diplomaWeeks)
+        .where(eq(diplomaWeeks.weekNumber, weekNumber));
+      
+      if (!week) {
+        return res.status(404).json({ message: "Week not found" });
+      }
+      
+      const vocabulary = await db.select()
+        .from(diplomaVocabulary)
+        .where(eq(diplomaVocabulary.weekId, week.id))
+        .orderBy(asc(diplomaVocabulary.orderIndex));
+      
+      const exercises = await db.select()
+        .from(diplomaExercises)
+        .where(eq(diplomaExercises.weekId, week.id))
+        .orderBy(asc(diplomaExercises.orderIndex));
+      
+      res.json({
+        week,
+        vocabulary,
+        exercises
+      });
+    } catch (error) {
+      console.error("Diploma week detail error:", error);
+      res.status(500).json({ message: "Failed to fetch week details" });
+    }
+  });
+  
+  // Get user's diploma progress
+  app.get("/api/diploma/progress/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { eq } = await import("drizzle-orm");
+      
+      const [progress] = await db.select()
+        .from(userDiplomaProgress)
+        .where(eq(userDiplomaProgress.userId, userId));
+      
+      if (!progress) {
+        return res.json(null);
+      }
+      
+      res.json(progress);
+    } catch (error) {
+      console.error("Diploma progress error:", error);
+      res.status(500).json({ message: "Failed to fetch progress" });
+    }
+  });
+  
+  // Enroll user in diploma
+  app.post("/api/diploma/enroll", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const { eq } = await import("drizzle-orm");
+      
+      // Check if already enrolled
+      const [existing] = await db.select()
+        .from(userDiplomaProgress)
+        .where(eq(userDiplomaProgress.userId, userId));
+      
+      if (existing) {
+        return res.json(existing);
+      }
+      
+      const [newProgress] = await db.insert(userDiplomaProgress)
+        .values({
+          userId,
+          currentWeek: 1,
+          completedWeeks: [],
+          completedExercises: [],
+          quizScores: {},
+          completionPercentage: 0,
+          isCompleted: 0,
+        })
+        .returning();
+      
+      res.status(201).json(newProgress);
+    } catch (error) {
+      console.error("Diploma enroll error:", error);
+      res.status(500).json({ message: "Failed to enroll in diploma" });
+    }
+  });
+  
+  // Submit exercise answer
+  app.post("/api/diploma/submit-answer", async (req, res) => {
+    try {
+      const { userId, exerciseId, weekNumber, userAnswer } = req.body;
+      const { eq, and } = await import("drizzle-orm");
+      
+      // Get exercise to check answer
+      const [exercise] = await db.select()
+        .from(diplomaExercises)
+        .where(eq(diplomaExercises.id, exerciseId));
+      
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      
+      // Check if answer is correct (normalize whitespace and diacritics for comparison)
+      const normalizeArabic = (text: string) => 
+        text.trim()
+          .replace(/[\u064B-\u065F]/g, '') // Remove Arabic diacritics
+          .replace(/\s+/g, ' ');
+      
+      const normalizedUserAnswer = normalizeArabic(userAnswer);
+      const normalizedCorrect = normalizeArabic(exercise.correctAnswer);
+      
+      let isCorrect = normalizedUserAnswer === normalizedCorrect;
+      
+      // Check alternative answers if available
+      if (!isCorrect && exercise.alternativeAnswers) {
+        const alternatives = exercise.alternativeAnswers as string[];
+        isCorrect = alternatives.some(alt => 
+          normalizeArabic(alt) === normalizedUserAnswer
+        );
+      }
+      
+      // Record attempt
+      await db.insert(diplomaExerciseAttempts).values({
+        userId,
+        exerciseId,
+        weekNumber,
+        userAnswer,
+        isCorrect: isCorrect ? 1 : 0,
+      });
+      
+      // Update user progress if correct
+      if (isCorrect) {
+        const [progress] = await db.select()
+          .from(userDiplomaProgress)
+          .where(eq(userDiplomaProgress.userId, userId));
+        
+        if (progress) {
+          const completedExercises = (progress.completedExercises || []) as string[];
+          if (!completedExercises.includes(exerciseId)) {
+            completedExercises.push(exerciseId);
+            
+            // Calculate completion percentage (48 total exercises)
+            const completionPercentage = Math.round((completedExercises.length / 48) * 100);
+            
+            await db.update(userDiplomaProgress)
+              .set({ 
+                completedExercises,
+                completionPercentage,
+                lastAccessedAt: new Date(),
+              })
+              .where(eq(userDiplomaProgress.userId, userId));
+          }
+        }
+      }
+      
+      res.json({
+        isCorrect,
+        correctAnswer: exercise.correctAnswer,
+        explanation: exercise.explanation,
+      });
+    } catch (error) {
+      console.error("Submit answer error:", error);
+      res.status(500).json({ message: "Failed to submit answer" });
+    }
+  });
+  
+  // Complete a week
+  app.post("/api/diploma/complete-week", async (req, res) => {
+    try {
+      const { userId, weekNumber, quizScore } = req.body;
+      const { eq } = await import("drizzle-orm");
+      
+      const [progress] = await db.select()
+        .from(userDiplomaProgress)
+        .where(eq(userDiplomaProgress.userId, userId));
+      
+      if (!progress) {
+        return res.status(404).json({ message: "Progress not found" });
+      }
+      
+      const completedWeeks = (progress.completedWeeks || []) as number[];
+      const quizScores = (progress.quizScores || {}) as Record<number, number>;
+      
+      if (!completedWeeks.includes(weekNumber)) {
+        completedWeeks.push(weekNumber);
+      }
+      quizScores[weekNumber] = quizScore;
+      
+      const nextWeek = Math.min(weekNumber + 1, 12);
+      const isCompleted = completedWeeks.length >= 12 ? 1 : 0;
+      
+      await db.update(userDiplomaProgress)
+        .set({
+          completedWeeks,
+          quizScores,
+          currentWeek: nextWeek,
+          isCompleted,
+          lastAccessedAt: new Date(),
+        })
+        .where(eq(userDiplomaProgress.userId, userId));
+      
+      res.json({ 
+        message: "Week completed",
+        nextWeek,
+        isCompleted: isCompleted === 1,
+      });
+    } catch (error) {
+      console.error("Complete week error:", error);
+      res.status(500).json({ message: "Failed to complete week" });
+    }
+  });
+  
+  // Get diploma statistics
+  app.get("/api/diploma/stats", async (_req, res) => {
+    try {
+      const { sql } = await import("drizzle-orm");
+      
+      const [weekCount] = await db.select({ count: sql<number>`count(*)` })
+        .from(diplomaWeeks);
+      
+      const [vocabCount] = await db.select({ count: sql<number>`count(*)` })
+        .from(diplomaVocabulary);
+      
+      const [exerciseCount] = await db.select({ count: sql<number>`count(*)` })
+        .from(diplomaExercises);
+      
+      const [enrolledCount] = await db.select({ count: sql<number>`count(*)` })
+        .from(userDiplomaProgress);
+      
+      res.json({
+        totalWeeks: weekCount?.count || 0,
+        totalVocabulary: vocabCount?.count || 0,
+        totalExercises: exerciseCount?.count || 0,
+        enrolledUsers: enrolledCount?.count || 0,
+      });
+    } catch (error) {
+      console.error("Diploma stats error:", error);
+      res.status(500).json({ message: "Failed to fetch diploma stats" });
     }
   });
 
