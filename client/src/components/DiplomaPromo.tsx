@@ -16,16 +16,16 @@ const DiplomaPromo = () => {
       subtitle: "12 أسبوعًا لإتقان العربية باستخدام المفردات القرآنية كمصدر لغوي",
       description: "برنامج شامل ومنظم يأخذك من الأساسيات إلى الإتقان، مع تمارين عملية ومتابعة تقدم مستمرة",
       features: [
-        "120 مفردة قرآنية أساسية",
-        "48 تمرين تفاعلي",
+        "240 مفردة قرآنية أساسية",
+        "96 تمرين تفاعلي",
         "شهادة إتمام معتمدة",
         "تقدم محفوظ ومتابعة مستمرة"
       ],
       cta: "اشترك الآن في الدبلوم",
       stats: {
         weeks: "12 أسبوع",
-        vocabulary: "120 مفردة", 
-        exercises: "48 تمرين"
+        vocabulary: "240 مفردة", 
+        exercises: "96 تمرين"
       }
     },
     en: {
@@ -34,16 +34,16 @@ const DiplomaPromo = () => {
       subtitle: "12 weeks to master Arabic using Quranic vocabulary as a linguistic corpus",
       description: "A comprehensive, structured program that takes you from basics to mastery, with practical exercises and continuous progress tracking",
       features: [
-        "120 essential Quranic vocabulary",
-        "48 interactive exercises",
+        "240 essential Quranic vocabulary",
+        "96 interactive exercises",
         "Certificate of completion",
         "Saved progress & tracking"
       ],
       cta: "Subscribe to the Diploma",
       stats: {
         weeks: "12 Weeks",
-        vocabulary: "120 Words",
-        exercises: "48 Exercises"
+        vocabulary: "240 Words",
+        exercises: "96 Exercises"
       }
     }
   };
