@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, BookOpen, Award, Clock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { GraduationCap, BookOpen, Award, Clock, ArrowRight, CheckCircle2, Globe, Languages, MapPin } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -11,40 +11,48 @@ const DiplomaPromo = () => {
 
   const content = {
     ar: {
-      badge: "برنامج معتمد",
+      badge: "واجهة عالمية",
       title: "دبلوم تعلم اللغة العربية",
-      subtitle: "12 أسبوعًا لإتقان العربية باستخدام المفردات القرآنية كمصدر لغوي",
-      description: "برنامج شامل ومنظم يأخذك من الأساسيات إلى الإتقان، مع تمارين عملية ومتابعة تقدم مستمرة",
+      subtitle: "بوابة زنجبار العالمية لتعليم اللغة العربية للمسلمين حول العالم",
+      description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من زنجبار كمركز إشعاع ثقافي ولغوي للمسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
       features: [
         "240 مفردة قرآنية أساسية",
-        "96 تمرين تفاعلي",
-        "شهادة إتمام معتمدة",
-        "تقدم محفوظ ومتابعة مستمرة"
+        "96 تمرين تفاعلي متنوع",
+        "دعم 10 لغات عالمية",
+        "شهادة إتمام معتمدة"
       ],
-      cta: "اشترك الآن في الدبلوم",
+      cta: "انضم للمنصة العالمية",
       stats: {
         weeks: "12 أسبوع",
         vocabulary: "240 مفردة", 
-        exercises: "96 تمرين"
-      }
+        languages: "10 لغات"
+      },
+      globalBadge: "منصة عالمية",
+      zanzibarTitle: "من زنجبار إلى العالم",
+      zanzibarDesc: "بوابة أفريقيا لتعليم العربية",
+      languages: ["العربية", "الإنجليزية", "الإندونيسية", "التركية", "الصينية", "السواحيلية", "الصومالية", "البوسنية", "الألبانية", "الروسية"]
     },
     en: {
-      badge: "Certified Program",
+      badge: "Global Platform",
       title: "Arabic Language Diploma",
-      subtitle: "12 weeks to master Arabic using Quranic vocabulary as a linguistic corpus",
-      description: "A comprehensive, structured program that takes you from basics to mastery, with practical exercises and continuous progress tracking",
+      subtitle: "Zanzibar's Gateway to Arabic Language Learning for Muslims Worldwide",
+      description: "A global educational platform supporting 10 languages, launching from Zanzibar as a cultural and linguistic beacon for Muslims across Africa, Asia, Europe, and the entire world",
       features: [
         "240 essential Quranic vocabulary",
-        "96 interactive exercises",
-        "Certificate of completion",
-        "Saved progress & tracking"
+        "96 diverse interactive exercises",
+        "Support for 10 global languages",
+        "Certified completion certificate"
       ],
-      cta: "Subscribe to the Diploma",
+      cta: "Join the Global Platform",
       stats: {
         weeks: "12 Weeks",
         vocabulary: "240 Words",
-        exercises: "96 Exercises"
-      }
+        languages: "10 Languages"
+      },
+      globalBadge: "Global Platform",
+      zanzibarTitle: "From Zanzibar to the World",
+      zanzibarDesc: "Africa's Gateway to Arabic Learning",
+      languages: ["Arabic", "English", "Indonesian", "Turkish", "Chinese", "Swahili", "Somali", "Bosnian", "Albanian", "Russian"]
     }
   };
 
@@ -98,28 +106,49 @@ const DiplomaPromo = () => {
                 </div>
                 
                 <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-8 md:p-12 flex flex-col justify-center items-center text-white">
-                  <div className="text-center mb-8">
-                    <GraduationCap className="h-24 w-24 mx-auto mb-4 opacity-90" />
-                    <h3 className="text-2xl font-bold mb-2">
-                      {language === 'ar' ? 'ابدأ رحلتك الآن' : 'Start Your Journey'}
+                  <div className="text-center mb-6">
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                      <MapPin className="h-8 w-8" />
+                      <Globe className="h-12 w-12" />
+                      <Languages className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2" data-testid="text-zanzibar-title">
+                      {t.zanzibarTitle}
                     </h3>
-                    <p className="text-emerald-100">
-                      {language === 'ar' ? 'انضم لآلاف المتعلمين' : 'Join thousands of learners'}
+                    <p className="text-emerald-100 mb-4">
+                      {t.zanzibarDesc}
                     </p>
+                    <Badge className="bg-white/20 text-white border-white/30 mb-4" data-testid="badge-global-platform">
+                      <Globe className="h-3 w-3 mr-1" />
+                      {t.globalBadge}
+                    </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-6 w-full max-w-sm">
-                    <div className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm" data-testid="text-diploma-stats-weeks">
-                      <Clock className="h-6 w-6 mx-auto mb-2" />
-                      <div className="text-xl font-bold">{t.stats.weeks}</div>
+                  <div className="grid grid-cols-3 gap-4 w-full max-w-sm mb-6">
+                    <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-weeks">
+                      <Clock className="h-5 w-5 mx-auto mb-1" />
+                      <div className="text-lg font-bold">{t.stats.weeks}</div>
                     </div>
-                    <div className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm" data-testid="text-diploma-stats-vocabulary">
-                      <BookOpen className="h-6 w-6 mx-auto mb-2" />
-                      <div className="text-xl font-bold">{t.stats.vocabulary}</div>
+                    <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-vocabulary">
+                      <BookOpen className="h-5 w-5 mx-auto mb-1" />
+                      <div className="text-lg font-bold">{t.stats.vocabulary}</div>
                     </div>
-                    <div className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm" data-testid="text-diploma-stats-exercises">
-                      <Award className="h-6 w-6 mx-auto mb-2" />
-                      <div className="text-xl font-bold">{t.stats.exercises}</div>
+                    <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-languages">
+                      <Languages className="h-5 w-5 mx-auto mb-1" />
+                      <div className="text-lg font-bold">{t.stats.languages}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="w-full">
+                    <p className="text-xs text-emerald-200 text-center mb-2">
+                      {language === 'ar' ? 'متاح بـ 10 لغات:' : 'Available in 10 languages:'}
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-1">
+                      {t.languages.map((lang, index) => (
+                        <span key={index} className="text-xs bg-white/10 px-2 py-1 rounded" data-testid={`text-language-${index}`}>
+                          {lang}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
