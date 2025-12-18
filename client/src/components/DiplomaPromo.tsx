@@ -24,7 +24,6 @@ const DiplomaPromo = () => {
       cta: "انضم للمنصة العالمية",
       stats: {
         weeks: "12 أسبوع",
-        vocabulary: "240 مفردة", 
         languages: "10 لغات"
       },
       globalBadge: "منصة عالمية",
@@ -46,7 +45,6 @@ const DiplomaPromo = () => {
       cta: "Join the Global Platform",
       stats: {
         weeks: "12 Weeks",
-        vocabulary: "240 Words",
         languages: "10 Languages"
       },
       globalBadge: "Global Platform",
@@ -124,14 +122,10 @@ const DiplomaPromo = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4 w-full max-w-sm mb-6">
+                  <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-6">
                     <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-weeks">
                       <Clock className="h-5 w-5 mx-auto mb-1" />
                       <div className="text-lg font-bold">{t.stats.weeks}</div>
-                    </div>
-                    <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-vocabulary">
-                      <BookOpen className="h-5 w-5 mx-auto mb-1" />
-                      <div className="text-lg font-bold">{t.stats.vocabulary}</div>
                     </div>
                     <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm" data-testid="text-diploma-stats-languages">
                       <Languages className="h-5 w-5 mx-auto mb-1" />

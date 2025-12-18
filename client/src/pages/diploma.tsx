@@ -185,8 +185,8 @@ export default function DiplomaPage() {
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
                   {language === 'ar' 
-                    ? '240 مفردة + 256 تمرين عملي في 12 أسبوعًا'
-                    : '240 vocabulary words + 256 practical exercises in 12 weeks'}
+                    ? 'برنامج متكامل في 12 أسبوعًا'
+                    : 'Complete program in 12 weeks'}
                 </p>
               </div>
               <Button 
