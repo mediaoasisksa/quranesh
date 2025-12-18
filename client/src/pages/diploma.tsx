@@ -185,8 +185,8 @@ export default function DiplomaPage() {
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
                   {language === 'ar' 
-                    ? '240 مفردة + 156 تمرين عملي في 12 أسبوعًا'
-                    : '240 vocabulary words + 156 practical exercises in 12 weeks'}
+                    ? '240 مفردة + 256 تمرين عملي في 12 أسبوعًا'
+                    : '240 vocabulary words + 256 practical exercises in 12 weeks'}
                 </p>
               </div>
               <Button 
@@ -217,7 +217,7 @@ export default function DiplomaPage() {
               <Progress value={progress?.completionPercentage || 0} className="h-3" />
               <div className="flex justify-between mt-2 text-sm text-gray-500">
                 <span>{completedWeeks.length} / 12 {language === 'ar' ? 'أسابيع مكتملة' : 'weeks completed'}</span>
-                <span>{progress?.completedExercises?.length || 0} / 156 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
+                <span>{progress?.completedExercises?.length || 0} / 256 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
               </div>
             </CardContent>
           </Card>
@@ -258,7 +258,7 @@ export default function DiplomaPage() {
                 <CardContent className="pt-0">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <BookOpen className="h-4 w-4" />
-                    <span>20 {language === 'ar' ? 'مفردة' : 'vocabulary'} • 13 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
+                    <span>20 {language === 'ar' ? 'مفردة' : 'vocabulary'} • 21 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
                   </div>
                   {quizScore !== undefined && (
                     <div className="mt-2 flex items-center gap-2">

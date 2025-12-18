@@ -17,7 +17,7 @@ const DiplomaPromo = () => {
       description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من زنجبار كمركز إشعاع ثقافي ولغوي للمسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
       features: [
         "240 مفردة قرآنية أساسية",
-        "156 تمرين تفاعلي متنوع",
+        "256 تمرين تفاعلي متنوع",
         "دعم 10 لغات عالمية",
         "شهادة إتمام معتمدة"
       ],
@@ -39,7 +39,7 @@ const DiplomaPromo = () => {
       description: "A global educational platform supporting 10 languages, launching from Zanzibar as a cultural and linguistic beacon for Muslims across Africa, Asia, Europe, and the entire world",
       features: [
         "240 essential Quranic vocabulary",
-        "156 diverse interactive exercises",
+        "256 diverse interactive exercises",
         "Support for 10 global languages",
         "Certified completion certificate"
       ],
