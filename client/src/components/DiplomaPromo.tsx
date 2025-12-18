@@ -16,8 +16,8 @@ const DiplomaPromo = () => {
       subtitle: "بوابة زنجبار العالمية لتعليم اللغة العربية للمسلمين حول العالم",
       description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من زنجبار كمركز إشعاع ثقافي ولغوي للمسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
       features: [
-        "240 مفردة قرآنية أساسية",
-        "256 تمرين تفاعلي متنوع",
+        "مفردات قرآنية أساسية للحياة اليومية",
+        "تمارين تفاعلية متنوعة وعملية",
         "دعم 10 لغات عالمية",
         "شهادة إتمام معتمدة"
       ],
@@ -38,8 +38,8 @@ const DiplomaPromo = () => {
       subtitle: "Zanzibar's Gateway to Arabic Language Learning for Muslims Worldwide",
       description: "A global educational platform supporting 10 languages, launching from Zanzibar as a cultural and linguistic beacon for Muslims across Africa, Asia, Europe, and the entire world",
       features: [
-        "240 essential Quranic vocabulary",
-        "256 diverse interactive exercises",
+        "Essential Quranic vocabulary for daily life",
+        "Diverse and practical interactive exercises",
         "Support for 10 global languages",
         "Certified completion certificate"
       ],
