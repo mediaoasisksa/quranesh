@@ -13,8 +13,8 @@ const DiplomaPromo = () => {
     ar: {
       badge: "واجهة عالمية",
       title: "دبلوم تعلم اللغة العربية",
-      subtitle: "بوابة زنجبار العالمية لتعليم اللغة العربية للمسلمين حول العالم",
-      description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من زنجبار كمركز إشعاع ثقافي ولغوي للمسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
+      subtitle: "من مكة المكرمة إلى العالم - تعليم اللغة العربية للمسلمين",
+      description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من قلب العالم الإسلامي لتصل إلى المسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
       features: [
         "مفردات قرآنية أساسية للحياة اليومية",
         "تمارين تفاعلية متنوعة وعملية",
@@ -28,15 +28,15 @@ const DiplomaPromo = () => {
         languages: "10 لغات"
       },
       globalBadge: "منصة عالمية",
-      zanzibarTitle: "من زنجبار إلى العالم",
-      zanzibarDesc: "بوابة أفريقيا لتعليم العربية",
+      zanzibarTitle: "من مكة إلى العالم",
+      zanzibarDesc: "بوابة تعليم العربية للمسلمين",
       languages: ["العربية", "الإنجليزية", "الإندونيسية", "التركية", "الصينية", "السواحيلية", "الصومالية", "البوسنية", "الألبانية", "الروسية"]
     },
     en: {
       badge: "Global Platform",
       title: "Arabic Language Diploma",
-      subtitle: "Zanzibar's Gateway to Arabic Language Learning for Muslims Worldwide",
-      description: "A global educational platform supporting 10 languages, launching from Zanzibar as a cultural and linguistic beacon for Muslims across Africa, Asia, Europe, and the entire world",
+      subtitle: "From Mecca to the World - Arabic Language Learning for Muslims",
+      description: "A global educational platform supporting 10 languages, launching from the heart of the Islamic world to reach Muslims across Africa, Asia, Europe, and the entire world",
       features: [
         "Essential Quranic vocabulary for daily life",
         "Diverse and practical interactive exercises",
@@ -50,8 +50,8 @@ const DiplomaPromo = () => {
         languages: "10 Languages"
       },
       globalBadge: "Global Platform",
-      zanzibarTitle: "From Zanzibar to the World",
-      zanzibarDesc: "Africa's Gateway to Arabic Learning",
+      zanzibarTitle: "From Mecca to the World",
+      zanzibarDesc: "Gateway to Arabic Learning for Muslims",
       languages: ["Arabic", "English", "Indonesian", "Turkish", "Chinese", "Swahili", "Somali", "Bosnian", "Albanian", "Russian"]
     }
   };
