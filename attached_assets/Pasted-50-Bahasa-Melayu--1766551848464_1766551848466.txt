@@ -1,0 +1,456 @@
+50 مفردة قرآنية مستخدمة في الماليزية (Bahasa Melayu) وأصلها عربي بنفس طريقتك: الكلمة بالماليزي + مثال + وجودها في القرآن + الجذر + مشتقات (عربي → ماليزي)
+
+ملاحظة للمبرمج (إن كنت سترسلها له): تُضاف داخل التمارين كـ محتوى ثابت/قائمة داخل الكود بدون أي تعديل على قواعد البيانات أو هيكل الداتا.
+
+1) Rahmat (رحمة)
+
+Bahasa Melayu: rahmat — Semoga Allah melimpahkan rahmat-Nya.
+Qur’ani: رحمة — الجذر: ر ح م
+مشتقات (عربي → Melayu):
+رحمة → rahmat
+رحيم → Rahim / penyayang
+رحمن → Ar-Rahman
+يرحم → merahmati
+
+2) Nikmat (نعمة)
+
+Bahasa Melayu: nikmat — Ini nikmat yang besar.
+Qur’ani: نعمة — الجذر: ن ع م
+مشتقات:
+نعمة → nikmat / ni‘mat
+نِعَم → nikmat-nikmat
+أنعم → memberi nikmat / mengurniakan
+
+3) Hikmah (حكمة)
+
+Bahasa Melayu: hikmah — Bertindak dengan hikmah.
+Qur’ani: حكمة — الجذر: ح ك م
+مشتقات:
+حكمة → hikmah
+حكيم → hakim / bijaksana
+حكم → hukum / keputusan
+
+4) Adil (عدل)
+
+Bahasa Melayu: adil — Berlaku adil kepada semua.
+Qur’ani: عدل — الجذر: ع د ل
+مشتقات:
+عدل → adil / keadilan
+عادل → orang yang adil
+يعدل → berlaku adil
+
+5) Zalim (ظلم)
+
+Bahasa Melayu: zalim — Jangan bersikap zalim.
+Qur’ani: ظلم — الجذر: ظ ل م
+مشتقات:
+ظلم → zalim / kezaliman
+ظالم → orang zalim
+يظلم → menzalimi
+
+6) Hak (حق)
+
+Bahasa Melayu: hak — Itu hak saya.
+Qur’ani: حق — الجذر: ح ق ق
+مشتقات:
+حق → hak / kebenaran
+أحق → lebih berhak
+حقيق → benar / layak
+
+7) Batil (باطل)
+
+Bahasa Melayu: batil — Itu dakwaan batil.
+Qur’ani: باطل — الجذر: ب ط ل
+مشتقات:
+باطل → batil
+يبطل → membatalkan
+إبطال → pembatalan
+
+8) Nur (نور)
+
+Bahasa Melayu: nur — Nur iman menerangi hati.
+Qur’ani: نور — الجذر: ن و ر
+مشتقات:
+نور → nur
+منير → menerangi / bercahaya
+أنار → menerangkan / memberi cahaya
+
+9) Syifa (شفاء)
+
+Bahasa Melayu: syifa — Semoga Allah memberi syifa.
+Qur’ani: شفاء — الجذر: ش ف ي
+مشتقات:
+شفاء → syifa
+يشفي → menyembuhkan
+اشفِ → sembuhkanlah (doa)
+
+10) Rezeki (رزق)
+
+Bahasa Melayu: rezeki — Rezeki datang dari Allah.
+Qur’ani: رزق — الجذر: ر ز ق
+مشتقات:
+رزق → rezeki
+يرزق → memberi rezeki
+رازق → pemberi rezeki
+
+11) Azab (عذاب)
+
+Bahasa Melayu: azab — Dia takut azab.
+Qur’ani: عذاب — الجذر: ع ذ ب
+مشتقات:
+عذاب → azab
+يعذب → mengazab
+عذابي → azab-Ku
+
+12) Hisab (حساب)
+
+Bahasa Melayu: hisab — Hari hisab pasti tiba.
+Qur’ani: حساب — الجذر: ح س ب
+مشتقات:
+حساب → hisab
+يحسب → menghitung / menyangka
+حسيب → Yang Menghisab / mencukupi
+
+13) Jaza (جزاء)
+
+Bahasa Melayu: jaza — Setiap amal ada jaza.
+Qur’ani: جزاء — الجذر: ج ز ي
+مشتقات:
+جزاء → jaza / balasan
+يجزي → membalas / memberi ganjaran
+
+14) Mizan (ميزان)
+
+Bahasa Melayu: mizan — Mizan keadilan di akhirat.
+Qur’ani: ميزان — الجذر: و ز ن
+مشتقات:
+ميزان → mizan
+وزن → timbang / ukuran
+موازين → timbangan-timbangan
+
+15) Sultan (سلطان)
+
+Bahasa Melayu: sultan — Sultan memerintah negeri.
+Qur’ani: سلطان — الجذر: س ل ط
+مشتقات:
+سلطان → sultan / kekuasaan / hujah
+سلطة → سلطه → السلطة → kuasa / autoriti
+تسلط → menindas / menguasai
+
+16) Mulk (مُلك)
+
+Bahasa Melayu: mulk — Mulk milik Allah.
+Qur’ani: مُلك/ملك — الجذر: م ل ك
+مشتقات:
+مُلك → mulk / kerajaan
+ملك → raja
+مالك → pemilik
+
+17) Sebab (سبب)
+
+Bahasa Melayu: sebab — Apa sebabnya?
+Qur’ani: سبب — الجذر: س ب ب
+مشتقات:
+سبب → sebab
+أسباب → sebab-sebab
+بسبب → disebabkan / kerana
+
+18) Amar (أمر)
+
+Bahasa Melayu: amar — Amar makruf nahi mungkar.
+Qur’ani: أمر — الجذر: أ م ر
+مشتقات:
+أمر → amar / perintah
+يأمر → memerintah / menyuruh
+مأمور → yang diperintah
+
+19) Amanah (أمانة)
+
+Bahasa Melayu: amanah — Ini satu amanah.
+Qur’ani: أمانة — الجذر: أ م ن
+مشتقات:
+أمانة → amanah
+أمين → amin / dipercayai
+أمن → aman / keamanan
+
+20) Fitnah (فتنة)
+
+Bahasa Melayu: fitnah — Jangan sebarkan fitnah.
+Qur’ani: فتنة — الجذر: ف ت ن
+مشتقات:
+فتنة → fitnah / ujian
+يفتن → memfitnah / menguji
+مفتون → terpedaya
+
+21) Bala (بلاء)
+
+Bahasa Melayu: bala — Itu bala dan ujian.
+Qur’ani: بلاء — الجذر: ب ل و
+مشتقات:
+بلاء → bala / ujian
+ابتلاء → ujian / cubaan
+مبتلى → yang diuji
+
+22) Ibrah (عبرة)
+
+Bahasa Melayu: ibrah — Ambil ibrah daripada kisah itu.
+Qur’ani: عبرة — الجذر: ع ب ر
+مشتقات:
+عبرة → ibrah
+اعتبار → mengambil iktibar
+عبور → عبور → عبور/ مرور → عبور (kurang biasa) / melintas
+
+23) Syahid (شاهد/شهيد)
+
+Bahasa Melayu: syahid — Dia gugur syahid.
+Qur’ani: شاهد/شهيد — الجذر: ش ه د
+مشتقات:
+شاهد → شاهد → saksi
+شهادة → syahadah / شهادت → شهادہ → syahadah
+شهيد → syahid
+يشهد → bersaksi
+
+24) Insan (إنسان)
+
+Bahasa Melayu: insan — Insan sering lalai.
+Qur’ani: إنسان — الجذر: أ ن س
+مشتقات:
+إنسان → insan
+إنس → manusia (lawan jin)
+أنس → mesra / keakraban
+
+25) Hayat (حياة)
+
+Bahasa Melayu: hayat — Menghayati kehidupan (hayat).
+Qur’ani: حياة — الجذر: ح ي ي
+مشتقات:
+حياة → hayat
+حي → hidup
+يحيي → menghidupkan
+محيي → Yang Menghidupkan
+
+26) Dunia (دنيا)
+
+Bahasa Melayu: dunia — Dunia ini sementara.
+Qur’ani: دنيا — الجذر: د ن و
+مشتقات:
+دنيا → dunia
+أدنى → lebih dekat / lebih rendah
+يدنو → mendekat
+
+27) Akhirat (آخرة)
+
+Bahasa Melayu: akhirat — Kejar akhirat.
+Qur’ani: آخرة — الجذر: أ خ ر
+مشتقات:
+آخرة → akhirat
+آخر → آخر → akhir / yang terakhir
+يؤخر → menangguhkan
+
+28) Kiamat (قيامة)
+
+Bahasa Melayu: kiamat — Hari kiamat pasti datang.
+Qur’ani: قيامة — الجذر: ق و م
+مشتقات:
+قيامة → kiamat
+يقوم → bangkit / berdiri
+قائم → قائم → قائم → قائم → berdiri / قائم
+
+29) Saat (ساعة)
+
+Bahasa Melayu: saat — Pada saat itu…
+Qur’ani: ساعة — الجذر: س ا ع
+مشتقات:
+ساعة → saat
+الساعات → ساعات → saat-saat
+سعي → sa‘ie / usaha (سعي)
+
+30) Din (دين)
+
+Bahasa Melayu: din — Din ini sempurna.
+Qur’ani: دين — الجذر: د ي ن
+مشتقات:
+دين → دين → din
+يوم الدين → Hari Pembalasan
+ديّان → Yang Mengadili
+
+31) Iman (إيمان)
+
+Bahasa Melayu: iman — Iman perlu dipelihara.
+Qur’ani: إيمان — الجذر: أ م ن
+مشتقات:
+إيمان → iman
+آمن → beriman
+مؤمن → mukmin
+
+32) Islam (إسلام)
+
+Bahasa Melayu: Islam — Islam membawa rahmat.
+Qur’ani: إسلام — الجذر: س ل م
+مشتقات:
+إسلام → Islam
+مسلم → Muslim
+سلام → salam / sejahtera
+أسلم → masuk Islam / menyerah diri
+
+33) Muslim (مسلم)
+
+Bahasa Melayu: Muslim — Dia seorang Muslim.
+Qur’ani: مسلم — الجذر: س ل م
+مشتقات:
+مسلم → Muslim
+مسلمين → المسلمين → المسلمين → المسلمين → umat Islam (jamak)
+
+34) Mukmin (مؤمن)
+
+Bahasa Melayu: mukmin — Mukmin sejati taat.
+Qur’ani: مؤمن — الجذر: أ م ن
+مشتقات:
+مؤمن → mukmin
+مؤمنين → orang-orang beriman
+آمنوا → mereka beriman
+
+35) Kafir (كافر)
+
+Bahasa Melayu: kafir — Jangan ikut jalan kafir.
+Qur’ani: كافر — الجذر: ك ف ر
+مشتقات:
+كافر → kafir
+كفر → kufur
+يكفر → mengkufuri / mengingkari
+
+36) Munafik (منافق)
+
+Bahasa Melayu: munafik — Sifat munafik merosakkan.
+Qur’ani: منافق — الجذر: ن ف ق
+مشتقات:
+منافق → munafik
+نفاق → nifak / kemunafikan
+نافق → bersikap munafik
+
+37) Musyrik (مشرك)
+
+Bahasa Melayu: musyrik — Syirik itu dosa besar.
+Qur’ani: مشرك — الجذر: ش ر ك
+مشتقات:
+مشرك → musyrik
+شرك → syirik
+يشرك → melakukan syirik
+
+38) Syaitan (شيطان)
+
+Bahasa Melayu: syaitan — Syaitan menyesatkan manusia.
+Qur’ani: شيطان — الجذر: ش ط ن
+مشتقات:
+شيطان → syaitan
+شياطين → syaitan-syaitan
+يوسوس → membisikkan (waswas)
+
+39) Malaikat (ملائكة)
+
+Bahasa Melayu: malaikat — Malaikat taat kepada Allah.
+Qur’ani: ملائكة — (اسم جمع)
+مشتقات:
+مَلَك → malaikat
+ملائكة → para malaikat
+
+40) Jannah (جنة)
+
+Bahasa Melayu: jannah — Semoga kita masuk jannah.
+Qur’ani: جنة/جنات — الجذر: ج ن ن
+مشتقات:
+جنة → jannah
+جنات → jannat / jannah-jannah
+جن → jin
+
+41) Jahannam (جهنم)
+
+Bahasa Melayu: jahannam — Berlindung daripada jahannam.
+Qur’ani: جهنم (اسم)
+مشتقات مرتبطة في القرآن:
+جحيم → jahim (api yang sangat panas)
+نار → نار → نار → النار → نار (api)
+
+42) Masjid (مسجد)
+
+Bahasa Melayu: masjid — Kita solat di masjid.
+Qur’ani: مسجد — الجذر: س ج د
+مشتقات:
+مسجد → masjid
+سجد → sujud
+سجود → سجود → sujud
+ساجدين → orang yang bersujud
+
+43) Kitab (كتاب)
+
+Bahasa Melayu: kitab — Al-Qur’an ialah kitab suci.
+Qur’ani: كتاب — الجذر: ك ت ب
+مشتقات:
+كتاب → kitab
+كتب → menulis
+مكتوب → tertulis
+كاتب → penulis
+
+44) Qalam (قلم)
+
+Bahasa Melayu: qalam — Menulis dengan qalam.
+Qur’ani: قلم — الجذر: ق ل م
+مشتقات:
+قلم → qalam
+أقلام → aqlaam (jamak) / qalam-qalam
+
+45) Ayat (آية)
+
+Bahasa Melayu: ayat — Baca ayat ini.
+Qur’ani: آية/آيات — الجذر: (آي)
+مشتقات:
+آية → ayat
+آيات → ayat-ayat
+بينات → bukti yang jelas
+
+46) Surah (سورة)
+
+Bahasa Melayu: surah — Surah Al-Fatihah.
+Qur’ani: سورة — الجذر: س و ر
+مشتقات:
+سورة → surah
+أسوار → aswar (kota/tembok) (معنى لغوي)
+
+47) Doa (دعاء)
+
+Bahasa Melayu: doa — Jangan lupa berdoa.
+Qur’ani: دعاء — الجذر: د ع و
+مشتقات:
+دعاء → doa
+دعا → berdoa / memohon
+يدعو → menyeru / berdoa
+دعوة → dakwah / seruan
+
+48) Zikir (ذكر)
+
+Bahasa Melayu: zikir — Perbanyakkan zikir.
+Qur’ani: ذكر/ذكرى — الجذر: ذ ك ر
+مشتقات:
+ذكر → zikir
+يذكر → berzikir / mengingati
+ذكرى → peringatan
+
+49) Syukur (شكر)
+
+Bahasa Melayu: syukur — Syukur kepada Allah.
+Qur’ani: شكر/شكور — الجذر: ش ك ر
+مشتقات:
+شكر → syukur
+يشكر → bersyukur
+شاكر → yang bersyukur
+شكور → sangat bersyukur
+
+50) Sabar (صبر)
+
+Bahasa Melayu: sabar — Bersabarlah.
+Qur’ani: صبر/صابرين — الجذر: ص ب ر
+مشتقات:
+صبر → sabar
+يصبر → bersabar
+صابر → orang yang sabar
+صابرين → orang-orang yang sabar
