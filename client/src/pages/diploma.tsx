@@ -85,10 +85,169 @@ interface UserProgress {
   isCompleted: number;
 }
 
-const DISCLAIMER = {
+const DISCLAIMER: Record<string, string> = {
   ar: "هذا المحتوى لتعليم اللغة العربية فقط، والنصوص تُستخدم كأمثلة لغوية دون أي تعليم ديني.",
-  en: "This content is for Arabic language learning only. Texts are used as linguistic examples without any religious instruction."
+  en: "This content is for Arabic language learning only. Texts are used as linguistic examples without any religious instruction.",
+  id: "Konten ini hanya untuk pembelajaran bahasa Arab. Teks digunakan sebagai contoh linguistik tanpa pengajaran agama.",
+  ms: "Kandungan ini hanya untuk pembelajaran bahasa Arab. Teks digunakan sebagai contoh linguistik tanpa pengajaran agama.",
+  tr: "Bu içerik yalnızca Arapça dil öğrenimi içindir. Metinler dini öğretim olmaksızın dilbilimsel örnekler olarak kullanılmaktadır.",
+  zh: "此内容仅用于阿拉伯语学习。文本仅作为语言学示例使用，不涉及任何宗教教学。",
+  sw: "Maudhui haya ni kwa ajili ya kujifunza lugha ya Kiarabu pekee. Maandishi yanatumika kama mifano ya kilugha bila mafundisho ya kidini.",
+  so: "Waxyaabahan waxay u qoran yihiin barashada luqadda Carabiga oo keliya. Qoraalladu waxay u isticmaalaan tusaale luqadeed aan waxbarasho diini ahayn.",
+  bs: "Ovaj sadržaj je samo za učenje arapskog jezika. Tekstovi se koriste kao jezički primjeri bez vjerske poduke.",
+  sq: "Ky përmbajtje është vetëm për të mësuar gjuhën arabe. Tekstet përdoren si shembuj gjuhësorë pa mësim fetar.",
+  ru: "Этот контент предназначен только для изучения арабского языка. Тексты используются как лингвистические примеры без религиозного обучения."
 };
+
+const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
+  diplomaTitle: {
+    ar: "دبلوم اللغة العربية",
+    en: "Arabic Language Diploma",
+    id: "Diploma Bahasa Arab",
+    ms: "Diploma Bahasa Arab",
+    tr: "Arapça Dil Diploması",
+    zh: "阿拉伯语文凭",
+    sw: "Diploma ya Lugha ya Kiarabu",
+    so: "Dibloomada Luuqadda Carabiga",
+    bs: "Diploma arapskog jezika",
+    sq: "Diploma e Gjuhës Arabe",
+    ru: "Диплом арабского языка"
+  },
+  diplomaSubtitle: {
+    ar: "12 أسبوعًا لإتقان العربية باستخدام المفردات القرآنية كمصدر لغوي",
+    en: "12 weeks to master Arabic using Quranic vocabulary as a linguistic corpus",
+    id: "12 minggu untuk menguasai bahasa Arab menggunakan kosakata Al-Quran sebagai sumber linguistik",
+    ms: "12 minggu untuk menguasai bahasa Arab menggunakan perbendaharaan kata Al-Quran sebagai sumber linguistik",
+    tr: "Kurani kelime hazinesini dilbilimsel kaynak olarak kullanarak Arapçayı ustalaşmak için 12 hafta",
+    zh: "12周掌握阿拉伯语，使用古兰经词汇作为语言资料库",
+    sw: "Wiki 12 za kujifunza Kiarabu kwa kutumia msamiati wa Qurani kama chanzo cha lugha",
+    so: "12 toddobaad si aad u barato Carabiga adoo isticmaalaya erayada Quraanka sida hirgelin luuqadeed",
+    bs: "12 sedmica za savladavanje arapskog koristeći kuranski vokabular kao jezički korpus",
+    sq: "12 javë për të zotëruar arabishten duke përdorur fjalorin kuranor si korpus gjuhësor",
+    ru: "12 недель для овладения арабским языком с использованием коранической лексики"
+  },
+  startJourney: {
+    ar: "ابدأ رحلتك في تعلم العربية",
+    en: "Start Your Arabic Learning Journey",
+    id: "Mulai Perjalanan Belajar Bahasa Arab Anda",
+    ms: "Mulakan Perjalanan Pembelajaran Bahasa Arab Anda",
+    tr: "Arapça Öğrenme Yolculuğunuza Başlayın",
+    zh: "开始您的阿拉伯语学习之旅",
+    sw: "Anza Safari Yako ya Kujifunza Kiarabu",
+    so: "Bilow Safarkaa Barashada Carabiga",
+    bs: "Započnite svoje putovanje učenja arapskog",
+    sq: "Filloni Udhëtimin Tuaj të Mësimit të Arabishtes",
+    ru: "Начните свой путь изучения арабского"
+  },
+  completeProgram: {
+    ar: "برنامج متكامل في 12 أسبوعًا",
+    en: "Complete program in 12 weeks",
+    id: "Program lengkap dalam 12 minggu",
+    ms: "Program lengkap dalam 12 minggu",
+    tr: "12 haftada tamamlanan program",
+    zh: "12周完整课程",
+    sw: "Programu kamili katika wiki 12",
+    so: "Barnaamij buuxa 12 toddobaad gudahood",
+    bs: "Kompletan program za 12 sedmica",
+    sq: "Program i plotë në 12 javë",
+    ru: "Полная программа за 12 недель"
+  },
+  enrollDiploma: {
+    ar: "الالتحاق بالدبلوم",
+    en: "Enroll in Diploma",
+    id: "Daftar Diploma",
+    ms: "Daftar Diploma",
+    tr: "Diploma'ya Kayıt Ol",
+    zh: "注册文凭课程",
+    sw: "Jiandikishe Diploma",
+    so: "Iska diiwaan geli Dibloomada",
+    bs: "Upišite se na Diplomu",
+    sq: "Regjistrohuni në Diplomë",
+    ru: "Записаться на Диплом"
+  },
+  yourProgress: {
+    ar: "تقدمك",
+    en: "Your Progress",
+    id: "Kemajuan Anda",
+    ms: "Kemajuan Anda",
+    tr: "İlerlemeniz",
+    zh: "您的进度",
+    sw: "Maendeleo Yako",
+    so: "Horumarkaa",
+    bs: "Vaš napredak",
+    sq: "Progresi Juaj",
+    ru: "Ваш прогресс"
+  },
+  weeksCompleted: {
+    ar: "أسابيع مكتملة",
+    en: "weeks completed",
+    id: "minggu selesai",
+    ms: "minggu selesai",
+    tr: "hafta tamamlandı",
+    zh: "周已完成",
+    sw: "wiki zimekamilika",
+    so: "toddobaad oo dhammaystiran",
+    bs: "sedmica završeno",
+    sq: "javë të përfunduara",
+    ru: "недель завершено"
+  },
+  exercises: {
+    ar: "تمرين",
+    en: "exercises",
+    id: "latihan",
+    ms: "latihan",
+    tr: "alıştırma",
+    zh: "练习",
+    sw: "mazoezi",
+    so: "jimicsiyeed",
+    bs: "vježbi",
+    sq: "ushtrime",
+    ru: "упражнений"
+  },
+  week: {
+    ar: "الأسبوع",
+    en: "Week",
+    id: "Minggu",
+    ms: "Minggu",
+    tr: "Hafta",
+    zh: "第",
+    sw: "Wiki",
+    so: "Toddobaad",
+    bs: "Sedmica",
+    sq: "Java",
+    ru: "Неделя"
+  },
+  vocabulary: {
+    ar: "مفردة",
+    en: "vocabulary",
+    id: "kosakata",
+    ms: "perbendaharaan kata",
+    tr: "kelime",
+    zh: "词汇",
+    sw: "msamiati",
+    so: "ereyga",
+    bs: "rječnik",
+    sq: "fjalor",
+    ru: "слов"
+  },
+  quizScore: {
+    ar: "درجة الاختبار:",
+    en: "Quiz Score:",
+    id: "Skor Kuis:",
+    ms: "Skor Kuiz:",
+    tr: "Quiz Puanı:",
+    zh: "测验分数：",
+    sw: "Alama ya Jaribio:",
+    so: "Dhibcaha Imtixaanka:",
+    bs: "Rezultat kviza:",
+    sq: "Rezultati i kuizit:",
+    ru: "Оценка теста:"
+  }
+};
+
+function getDiplomaText(key: string, language: string): string {
+  return DIPLOMA_TEXTS[key]?.[language] || DIPLOMA_TEXTS[key]?.en || key;
+}
 
 export default function DiplomaPage() {
   const { language, dir } = useLanguage();
@@ -169,12 +328,10 @@ export default function DiplomaPage() {
           <div>
             <h1 className="text-3xl font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-3">
               <GraduationCap className="h-8 w-8" />
-              {language === 'ar' ? 'دبلوم اللغة العربية' : 'Arabic Language Diploma'}
+              {getDiplomaText('diplomaTitle', language)}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
-              {language === 'ar' 
-                ? '12 أسبوعًا لإتقان العربية باستخدام المفردات القرآنية كمصدر لغوي'
-                : '12 weeks to master Arabic using Quranic vocabulary as a linguistic corpus'}
+              {getDiplomaText('diplomaSubtitle', language)}
             </p>
           </div>
         </div>
@@ -182,7 +339,7 @@ export default function DiplomaPage() {
         <Alert className="mb-6 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-700">
           <Info className="h-4 w-4" />
           <AlertDescription className="text-amber-800 dark:text-amber-200">
-            {language === 'ar' ? DISCLAIMER.ar : DISCLAIMER.en}
+            {DISCLAIMER[language] || DISCLAIMER.en}
           </AlertDescription>
         </Alert>
         
@@ -191,12 +348,10 @@ export default function DiplomaPage() {
             <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-emerald-800 dark:text-emerald-300">
-                  {language === 'ar' ? 'ابدأ رحلتك في تعلم العربية' : 'Start Your Arabic Learning Journey'}
+                  {getDiplomaText('startJourney', language)}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  {language === 'ar' 
-                    ? 'برنامج متكامل في 12 أسبوعًا'
-                    : 'Complete program in 12 weeks'}
+                  {getDiplomaText('completeProgram', language)}
                 </p>
               </div>
               <Button 
@@ -207,7 +362,7 @@ export default function DiplomaPage() {
                 data-testid="button-enroll-diploma"
               >
                 <Play className="h-5 w-5 mr-2" />
-                {language === 'ar' ? 'الالتحاق بالدبلوم' : 'Enroll in Diploma'}
+                {getDiplomaText('enrollDiploma', language)}
               </Button>
             </CardContent>
           </Card>
@@ -218,7 +373,7 @@ export default function DiplomaPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-lg">
-                  {language === 'ar' ? 'تقدمك' : 'Your Progress'}
+                  {getDiplomaText('yourProgress', language)}
                 </h3>
                 <Badge variant="secondary" className="text-lg px-4 py-1">
                   {progress?.completionPercentage || 0}%
@@ -226,8 +381,8 @@ export default function DiplomaPage() {
               </div>
               <Progress value={progress?.completionPercentage || 0} className="h-3" />
               <div className="flex justify-between mt-2 text-sm text-gray-500">
-                <span>{completedWeeks.length} / 12 {language === 'ar' ? 'أسابيع مكتملة' : 'weeks completed'}</span>
-                <span>{progress?.completedExercises?.length || 0} / 256 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
+                <span>{completedWeeks.length} / 12 {getDiplomaText('weeksCompleted', language)}</span>
+                <span>{progress?.completedExercises?.length || 0} / 256 {getDiplomaText('exercises', language)}</span>
               </div>
             </CardContent>
           </Card>
@@ -252,7 +407,7 @@ export default function DiplomaPage() {
                     <Badge variant={status === 'completed' ? 'default' : 'outline'} className={
                       status === 'completed' ? 'bg-emerald-600' : ''
                     }>
-                      {language === 'ar' ? `الأسبوع ${week.weekNumber}` : `Week ${week.weekNumber}`}
+                      {language === 'zh' ? `${getDiplomaText('week', language)}${week.weekNumber}周` : `${getDiplomaText('week', language)} ${week.weekNumber}`}
                     </Badge>
                     {status === 'completed' && <CheckCircle2 className="h-5 w-5 text-emerald-600" />}
                     {status === 'locked' && <Lock className="h-5 w-5 text-gray-400" />}
@@ -268,12 +423,12 @@ export default function DiplomaPage() {
                 <CardContent className="pt-0">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <BookOpen className="h-4 w-4" />
-                    <span>20 {language === 'ar' ? 'مفردة' : 'vocabulary'} • 21 {language === 'ar' ? 'تمرين' : 'exercises'}</span>
+                    <span>20 {getDiplomaText('vocabulary', language)} • 21 {getDiplomaText('exercises', language)}</span>
                   </div>
                   {quizScore !== undefined && (
                     <div className="mt-2 flex items-center gap-2">
                       <Award className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm">{language === 'ar' ? 'درجة الاختبار:' : 'Quiz Score:'} {quizScore}%</span>
+                      <span className="text-sm">{getDiplomaText('quizScore', language)} {quizScore}%</span>
                     </div>
                   )}
                 </CardContent>
@@ -389,7 +544,7 @@ function WeekDetail({
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <Badge className="mb-2">{language === 'ar' ? `الأسبوع ${week.weekNumber}` : `Week ${week.weekNumber}`}</Badge>
+            <Badge className="mb-2">{language === 'zh' ? `${getDiplomaText('week', language)}${week.weekNumber}周` : `${getDiplomaText('week', language)} ${week.weekNumber}`}</Badge>
             <h1 className="text-2xl font-bold text-emerald-800 dark:text-emerald-400">
               {language === 'ar' ? week.titleAr : week.titleEn}
             </h1>
