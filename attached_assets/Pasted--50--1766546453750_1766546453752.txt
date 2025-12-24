@@ -1,0 +1,501 @@
+أرجو منك إضافة المعلومات المرفقة (50 كلمة تركية أصلها عربي + وجودها في القرآن + الجذر + المشتقات عربي→تركي) داخل التمارين في التطبيق/الموقع، مع الالتزام التام بالآتي:
+
+شرط أساسي (ممنوع تغييره)
+
+ممنوع تماما أي تغيير في هيكل الداتا (DB Schema)
+
+ممنوع إضافة أعمدة جديدة
+
+ممنوع إنشاء جداول جديدة
+
+ممنوع migrations أو db:push أو أي إجراء يغير الـschema
+
+لا تعديل على العلاقات أو المفاتيح أو أسماء الحقول
+
+المطلوب بالضبط
+1) إضافة “قسم كلمات قرآنية تركية” داخل التمارين
+
+داخل صفحة التمرين (أو شاشة التمرين) أضف بلوك/قسم ثابت يظهر للمستخدم بعنوان مثل:
+
+تمرين: كلمات تركية أصلها عربي (من القرآن)
+
+ويحتوي على العناصر التالية لكل كلمة:
+
+الكلمة بالتركي
+
+الكلمة في القرآن بالعربي
+
+الجذر العربي
+
+المشتقات (عربي → تركي) كما هي مكتوبة في القائمة أدناه
+
+مهم: عرض هذه البيانات يتم بدون تخزين جديد في DB
+يتم إمّا:
+
+عبر ملف ثابت (JSON / TS object) داخل الكود
+أو
+
+عبر نص ثابت داخل الواجهة (UI template) حسب نوع التمرين
+أو
+
+عبر استخدام نفس الحقول النصية الحالية الموجودة في التمرين (إن كان عندنا حقل description/content) بدون إضافة أي حقول.
+
+2) عدم المساس بأي بيانات حالية
+
+لا تغيير على بيانات المستخدمين
+
+لا تغيير على بيانات التمارين الحالية
+
+فقط إضافة هذا المحتوى للعرض داخل التمارين
+
+البيانات المطلوب إدراجها (كما هي)
+
+Rahmet (رحمة)
+بالتركي: Rahmet
+في القرآن: رحمة — الجذر: ر ح م
+مشتقات (عربي → تركي):
+رحمة → merhamet, rahmet
+رحيم → merhametli, çok merhamet eden
+رحمن → çok merhametli (Allah sıfatı)
+يرحم → merhamet eder
+
+Nimet (نعمة)
+بالتركي: Nimet
+في القرآن: نعمة — الجذر: ن ع م
+مشتقات:
+نعمة → nimet
+نعم → evet / (bağlamına göre) nimetler
+أنعم → nimet verdi, ihsan etti
+منعم → nimet veren
+
+Hikmet (حكمة)
+بالتركي: Hikmet
+في القرآن: حكمة — الجذر: ح ك م
+مشتقات:
+حكمة → hikmet
+حكيم → hikmet sahibi / bilge
+حكم → hüküm, karar
+أحكم → sağlamlaştırdı / en doğru yaptı
+
+Adalet (عدل)
+بالتركي: Adalet
+في القرآن: عدل — الجذر: ع د ل
+مشتقات:
+عدل → adalet / denge
+عادل → adil
+يعدل → adaletli davranır
+بالعدل → adaletle
+
+Zulüm (ظلم)
+بالتركي: Zulüm
+في القرآن: ظلم — الجذر: ظ ل م
+مشتقات:
+ظلم → zulüm / haksızlık
+ظالم → zalim
+مظلوم → mazlum
+يظلم → zulmeder
+
+Hak (حق)
+بالتركي: Hak
+في القرآن: حق — الجذر: ح ق ق
+مشتقات:
+حق → hak / gerçek
+أحق → daha haklı
+يحق → gerçekleşir / hak olur
+حقيق → gerçek / layık
+
+Batıl (باطل)
+بالتركي: Batıl
+في القرآن: باطل — الجذر: ب ط ل
+مشتقات:
+باطل → batıl / yanlış
+يبطل → boşa çıkarır / geçersiz kılar
+أبطل → iptal etti
+بطل → boşa gitti / hükümsüz oldu
+
+Nur (نور)
+بالتركي: Nur
+في القرآن: نور — الجذر: ن و ر
+مشتقات:
+نور → nur / ışık
+منير → aydınlatıcı
+أنار → aydınlattı
+ينير → aydınlatır
+
+Şifa (شفاء)
+بالتركي: Şifa
+في القرآن: شفاء — الجذر: ش ف ي
+مشتقات:
+شفاء → şifa
+يشفي → şifa verir
+شاف → şifa veren
+اشفِ → şifa ver (dua/istek)
+
+Rızık (رزق)
+بالتركي: Rızık
+في القرآن: رزق — الجذر: ر ز ق
+مشتقات:
+رزق → rızık
+يرزق → rızık verir
+رزقنا → bize rızık verdi
+رازق → rızık veren
+
+Azap (عذاب)
+بالتركي: Azap
+في القرآن: عذاب — الجذر: ع ذ ب
+مشتقات:
+عذاب → azap
+يعذب → azap eder
+معذب → azap edilen / azap gören
+عذابي → benim azabım
+
+Hesap (حساب)
+بالتركي: Hesap
+في القرآن: حساب — الجذر: ح س ب
+مشتقات:
+حساب → hesap
+يحسب → حساب eder / zanneder
+حسيب → hesaba çeken / yeterli gören
+حسبان → حساب / ölçü
+
+Ceza (جزاء)
+بالتركي: Ceza
+في القرآن: جزاء — الجذر: ج ز ي
+مشتقات:
+جزاء → karşılık / ceza-ödül
+يجزي → karşılık verir
+جازى → mükâfatlandırdı / cezalandırdı
+مجزي → karşılığı verilen
+
+Mizan (ميزان)
+بالتركي: Mizan
+في القرآن: ميزان — الجذر: و ز ن
+مشتقات:
+ميزان → mizan / terazi
+وزن → ağırlık / ölçü
+يزن → tartar
+موازين → teraziler / ölçüler
+
+Sultan (سلطان)
+بالتركي: Sultan
+في القرآن: سلطان — الجذر: س ل ط
+مشتقات:
+سلطان → sultan / güç, delil
+تسلط → baskı kurdu / musallat oldu
+مسلط → musallat edilen / yetkili kılınan
+سلطة → otorite
+
+Mülk (مُلك)
+بالتركي: Mülk
+في القرآن: مُلك / ملك — الجذر: م ل ك
+مشتقات:
+مُلك → mülk / egemenlik
+ملك → kral / hükümdar
+مالك → sahip / malik
+ملوك → krallar
+
+Sebep (سبب)
+بالتركي: Sebep
+في القرآن: سبب — الجذر: س ب ب
+مشتقات:
+سبب → sebep
+أسباب → sebepler
+بسبب → nedeniyle
+مسبَّب → sonuç / sebep olunan şey
+
+Emir (أمر)
+بالتركي: Emir
+في القرآن: أمر — الجذر: أ م ر
+مشتقات:
+أمر → emir / iş
+يأمر → emreder
+أمرنا → emrimiz / buyruğumuz
+مأمور → memur / emredilmiş
+
+Emanet (أمانة)
+بالتركي: Emanet
+في القرآن: أمانة — الجذر: أ م ن
+مشتقات:
+أمانة → emanet
+أمين → güvenilir
+أمن → güvenlik
+آمن → inandı / güvende oldu
+
+Fitne (فتنة)
+بالتركي: Fitne
+في القرآن: فتنة — الجذر: ف ت ن
+مشتقات:
+فتنة → fitne / imtihan / kargaşa
+يفتن → fitneye düşürür / sınar
+مفتون → fitneye kapılmış
+فاتن → baştan çıkaran
+
+Bela (بلاء)
+بالتركي: Bela
+في القرآن: بلاء — الجذر: ب ل و
+مشتقات:
+بلاء → bela / imtihan
+ابتلاء → sınanma / imtihan
+يبلو → sınar
+مبتلى → sınanan
+
+İbret (عبرة)
+بالتركي: İbret
+في القرآن: عبرة — الجذر: ع ب ر
+مشتقات:
+عبرة → ibret / ders
+اعتبار → ibret alma
+يعبر → geçer / yorumlar (bağlama göre)
+عبور → geçiş
+
+Şahit (شاهد/شهيد)
+بالتركي: Şahit
+في القرآن: شاهد / شهيد — الجذر: ش ه د
+مشتقات:
+شاهد → şahit
+شهادة → şahitlik / شهادت
+شهيد → şehit / tanık
+يشهد → şahitlik eder
+
+İnsan (إنسان)
+بالتركي: İnsan
+في القرآن: إنسان / إنس — الجذر: أ ن س
+مشتقات:
+إنسان → insan
+إنس → insanlar (cin-ins ayrımı bağlamında)
+أنس → ünsiyet / yakınlık
+استأنس → alıştı / yakınlık kurdu
+
+Hayat (حياة)
+بالتركي: Hayat
+في القرآن: حياة — الجذر: ح ي ي
+مشتقات:
+حياة → hayat
+حي → diri / canlı
+يحيي → diriltir
+محيي → dirilten (Allah sıfatı olarak da kullanılır)
+
+Dünya (دنيا)
+بالتركي: Dünya
+في القرآن: دنيا — الجذر: د ن و
+مشتقات:
+دنيا → dünya
+أدنى → daha yakın / daha düşük
+دنو → yakınlaşma
+يدنو → yaklaşır
+
+Ahiret (آخرة)
+بالتركي: Ahiret
+في القرآن: آخرة — الجذر: أ خ ر
+مشتقات:
+آخرة → ahiret
+آخر → son / آخر
+يؤخر → erteler
+تأخير → erteleme
+
+Kıyamet (قيامة)
+بالتركي: Kıyamet
+في القرآن: قيامة — الجذر: ق و م
+مشتقات:
+قيامة → kıyamet
+يقوم → kalkar / ayağa kalkar
+قائم → ayakta duran
+أقام → kurdu / إقامة (bağlama göre)
+
+Saat (ساعة)
+بالتركي: Saat
+في القرآن: ساعة — الجذر: س ا ع
+مشتقات:
+ساعة → saat
+الساعات → saatler
+ساعي → çabalayan / koşan
+مسعى → çaba / gayret
+
+Din (دين)
+بالتركي: Din
+في القرآن: دين — الجذر: د ي ن
+مشتقات:
+دين → din
+يوم الدين → din günü / hesap günü
+يدين → din edinir / boyun eğer (bağlama göre)
+ديّان → hesaba çeken (Allah için de استعمال)
+
+İman (إيمان)
+بالتركي: İman
+في القرآن: إيمان — الجذر: أ م ن
+مشتقات:
+إيمان → iman
+آمن → inandı
+مؤمن → mümin
+أمان → emniyet / güven
+
+İslam (إسلام)
+بالتركي: İslam
+في القرآن: إسلام — الجذر: س ل م
+مشتقات:
+إسلام → İslam
+مسلم → Müslüman
+سلام → selam / barış
+أسلم → teslim oldu / Müslüman oldu
+
+Müslüman (مسلم)
+بالتركي: Müslüman
+في القرآن: مسلم / مسلمين — الجذر: س ل م
+مشتقات:
+مسلم → Müslüman
+مسلمين → Müslümanlar
+إسلام → İslam
+تسليم → teslimiyet
+
+Mümin (مؤمن)
+بالتركي: Mümin
+في القرآن: مؤمن — الجذر: أ م ن
+مشتقات:
+مؤمن → mümin
+مؤمنين → müminler
+إيمان → iman
+آمنوا → iman ettiler
+
+Kâfir (كافر)
+بالتركي: Kâfir
+في القرآن: كافر — الجذر: ك ف ر
+مشتقات:
+كافر → kâfir
+كفر → inkâr / küfür
+يكفر → inkâr eder
+كفور → çok nankör / çok inkârcı
+
+Münafık (منافق)
+بالتركي: Münafık
+في القرآن: منافق — الجذر: ن ف ق
+مشتقات:
+منافق → münafık
+نفاق → nifak / ikiyüzlülük
+نافق → ikiyüzlü davrandı
+(إنفاق) → infak / harcama
+
+Müşrik (مشرك)
+بالتركي: Müşrik
+في القرآن: مشرك — الجذر: ش ر ك
+مشتقات:
+مشرك → müşrik
+شرك → şirk / ortak koşma
+يشرك → ortak koşar
+شركاء → ortaklar
+
+Şeytan (شيطان)
+بالتركي: Şeytan
+في القرآن: شيطان — الجذر: ش ط ن
+مشتقات:
+شيطان → şeytan
+شياطين → şeytanlar
+وسوسة → vesvese
+يوسوس → vesvese verir
+
+Melek (مَلَك/ملائكة)
+بالتركي: Melek
+في القرآن: مَلَك / ملائكة
+مشتقات:
+مَلَك → melek
+ملائكة → melekler
+ملكوت → melekût / âlem-i melekût
+رسل → elçiler (bağlama göre)
+
+Cennet (جنة)
+بالتركي: Cennet
+في القرآن: جنة / جنات — الجذر: ج ن ن
+مشتقات:
+جنة → cennet
+جنات → cennetler
+جن → cin
+مجنون → deli / cinlenmiş
+
+Cehennem (جهنم)
+بالتركي: Cehennem
+في القرآن: جهنم
+مشتقات:
+جهنم → cehennem
+نار → ateş
+جحيم → cehennem ateşi
+سقر → cehennem isimlerinden
+
+Mescit (مسجد)
+بالتركي: Mescit
+في القرآن: مسجد — الجذر: س ج د
+مشتقات:
+مسجد → mescit / cami
+سجد → secde etti
+سجود → secde
+ساجدين → secde edenler
+
+Kitap (كتاب)
+بالتركي: Kitap
+في القرآن: كتاب — الجذر: ك ت ب
+مشتقات:
+كتاب → kitap
+كتب → yazdı
+مكتوب → yazılı
+كاتب → yazar / yazıcı
+
+Kalem (قلم)
+بالتركي: Kalem
+في القرآن: قلم — الجذر: ق ل م
+مشتقات:
+قلم → kalem
+أقلام → kalemler
+يكتب بالقلم → kalemle yazar
+قلمنا → kalemimiz
+
+Ayet (آية)
+بالتركي: Ayet
+في القرآن: آية / آيات
+مشتقات:
+آية → ayet
+آيات → ayetler
+بينات → apaçık deliller
+علامة → işaret / alamet
+
+Sure (سورة)
+بالتركي: Sure
+في القرآن: سورة — الجذر: س و ر
+مشتقات:
+سورة → sure
+سور → surlar / duvarlar
+تسوّر → surdan tırmandı / aştı
+أسوار → surlar
+
+Dua (دعاء)
+بالتركي: Dua
+في القرآن: دعاء — الجذر: د ع و
+مشتقات:
+دعاء → dua
+دعا → دعا etti
+يدعو → dua eder / çağırır
+دعوة → davet / çağrı
+
+Zikir (ذكر)
+بالتركي: Zikir
+في القرآن: ذكر / ذكرى — الجذر: ذ ك ر
+مشتقات:
+ذكر → zikir / anma
+يذكر → zikreder / anar
+ذكرى → hatırlatma / öğüt
+تذكير → hatırlatma
+
+Şükür (شكر)
+بالتركي: Şükür
+في القرآن: شكر / شكور — الجذر: ش ك ر
+مشتقات:
+شكر → şükür / teşekkür
+يشكر → şükreder
+شاكر → şükreden
+شكور → çok şükreden
+
+Sabır (صبر)
+بالتركي: Sabır
+في القرآن: صبر / صابرين — الجذر: ص ب ر
+مشتقات:
+صبر → sabır
+يصبر → sabreder
+صابر → sabreden
+صابرين → sabredenler

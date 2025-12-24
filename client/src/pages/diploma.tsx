@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
+import { TurkishQuranicWordCard } from "@/components/TurkishQuranicWordCard";
+import { getTurkishWordByIndex } from "@/data/turkishQuranicWords";
 
 interface DiplomaWeek {
   id: string;
@@ -474,7 +476,10 @@ function WeekDetail({
             </div>
           </TabsContent>
           
-          <TabsContent value="exercises" className="mt-4">
+          <TabsContent value="exercises" className="mt-4 space-y-4">
+            {language === 'tr' && (
+              <TurkishQuranicWordCard word={getTurkishWordByIndex(currentExerciseIndex)} />
+            )}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
