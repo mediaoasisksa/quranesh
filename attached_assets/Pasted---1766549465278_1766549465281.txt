@@ -1,0 +1,457 @@
+نريد إضافة قائمة كلمات السواحيلية (أصلها عربي ومذكورة في القرآن) داخل التمارين في التطبيق، بدون أي تغيير مطلقًا على قواعد البيانات أو هيكل الداتا.
+
+شرط أساسي (غير قابل للنقاش)
+
+ممنوع إضافة جداول جديدة
+
+ممنوع إضافة أعمدة جديدة
+
+ممنوع migrations
+
+ممنوع أي db:push أو db:migrate ينتج عنه تعديل schema
+
+ممنوع تعديل العلاقات أو المفاتيح أو أسماء الحقول
+
+لا نريد أي تغيير على الداتا الحالية إطلاقًا
+
+المطلوب بالضبط
+1) إضافة “قسم كلمات قرآنية بالسواحيلية” داخل صفحة التمرين
+
+أضف داخل واجهة التمرين (UI) قسم ثابت بعنوان مثل:
+
+Swahili Qur’anic Vocabulary (Arabic Origin)
+أو بالعربي: مفردات سواحيلية أصلها عربي (من القرآن)
+
+ويظهر لكل كلمة:
+
+Kiswahili: الكلمة + مثال استخدام سواحلي (الجملة المعطاة)
+
+Qur’ani: الكلمة العربية + الجذر
+
+مشتقات (عربي → Kiswahili) كما هي
+
+2) طريقة التنفيذ بدون DB
+
+نفذها واحدة من هذه الطرق (بدون تخزين جديد):
+
+ملف ثابت داخل الكود: sw_vocab.ts أو sw_vocab.json
+
+أو constant داخل Frontend/Component
+
+أو Mapping حسب نوع التمرين (إن كان موجود) لكن بدون إضافة أي حقول
+
+أهم شيء: هذه الكلمات تُعرض للمستخدم داخل التمارين كـ “محتوى تدريبي” فقط، وليست بيانات تُخزن في قاعدة البيانات.
+
+3) معيار قبول (Acceptance Criteria)
+
+ظهور القسم في صفحة التمرين
+
+الكلمات 1 إلى 50 تظهر كاملة وبنفس النص أدناه
+
+لا يوجد أي تعديل على الـschema
+
+لا تظهر أي إعادة تهيئة/تطابق قواعد بيانات أو مشاكل توافق
+
+الكلمات المطلوب إضافتها (Swahili فقط) — كما هي
+
+Rahma (رحمة)
+Kiswahili: rahma — Mwenyezi Mungu akupe rahma.
+Qur’ani: رحمة — الجذر: ر ح م
+مشتقات (عربي → Kiswahili):
+رحمة → rehema / rahma
+رحيم → mwenye rehema / mwingi wa rehema
+يرحم → hurehemu
+
+Neema (نعمة)
+Kiswahili: neema — Hii ni neema kubwa.
+Qur’ani: نعمة — الجذر: ن ع م
+مشتقات:
+نعمة → neema
+نعم (نِعَم) → neema nyingi
+أنعم → ameneemesha / ametoa neema
+
+Hikima (حكمة)
+Kiswahili: hikima — Tenda kwa hikima.
+Qur’ani: حكمة — الجذر: ح ك م
+مشتقات:
+حكمة → hikima
+حكيم → mwenye hekima / mwerevu
+حكم → hukumu / uamuzi
+
+Uadilifu (عدل)
+Kiswahili: uadilifu — Uadilifu ni msingi wa jamii.
+Qur’ani: عدل — الجذر: ع د ل
+مشتقات:
+عدل → uadilifu / haki (kwa maana ya usawa)
+عادل → mwadilifu
+يعدل → hutenda kwa uadilifu
+
+Dhuluma (ظلم)
+Kiswahili: dhuluma — Hii ni dhuluma.
+Qur’ani: ظلم — الجذر: ظ ل م
+مشتقات:
+ظلم → dhuluma
+ظالم → dhalimu
+يظلم → hudhulumu
+
+Haki (حق)
+Kiswahili: haki — Nipe haki yangu.
+Qur’ani: حق — الجذر: ح ق ق
+مشتقات:
+حق → haki / ukweli
+أحق → mwenye haki zaidi
+حقيق → kweli / sahihi
+
+Batili (باطل)
+Kiswahili: batili — Hiyo ni imani batili.
+Qur’ani: باطل — الجذر: ب ط ل
+مشتقات:
+باطل → batili
+يبطل → hubatilisha / huondoa uhalali
+إبطال → ubatilishaji
+
+Nuru (نور)
+Kiswahili: nuru — Nuru ya imani.
+Qur’ani: نور — الجذر: ن و ر
+مشتقات:
+نور → nuru
+منير → ang’avu / yenye kuangaza
+أنار → akaangaza / akaweka nuru
+
+Shifa (شفاء)
+Kiswahili: shifa — Mungu akupe shifa.
+Qur’ani: شفاء — الجذر: ش ف ي
+مشتقات:
+شفاء → shifa
+يشفي → huponya / hutoa shifa
+شاف → mponyaji / mwenye kuponya
+
+Riziki (رزق)
+Kiswahili: riziki — Riziki hutoka kwa Mungu.
+Qur’ani: رزق — الجذر: ر ز ق
+مشتقات:
+رزق → riziki
+يرزق → huruzuku / hutoa riziki
+رازق → mruzuku / mtoa riziki
+
+Adhabu (عذاب)
+Kiswahili: adhabu — Anaogopa adhabu.
+Qur’ani: عذاب — الجذر: ع ذ ب
+مشتقات:
+عذاب → adhabu
+يعذب → huadhibu
+معذب → aliyeadhibiwa / mwenye adhabu
+
+Hisabu (حساب)
+Kiswahili: hisabu — Siku ya hisabu.
+Qur’ani: حساب — الجذر: ح س ب
+مشتقات:
+حساب → hisabu
+يحسب → huhesabu / hudhani (kulingana na muktadha)
+حسيب → mhisabu / mwenye kuhisabu
+
+Jazaa (جزاء)
+Kiswahili: jazaa — Atapata jazaa yake.
+Qur’ani: جزاء — الجذر: ج ز ي
+مشتقات:
+جزاء → jazaa / malipo
+يجزي → hulipa / hutoa malipo
+مجزي → aliyelipwa / mwenye malipo
+
+Mizani (ميزان)
+Kiswahili: mizani — Mizani ya haki.
+Qur’ani: ميزان — الجذر: و ز ن
+مشتقات:
+ميزان → mizani
+وزن → uzito / kipimo
+موازين → mizani (wingi)
+
+Sultani (سلطان)
+Kiswahili: sultani — Sultani wa nchi.
+Qur’ani: سلطان — الجذر: س ل ط
+مشتقات:
+سلطان → mamlaka / nguvu / sultani
+سلطة → mamlaka
+تسلط → kutawala kwa nguvu / kuonea
+
+Milki (مُلك)
+Kiswahili: milki — Milki ya Mungu.
+Qur’ani: مُلك / ملك — الجذر: م ل ك
+مشتقات:
+مُلك → milki / utawala
+ملك → mfalme / malaika (kwa muktadha mwingine)
+مالك → mwenye / mmiliki
+
+Sababu (سبب)
+Kiswahili: sababu — Sababu ni nini?
+Qur’ani: سبب — الجذر: س ب ب
+مشتقات:
+سبب → sababu
+أسباب → sababu nyingi
+بسبب → kwa sababu ya
+
+Amri (أمر)
+Kiswahili: amri — Amri ya Mungu.
+Qur’ani: أمر — الجذر: أ م ر
+مشتقات:
+أمر → amri / jambo
+يأمر → huamuru
+مأمور → aliyeamriwa
+
+Amana (أمانة)
+Kiswahili: amana — Hii ni amana.
+Qur’ani: أمانة — الجذر: أ م ن
+مشتقات:
+أمانة → amana
+أمين → mwaminifu
+أمن → amani / usalama
+
+Fitina (فتنة)
+Kiswahili: fitina — Usieneze fitina.
+Qur’ani: فتنة — الجذر: ف ت ن
+مشتقات:
+فتنة → fitina / majaribu
+يفتن → huchochea fitina / hujaribu
+مفتون → aliyepotoka kwa fitina
+
+Bala (بلاء)
+Kiswahili: bala — Hii ni bala kubwa.
+Qur’ani: بلاء — الجذر: ب ل و
+مشتقات:
+بلاء → bala / mtihani
+ابتلاء → majaribio / mitihani
+مبتلى → aliyejaribiwa
+
+Ibra (عبرة)
+Kiswahili: ibra — Chukua ibra.
+Qur’ani: عبرة — الجذر: ع ب ر
+مشتقات:
+عبرة → ibra / funzo
+اعتبار → kuzingatia / kuchukua funzo
+عبور → kuvuka / kupita
+
+Shahidi (شاهد/شهيد)
+Kiswahili: shahidi — Yeye ni shahidi.
+Qur’ani: شاهد / شهيد — الجذر: ش ه د
+مشتقات:
+شاهد → shahidi (mshuhuda)
+شهادة → ushahidi
+يشهد → hushuhudia
+
+Insani (إنسان)
+Kiswahili: insani — Utu wa insani.
+Qur’ani: إنسان — الجذر: أ ن س
+مشتقات:
+إنسان → binadamu / insani
+إنس → watu (kinyume na majini)
+أنس → mazoea / urafiki
+
+Maisha (معيشة)
+Kiswahili: maisha — Maisha ya dunia.
+Qur’ani: معيشة — الجذر: ع ي ش
+مشتقات:
+معيشة → maisha / riziki ya kuishi
+عيش → kuishi / maisha
+يعيش → huishi
+
+Dunia (دنيا)
+Kiswahili: dunia — Dunia ni ya kupita.
+Qur’ani: دنيا — الجذر: د ن و
+مشتقات:
+دنيا → dunia
+أدنى → karibu zaidi / chini zaidi
+يدنو → hukaribia
+
+Akhera (آخرة)
+Kiswahili: akhera — Fikiria akhera.
+Qur’ani: آخرة — الجذر: أ خ ر
+مشتقات:
+آخرة → akhera
+آخر → mwisho / ya mwisho
+يؤخر → huahirisha
+
+Kiyama (قيامة)
+Kiswahili: kiyama — Siku ya kiyama.
+Qur’ani: قيامة — الجذر: ق و م
+مشتقات:
+قيامة → kiyama
+يقوم → husimama / huinuka
+قائم → aliyesimama
+
+Saa (ساعة)
+Kiswahili: saa — Subiri saa moja.
+Qur’ani: ساعة — الجذر: س ا ع
+مشتقات:
+ساعة → saa
+الساعات → saa (wingi)
+سعي → juhudi / kujitahidi
+
+Dini (دين)
+Kiswahili: dini — Dini ya kweli.
+Qur’ani: دين — الجذر: د ي ن
+مشتقات:
+دين → dini
+يوم الدين → siku ya malipo / hisabu
+ديّان → Mwenye kuhukumu (sifa)
+
+Imani (إيمان)
+Kiswahili: imani — Imani yangu ni thabiti.
+Qur’ani: إيمان — الجذر: أ م ن
+مشتقات:
+إيمان → imani
+آمن → aliamini
+مؤمن → muumini
+
+Uislamu (إسلام)
+Kiswahili: Uislamu — Uislamu ni dini ya amani.
+Qur’ani: إسلام — الجذر: س ل م
+مشتقات:
+إسلام → Uislamu
+مسلم → Muislamu
+سلام → salamu / amani
+
+Muislamu (مسلم)
+Kiswahili: Muislamu — Yeye ni Muislamu.
+Qur’ani: مسلم — الجذر: س ل م
+مشتقات:
+مسلم → Muislamu
+مسلمين → Waislamu
+أسلم → alisilimu / alisalimu nafsi
+
+Muumini (مؤمن)
+Kiswahili: muumini — Muumini wa kweli.
+Qur’ani: مؤمن — الجذر: أ م ن
+مشتقات:
+مؤمن → muumini
+مؤمنين → waumini
+آمنوا → waliamini
+
+Kafiri (كافر)
+Kiswahili: kafiri
+Qur’ani: كافر — الجذر: ك ف ر
+مشتقات:
+كافر → kafiri
+كفر → ukafiri / kukataa
+يكفر → hukufuru / hukataa
+
+Mnafiki (منافق)
+Kiswahili: mnafiki — Usiwe mnafiki.
+Qur’ani: منافق — الجذر: ن ف ق
+مشتقات:
+منافق → mnafiki
+نفاق → unafiki
+نافق → alifanya unafiki
+
+Mshirikina (مشرك)
+Kiswahili: mshirikina
+Qur’ani: مشرك — الجذر: ش ر ك
+مشتقات:
+مشرك → mshirikina
+شرك → shirk / kushirikisha
+يشرك → hushirikisha
+
+Shetani (شيطان)
+Kiswahili: shetani — Shetani ananong’ona.
+Qur’ani: شيطان — الجذر: ش ط ن
+مشتقات:
+شيطان → shetani
+شياطين → mashetani
+وسوسة → wasiwasi / mnong’ono
+
+Malaika (ملائكة)
+Kiswahili: malaika — Malaika waliteremka.
+Qur’ani: ملائكة
+مشتقات:
+مَلَك → malaika
+ملائكة → malaika (wingi)
+رسل → wajumbe (kwa muktadha)
+
+Janna (جنة)
+Kiswahili: janna — Waombe Janna.
+Qur’ani: جنة — الجذر: ج ن ن
+مشتقات:
+جنة → janna / pepo
+جنات → majanna / pepo nyingi
+جن → majini
+
+Jahannamu (جهنم)
+Kiswahili: jahannamu — Anaogopa Jahannamu.
+Qur’ani: جهنم
+مشتقات:
+جهنم → jahannamu
+جحيم → moto mkali
+نار → moto
+
+Msikiti (مسجد)
+Kiswahili: msikiti — Tunaenda msikitini.
+Qur’ani: مسجد — الجذر: س ج د
+مشتقات:
+مسجد → msikiti
+سجد → kusujudu
+سجود → sijda / kusujudu
+
+Kitabu (كتاب)
+Kiswahili: kitabu — Soma kitabu.
+Qur’ani: كتاب — الجذر: ك ت ب
+مشتقات:
+كتاب → kitabu
+كتب → aliandika
+كاتب → mwandishi
+
+Kalamu (قلم)
+Kiswahili: kalamu — Andika kwa kalamu.
+Qur’ani: قلم — الجذر: ق ل م
+مشتقات:
+قلم → kalamu
+أقلام → kalamu nyingi
+يكتب بالقلم → huandika kwa kalamu
+
+Aya (آية)
+Kiswahili: aya — Soma aya hii.
+Qur’ani: آية
+مشتقات:
+آية → aya
+آيات → aya nyingi
+بينات → dalili zilizo wazi
+
+Sura (سورة)
+Kiswahili: sura — Sura ya Al-Fatiha.
+Qur’ani: سورة — الجذر: س و ر
+مشتقات:
+سورة → sura
+سور → kuta / ngome
+أسوار → kuta (wingi)
+
+Dua (دعاء)
+Kiswahili: dua — Fanya dua.
+Qur’ani: دعاء — الجذر: د ع و
+مشتقات:
+دعاء → dua
+دعا → alifanya dua / aliomba
+يدعو → huomba / huita
+
+Dhikri (ذكر)
+Kiswahili: dhikri — Dhikri ya Mungu.
+Qur’ani: ذكر — الجذر: ذ ك ر
+مشتقات:
+ذكر → dhikri / kukumbuka
+يذكر → hukumbuka / hutaja
+ذكرى → ukumbusho / mawaidha
+
+Shukrani (شكر)
+Kiswahili: shukrani — Shukrani kwa Mungu.
+Qur’ani: شكر — الجذر: ش ك ر
+مشتقات:
+شكر → shukrani
+يشكر → hushukuru
+شاكر → mwenye kushukuru
+
+Saburi (صبر)
+Kiswahili: saburi — Kuwa na saburi.
+Qur’ani: صبر — الجذر: ص ب ر
+مشتقات:
+صبر → saburi
+يصبر → husubiri
+صابر → mvumilivu / mwenye saburi
+
+المطلوب تنفيذ العرض داخل التمارين فقط بدون DB changes.

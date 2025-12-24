@@ -26,6 +26,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { TurkishQuranicWordCard } from "@/components/TurkishQuranicWordCard";
 import { getTurkishWordByIndex } from "@/data/turkishQuranicWords";
+import { SwahiliQuranicWordCard } from "@/components/SwahiliQuranicWordCard";
+import { getSwahiliWordByIndex } from "@/data/swahiliQuranicWords";
 
 interface DiplomaWeek {
   id: string;
@@ -479,6 +481,9 @@ function WeekDetail({
           <TabsContent value="exercises" className="mt-4 space-y-4">
             {language === 'tr' && (
               <TurkishQuranicWordCard word={getTurkishWordByIndex(currentExerciseIndex)} />
+            )}
+            {language === 'sw' && (
+              <SwahiliQuranicWordCard word={getSwahiliWordByIndex(currentExerciseIndex)} />
             )}
             <Card>
               <CardHeader>
