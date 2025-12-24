@@ -1,0 +1,221 @@
+توجيه للمبرمج (Replit) — ممنوع تغيير قاعدة البيانات
+1) ممنوعات واضحة
+
+لا تعدل shared/schema.ts
+
+لا تشغّل npm run db:push ولا db:push --force
+
+لا تنشئ migrations
+
+لا تضف أي جدول/عمود/علاقة جديدة في Neon
+
+المطلوب “إضافة محتوى تدريبي فقط” من خلال ملفات داخل المشروع (static content) أو حقن بيانات عبر الكود أثناء التشغيل.
+
+2) الطريقة الآمنة 100% (بدون لمس DB نهائيًا)
+(A) أضف ملف محتوى جديد للكلمات (TypeScript ثابت)
+
+أنشئ ملفًا جديدًا مثلًا:
+src/content/vocab/id_ar_quran_words.ts
+
+ثم ضع فيه هذا الكود (انسخه كما هو):
+
+export type QuraneshVocabItem = {
+  key: string;
+  indo: string;       // الكلمة بالإندونيسي
+  ar: string;         // الأصل العربي
+  root: string;       // الجذر
+  example_id: string; // مثال إندونيسي
+  derivatives: Array<{ ar: string; id: string }>; // مشتقات عربي -> إندونيسي
+  notes?: string;
+  tags?: string[];
+};
+
+export const ID_AR_QURAN_WORDS: QuraneshVocabItem[] = [
+  {
+    key: "rahmat",
+    indo: "Rahmat",
+    ar: "رحمة",
+    root: "ر ح م",
+    example_id: "Semoga Allah memberi rahmat-Nya.",
+    derivatives: [
+      { ar: "رحمة", id: "rahmat / kasih sayang" },
+      { ar: "رحيم", id: "Maha Penyayang / penyayang" },
+      { ar: "رحمن", id: "Maha Pengasih" },
+      { ar: "يرحم", id: "merahmati / mengasihi" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "nikmat",
+    indo: "Nikmat",
+    ar: "نعمة",
+    root: "ن ع م",
+    example_id: "Ini nikmat yang besar.",
+    derivatives: [
+      { ar: "نعمة", id: "nikmat" },
+      { ar: "نعم (نِعَم)", id: "nikmat-nikmat" },
+      { ar: "أنعم", id: "memberi nikmat / menganugerahi" },
+      { ar: "منعم", id: "pemberi nikmat" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "hikmah",
+    indo: "Hikmah",
+    ar: "حكمة",
+    root: "ح ك م",
+    example_id: "Bertindaklah dengan hikmah.",
+    derivatives: [
+      { ar: "حكمة", id: "hikmah / kebijaksanaan" },
+      { ar: "حكيم", id: "bijaksana / Maha Bijaksana" },
+      { ar: "حكم", id: "hukum / keputusan" },
+      { ar: "يحكم", id: "memutuskan / mengadili" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "adil",
+    indo: "Adil",
+    ar: "عدل",
+    root: "ع د ل",
+    example_id: "Hakim harus adil.",
+    derivatives: [
+      { ar: "عدل", id: "adil / keadilan" },
+      { ar: "عدالة", id: "keadilan" },
+      { ar: "عادل", id: "orang yang adil" },
+      { ar: "يعدل", id: "berlaku adil" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "zalim",
+    indo: "Zalim",
+    ar: "ظلم",
+    root: "ظ ل م",
+    example_id: "Jangan berlaku zalim.",
+    derivatives: [
+      { ar: "ظلم", id: "kezaliman / ظلم" },
+      { ar: "ظالم", id: "zalim (pelaku ظلم)" },
+      { ar: "مظلوم", id: "orang yang dizalimi" },
+      { ar: "يظلم", id: "menzalimi" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "hak",
+    indo: "Hak",
+    ar: "حق",
+    root: "ح ق ق",
+    example_id: "Itu hak saya.",
+    derivatives: [
+      { ar: "حق", id: "hak / kebenaran" },
+      { ar: "حقيقة", id: "حقيقة / kenyataan" },
+      { ar: "أحق", id: "lebih berhak" },
+      { ar: "يحق", id: "benar/layak terjadi" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "batil",
+    indo: "Batil",
+    ar: "باطل",
+    root: "ب ط ل",
+    example_id: "Itu tuduhan batil.",
+    derivatives: [
+      { ar: "باطل", id: "batil / salah" },
+      { ar: "يبطل", id: "membatalkan / menggugurkan" },
+      { ar: "إبطال", id: "pembatalan" },
+      { ar: "مُبطِل", id: "yang membatalkan" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "nur",
+    indo: "Nur",
+    ar: "نور",
+    root: "ن و ر",
+    example_id: "Nur iman menerangi hati.",
+    derivatives: [
+      { ar: "نور", id: "nur / cahaya" },
+      { ar: "منير", id: "yang menerangi" },
+      { ar: "أنار", id: "menerangi" },
+      { ar: "ينير", id: "menerangi (sedang/terus)" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "syifa",
+    indo: "Syifa",
+    ar: "شفاء",
+    root: "ش ف ي",
+    example_id: "Semoga cepat mendapat syifa.",
+    derivatives: [
+      { ar: "شفاء", id: "syifa / kesembuhan" },
+      { ar: "يشفي", id: "menyembuhkan" },
+      { ar: "شافٍ", id: "penyembuh / yang menyembuhkan" },
+      { ar: "استشفاء", id: "mencari kesembuhan" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+  {
+    key: "rezeki",
+    indo: "Rezeki/Rizki",
+    ar: "رزق",
+    root: "ر ز ق",
+    example_id: "Rezeki sudah diatur Allah.",
+    derivatives: [
+      { ar: "رزق", id: "rezeki" },
+      { ar: "يرزق", id: "memberi rezeki" },
+      { ar: "رزاق", id: "Maha Pemberi rezeki" },
+      { ar: "مرزوق", id: "yang diberi rezeki" },
+    ],
+    tags: ["id", "arabic-origin", "quran"],
+  },
+
+  // ملاحظة للمبرمج:
+  // أكمل بنفس النمط لباقي الكلمات (Azab... Taubat) حرفيًا من قائمة المالك Marwan
+  // بدون أي تغيير على DB. فقط محتوى ثابت.
+];
+
+
+مهم: لا تغيّر “شكل” البيانات داخل الـ DB. فقط أضف الملف ووسّع القائمة داخله حتى 50 كلمة (انسخ بقية العناصر من رسالتك بنفس النمط).
+
+3) ربط الملف بالتدريبات بدون DB
+(B) سجّل “حزمة تدريب” جديدة للغة الإندونيسية داخل الكود
+
+ابحث في المشروع عن مكان تجميع حزم التدريبات (غالبًا شيء مثل):
+
+src/lib/trainingPacks.ts
+
+أو server/routes.ts
+
+أو src/features/training/...
+
+ثم:
+
+Import للملف:
+
+import { ID_AR_QURAN_WORDS } from "@/content/vocab/id_ar_quran_words";
+
+
+أضف خيار جديد في قائمة اللغات/المسارات:
+
+language = "id"
+
+module = "arabic-origin-quran-words"
+
+عندما يختار المستخدم الإندونيسية، أرجع هذه القائمة من الذاكرة بدل DB.
+
+مثال (فكرة عامة داخل API route):
+
+if (req.query.lang === "id" && req.query.module === "arabic-origin-quran-words") {
+  return res.json({ items: ID_AR_QURAN_WORDS });
+}
+
+4) ضمان “لا تغيّر DB” أثناء النشر على Replit
+
+بعد الإضافة:
+
+شغّل فقط: npm run build و npm run start أو npm run dev
+
+لا تشغل أي أوامر تزامن Drizzle/Neon.
