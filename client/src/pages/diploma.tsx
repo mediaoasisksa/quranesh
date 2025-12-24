@@ -32,6 +32,8 @@ import { IndonesianQuranicWordCard } from "@/components/IndonesianQuranicWordCar
 import { getIndonesianWordByIndex } from "@/data/indonesianQuranicWords";
 import { MalayQuranicWordCard } from "@/components/MalayQuranicWordCard";
 import { getMalayWordByIndex } from "@/data/malayQuranicWords";
+import { ChineseQuranicWordCard } from "@/components/ChineseQuranicWordCard";
+import { getChineseWordByIndex } from "@/data/chineseQuranicWords";
 
 interface DiplomaWeek {
   id: string;
@@ -494,6 +496,9 @@ function WeekDetail({
             )}
             {language === 'ms' && (
               <MalayQuranicWordCard word={getMalayWordByIndex(currentExerciseIndex)} />
+            )}
+            {language === 'zh' && (
+              <ChineseQuranicWordCard word={getChineseWordByIndex(currentExerciseIndex)} />
             )}
             <Card>
               <CardHeader>
