@@ -237,34 +237,34 @@ const DiplomaPromo = () => {
   const t = content[language] || content.en;
 
   return (
-    <section className={`py-16 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-cyan-950/30 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <section className="py-16 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-cyan-950/30" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <Card className="overflow-hidden border-2 border-emerald-200 dark:border-emerald-800 shadow-xl">
             <CardContent className="p-0">
-              <div className="grid md:grid-cols-2 gap-0">
-                <div className="p-8 md:p-12 flex flex-col justify-center">
-                  <Badge className="w-fit mb-4 bg-emerald-600 hover:bg-emerald-700" data-testid="badge-diploma-certified">
-                    <Award className="h-4 w-4 mr-1" />
+              <div className={`grid md:grid-cols-2 gap-0 ${isRTL ? 'md:grid-flow-dense' : ''}`}>
+                <div className={`p-8 md:p-12 flex flex-col justify-center ${isRTL ? 'text-right md:order-2' : 'text-left md:order-1'}`}>
+                  <Badge className={`w-fit mb-4 bg-emerald-600 hover:bg-emerald-700 ${isRTL ? 'self-end flex-row-reverse' : 'self-start'}`} data-testid="badge-diploma-certified">
+                    <Award className={`h-4 w-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
                     {t.badge}
                   </Badge>
                   
-                  <h2 className="text-3xl md:text-4xl font-bold text-emerald-800 dark:text-emerald-300 mb-4">
-                    <GraduationCap className="inline-block h-10 w-10 mr-3 mb-1" />
-                    {t.title}
+                  <h2 className={`text-3xl md:text-4xl font-bold text-emerald-800 dark:text-emerald-300 mb-4 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <GraduationCap className={`h-10 w-10 mb-1 ${isRTL ? 'ml-3' : 'mr-3'}`} />
+                    <span>{t.title}</span>
                   </h2>
                   
-                  <p className="text-lg text-emerald-700 dark:text-emerald-400 mb-3">
+                  <p className="text-lg text-emerald-700 dark:text-emerald-400 mb-3 leading-relaxed">
                     {t.subtitle}
                   </p>
                   
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
                     {t.description}
                   </p>
                   
                   <ul className="space-y-3 mb-8">
                     {t.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-3 text-gray-700 dark:text-gray-200" data-testid={`text-diploma-feature-${index}`}>
+                      <li key={index} className={`flex items-center gap-3 text-gray-700 dark:text-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`} data-testid={`text-diploma-feature-${index}`}>
                         <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
@@ -274,7 +274,7 @@ const DiplomaPromo = () => {
                   <Link href="/diploma">
                     <Button 
                       size="lg" 
-                      className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-6"
+                      className={`w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-6 ${isRTL ? 'flex-row-reverse' : ''}`}
                       data-testid="button-subscribe-diploma"
                     >
                       {t.cta}
@@ -283,7 +283,7 @@ const DiplomaPromo = () => {
                   </Link>
                 </div>
                 
-                <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-8 md:p-12 flex flex-col justify-center items-center text-white">
+                <div className={`bg-gradient-to-br from-emerald-600 to-teal-700 p-8 md:p-12 flex flex-col justify-center items-center text-white ${isRTL ? 'md:order-1' : 'md:order-2'}`}>
                   <div className="text-center mb-6">
                     <div className="flex items-center justify-center gap-2 mb-4">
                       <MapPin className="h-8 w-8" />
@@ -296,8 +296,8 @@ const DiplomaPromo = () => {
                     <p className="text-emerald-100 mb-4">
                       {t.zanzibarDesc}
                     </p>
-                    <Badge className="bg-white/20 text-white border-white/30 mb-4" data-testid="badge-global-platform">
-                      <Globe className="h-3 w-3 mr-1" />
+                    <Badge className={`bg-white/20 text-white border-white/30 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`} data-testid="badge-global-platform">
+                      <Globe className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
                       {t.globalBadge}
                     </Badge>
                   </div>
@@ -317,7 +317,7 @@ const DiplomaPromo = () => {
                     <p className="text-xs text-emerald-200 text-center mb-2">
                       {t.availableIn}
                     </p>
-                    <div className="flex flex-wrap justify-center gap-1">
+                    <div className="flex flex-wrap justify-center gap-1" dir="ltr">
                       {t.languages.map((lang, index) => (
                         <span key={index} className="text-xs bg-white/10 px-2 py-1 rounded" data-testid={`text-language-${index}`}>
                           {lang}
