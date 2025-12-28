@@ -302,7 +302,8 @@ export default function ExerciseCard({
         {renderExerciseContent()}
 
         <div className="flex justify-between items-center">
-          {phrase && (
+          {/* Only show audio button for exercise types that use the phrase */}
+          {phrase && type !== "conversation" && type !== "roleplay" && (
             <AudioButton
               text={phrase.arabicText}
               lang="ar-SA"
@@ -310,7 +311,7 @@ export default function ExerciseCard({
               data-testid={`button-audio-exercise-${type}`}
             />
           )}
-          {!phrase && <div />}
+          {(!phrase || type === "conversation" || type === "roleplay") && <div />}
           <Button
             className={`text-sm transition-colors ${buttonStyles[variant]}`}
             onClick={handleStart}
