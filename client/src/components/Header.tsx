@@ -28,9 +28,10 @@ const Header = () => {
   const { dir, t } = useLanguage();
 
   const navigation = [
-    { name: t('features'), href: "/features" },
-    { name: t('howItWorks'), href: "/how-it-works" },
-    { name: t('pricing'), href: "/pricing" },
+    { name: t('features'), href: "/features", external: false },
+    { name: t('howItWorks'), href: "/how-it-works", external: false },
+    { name: t('quranMemorization'), href: "https://www.mojzy.com/", external: true },
+    { name: t('pricing'), href: "/pricing", external: false },
   ];
 
   return (
@@ -49,13 +50,25 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
-              >
-                {item.name}
-              </Link>
+              item.external ? (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-1"
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
             {isAuthenticated && (
               <Link
@@ -159,14 +172,27 @@ const Header = () => {
           <div className="md:hidden mt-4 pb-4 border-t border-border">
             <div className="flex flex-col gap-4 pt-4">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
+                item.external ? (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <LanguageToggle />
