@@ -96,7 +96,8 @@ const DISCLAIMER: Record<string, string> = {
   so: "Waxyaabahan waxay u qoran yihiin barashada luqadda Carabiga oo keliya. Qoraalladu waxay u isticmaalaan tusaale luqadeed aan waxbarasho diini ahayn.",
   bs: "Ovaj sadržaj je samo za učenje arapskog jezika. Tekstovi se koriste kao jezički primjeri bez vjerske poduke.",
   sq: "Ky përmbajtje është vetëm për të mësuar gjuhën arabe. Tekstet përdoren si shembuj gjuhësorë pa mësim fetar.",
-  ru: "Этот контент предназначен только для изучения арабского языка. Тексты используются как лингвистические примеры без религиозного обучения."
+  ru: "Этот контент предназначен только для изучения арабского языка. Тексты используются как лингвистические примеры без религиозного обучения.",
+  ur: "یہ مواد صرف عربی زبان سیکھنے کے لیے ہے۔ متون کو لسانی مثالوں کے طور پر استعمال کیا جاتا ہے بغیر کسی مذہبی تعلیم کے۔"
 };
 
 const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
@@ -111,7 +112,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Dibloomada Luuqadda Carabiga",
     bs: "Diploma arapskog jezika",
     sq: "Diploma e Gjuhës Arabe",
-    ru: "Диплом арабского языка"
+    ru: "Диплом арабского языка",
+    ur: "عربی زبان کا ڈپلوما"
   },
   diplomaSubtitle: {
     ar: "12 أسبوعًا لإتقان العربية باستخدام المفردات القرآنية كمصدر لغوي",
@@ -124,7 +126,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "12 toddobaad si aad u barato Carabiga adoo isticmaalaya erayada Quraanka sida hirgelin luuqadeed",
     bs: "12 sedmica za savladavanje arapskog koristeći kuranski vokabular kao jezički korpus",
     sq: "12 javë për të zotëruar arabishten duke përdorur fjalorin kuranor si korpus gjuhësor",
-    ru: "12 недель для овладения арабским языком с использованием коранической лексики"
+    ru: "12 недель для овладения арабским языком с использованием коранической лексики",
+    ur: "قرآنی الفاظ کو لسانی ذریعے کے طور پر استعمال کرتے ہوئے عربی میں مہارت حاصل کرنے کے لیے 12 ہفتے"
   },
   startJourney: {
     ar: "ابدأ رحلتك في تعلم العربية",
@@ -137,7 +140,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Bilow Safarkaa Barashada Carabiga",
     bs: "Započnite svoje putovanje učenja arapskog",
     sq: "Filloni Udhëtimin Tuaj të Mësimit të Arabishtes",
-    ru: "Начните свой путь изучения арабского"
+    ru: "Начните свой путь изучения арабского",
+    ur: "اپنا عربی سیکھنے کا سفر شروع کریں"
   },
   completeProgram: {
     ar: "برنامج متكامل في 12 أسبوعًا",
@@ -150,7 +154,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Barnaamij buuxa 12 toddobaad gudahood",
     bs: "Kompletan program za 12 sedmica",
     sq: "Program i plotë në 12 javë",
-    ru: "Полная программа за 12 недель"
+    ru: "Полная программа за 12 недель",
+    ur: "12 ہفتوں میں مکمل پروگرام"
   },
   enrollDiploma: {
     ar: "الالتحاق بالدبلوم",
@@ -163,7 +168,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Iska diiwaan geli Dibloomada",
     bs: "Upišite se na Diplomu",
     sq: "Regjistrohuni në Diplomë",
-    ru: "Записаться на Диплом"
+    ru: "Записаться на Диплом",
+    ur: "ڈپلوما میں اندراج کریں"
   },
   yourProgress: {
     ar: "تقدمك",
@@ -176,7 +182,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Horumarkaa",
     bs: "Vaš napredak",
     sq: "Progresi Juaj",
-    ru: "Ваш прогресс"
+    ru: "Ваш прогресс",
+    ur: "آپ کی پیشرفت"
   },
   weeksCompleted: {
     ar: "أسابيع مكتملة",
@@ -189,7 +196,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "toddobaad oo dhammaystiran",
     bs: "sedmica završeno",
     sq: "javë të përfunduara",
-    ru: "недель завершено"
+    ru: "недель завершено",
+    ur: "ہفتے مکمل"
   },
   exercises: {
     ar: "تمرين",
@@ -202,7 +210,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "jimicsiyeed",
     bs: "vježbi",
     sq: "ushtrime",
-    ru: "упражнений"
+    ru: "упражнений",
+    ur: "مشقیں"
   },
   week: {
     ar: "الأسبوع",
@@ -215,7 +224,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Toddobaad",
     bs: "Sedmica",
     sq: "Java",
-    ru: "Неделя"
+    ru: "Неделя",
+    ur: "ہفتہ"
   },
   vocabulary: {
     ar: "مفردة",
@@ -228,7 +238,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "ereyga",
     bs: "rječnik",
     sq: "fjalor",
-    ru: "слов"
+    ru: "слов",
+    ur: "الفاظ"
   },
   quizScore: {
     ar: "درجة الاختبار:",
@@ -241,7 +252,8 @@ const DIPLOMA_TEXTS: Record<string, Record<string, string>> = {
     so: "Dhibcaha Imtixaanka:",
     bs: "Rezultat kviza:",
     sq: "Rezultati i kuizit:",
-    ru: "Оценка теста:"
+    ru: "Оценка теста:",
+    ur: "کوئز سکور:"
   }
 };
 

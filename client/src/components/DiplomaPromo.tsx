@@ -27,210 +27,229 @@ const DiplomaPromo = () => {
       badge: "واجهة عالمية",
       title: "دبلوم تعلم اللغة العربية",
       subtitle: "من مكة المكرمة إلى العالم - تعليم اللغة العربية للمسلمين",
-      description: "منصة تعليمية عالمية تدعم 10 لغات، تنطلق من قلب العالم الإسلامي لتصل إلى المسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
+      description: "منصة تعليمية عالمية تدعم 11 لغة، تنطلق من قلب العالم الإسلامي لتصل إلى المسلمين في أفريقيا وآسيا وأوروبا والعالم أجمع",
       features: [
         "مفردات قرآنية أساسية للحياة اليومية",
         "تمارين تفاعلية متنوعة وعملية",
-        "دعم 10 لغات عالمية",
+        "دعم 11 لغة عالمية",
         "شهادة إتمام معتمدة"
       ],
       cta: "انضم للمنصة العالمية",
-      stats: { weeks: "12 أسبوع", languages: "10 لغات" },
+      stats: { weeks: "12 أسبوع", languages: "11 لغة" },
       globalBadge: "منصة عالمية",
       zanzibarTitle: "من مكة إلى العالم",
       zanzibarDesc: "بوابة تعليم العربية للمسلمين",
-      languages: ["العربية", "الإنجليزية", "الإندونيسية", "التركية", "الصينية", "السواحيلية", "الصومالية", "البوسنية", "الألبانية", "الروسية"],
-      availableIn: "متاح بـ 10 لغات:"
+      languages: ["العربية", "الإنجليزية", "الإندونيسية", "الملايو", "التركية", "الصينية", "السواحيلية", "الصومالية", "البوسنية", "الألبانية", "الروسية"],
+      availableIn: "متاح بـ 11 لغة:"
     },
     en: {
       badge: "Global Platform",
       title: "Arabic Language Diploma",
       subtitle: "From Mecca to the World - Arabic Language Learning for Muslims",
-      description: "A global educational platform supporting 10 languages, launching from the heart of the Islamic world to reach Muslims across Africa, Asia, Europe, and the entire world",
+      description: "A global educational platform supporting 11 languages, launching from the heart of the Islamic world to reach Muslims across Africa, Asia, Europe, and the entire world",
       features: [
         "Essential Quranic vocabulary for daily life",
         "Diverse and practical interactive exercises",
-        "Support for 10 global languages",
+        "Support for 11 global languages",
         "Certified completion certificate"
       ],
       cta: "Join the Global Platform",
-      stats: { weeks: "12 Weeks", languages: "10 Languages" },
+      stats: { weeks: "12 Weeks", languages: "11 Languages" },
       globalBadge: "Global Platform",
       zanzibarTitle: "From Mecca to the World",
       zanzibarDesc: "Gateway to Arabic Learning for Muslims",
-      languages: ["Arabic", "English", "Indonesian", "Turkish", "Chinese", "Swahili", "Somali", "Bosnian", "Albanian", "Russian"],
-      availableIn: "Available in 10 languages:"
+      languages: ["Arabic", "English", "Indonesian", "Malay", "Turkish", "Chinese", "Swahili", "Somali", "Bosnian", "Albanian", "Russian"],
+      availableIn: "Available in 11 languages:"
     },
     id: {
       badge: "Platform Global",
       title: "Diploma Bahasa Arab",
       subtitle: "Dari Mekkah ke Dunia - Pembelajaran Bahasa Arab untuk Muslim",
-      description: "Platform pendidikan global yang mendukung 10 bahasa, diluncurkan dari jantung dunia Islam untuk menjangkau Muslim di Afrika, Asia, Eropa, dan seluruh dunia",
+      description: "Platform pendidikan global yang mendukung 11 bahasa, diluncurkan dari jantung dunia Islam untuk menjangkau Muslim di Afrika, Asia, Eropa, dan seluruh dunia",
       features: [
         "Kosakata Quran penting untuk kehidupan sehari-hari",
         "Latihan interaktif yang beragam dan praktis",
-        "Dukungan untuk 10 bahasa global",
+        "Dukungan untuk 11 bahasa global",
         "Sertifikat penyelesaian resmi"
       ],
       cta: "Bergabung dengan Platform Global",
-      stats: { weeks: "12 Minggu", languages: "10 Bahasa" },
+      stats: { weeks: "12 Minggu", languages: "11 Bahasa" },
       globalBadge: "Platform Global",
       zanzibarTitle: "Dari Mekkah ke Dunia",
       zanzibarDesc: "Gerbang Pembelajaran Bahasa Arab untuk Muslim",
-      languages: ["Arab", "Inggris", "Indonesia", "Turki", "Cina", "Swahili", "Somalia", "Bosnia", "Albania", "Rusia"],
-      availableIn: "Tersedia dalam 10 bahasa:"
+      languages: ["Arab", "Inggris", "Indonesia", "Melayu", "Turki", "Cina", "Swahili", "Somalia", "Bosnia", "Albania", "Rusia"],
+      availableIn: "Tersedia dalam 11 bahasa:"
     },
     ms: {
       badge: "Platform Global",
       title: "Diploma Bahasa Arab",
       subtitle: "Dari Mekah ke Dunia - Pembelajaran Bahasa Arab untuk Muslim",
-      description: "Platform pendidikan global yang menyokong 10 bahasa, dilancarkan dari jantung dunia Islam untuk menjangkau Muslim di Afrika, Asia, Eropah, dan seluruh dunia",
+      description: "Platform pendidikan global yang menyokong 11 bahasa, dilancarkan dari jantung dunia Islam untuk menjangkau Muslim di Afrika, Asia, Eropah, dan seluruh dunia",
       features: [
         "Perbendaharaan kata Al-Quran penting untuk kehidupan harian",
         "Latihan interaktif yang pelbagai dan praktikal",
-        "Sokongan untuk 10 bahasa global",
+        "Sokongan untuk 11 bahasa global",
         "Sijil penyelesaian rasmi"
       ],
       cta: "Sertai Platform Global",
-      stats: { weeks: "12 Minggu", languages: "10 Bahasa" },
+      stats: { weeks: "12 Minggu", languages: "11 Bahasa" },
       globalBadge: "Platform Global",
       zanzibarTitle: "Dari Mekah ke Dunia",
       zanzibarDesc: "Gerbang Pembelajaran Bahasa Arab untuk Muslim",
-      languages: ["Arab", "Inggeris", "Indonesia", "Turki", "Cina", "Swahili", "Somalia", "Bosnia", "Albania", "Rusia"],
-      availableIn: "Tersedia dalam 10 bahasa:"
+      languages: ["Arab", "Inggeris", "Indonesia", "Melayu", "Turki", "Cina", "Swahili", "Somalia", "Bosnia", "Albania", "Rusia"],
+      availableIn: "Tersedia dalam 11 bahasa:"
     },
     tr: {
       badge: "Küresel Platform",
       title: "Arapça Dil Diploması",
       subtitle: "Mekke'den Dünyaya - Müslümanlar için Arapça Dil Öğrenimi",
-      description: "Afrika, Asya, Avrupa ve tüm dünyada Müslümanlara ulaşmak için İslam dünyasının kalbinden başlayan 10 dili destekleyen küresel eğitim platformu",
+      description: "Afrika, Asya, Avrupa ve tüm dünyada Müslümanlara ulaşmak için İslam dünyasının kalbinden başlayan 11 dili destekleyen küresel eğitim platformu",
       features: [
         "Günlük yaşam için temel Kuran kelime hazinesi",
         "Çeşitli ve pratik etkileşimli alıştırmalar",
-        "10 küresel dil desteği",
+        "11 küresel dil desteği",
         "Onaylı tamamlama sertifikası"
       ],
       cta: "Küresel Platforma Katıl",
-      stats: { weeks: "12 Hafta", languages: "10 Dil" },
+      stats: { weeks: "12 Hafta", languages: "11 Dil" },
       globalBadge: "Küresel Platform",
       zanzibarTitle: "Mekke'den Dünyaya",
       zanzibarDesc: "Müslümanlar için Arapça Öğrenme Kapısı",
-      languages: ["Arapça", "İngilizce", "Endonezce", "Türkçe", "Çince", "Svahili", "Somalice", "Boşnakça", "Arnavutça", "Rusça"],
-      availableIn: "10 dilde mevcut:"
+      languages: ["Arapça", "İngilizce", "Endonezce", "Malayca", "Türkçe", "Çince", "Svahili", "Somalice", "Boşnakça", "Arnavutça", "Rusça"],
+      availableIn: "11 dilde mevcut:"
     },
     zh: {
       badge: "全球平台",
       title: "阿拉伯语文凭",
       subtitle: "从麦加到世界 - 穆斯林阿拉伯语学习",
-      description: "一个支持10种语言的全球教育平台，从伊斯兰世界的心脏地带出发，覆盖非洲、亚洲、欧洲和全世界的穆斯林",
+      description: "一个支持11种语言的全球教育平台，从伊斯兰世界的心脏地带出发，覆盖非洲、亚洲、欧洲和全世界的穆斯林",
       features: [
         "日常生活必备的古兰经词汇",
         "多样化的实践互动练习",
-        "支持10种全球语言",
+        "支持11种全球语言",
         "官方结业证书"
       ],
       cta: "加入全球平台",
-      stats: { weeks: "12周", languages: "10种语言" },
+      stats: { weeks: "12周", languages: "11种语言" },
       globalBadge: "全球平台",
       zanzibarTitle: "从麦加到世界",
       zanzibarDesc: "穆斯林阿拉伯语学习之门",
-      languages: ["阿拉伯语", "英语", "印尼语", "土耳其语", "中文", "斯瓦希里语", "索马里语", "波斯尼亚语", "阿尔巴尼亚语", "俄语"],
-      availableIn: "提供10种语言："
+      languages: ["阿拉伯语", "英语", "印尼语", "马来语", "土耳其语", "中文", "斯瓦希里语", "索马里语", "波斯尼亚语", "阿尔巴尼亚语", "俄语"],
+      availableIn: "提供11种语言："
     },
     sw: {
       badge: "Jukwaa la Kimataifa",
       title: "Diploma ya Lugha ya Kiarabu",
       subtitle: "Kutoka Makka hadi Ulimwengu - Kujifunza Kiarabu kwa Waislamu",
-      description: "Jukwaa la elimu la kimataifa linalosaidia lugha 10, lililoanzishwa kutoka moyo wa ulimwengu wa Kiislamu kuwafikia Waislamu katika Afrika, Asia, Ulaya, na ulimwengu mzima",
+      description: "Jukwaa la elimu la kimataifa linalosaidia lugha 11, lililoanzishwa kutoka moyo wa ulimwengu wa Kiislamu kuwafikia Waislamu katika Afrika, Asia, Ulaya, na ulimwengu mzima",
       features: [
         "Msamiati muhimu wa Qurani kwa maisha ya kila siku",
         "Mazoezi ya kuvutia yenye aina mbalimbali na vitendo",
-        "Msaada wa lugha 10 za kimataifa",
+        "Msaada wa lugha 11 za kimataifa",
         "Cheti cha kukamilisha kilichoidhinishwa"
       ],
       cta: "Jiunge na Jukwaa la Kimataifa",
-      stats: { weeks: "Wiki 12", languages: "Lugha 10" },
+      stats: { weeks: "Wiki 12", languages: "Lugha 11" },
       globalBadge: "Jukwaa la Kimataifa",
       zanzibarTitle: "Kutoka Makka hadi Ulimwengu",
       zanzibarDesc: "Mlango wa Kujifunza Kiarabu kwa Waislamu",
-      languages: ["Kiarabu", "Kiingereza", "Kiindonesia", "Kituruki", "Kichina", "Kiswahili", "Kisomali", "Kibosnia", "Kialbania", "Kirusi"],
-      availableIn: "Inapatikana kwa lugha 10:"
+      languages: ["Kiarabu", "Kiingereza", "Kiindonesia", "Kimalei", "Kituruki", "Kichina", "Kiswahili", "Kisomali", "Kibosnia", "Kialbania", "Kirusi"],
+      availableIn: "Inapatikana kwa lugha 11:"
     },
     so: {
       badge: "Madal Caalami",
       title: "Dibloomada Luuqadda Carabiga",
       subtitle: "Maka ilaa Adduunka - Barashada Carabiga Muslimiinta",
-      description: "Madal waxbarasho caalami ah oo taageera 10 luuqadood, ka bilaabmaya qalbiga adduunka Islaamka si loo gaadho Muslimiinta Afrika, Aasiya, Yurub, iyo adduunka oo dhan",
+      description: "Madal waxbarasho caalami ah oo taageera 11 luuqadood, ka bilaabmaya qalbiga adduunka Islaamka si loo gaadho Muslimiinta Afrika, Aasiya, Yurub, iyo adduunka oo dhan",
       features: [
         "Erayada Quraanka ee muhiimka ah ee nolosha maalinlaha ah",
         "Jimicsiyada isdhexgalka ah ee kala duwan iyo kuwa wax ku oolka ah",
-        "Taageero 10 luuqadood oo caalami ah",
+        "Taageero 11 luuqadood oo caalami ah",
         "Shahaadada dhammaystirka ee la ansixiyey"
       ],
       cta: "Ku Biir Madalka Caalamiga",
-      stats: { weeks: "12 Toddobaad", languages: "10 Luuqadood" },
+      stats: { weeks: "12 Toddobaad", languages: "11 Luuqadood" },
       globalBadge: "Madal Caalami",
       zanzibarTitle: "Maka ilaa Adduunka",
       zanzibarDesc: "Albaabka Barashada Carabiga Muslimiinta",
-      languages: ["Carabi", "Ingiriis", "Indunuusiyaan", "Turki", "Shiinaha", "Sawaaxili", "Soomaali", "Boosniya", "Albaaniya", "Ruush"],
-      availableIn: "Waxaa lagu heli karaa 10 luuqadood:"
+      languages: ["Carabi", "Ingiriis", "Indunuusiyaan", "Malay", "Turki", "Shiinaha", "Sawaaxili", "Soomaali", "Boosniya", "Albaaniya", "Ruush"],
+      availableIn: "Waxaa lagu heli karaa 11 luuqadood:"
     },
     bs: {
       badge: "Globalna Platforma",
       title: "Diploma arapskog jezika",
       subtitle: "Od Meke do Svijeta - Učenje arapskog za muslimane",
-      description: "Globalna obrazovna platforma koja podržava 10 jezika, pokrenuta iz srca islamskog svijeta kako bi dosegla muslimane u Africi, Aziji, Evropi i cijelom svijetu",
+      description: "Globalna obrazovna platforma koja podržava 11 jezika, pokrenuta iz srca islamskog svijeta kako bi dosegla muslimane u Africi, Aziji, Evropi i cijelom svijetu",
       features: [
         "Ključni kuranski vokabular za svakodnevni život",
         "Raznovrsne i praktične interaktivne vježbe",
-        "Podrška za 10 globalnih jezika",
+        "Podrška za 11 globalnih jezika",
         "Certificirani završni certifikat"
       ],
       cta: "Pridružite se Globalnoj Platformi",
-      stats: { weeks: "12 Sedmica", languages: "10 Jezika" },
+      stats: { weeks: "12 Sedmica", languages: "11 Jezika" },
       globalBadge: "Globalna Platforma",
       zanzibarTitle: "Od Meke do Svijeta",
       zanzibarDesc: "Kapija za učenje arapskog za muslimane",
-      languages: ["Arapski", "Engleski", "Indonezijski", "Turski", "Kineski", "Svahili", "Somalijski", "Bosanski", "Albanski", "Ruski"],
-      availableIn: "Dostupno na 10 jezika:"
+      languages: ["Arapski", "Engleski", "Indonezijski", "Malajski", "Turski", "Kineski", "Svahili", "Somalijski", "Bosanski", "Albanski", "Ruski"],
+      availableIn: "Dostupno na 11 jezika:"
     },
     sq: {
       badge: "Platforma Globale",
       title: "Diploma e Gjuhës Arabe",
       subtitle: "Nga Meka në Botë - Mësimi i Arabishtes për Myslimanët",
-      description: "Një platformë arsimore globale që mbështet 10 gjuhë, e nisur nga zemra e botës islame për të arritur myslimanët në Afrikë, Azi, Evropë dhe të gjithë botën",
+      description: "Një platformë arsimore globale që mbështet 11 gjuhë, e nisur nga zemra e botës islame për të arritur myslimanët në Afrikë, Azi, Evropë dhe të gjithë botën",
       features: [
         "Fjalor thelbësor kuranor për jetën e përditshme",
         "Ushtrime interaktive të larmishme dhe praktike",
-        "Mbështetje për 10 gjuhë globale",
+        "Mbështetje për 11 gjuhë globale",
         "Certifikatë përfundimi e certifikuar"
       ],
       cta: "Bashkohuni me Platformën Globale",
-      stats: { weeks: "12 Javë", languages: "10 Gjuhë" },
+      stats: { weeks: "12 Javë", languages: "11 Gjuhë" },
       globalBadge: "Platforma Globale",
       zanzibarTitle: "Nga Meka në Botë",
       zanzibarDesc: "Porta për Mësimin e Arabishtes për Myslimanët",
-      languages: ["Arabisht", "Anglisht", "Indonezisht", "Turqisht", "Kinezisht", "Svahili", "Somalisht", "Boshnjakisht", "Shqip", "Rusisht"],
-      availableIn: "E disponueshme në 10 gjuhë:"
+      languages: ["Arabisht", "Anglisht", "Indonezisht", "Malajzisht", "Turqisht", "Kinezisht", "Svahili", "Somalisht", "Boshnjakisht", "Shqip", "Rusisht"],
+      availableIn: "E disponueshme në 11 gjuhë:"
     },
     ru: {
       badge: "Глобальная Платформа",
       title: "Диплом арабского языка",
       subtitle: "От Мекки к Миру - Изучение арабского для мусульман",
-      description: "Глобальная образовательная платформа, поддерживающая 10 языков, запущенная из сердца исламского мира, чтобы достичь мусульман в Африке, Азии, Европе и во всём мире",
+      description: "Глобальная образовательная платформа, поддерживающая 11 языков, запущенная из сердца исламского мира, чтобы достичь мусульман в Африке, Азии, Европе и во всём мире",
       features: [
         "Основная коранная лексика для повседневной жизни",
         "Разнообразные и практические интерактивные упражнения",
-        "Поддержка 10 мировых языков",
+        "Поддержка 11 мировых языков",
         "Сертифицированный сертификат об окончании"
       ],
       cta: "Присоединиться к Глобальной Платформе",
-      stats: { weeks: "12 Недель", languages: "10 Языков" },
+      stats: { weeks: "12 Недель", languages: "11 Языков" },
       globalBadge: "Глобальная Платформа",
       zanzibarTitle: "От Мекки к Миру",
       zanzibarDesc: "Врата к изучению арабского для мусульман",
-      languages: ["Арабский", "Английский", "Индонезийский", "Турецкий", "Китайский", "Суахили", "Сомали", "Боснийский", "Албанский", "Русский"],
-      availableIn: "Доступно на 10 языках:"
+      languages: ["Арабский", "Английский", "Индонезийский", "Малайский", "Турецкий", "Китайский", "Суахили", "Сомали", "Боснийский", "Албанский", "Русский"],
+      availableIn: "Доступно на 11 языках:"
+    },
+    ur: {
+      badge: "عالمی پلیٹ فارم",
+      title: "عربی زبان کا ڈپلوما",
+      subtitle: "مکہ سے دنیا تک - مسلمانوں کے لیے عربی زبان سیکھنا",
+      description: "11 زبانوں کی حمایت کرنے والا عالمی تعلیمی پلیٹ فارم، اسلامی دنیا کے دل سے شروع ہو کر افریقہ، ایشیا، یورپ اور پوری دنیا میں مسلمانوں تک پہنچتا ہے",
+      features: [
+        "روزمرہ زندگی کے لیے ضروری قرآنی الفاظ",
+        "متنوع اور عملی انٹرایکٹو مشقیں",
+        "11 عالمی زبانوں کی حمایت",
+        "تصدیق شدہ تکمیل سرٹیفکیٹ"
+      ],
+      cta: "عالمی پلیٹ فارم میں شامل ہوں",
+      stats: { weeks: "12 ہفتے", languages: "11 زبانیں" },
+      globalBadge: "عالمی پلیٹ فارم",
+      zanzibarTitle: "مکہ سے دنیا تک",
+      zanzibarDesc: "مسلمانوں کے لیے عربی سیکھنے کا دروازہ",
+      languages: ["عربی", "انگریزی", "انڈونیشی", "ملائی", "ترکی", "چینی", "سواحلی", "صومالی", "بوسنیائی", "البانی", "روسی"],
+      availableIn: "11 زبانوں میں دستیاب:"
     }
   };
 
