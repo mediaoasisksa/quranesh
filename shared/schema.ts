@@ -491,3 +491,20 @@ export const insertDiplomaExerciseAttemptSchema = createInsertSchema(diplomaExer
 
 export type DiplomaExerciseAttempt = typeof diplomaExerciseAttempts.$inferSelect;
 export type InsertDiplomaExerciseAttempt = z.infer<typeof insertDiplomaExerciseAttemptSchema>;
+
+// Analytics Events - تتبع الأحداث
+export const analyticsEvents = pgTable("analytics_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventName: text("event_name").notNull(), // اسم الحدث (مثل click_mojzy_button)
+  userId: text("user_id"), // معرف المستخدم (اختياري للزوار)
+  metadata: jsonb("metadata").$type<Record<string, any>>().default({}), // بيانات إضافية
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;

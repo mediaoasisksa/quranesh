@@ -21,6 +21,7 @@ import {
   diplomaExercises,
   userDiplomaProgress,
   diplomaExerciseAttempts,
+  analyticsEvents,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -1859,6 +1860,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Complete week error:", error);
       res.status(500).json({ message: "Failed to complete week" });
+    }
+  });
+  
+  // Track analytics events
+  app.post("/api/analytics/track", async (req, res) => {
+    try {
+      const { eventName, userId, metadata } = req.body;
+      
+      if (!eventName) {
+        return res.status(400).json({ message: "Event name is required" });
+      }
+      
+      await db.insert(analyticsEvents).values({
+        eventName,
+        userId: userId || null,
+        metadata: metadata || {},
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Analytics track error:", error);
+      res.status(500).json({ message: "Failed to track event" });
     }
   });
   

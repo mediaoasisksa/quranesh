@@ -22,6 +22,8 @@ import {
   Settings,
   Languages,
   BookOpen,
+  Book,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
@@ -128,6 +130,23 @@ export default function Dashboard() {
     });
   };
 
+  const handleMojzyClick = async () => {
+    try {
+      await fetch("/api/analytics/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: "click_mojzy_button",
+          userId: userId,
+          metadata: { source: "dashboard", language },
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to track event:", error);
+    }
+    window.open("https://www.mojzy.com/", "_blank", "noopener,noreferrer");
+  };
+
   const masteredPhrases = userProgress.filter(
     (p) => (p.masteryLevel || 0) >= 80,
   );
@@ -232,6 +251,19 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mojzy Quran Memorization Button */}
+        <div className="mb-8">
+          <Button
+            onClick={handleMojzyClick}
+            className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-6 px-8 text-lg font-bold rounded-xl"
+            data-testid="button-mojzy-memorization"
+          >
+            <Book className={`h-6 w-6 ${dir === 'rtl' ? 'ml-3' : 'mr-3'}`} />
+            <span>{language === 'ar' ? 'تحفيظ القرآن الكريم (مُجْزِي)' : t('quranMemorization') + ' (Mojzy)'}</span>
+            <ExternalLink className={`h-4 w-4 ${dir === 'rtl' ? 'mr-3' : 'ml-3'}`} />
+          </Button>
+        </div>
+
         {/* Exercise Types Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
