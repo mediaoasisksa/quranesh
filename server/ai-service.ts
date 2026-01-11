@@ -1,6 +1,50 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
 
+// دالة لإزالة التشكيل من النص العربي (Ignore Diacritics)
+function removeDiacritics(text: string): string {
+  // Arabic diacritics Unicode range: \u064B-\u065F (Fathah, Dammah, Kasrah, Sukun, Shadda, etc.)
+  // Also remove Tatweel (\u0640) and other marks
+  return text
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, '') // Remove diacritics
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+}
+
+// دالة للمقارنة المباشرة للنص العربي مع تجاهل التشكيل
+function compareArabicText(userAnswer: string, expectedAnswer: string): boolean {
+  const normalizedUser = removeDiacritics(userAnswer);
+  const normalizedExpected = removeDiacritics(expectedAnswer);
+  
+  // التحقق من التطابق الكامل
+  if (normalizedUser === normalizedExpected) {
+    return true;
+  }
+  
+  // التحقق من احتواء الإجابة المتوقعة على إجابة المستخدم أو العكس
+  if (normalizedExpected.includes(normalizedUser) || normalizedUser.includes(normalizedExpected)) {
+    return true;
+  }
+  
+  // التحقق من تطابق الكلمات المفتاحية (على الأقل 70% من الكلمات)
+  const userWords = normalizedUser.split(' ').filter(w => w.length > 1);
+  const expectedWords = normalizedExpected.split(' ').filter(w => w.length > 1);
+  
+  if (userWords.length === 0 || expectedWords.length === 0) {
+    return false;
+  }
+  
+  let matchCount = 0;
+  for (const word of userWords) {
+    if (expectedWords.some(ew => ew.includes(word) || word.includes(ew))) {
+      matchCount++;
+    }
+  }
+  
+  const matchRatio = matchCount / Math.min(userWords.length, expectedWords.length);
+  return matchRatio >= 0.7;
+}
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 if (!GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY environment variable is required");
@@ -1207,24 +1251,44 @@ export async function validateExerciseAnswer(
   phraseData: any,
   userLanguage: string = "en",
 ): Promise<AIValidationResult> {
-  // For conversation exercises, use English translation as context (what user needs to translate)
+  // استخراج الإجابة المتوقعة (suggestedVerse أو arabicText)
+  const suggestedVerse = phraseData?.suggestedVerse || phraseData?.arabicText || phraseData?.expectedAnswer || "";
+  
+  console.log("=== DIRECT ARABIC COMPARISON ===");
+  console.log("User Answer:", userAnswer);
+  console.log("Suggested Verse:", suggestedVerse);
+  
+  // التحقق المباشر من مطابقة النص العربي مع تجاهل التشكيل
+  if (suggestedVerse && compareArabicText(userAnswer, suggestedVerse)) {
+    console.log("Direct Arabic match found! Answer is CORRECT.");
+    return {
+      isCorrect: true,
+      score: 100,
+      feedback: "ممتاز! إجابتك صحيحة.",
+      suggestions: [],
+      suggestedAnswer: undefined,
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
+  
+  // For conversation exercises, use Arabic question as context (not English)
   // For other exercises, use Arabic text as context
   let context = "";
   let expectedAnswer = "";
 
   if (exerciseType === "conversation") {
-    context = phraseData?.englishTranslation || phraseData?.question || "";
-    expectedAnswer = phraseData?.arabicText || phraseData?.expectedAnswer || "";
+    // استخدام السؤال العربي كسياق بدلاً من الترجمة الإنجليزية
+    context = phraseData?.question || phraseData?.arabicText || "";
+    expectedAnswer = suggestedVerse;
   } else if (exerciseType === "thematic") {
     // For thematic exercises, use the theme and description as context
     context =
       `${phraseData?.theme || ""} ${phraseData?.themeEnglish || ""} ${phraseData?.description || ""} ${phraseData?.tags?.join(" ") || ""}`.trim();
-    expectedAnswer =
-      phraseData?.englishTranslation || phraseData?.expectedAnswer || "";
+    expectedAnswer = suggestedVerse;
   } else {
     context = phraseData?.arabicText || phraseData?.question || "";
-    expectedAnswer =
-      phraseData?.englishTranslation || phraseData?.expectedAnswer || "";
+    expectedAnswer = suggestedVerse;
   }
 
   return validateArabicAnswer(
