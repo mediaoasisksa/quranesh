@@ -657,10 +657,21 @@ export default function Exercise() {
                 {getLocalizedQuestion(conversationPrompt, language)}
               </p>
             </div>
-            {conversationPrompt?.suggestedVerse && (
+            {conversationPrompt?.suggestedVerse && !showSuggested && !isAnswered && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-primary/50 text-primary hover:bg-primary/10"
+                onClick={() => setShowSuggested(true)}
+                data-testid="button-show-solution"
+              >
+                {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
+              </Button>
+            )}
+            {conversationPrompt?.suggestedVerse && (showSuggested || isAnswered) && (
               <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30">
                 <p className="text-sm font-medium text-primary mb-2">
-                  {t('suggestedVerse') || "العبارة القرآنية المقترحة:"}
+                  {t('suggestedVerse') || "آية مقترحة:"}
                 </p>
                 <p 
                   className="arabic-text text-lg text-foreground" 
