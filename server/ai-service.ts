@@ -1052,9 +1052,10 @@ export async function validateExerciseAnswer(
   exerciseType: string,
   phraseData: any,
   userLanguage: string = "en",
+  providedSuggestedVerse?: string,
 ): Promise<AIValidationResult> {
-  // استخراج الإجابة المتوقعة (suggestedVerse أو arabicText)
-  const suggestedVerse = phraseData?.suggestedVerse || phraseData?.arabicText || phraseData?.expectedAnswer || "";
+  // استخراج الإجابة المتوقعة - الأولوية للآية المرسلة مباشرة من Frontend
+  const suggestedVerse = providedSuggestedVerse || phraseData?.suggestedVerse || phraseData?.arabicText || phraseData?.expectedAnswer || "";
   const questionContext = phraseData?.question || phraseData?.arabicText || "";
   
   console.log("=== DIRECT ARABIC COMPARISON ===");

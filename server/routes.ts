@@ -1246,7 +1246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI-powered answer validation
   app.post("/api/validate-answer", async (req, res) => {
     try {
-      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId, language } = req.body;
+      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId, language, suggestedVerse } = req.body;
 
       if (!userAnswer || !exerciseType) {
         return res.status(400).json({
@@ -1286,6 +1286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Exercise Type:", exerciseType);
       console.log("User Language:", userLanguage);
       console.log("Phrase Data:", phraseData);
+      console.log("Suggested Verse:", suggestedVerse);
       console.log("==========================");
 
       // Use AI to validate the answer
@@ -1294,6 +1295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         exerciseType,
         phraseData,
         userLanguage,
+        suggestedVerse,
       );
 
       console.log("AI Validation Result:", result);

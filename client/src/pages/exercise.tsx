@@ -395,7 +395,8 @@ export default function Exercise() {
           phraseId: exerciseType === "thematic" ? null : (exerciseType === "transformation" ? philosophicalSentence?.id : (phraseId || phrase?.id)),
           questionBankId: questionBank?.id,
           philosophicalSentenceId: exerciseType === "transformation" ? philosophicalSentence?.id : undefined,
-          language: language, // Pass user's language for connection explanation
+          language: language,
+          suggestedVerse: isConversationExercise ? conversationPrompt?.suggestedVerse : undefined,
         }),
       });
 
