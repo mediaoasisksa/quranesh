@@ -1,6 +1,42 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
 
+// قوائم الكلمات المفتاحية للحماية الفلسفية
+// منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
+const PRODUCT_TECH_KEYWORDS = [
+  'شاشة', 'هاتف', 'جوال', 'موبايل', 'سيارة', 'كمبيوتر', 'حاسوب', 'لابتوب',
+  'تلفزيون', 'تلفاز', 'ثلاجة', 'غسالة', 'مكيف', 'مروحة', 'ساعة', 'كاميرا',
+  'طابعة', 'ماكينة', 'آلة', 'جهاز', 'معدات', 'أدوات', 'قطع غيار',
+  'عطل', 'عطلان', 'خراب', 'تصليح', 'صيانة', 'إصلاح', 'تشغيل',
+  'screen', 'phone', 'car', 'computer', 'device', 'machine', 'repair', 'broken'
+];
+
+// آيات الخلق والإعجاز الإلهي - يجب عدم استخدامها للمنتجات البشرية
+const DIVINE_CREATION_PATTERNS = [
+  'صنع الله', 'صُنْعَ اللَّهِ', 'أتقن كل شيء', 'أَتْقَنَ كُلَّ شَيْءٍ',
+  'خلق', 'خَلَقَ', 'فطر', 'فَطَرَ', 'برأ', 'بَرَأَ',
+  'أحسن الخالقين', 'أَحْسَنَ الْخَالِقِينَ', 'أحسن كل شيء خلقه',
+  'فتبارك الله', 'فَتَبَارَكَ اللَّهُ', 'الخلاق العليم', 'الْخَلَّاقُ الْعَلِيمُ',
+  'خلق السماوات', 'خَلَقَ السَّمَاوَاتِ', 'خلق الإنسان', 'خَلَقَ الْإِنسَانَ',
+  'بديع السماوات', 'بَدِيعُ السَّمَاوَاتِ', 'فاطر السماوات', 'فَاطِرِ السَّمَاوَاتِ'
+];
+
+// دالة للتحقق من وجود منتجات بشرية في السياق
+function containsProductKeywords(text: string): boolean {
+  const normalizedText = removeDiacritics(text.toLowerCase());
+  return PRODUCT_TECH_KEYWORDS.some(keyword => 
+    normalizedText.includes(removeDiacritics(keyword.toLowerCase()))
+  );
+}
+
+// دالة للتحقق من وجود آيات الخلق الإلهي
+function containsDivineCreationPatterns(text: string): boolean {
+  const normalizedText = removeDiacritics(text);
+  return DIVINE_CREATION_PATTERNS.some(pattern => 
+    normalizedText.includes(removeDiacritics(pattern))
+  );
+}
+
 // دالة لإزالة التشكيل من النص العربي (Ignore Diacritics)
 function removeDiacritics(text: string): string {
   // Arabic diacritics Unicode range: \u064B-\u065F (Fathah, Dammah, Kasrah, Sukun, Shadda, etc.)
@@ -1253,13 +1289,57 @@ export async function validateExerciseAnswer(
 ): Promise<AIValidationResult> {
   // استخراج الإجابة المتوقعة (suggestedVerse أو arabicText)
   const suggestedVerse = phraseData?.suggestedVerse || phraseData?.arabicText || phraseData?.expectedAnswer || "";
+  const questionContext = phraseData?.question || phraseData?.arabicText || "";
   
   console.log("=== DIRECT ARABIC COMPARISON ===");
   console.log("User Answer:", userAnswer);
   console.log("Suggested Verse:", suggestedVerse);
+  console.log("Question Context:", questionContext);
+  
+  // === الحماية الفلسفية: منع آيات الخلق للمنتجات البشرية ===
+  const isProductQuestion = containsProductKeywords(questionContext);
+  const userAnswerHasDivineCreation = containsDivineCreationPatterns(userAnswer);
+  const suggestedHasDivineCreation = containsDivineCreationPatterns(suggestedVerse);
+  
+  console.log("=== PHILOSOPHICAL GUARD ===");
+  console.log("Is Product Question:", isProductQuestion);
+  console.log("User Answer Has Divine Creation:", userAnswerHasDivineCreation);
+  console.log("Suggested Has Divine Creation:", suggestedHasDivineCreation);
+  
+  // إذا كان السؤال عن منتج بشري وكانت الإجابة آية خلق إلهي → رفض
+  if (isProductQuestion && userAnswerHasDivineCreation) {
+    console.log("BLOCKED: Divine creation verse used for human product question!");
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: "لا يجوز استخدام آيات الخلق والإعجاز الإلهي للإجابة على أسئلة حول المنتجات البشرية. استخدم آيات تتعلق بالأفعال البشرية (سلوك، كلام، أخلاق، سعي).",
+      suggestions: [
+        "استخدم آيات عن السلوك البشري أو الأخلاق",
+        "تجنب آيات الخلق الإلهي للأشياء المادية/التقنية",
+        "ابحث عن آيات تناسب السياق البشري"
+      ],
+      suggestedAnswer: "لَا تُسْرِفُوا",
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
   
   // التحقق المباشر من مطابقة النص العربي مع تجاهل التشكيل
   if (suggestedVerse && compareArabicText(userAnswer, suggestedVerse)) {
+    // إذا كانت الآية المقترحة نفسها عن الخلق الإلهي لمنتج بشري → تحذير
+    if (isProductQuestion && suggestedHasDivineCreation) {
+      console.log("WARNING: Suggested verse itself is inappropriate for product question!");
+      return {
+        isCorrect: false,
+        score: 0,
+        feedback: "هذا السؤال يحتاج إلى مراجعة. الآية المقترحة غير مناسبة للسياق.",
+        suggestions: ["هذا التمرين يحتاج تحديث الآية المقترحة"],
+        suggestedAnswer: undefined,
+        connectionExplanation: undefined,
+        confidence: 1.0,
+      };
+    }
+    
     console.log("Direct Arabic match found! Answer is CORRECT.");
     return {
       isCorrect: true,
