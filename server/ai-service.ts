@@ -496,201 +496,53 @@ function fallbackValidation(
       }
       break;
     case "conversation":
-      // For conversation exercises, check if the answer is a Quranic verse that is semantically related to the English prompt
-      const englishContext = context.toLowerCase();
-      const userAnswerLower = userAnswer.toLowerCase();
+      // التحقق من تمارين المحادثة باستخدام مقارنة النص العربي فقط
+      console.log("=== CONVERSATION FALLBACK VALIDATION ===");
+      console.log("User Answer:", userAnswer);
+      console.log("Context (Arabic suggested verse):", context);
 
-      // Check if the answer contains Quranic verse patterns
+      // التحقق من وجود نمط قرآني في الإجابة
       const hasQuranicPattern =
-        /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|بصير|سميع|عليم|حكيم|عزيز|قدير|غفور|رحيم|عظيم|مجيد|ودود|شكور|صبور|حليم|كريم|عليم|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم|ودود|شكور|صبور|حليم|كريم|عظيم|مجيد|قدير|سميع|بصير|عليم|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم)/.test(
+        /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|بصير|سميع|عليم|حكيم|عزيز|قدير|غفور|رحيم|عظيم|مجيد|ودود|شكور|صبور|حليم|كريم)/.test(
           userAnswer,
         );
 
-      // Check for semantic relevance - look for key concepts that relate to the English prompt
-      let semanticRelevance = 0;
-      let totalConcepts = 0;
-
-      console.log("=== CONVERSATION SEMANTIC DEBUG ===");
-      console.log("English Context:", englishContext);
-      console.log("User Answer:", userAnswer);
-
-      // Check for God/Allah references
-      if (englishContext.includes("god") || englishContext.includes("allah")) {
-        totalConcepts++;
-        console.log("Found Allah/God in context, checking user answer...");
-        if (
-          userAnswer.includes("الله") ||
-          userAnswer.includes("اللَّهُ") ||
-          userAnswer.includes("الله") ||
-          userAnswer.includes("رب")
-        ) {
-          semanticRelevance++;
-          console.log("Found Allah in user answer!");
+      // إذا كان هناك آية مقترحة، نقارن النص العربي مباشرة
+      if (context && context.trim().length > 0) {
+        const isArabicMatch = compareArabicText(userAnswer, context);
+        console.log("Arabic text comparison result:", isArabicMatch);
+        
+        if (isArabicMatch) {
+          exerciseSpecificFeedback = "ممتاز! إجابتك صحيحة ومطابقة للآية القرآنية.";
+          suggestions = [
+            "أحسنت! هذه هي الآية المطلوبة",
+            "إجابة صحيحة",
+          ];
+        } else if (hasQuranicPattern) {
+          exerciseSpecificFeedback = "إجابتك تحتوي على نص قرآني لكنها لا تطابق الآية المقترحة.";
+          suggestions = [
+            "راجع الآية المقترحة وحاول مرة أخرى",
+            "تأكد من كتابة الآية بشكل صحيح",
+          ];
+        } else {
+          exerciseSpecificFeedback = "إجابتك لا تحتوي على آية قرآنية صحيحة.";
+          suggestions = [
+            "استخدم آية قرآنية",
+            "راجع الآية المقترحة",
+          ];
         }
-      }
-
-      // Check for watching/seeing/observing concepts
-      if (
-        englishContext.includes("watching") ||
-        englishContext.includes("see") ||
-        englishContext.includes("observe") ||
-        englishContext.includes("watch")
-      ) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("يرى") ||
-          userAnswer.includes("يشاهد") ||
-          userAnswer.includes("ينظر") ||
-          userAnswer.includes("يراقب") ||
-          userAnswer.includes("بصير") ||
-          userAnswer.includes("سميع")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Check for "everything" or "all" concepts
-      if (
-        englishContext.includes("everything") ||
-        englishContext.includes("all") ||
-        englishContext.includes("each") ||
-        englishContext.includes("every")
-      ) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("كل") ||
-          userAnswer.includes("جميع") ||
-          userAnswer.includes("كُلَّ") ||
-          userAnswer.includes("ما") ||
-          userAnswer.includes("بما")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Check for "do/doing" concepts
-      if (
-        englishContext.includes("do") ||
-        englishContext.includes("doing") ||
-        englishContext.includes("work") ||
-        englishContext.includes("action")
-      ) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("تفعل") ||
-          userAnswer.includes("تعمل") ||
-          userAnswer.includes("تأتي") ||
-          userAnswer.includes("تعملون") ||
-          userAnswer.includes("تفعلون")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Check for love/care concepts
-      if (
-        englishContext.includes("love") ||
-        englishContext.includes("care") ||
-        englishContext.includes("loves")
-      ) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("يحب") ||
-          userAnswer.includes("يحبون") ||
-          userAnswer.includes("محسنين") ||
-          userAnswer.includes("رحيم")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Check for good/righteous concepts
-      if (
-        englishContext.includes("good") ||
-        englishContext.includes("righteous") ||
-        englishContext.includes("virtuous") ||
-        englishContext.includes("pious")
-      ) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("محسن") ||
-          userAnswer.includes("محسنين") ||
-          userAnswer.includes("صالح") ||
-          userAnswer.includes("صالحين") ||
-          userAnswer.includes("تقوى") ||
-          userAnswer.includes("تقوى")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Check for divine attributes (more comprehensive)
-      if (englishContext.includes("allah") || englishContext.includes("god")) {
-        totalConcepts++;
-        if (
-          userAnswer.includes("الله") ||
-          userAnswer.includes("اللَّهُ") ||
-          userAnswer.includes("رب") ||
-          userAnswer.includes("رحيم") ||
-          userAnswer.includes("غفور") ||
-          userAnswer.includes("عزيز") ||
-          userAnswer.includes("حكيم") ||
-          userAnswer.includes("بصير") ||
-          userAnswer.includes("سميع") ||
-          userAnswer.includes("عليم")
-        ) {
-          semanticRelevance++;
-        }
-      }
-
-      // Calculate relevance percentage - be more lenient
-      const relevancePercentage =
-        totalConcepts > 0 ? semanticRelevance / totalConcepts : 0;
-
-      console.log("Semantic Relevance:", semanticRelevance);
-      console.log("Total Concepts:", totalConcepts);
-      console.log("Relevance Percentage:", relevancePercentage);
-      console.log("Has Quranic Pattern:", hasQuranicPattern);
-      console.log(
-        "Will be correct:",
-        hasQuranicPattern && relevancePercentage >= 0.3,
-      );
-      console.log("================================");
-
-      if (hasQuranicPattern && relevancePercentage >= 0.3) {
-        exerciseSpecificFeedback =
-          "Excellent! You provided a relevant Quranic verse that captures the meaning of the English prompt.";
-        suggestions = [
-          "Perfect! This is a valid Quranic verse",
-          "Great job finding a verse that relates to the prompt",
-          "Well done on the semantic connection",
-        ];
-      } else if (hasQuranicPattern && relevancePercentage > 0) {
-        exerciseSpecificFeedback =
-          "Good! You provided a Quranic verse, but try to find one that more closely relates to the English prompt.";
-        suggestions = [
-          "This is a Quranic verse, but look for one more relevant to the prompt",
-          "Try to match the key concepts better",
-          "Consider verses that directly address the same theme",
-        ];
       } else if (hasQuranicPattern) {
-        exerciseSpecificFeedback =
-          "You provided a Quranic verse, but it doesn't seem to relate to the English prompt. Try to find a verse that matches the meaning.";
+        exerciseSpecificFeedback = "إجابتك تحتوي على نص قرآني.";
         suggestions = [
-          "This is a Quranic verse, but find one related to the prompt",
-          "Look for verses about the same topic",
-          "Make sure the verse addresses the same concepts",
+          "تم قبول الإجابة كنص قرآني",
         ];
       } else {
-        exerciseSpecificFeedback =
-          "Incorrect! For conversation exercises, provide a Quranic verse that relates to the English prompt.";
+        exerciseSpecificFeedback = "إجابتك لا تحتوي على آية قرآنية.";
         suggestions = [
-          "Use an authentic Quranic verse",
-          "Make sure it relates to the English prompt",
-          'Example: For "God is watching" use verses like "وَاللَّهُ بَصِيرٌ بِمَا تَعْمَلُونَ"',
+          "استخدم آية قرآنية مناسبة للموقف",
         ];
-        suggestedAnswer = "وَاللَّهُ بَصِيرٌ بِمَا تَعْمَلُونَ";
       }
+      console.log("================================");
       break;
     case "completion":
       exerciseSpecificFeedback =
@@ -1007,145 +859,48 @@ function fallbackValidation(
     console.log("Final decision:", isActuallyCorrect);
     console.log("=========================================");
   } else if (exerciseType === "conversation") {
-    // For conversation exercises, check if it's a Quranic verse with semantic relevance
+    // التحقق من تمارين المحادثة باستخدام مقارنة النص العربي فقط
     console.log("=== CONVERSATION VALIDATION START ===");
-    console.log("Context (English prompt):", context);
     console.log("User Answer:", userAnswer);
-    const englishContext = context.toLowerCase();
-    console.log("English context (lowercase):", englishContext);
+    console.log("Context (Arabic suggested verse):", context);
 
-    // Check if the answer contains Quranic verse patterns
+    // التحقق من وجود نمط قرآني في الإجابة
     const hasQuranicPattern =
-      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|بصير|سميع|عليم|حكيم|عزيز|قدير|غفور|رحيم|عظيم|مجيد|ودود|شكور|صبور|حليم|كريم|عليم|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم|ودود|شكور|صبور|حليم|كريم|عظيم|مجيد|قدير|سميع|بصير|عليم|عالم|حكيم|عزيز|غفار|تواب|رحمن|رحيم)/.test(
+      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|بصير|سميع|عليم|حكيم|عزيز|قدير|غفور|رحيم|عظيم|مجيد|ودود|شكور|صبور|حليم|كريم)/.test(
         userAnswer,
       );
 
-    // Check for semantic relevance
-    let semanticRelevance = 0;
-    let totalConcepts = 0;
+    // مقارنة النص العربي مباشرة مع الآية المقترحة
+    const isArabicMatch = context && context.trim().length > 0 
+      ? compareArabicText(userAnswer, context) 
+      : false;
 
-    if (englishContext.includes("god") || englishContext.includes("allah")) {
-      totalConcepts++;
-      if (
-        userAnswer.includes("الله") ||
-        userAnswer.includes("اللَّهُ") ||
-        userAnswer.includes("الله") ||
-        userAnswer.includes("رب")
-      ) {
-        semanticRelevance++;
-      }
-    }
-
-    if (
-      englishContext.includes("watching") ||
-      englishContext.includes("see") ||
-      englishContext.includes("observe") ||
-      englishContext.includes("watch")
-    ) {
-      totalConcepts++;
-      if (
-        userAnswer.includes("يرى") ||
-        userAnswer.includes("يشاهد") ||
-        userAnswer.includes("ينظر") ||
-        userAnswer.includes("يراقب") ||
-        userAnswer.includes("بصير") ||
-        userAnswer.includes("سميع")
-      ) {
-        semanticRelevance++;
-      }
-    }
-
-    if (
-      englishContext.includes("everything") ||
-      englishContext.includes("all") ||
-      englishContext.includes("each") ||
-      englishContext.includes("every")
-    ) {
-      totalConcepts++;
-      if (
-        userAnswer.includes("كل") ||
-        userAnswer.includes("جميع") ||
-        userAnswer.includes("كُلَّ") ||
-        userAnswer.includes("ما") ||
-        userAnswer.includes("بما")
-      ) {
-        semanticRelevance++;
-      }
-    }
-
-    if (
-      englishContext.includes("do") ||
-      englishContext.includes("doing") ||
-      englishContext.includes("work") ||
-      englishContext.includes("action")
-    ) {
-      totalConcepts++;
-      if (
-        userAnswer.includes("تفعل") ||
-        userAnswer.includes("تعمل") ||
-        userAnswer.includes("تأتي") ||
-        userAnswer.includes("تعملون") ||
-        userAnswer.includes("تفعلون")
-      ) {
-        semanticRelevance++;
-      }
-    }
-
-    if (
-      englishContext.includes("love") ||
-      englishContext.includes("care") ||
-      englishContext.includes("loves")
-    ) {
-      totalConcepts++;
-      if (
-        userAnswer.includes("يحب") ||
-        userAnswer.includes("يحبون") ||
-        userAnswer.includes("محسنين") ||
-        userAnswer.includes("رحيم")
-      ) {
-        semanticRelevance++;
-      }
-    }
-
-    const relevancePercentage =
-      totalConcepts > 0 ? semanticRelevance / totalConcepts : 0;
-
-    console.log("=== CONVERSATION EXERCISE VALIDATION ===");
     console.log("Has Quranic Pattern:", hasQuranicPattern);
-    console.log("Total Concepts:", totalConcepts);
-    console.log("Semantic Relevance:", semanticRelevance);
-    console.log("Relevance Percentage:", relevancePercentage);
+    console.log("Arabic text match:", isArabicMatch);
     console.log("========================================");
 
-    // Consider it correct if it's a Quranic verse with at least 50% semantic relevance (stricter)
-    isActuallyCorrect =
-      hasArabic &&
-      hasContent &&
-      hasQuranicPattern &&
-      relevancePercentage >= 0.5;
+    // الإجابة صحيحة إذا تطابقت مع الآية المقترحة أو إذا كانت تحتوي على نمط قرآني
+    isActuallyCorrect = hasArabic && hasContent && (isArabicMatch || hasQuranicPattern);
     
-    // Update feedback based on validation
+    // تحديث رسالة الملاحظات
     if (!isActuallyCorrect) {
-      if (relevancePercentage < 0.5 && relevancePercentage > 0) {
-        exerciseSpecificFeedback = `Your answer contains some relevant concepts but doesn't fully match the English prompt. The answer should include key concepts like the ones mentioned in the English phrase.`;
+      if (!hasArabic || !hasContent) {
+        exerciseSpecificFeedback = "الرجاء كتابة إجابة باللغة العربية.";
         suggestions = [
-          "Include ALL key concepts from the English prompt",
-          "Make sure your Arabic answer captures the complete meaning",
-          `Your answer matched only ${Math.round(relevancePercentage * 100)}% of the required concepts (need at least 50%)`,
-        ];
-      } else if (!hasQuranicPattern) {
-        exerciseSpecificFeedback = "Your answer doesn't appear to be a Quranic verse or proper Arabic phrase.";
-        suggestions = [
-          "Use authentic Quranic verses or proper Arabic phrases",
-          "Include Quranic vocabulary and patterns",
+          "استخدم آية قرآنية مناسبة للموقف",
         ];
       } else {
-        exerciseSpecificFeedback = "Your answer doesn't match the English prompt. Make sure to include all key concepts.";
+        exerciseSpecificFeedback = "إجابتك لا تحتوي على آية قرآنية. حاول مرة أخرى.";
         suggestions = [
-          "Read the English prompt carefully",
-          "Include all required concepts in your Arabic answer",
+          "استخدم آية قرآنية مناسبة للموقف",
+          "راجع الآية المقترحة",
         ];
       }
+    } else {
+      exerciseSpecificFeedback = "ممتاز! إجابتك صحيحة.";
+      suggestions = [
+        "أحسنت!",
+      ];
     }
   } else if (exerciseType === "roleplay") {
     // For roleplay exercises, check for Quranic patterns and comfort words
