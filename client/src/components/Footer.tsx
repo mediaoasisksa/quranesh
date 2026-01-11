@@ -11,6 +11,7 @@ const Footer = () => {
         { nameKey: "features", href: "#features" },
         { nameKey: "pricing", href: "#pricing" },
         { nameKey: "howItWorks", href: "#how-it-works" },
+        { nameKey: "quranMemorization", href: "https://mojzy.com/", external: true },
         { nameKey: "successStories", href: "#testimonials" },
       ],
     },
@@ -95,6 +96,7 @@ const Footer = () => {
                     <li key={linkIndex}>
                       <a
                         href={link.href}
+                        {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                         className="text-muted-foreground hover:text-primary transition-colors duration-200"
                       >
                         {t(link.nameKey as any)}
