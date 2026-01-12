@@ -797,6 +797,11 @@ export default function Exercise() {
       case "roleplay":
         const getVerseExplanation = () => {
           if (language === 'ar') return roleplayScenario?.verseExplanation;
+          if (language === 'en') return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
+          // Check translations JSONB field for other languages
+          const translations = roleplayScenario?.verseExplanationTranslations as Record<string, string> | null;
+          if (translations && translations[language]) return translations[language];
+          // Fallback to English, then Arabic
           return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
         };
         return (

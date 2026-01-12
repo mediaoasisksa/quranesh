@@ -190,6 +190,7 @@ export const roleplayScenarios = pgTable("roleplay_scenarios", {
   suggestedVerse: text("suggested_verse"), // Suggested Quranic verse for the scenario
   verseExplanation: text("verse_explanation"), // Arabic explanation
   verseExplanationEn: text("verse_explanation_en"), // English explanation
+  verseExplanationTranslations: jsonb("verse_explanation_translations").$type<Record<string, string>>(), // Translations for all languages
 });
 
 export const insertRoleplayScenarioSchema = createInsertSchema(roleplayScenarios).omit({
