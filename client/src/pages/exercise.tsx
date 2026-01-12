@@ -87,6 +87,7 @@ export default function Exercise() {
   const [isValidating, setIsValidating] = useState(false);
   const [suggestedAnswer, setSuggestedAnswer] = useState<string | null>(null);
   const [showSuggested, setShowSuggested] = useState(false);
+  const [showRoleplayVerse, setShowRoleplayVerse] = useState(false);
   const [connectionExplanation, setConnectionExplanation] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -177,6 +178,9 @@ export default function Exercise() {
     theme: string;
     psychologicalDepth?: string | null;
     difficulty?: number | null;
+    suggestedVerse?: string | null;
+    verseExplanation?: string | null;
+    verseExplanationEn?: string | null;
   }>({
     queryKey: ["/api/roleplay-scenarios/random", userId],
     queryFn: async () => {
@@ -507,6 +511,7 @@ export default function Exercise() {
     setFeedback("");
     setSuggestedAnswer(null);
     setShowSuggested(false);
+    setShowRoleplayVerse(false);
     setConnectionExplanation(null);
   };
 
@@ -790,6 +795,10 @@ export default function Exercise() {
         );
 
       case "roleplay":
+        const getVerseExplanation = () => {
+          if (language === 'ar') return roleplayScenario?.verseExplanation;
+          return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
+        };
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
@@ -806,6 +815,39 @@ export default function Exercise() {
                 </div>
               </div>
             </div>
+            
+            {roleplayScenario?.suggestedVerse && !showRoleplayVerse && !isAnswered && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRoleplayVerse(true)}
+                className="text-primary border-primary hover:bg-primary/10"
+              >
+                💡 {t('revealVerse') || 'Reveal Verse'}
+              </Button>
+            )}
+            
+            {roleplayScenario?.suggestedVerse && (showRoleplayVerse || isAnswered) && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
+                  {t('suggestedVerse') || "Suggested verse:"}
+                </p>
+                <p className="arabic-text text-lg text-green-800 dark:text-green-200 mb-3" dir="rtl" lang="ar">
+                  {roleplayScenario.suggestedVerse}
+                </p>
+                {getVerseExplanation() && (
+                  <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">
+                      {t('whyThisVerse') || "Why this verse?"}
+                    </p>
+                    <p className={`text-sm text-green-700 dark:text-green-300 ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={dir}>
+                      {getVerseExplanation()}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <p className="text-foreground">{t('yourResponseInArabic')}:</p>
             <Textarea
               className="arabic-text text-right text-lg min-h-[100px]"

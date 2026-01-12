@@ -187,6 +187,9 @@ export const roleplayScenarios = pgTable("roleplay_scenarios", {
   theme: text("theme").notNull(), // anxiety, depression, hope, faith, etc.
   psychologicalDepth: text("psychological_depth"), // Description of the psychological aspect
   difficulty: integer("difficulty").default(1), // 1-5 scale
+  suggestedVerse: text("suggested_verse"), // Suggested Quranic verse for the scenario
+  verseExplanation: text("verse_explanation"), // Arabic explanation
+  verseExplanationEn: text("verse_explanation_en"), // English explanation
 });
 
 export const insertRoleplayScenarioSchema = createInsertSchema(roleplayScenarios).omit({
