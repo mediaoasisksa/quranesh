@@ -185,9 +185,11 @@ export const roleplayScenarios = pgTable("roleplay_scenarios", {
   scenarioSq: text("scenario_sq"),
   scenarioRu: text("scenario_ru"),
   theme: text("theme").notNull(), // anxiety, depression, hope, faith, etc.
+  emotionalState: text("emotional_state"), // الحالة الشعورية: hope, consolation, patience, agreement, facilitation, loss_compensation, etc.
   psychologicalDepth: text("psychological_depth"), // Description of the psychological aspect
   difficulty: integer("difficulty").default(1), // 1-5 scale
   suggestedVerse: text("suggested_verse"), // Suggested Quranic verse for the scenario
+  verseSource: text("verse_source"), // مصدر الآية: لسان النبي يوسف، دعاء موسى، وصف لفعل بشري
   verseExplanation: text("verse_explanation"), // Arabic explanation
   verseExplanationEn: text("verse_explanation_en"), // English explanation
   verseExplanationTranslations: jsonb("verse_explanation_translations").$type<Record<string, string>>(), // Translations for all languages

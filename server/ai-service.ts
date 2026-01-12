@@ -47,6 +47,17 @@ const DIVINE_CREATION_PATTERNS = [
   // آيات العلم الإلهي - يمنع ربطها بالأجهزة والتحديثات التقنية
   'وعلم الإنسان', 'وَعَلَّمَ الْإِنسَانَ', 'علم الإنسان ما لم يعلم',
   'يعلم ما في السماوات', 'يَعْلَمُ مَا فِي السَّمَاوَاتِ',
+  // آيات علم الغيب - يمنع ربطها بالمعلومات البشرية أو التوقعات
+  'عنده علم الغيب', 'عِندَهُ عِلْمُ الْغَيْبِ', 'علام الغيوب', 'عَلَّامُ الْغُيُوبِ',
+  'لا يعلم الغيب', 'لَا يَعْلَمُ الْغَيْبَ', 'علم الغيب', 'عِلْمِ الْغَيْبِ',
+  'يعلم السر', 'يَعْلَمُ السِّرَّ', 'يعلم ما تخفي', 'يَعْلَمُ مَا تُخْفِي',
+  // آيات الإحياء والإماتة - يمنع ربطها بالأجهزة أو المشاريع
+  'يحيي ويميت', 'يُحْيِي وَيُمِيتُ', 'أحيا الموتى', 'أَحْيَا الْمَوْتَىٰ',
+  'يخرج الحي', 'يُخْرِجُ الْحَيَّ', 'يخرج الميت', 'يُخْرِجُ الْمَيِّتَ',
+  'من يحيي العظام', 'مَن يُحْيِي الْعِظَامَ', 'الذي أحياكم', 'الَّذِي أَحْيَاكُمْ',
+  // آيات الإحصاء الإلهي - يمنع ربطها بالبيانات والملفات البشرية
+  'أحصاه الله', 'أَحْصَاهُ اللَّهُ', 'وكل شيء أحصيناه', 'وَكُلَّ شَيْءٍ أَحْصَيْنَاهُ',
+  'لا يغادر صغيرة', 'لَا يُغَادِرُ صَغِيرَةً', 'ولا كبيرة', 'وَلَا كَبِيرَةً',
   // آيات الصراع التاريخي ومداولة الأيام - يمنع ربطها بالمواعيد الشخصية
   'نداولها', 'نُدَاوِلُهَا', 'تلك الأيام نداولها', 'وَتِلْكَ الْأَيَّامُ نُدَاوِلُهَا',
   'الأيام نداولها', 'نداولها بين الناس', 'نُدَاوِلُهَا بَيْنَ النَّاسِ',
@@ -1274,6 +1285,36 @@ export async function validateExerciseAnswer(
   console.log("Is Product Question:", isProductQuestion);
   console.log("User Answer Has Divine Creation:", userAnswerHasDivineCreation);
   console.log("Suggested Has Divine Creation:", suggestedHasDivineCreation);
+  
+  // === المنهج المقاصدي: تحديد فئة الموقف واختيار الآيات المناسبة ===
+  const situationCategory = detectSituationCategory(questionContext);
+  console.log("=== MAQASIDI APPROACH ===");
+  console.log("Detected Situation Category:", situationCategory);
+  
+  // التحقق من ملاءمة إجابة المستخدم للموقف
+  if (situationCategory && !isVerseContextuallyAppropriate(userAnswer, questionContext)) {
+    const contextualVerses = getContextualVerses(situationCategory);
+    const suggestedContextualVerse = contextualVerses.length > 0 ? contextualVerses[0] : undefined;
+    
+    console.log("BLOCKED: User answer not contextually appropriate for situation!");
+    console.log("Suggested contextual verses:", contextualVerses);
+    
+    return {
+      isCorrect: false,
+      score: 0,
+      feedback: "الآية المختارة غير مناسبة لهذا الموقف. استخدم آيات تعبر عن الحالة الشعورية للموقف من لسان الأنبياء أو البشر.",
+      suggestions: [
+        "اختر آية تناسب السياق العاطفي للموقف",
+        "استخدم آيات من أقوال الأنبياء والبشر في القرآن",
+        situationCategory === 'facilitation' ? "للتيسير: استخدم آيات مثل (يُرِيدُ اللَّهُ بِكُمُ الْيُسْرَ)" : "",
+        situationCategory === 'consolation' ? "للمواساة: استخدم آيات مثل (فَصَبْرٌ جَمِيلٌ)" : "",
+        situationCategory === 'loss_compensation' ? "للخسارة: استخدم آيات مثل (عَسَىٰ أَن يُبْدِلَنَا خَيْرًا)" : ""
+      ].filter(s => s),
+      suggestedAnswer: suggestedContextualVerse,
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
   
   // إذا كان السؤال عن منتج بشري وكانت الإجابة آية خلق إلهي → رفض
   if (isProductQuestion && userAnswerHasDivineCreation) {
