@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Check, X, RotateCcw, ArrowRight } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw, ArrowRight, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AudioButton from "@/components/audio-button";
 import { apiRequest } from "@/lib/queryClient";
@@ -91,6 +91,8 @@ export default function Exercise() {
   const [connectionExplanation, setConnectionExplanation] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  // نظام الدرجات الجديد: exact_match (أخضر)، valid_but_less_suitable (أصفر)، incorrect (أحمر)
+  const [feedbackGrade, setFeedbackGrade] = useState<'exact_match' | 'valid_but_less_suitable' | 'incorrect'>('incorrect');
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
@@ -314,6 +316,15 @@ export default function Exercise() {
         setIsCorrect(result.isCorrect);
         setFeedback(result.feedback);
         setIsAnswered(true);
+        
+        // تحديد درجة الـ feedback بناءً على حقل grade من الـ API
+        if (result.grade === 'exact_match' || result.grade === 'valid_but_less_suitable' || result.grade === 'incorrect') {
+          setFeedbackGrade(result.grade);
+        } else if (result.isCorrect) {
+          setFeedbackGrade('exact_match');
+        } else {
+          setFeedbackGrade('incorrect');
+        }
 
         // Submit session
         const correctId = dailyContextualExercise?.correctExpression?.id;
@@ -415,6 +426,15 @@ export default function Exercise() {
       setIsCorrect(result.isCorrect);
       setFeedback(result.feedback);
       setIsAnswered(true);
+      
+      // تحديد درجة الـ feedback بناءً على حقل grade من الـ API
+      if (result.grade === 'exact_match' || result.grade === 'valid_but_less_suitable' || result.grade === 'incorrect') {
+        setFeedbackGrade(result.grade);
+      } else if (result.isCorrect) {
+        setFeedbackGrade('exact_match');
+      } else {
+        setFeedbackGrade('incorrect');
+      }
 
       // Handle suggested answer if user made a mistake
       if (!result.isCorrect && result.suggestedAnswer) {
@@ -509,6 +529,7 @@ export default function Exercise() {
     setIsAnswered(false);
     setIsCorrect(false);
     setFeedback("");
+    setFeedbackGrade('incorrect');
     setSuggestedAnswer(null);
     setShowSuggested(false);
     setShowRoleplayVerse(false);
@@ -1131,35 +1152,47 @@ export default function Exercise() {
           <CardContent>
             {renderExerciseContent()}
 
-            {/* Feedback */}
+            {/* Feedback - نظام الدرجات الثلاثة */}
             {isAnswered && (
               <div
                 className={`mt-6 p-4 rounded-lg border ${
-                  isCorrect
+                  feedbackGrade === 'exact_match'
                     ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                    : feedbackGrade === 'valid_but_less_suitable'
+                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
                     : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-2">
-                  {isCorrect ? (
+                  {feedbackGrade === 'exact_match' ? (
                     <Check className="h-5 w-5 text-green-600" />
+                  ) : feedbackGrade === 'valid_but_less_suitable' ? (
+                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
                   ) : (
                     <X className="h-5 w-5 text-red-600" />
                   )}
                   <span
                     className={`font-medium ${
-                      isCorrect
+                      feedbackGrade === 'exact_match'
                         ? "text-green-800 dark:text-green-200"
+                        : feedbackGrade === 'valid_but_less_suitable'
+                        ? "text-yellow-800 dark:text-yellow-200"
                         : "text-red-800 dark:text-red-200"
                     }`}
                   >
-                    {isCorrect ? t('correct') : t('incorrect')}
+                    {feedbackGrade === 'exact_match' 
+                      ? t('correct') 
+                      : feedbackGrade === 'valid_but_less_suitable'
+                      ? t('validButLessSuitable') || 'صحيح لكن أقل ملاءمة'
+                      : t('incorrect')}
                   </span>
                 </div>
                 <p
                   className={`text-sm ${
-                    isCorrect
+                    feedbackGrade === 'exact_match'
                       ? "text-green-700 dark:text-green-300"
+                      : feedbackGrade === 'valid_but_less_suitable'
+                      ? "text-yellow-700 dark:text-yellow-300"
                       : "text-red-700 dark:text-red-300"
                   }`}
                   data-testid="text-exercise-feedback"

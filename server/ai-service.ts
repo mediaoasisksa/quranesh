@@ -312,14 +312,148 @@ if (!GEMINI_API_KEY) {
 // Using gemini-2.0-flash-exp for reliable translations
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
+// نظام التقييم الجديد: ثلاث درجات بدل صح/خطأ
+type ValidationGrade = 'exact_match' | 'valid_but_less_suitable' | 'incorrect';
+
 interface AIValidationResult {
   isCorrect: boolean;
+  grade: ValidationGrade; // الدرجة الجديدة
   score: number; // 0-100
   feedback: string;
   suggestions: string[];
   suggestedAnswer?: string; // Suggested correct answer in Arabic (shown for 5 seconds when user makes a mistake)
   connectionExplanation?: string; // Explanation of logical connection between wisdom sentence and Quranic verse (for transformation exercises)
   confidence: number; // 0-1
+  isAuthenticVerse?: boolean; // هل النص آية قرآنية صحيحة؟
+  suitabilityScore?: number; // درجة ملاءمة الآية للموقف (0-100)
+}
+
+// =============================================================================
+// نظام التحقق المنفصل: (أ) تحقق النص (ب) تحقق الملاءمة
+// =============================================================================
+
+// أنماط قرآنية معروفة للتحقق من صحة النص
+const QURAN_VERIFICATION_PATTERNS = [
+  // أدوات قرآنية شائعة
+  /^(قال|قالوا|قالت|يقول|تقول)/,
+  /^(إن|إنا|إنه|إنها|إنهم|إننا)/,
+  /^(وقال|وقالوا|فقال|فقالوا)/,
+  /^(يا أيها|يا أهل|يا بني|يا أبت)/,
+  /^(الذين|الذي|التي|اللذان|اللتان)/,
+  /^(ربنا|رب|ربي|ربك|ربكم)/,
+  // كلمات قرآنية مميزة
+  /(الله|الرحمن|الرحيم|المؤمنين|المتقين|الصالحين|الكافرين)/,
+  /(السماوات|الأرض|الجنة|النار|الآخرة|الدنيا)/,
+  /(صراط|سبيل|آية|آيات|كتاب|قرآن)/,
+];
+
+// التحقق من صحة النص القرآني (هل هذا قرآن فعلاً؟)
+function verifyQuranicText(text: string): { isAuthentic: boolean; confidence: number } {
+  const normalizedText = removeDiacritics(text);
+  
+  // التحقق من الطول المعقول
+  if (normalizedText.length < 5) {
+    return { isAuthentic: false, confidence: 0.9 };
+  }
+  
+  // التحقق من وجود أحرف عربية
+  const hasArabic = /[\u0600-\u06FF]/.test(text);
+  if (!hasArabic) {
+    return { isAuthentic: false, confidence: 1.0 };
+  }
+  
+  // التحقق من أنماط قرآنية
+  let patternMatches = 0;
+  for (const pattern of QURAN_VERIFICATION_PATTERNS) {
+    if (pattern.test(normalizedText)) {
+      patternMatches++;
+    }
+  }
+  
+  // إذا وجدنا أنماط قرآنية متعددة، نثق أنها آية
+  if (patternMatches >= 2) {
+    return { isAuthentic: true, confidence: 0.85 };
+  }
+  
+  // إذا وجدنا نمطاً واحداً على الأقل، نعتبرها محتملة
+  if (patternMatches >= 1) {
+    return { isAuthentic: true, confidence: 0.7 };
+  }
+  
+  // افتراضياً نعتبر النص العربي المعقول آية محتملة
+  if (normalizedText.length >= 10) {
+    return { isAuthentic: true, confidence: 0.5 };
+  }
+  
+  return { isAuthentic: false, confidence: 0.6 };
+}
+
+// حساب درجة ملاءمة الآية للموقف (0-100)
+function calculateSuitabilityScore(verse: string, scenarioText: string, expectedVerses: string[]): number {
+  const normalizedVerse = removeDiacritics(verse);
+  
+  // تطابق تام مع الآية المتوقعة = 100
+  for (const expected of expectedVerses) {
+    if (compareArabicText(verse, expected)) {
+      return 100;
+    }
+  }
+  
+  // تطابق جزئي مع الآية المتوقعة = 80-95
+  for (const expected of expectedVerses) {
+    const normalizedExpected = removeDiacritics(expected);
+    if (normalizedVerse.includes(normalizedExpected) || normalizedExpected.includes(normalizedVerse)) {
+      return 90;
+    }
+  }
+  
+  // التحقق من فئة الموقف
+  const category = detectSituationCategory(scenarioText);
+  if (category) {
+    const contextualVerses = getContextualVerses(category);
+    
+    // الآية من نفس فئة الموقف = 70-85
+    for (const contextVerse of contextualVerses) {
+      if (compareArabicText(verse, contextVerse)) {
+        return 85;
+      }
+      const normalizedContextVerse = removeDiacritics(contextVerse);
+      if (normalizedVerse.includes(normalizedContextVerse) || normalizedContextVerse.includes(normalizedVerse)) {
+        return 75;
+      }
+    }
+  }
+  
+  // آية قرآنية صحيحة لكن ليست من الفئة المناسبة = 40-60
+  const verification = verifyQuranicText(verse);
+  if (verification.isAuthentic && verification.confidence >= 0.7) {
+    return 50;
+  }
+  
+  // آية قرآنية محتملة = 30-40
+  if (verification.isAuthentic) {
+    return 35;
+  }
+  
+  // ليست آية قرآنية = 0-20
+  return 10;
+}
+
+// تحديد الدرجة بناءً على التحقق المنفصل
+function determineGrade(isAuthentic: boolean, suitabilityScore: number): ValidationGrade {
+  if (!isAuthentic) {
+    return 'incorrect';
+  }
+  
+  if (suitabilityScore >= 80) {
+    return 'exact_match'; // ✅ صحيح ومطابق
+  }
+  
+  if (suitabilityScore >= 35) {
+    return 'valid_but_less_suitable'; // 🟡 صحيح لكن غير أنسب خيار
+  }
+  
+  return 'incorrect'; // 🔴 غير صحيح
 }
 
 export interface GeneratedExercise {
@@ -631,10 +765,21 @@ function parseAIResponse(response: string): AIValidationResult {
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
+    const score = Math.max(0, Math.min(100, parsed.score || 0));
+    const isCorrect = parsed.isCorrect || false;
+    
+    // تحديد الدرجة بناءً على النتيجة والنقاط
+    let grade: ValidationGrade = 'incorrect';
+    if (isCorrect && score >= 80) {
+      grade = 'exact_match';
+    } else if (isCorrect || score >= 40) {
+      grade = 'valid_but_less_suitable';
+    }
 
     return {
-      isCorrect: parsed.isCorrect || false,
-      score: Math.max(0, Math.min(100, parsed.score || 0)),
+      isCorrect: isCorrect,
+      grade: grade,
+      score: score,
       feedback: parsed.feedback || "No feedback provided",
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
       suggestedAnswer: parsed.suggestedAnswer || undefined,
@@ -645,6 +790,7 @@ function parseAIResponse(response: string): AIValidationResult {
     console.error("Error parsing AI response:", error);
     return {
       isCorrect: false,
+      grade: 'incorrect' as ValidationGrade,
       score: 0,
       feedback: "Unable to evaluate answer. Please try again.",
       suggestions: ["Check your Arabic spelling and grammar"],
@@ -1116,17 +1262,52 @@ function fallbackValidation(
       ];
     }
   } else if (exerciseType === "roleplay") {
-    // For roleplay exercises, check for Quranic patterns and comfort words
+    // For roleplay exercises, use the new grading system
     const hasRoleplayQuranicPattern =
-      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|العسر|اليسر|رحمة|صبر|فرج|أمل)/.test(
+      /(إن|إنا|فإن|والله|يا|رب|الله|الرحمن|الرحيم|العسر|اليسر|رحمة|صبر|فرج|أمل|اعملوا|سيرى|عملكم)/.test(
         userAnswer,
       );
     const hasComfortWords =
-      /(رحمة|صبر|فرج|أمل|يسر|نجاة|عون|توكل|ثقة|طمأنينة)/.test(userAnswer);
-
-    // Consider it correct if it has Arabic content AND either Quranic patterns OR comfort-related words
-    isActuallyCorrect =
-      hasArabic && hasContent && (hasRoleplayQuranicPattern || hasComfortWords);
+      /(رحمة|صبر|فرج|أمل|يسر|نجاة|عون|توكل|ثقة|طمأنينة|اعملوا|عمل)/.test(userAnswer);
+    
+    // التحقق من صحة النص القرآني
+    const verificationResult = verifyQuranicText(userAnswer);
+    
+    // إذا كانت آية قرآنية صحيحة
+    if (verificationResult.isAuthentic && hasArabic && hasContent) {
+      // التحقق من الملاءمة للموقف
+      const suitability = calculateSuitabilityScore(userAnswer, context, []);
+      
+      if (suitability >= 80 || (hasRoleplayQuranicPattern && hasComfortWords)) {
+        // ✅ صحيح ومطابق
+        isActuallyCorrect = true;
+        exerciseSpecificFeedback = "✅ ممتاز! إجابتك صحيحة ومطابقة للموقف.";
+        suggestions = ["أحسنت! اخترت آية مناسبة تماماً."];
+      } else if (suitability >= 35 || hasRoleplayQuranicPattern) {
+        // 🟡 صحيح لكن غير أنسب خيار - نعتبرها صحيحة جزئياً
+        isActuallyCorrect = true;
+        exerciseSpecificFeedback = "🟡 آية قرآنية صحيحة، لكن قد تكون هناك آيات أنسب لهذا الموقف.";
+        suggestions = [
+          "للتقاعد والفراغ: جرّب آيات عن العطاء المستمر مثل (وَافْعَلُوا الْخَيْرَ لَعَلَّكُمْ تُفْلِحُونَ)",
+          "آيتك صحيحة لكن الموقف يحتاج آية تعطي معنى للمرحلة والعطاء بعد الكِبر",
+        ];
+      } else {
+        // آية قرآنية لكن غير مناسبة للسياق
+        isActuallyCorrect = false;
+        exerciseSpecificFeedback = "🔴 آية قرآنية صحيحة، لكنها لا تناسب هذا الموقف تماماً.";
+        suggestions = [
+          "اختر آية تتناسب مع الحالة الشعورية للموقف",
+          "راجع السياق واختر آية تعبر عن المعنى المطلوب",
+        ];
+      }
+    } else {
+      isActuallyCorrect = false;
+      exerciseSpecificFeedback = "🔴 الرجاء كتابة آية قرآنية صحيحة.";
+      suggestions = [
+        "استخدم آية قرآنية حقيقية",
+        "تأكد من صحة النص القرآني",
+      ];
+    }
   } else if (exerciseType === "transformation") {
     // For transformation exercises, check if the answer is a Quranic verse (philosophical match)
     // CRITICAL: Accept partial Quranic verses!
@@ -1250,6 +1431,7 @@ function fallbackValidation(
 
   return {
     isCorrect: isActuallyCorrect,
+    grade: isActuallyCorrect ? 'exact_match' : 'incorrect',
     score: isActuallyCorrect ? 60 : 20,
     feedback: completeFeedback,
     suggestions,
@@ -1301,8 +1483,9 @@ export async function validateExerciseAnswer(
     
     return {
       isCorrect: false,
-      score: 0,
-      feedback: "الآية المختارة غير مناسبة لهذا الموقف. استخدم آيات تعبر عن الحالة الشعورية للموقف من لسان الأنبياء أو البشر.",
+      grade: 'valid_but_less_suitable' as ValidationGrade,
+      score: 40,
+      feedback: "🟡 آية صحيحة، لكنها ليست الأنسب لهذا الموقف. استخدم آيات تعبر عن الحالة الشعورية للموقف من لسان الأنبياء أو البشر.",
       suggestions: [
         "اختر آية تناسب السياق العاطفي للموقف",
         "استخدم آيات من أقوال الأنبياء والبشر في القرآن",
@@ -1313,6 +1496,8 @@ export async function validateExerciseAnswer(
       suggestedAnswer: suggestedContextualVerse,
       connectionExplanation: undefined,
       confidence: 1.0,
+      isAuthenticVerse: true,
+      suitabilityScore: 40,
     };
   }
   
@@ -1321,8 +1506,9 @@ export async function validateExerciseAnswer(
     console.log("BLOCKED: Divine creation verse used for human product question!");
     return {
       isCorrect: false,
+      grade: 'incorrect' as ValidationGrade,
       score: 0,
-      feedback: "لا يجوز استخدام آيات الخلق والإعجاز الإلهي للإجابة على أسئلة حول المنتجات البشرية. استخدم آيات تتعلق بالأفعال البشرية (سلوك، كلام، أخلاق، سعي).",
+      feedback: "🔴 لا يجوز استخدام آيات الخلق والإعجاز الإلهي للإجابة على أسئلة حول المنتجات البشرية. استخدم آيات تتعلق بالأفعال البشرية (سلوك، كلام، أخلاق، سعي).",
       suggestions: [
         "استخدم آيات عن السلوك البشري أو الأخلاق",
         "تجنب آيات الخلق الإلهي للأشياء المادية/التقنية",
@@ -1331,6 +1517,8 @@ export async function validateExerciseAnswer(
       suggestedAnswer: "لَا تُسْرِفُوا",
       connectionExplanation: undefined,
       confidence: 1.0,
+      isAuthenticVerse: true,
+      suitabilityScore: 0,
     };
   }
   
@@ -1341,6 +1529,7 @@ export async function validateExerciseAnswer(
       console.log("WARNING: Suggested verse itself is inappropriate for product question!");
       return {
         isCorrect: false,
+        grade: 'incorrect' as ValidationGrade,
         score: 0,
         feedback: "هذا السؤال يحتاج إلى مراجعة. الآية المقترحة غير مناسبة للسياق.",
         suggestions: ["هذا التمرين يحتاج تحديث الآية المقترحة"],
@@ -1353,12 +1542,15 @@ export async function validateExerciseAnswer(
     console.log("Direct Arabic match found! Answer is CORRECT.");
     return {
       isCorrect: true,
+      grade: 'exact_match' as ValidationGrade,
       score: 100,
-      feedback: "ممتاز! إجابتك صحيحة.",
+      feedback: "✅ ممتاز! إجابتك صحيحة ومطابقة.",
       suggestions: [],
       suggestedAnswer: undefined,
       connectionExplanation: undefined,
       confidence: 1.0,
+      isAuthenticVerse: true,
+      suitabilityScore: 100,
     };
   }
   
