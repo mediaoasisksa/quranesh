@@ -200,6 +200,28 @@ export const insertRoleplayScenarioSchema = createInsertSchema(roleplayScenarios
 export type RoleplayScenario = typeof roleplayScenarios.$inferSelect;
 export type InsertRoleplayScenario = z.infer<typeof insertRoleplayScenarioSchema>;
 
+// Human Situations - Mapping human situations to appropriate prophetic verses
+export const humanSituations = pgTable("human_situations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  situationAr: text("situation_ar").notNull(), // Arabic situation description
+  situationEn: text("situation_en").notNull(), // English situation description
+  category: text("category").notNull(), // agreement, facilitation, consolation, work, planning, etc.
+  suggestedVerse: text("suggested_verse").notNull(), // Quranic verse from prophets/humans
+  verseSource: text("verse_source"), // e.g., "لسان النبي يوسف", "وصف لفعل بشري"
+  contextualLogic: text("contextual_logic"), // Why this verse fits this situation
+  contextualLogicEn: text("contextual_logic_en"),
+  translations: jsonb("translations").$type<Record<string, string>>(), // Translations for all languages
+  keywords: jsonb("keywords").$type<string[]>(), // Keywords for matching situations
+  blockedPatterns: jsonb("blocked_patterns").$type<string[]>(), // Patterns to avoid for this situation
+});
+
+export const insertHumanSituationSchema = createInsertSchema(humanSituations).omit({
+  id: true,
+});
+
+export type HumanSituation = typeof humanSituations.$inferSelect;
+export type InsertHumanSituation = z.infer<typeof insertHumanSituationSchema>;
+
 // Daily Sentences for contextual Quranic expression matching
 export const dailySentences = pgTable("daily_sentences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

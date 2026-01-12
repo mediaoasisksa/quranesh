@@ -74,6 +74,182 @@ function containsDivineCreationPatterns(text: string): boolean {
   );
 }
 
+// =============================================================================
+// المنهج المقاصدي: ربط الآيات بالمواقف حسب المعنى وليس اللفظ
+// =============================================================================
+
+// فئات المواقف البشرية مع الآيات المناسبة من لسان الأنبياء والبشر
+const CONTEXTUAL_VERSE_MAPPING: Record<string, {
+  verses: string[];
+  source: string;
+  blockedPatterns?: string[];
+}> = {
+  // التيسير والإجراءات الرسمية
+  facilitation: {
+    verses: [
+      'يُرِيدُ اللَّهُ بِكُمُ الْيُسْرَ',
+      'فَسَنُيَسِّرُهُ لِلْيُسْرَىٰ',
+      'وَيَسِّرْ لِي أَمْرِي',
+      'رَبِّ اشْرَحْ لِي صَدْرِي'
+    ],
+    source: 'آيات التيسير ودعاء الأنبياء',
+    blockedPatterns: ['رسول', 'رسولا', 'نبعث', 'معذبين', 'عذاب']
+  },
+  // الموافقة والاتفاق
+  agreement: {
+    verses: [
+      'قَالَ نَعَمْ',
+      'قَالَ ذَٰلِكَ بَيْنِي وَبَيْنَكَ'
+    ],
+    source: 'لسان الأنبياء في الاتفاقات'
+  },
+  // المواساة والحزن
+  consolation: {
+    verses: [
+      'وَلَا تَحْزَنْ عَلَيْهِمْ',
+      'فَصَبْرٌ جَمِيلٌ',
+      'إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ',
+      'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا'
+    ],
+    source: 'آيات المواساة والصبر'
+  },
+  // الخسارة والتعويض
+  loss_compensation: {
+    verses: [
+      'عَسَىٰ رَبُّنَا أَن يُبْدِلَنَا خَيْرًا مِّنْهَا',
+      'عَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ'
+    ],
+    source: 'لسان البشر (أصحاب الجنة)'
+  },
+  // التنظيم والإدارة
+  organization: {
+    verses: [
+      'إِنِّي حَفِيظٌ عَلِيمٌ',
+      'اجْعَلْنِي عَلَىٰ خَزَائِنِ الْأَرْضِ'
+    ],
+    source: 'لسان النبي يوسف (ع)'
+  },
+  // الحرفة والصناعة
+  craftsmanship: {
+    verses: [
+      'وَعَلَّمْنَاهُ صَنْعَةَ لَبُوسٍ لَّكُمْ',
+      'أَنِ اعْمَلْ سَابِغَاتٍ وَقَدِّرْ فِي السَّرْدِ'
+    ],
+    source: 'وصف لفعل بشري (داود)'
+  },
+  // الرحلة والالتزام
+  commitment: {
+    verses: [
+      'سَتَجِدُنِي إِن شَاءَ اللَّهُ صَابِرًا',
+      'عَسَىٰ رَبِّي أَن يَهْدِيَنِي سَوَاءَ السَّبِيلِ'
+    ],
+    source: 'لسان النبي موسى (ع)'
+  },
+  // التعب والإرهاق
+  fatigue: {
+    verses: [
+      'لَقَدْ لَقِينَا مِن سَفَرِنَا هَٰذَا نَصَبًا'
+    ],
+    source: 'لسان النبي موسى (ع)'
+  },
+  // الخبرة والنجاح
+  expertise: {
+    verses: [
+      'إِنَّمَا أُوتِيتُهُ عَلَىٰ عِلْمٍ عِندِي'
+    ],
+    source: 'وصف لتفكير بشري'
+  }
+};
+
+// دالة لتحديد فئة الموقف من النص
+function detectSituationCategory(text: string): string | null {
+  const normalizedText = removeDiacritics(text.toLowerCase());
+  
+  // التيسير والإجراءات
+  if (/فيزا|تأشيرة|جواز|سفارة|إقامة|تصريح|رخصة|إجراء|طلب/.test(normalizedText) ||
+      /visa|passport|embassy|permit|license/.test(normalizedText)) {
+    return 'facilitation';
+  }
+  
+  // الموافقة والاتفاق
+  if (/اتفاق|موافقة|نعم|مستعد|جاهز|شراكة|عقد/.test(normalizedText) ||
+      /agreement|approval|ready|yes/.test(normalizedText)) {
+    return 'agreement';
+  }
+  
+  // المواساة
+  if (/خيانة|غدر|حزن|فقد|وفاة|مصيبة|خذلان|صدمة/.test(normalizedText) ||
+      /betrayal|grief|loss|death|sad/.test(normalizedText)) {
+    return 'consolation';
+  }
+  
+  // الخسارة والتعويض
+  if (/تعطل|عطل|خسارة|ضاع|انكسر|خربان|فقدت/.test(normalizedText) ||
+      /broken|lost|malfunction|damage/.test(normalizedText)) {
+    return 'loss_compensation';
+  }
+  
+  // التنظيم والإدارة
+  if (/تنظيم|ملفات|إدارة|ترتيب|حفظ|أرشيف/.test(normalizedText) ||
+      /organize|files|management|archive/.test(normalizedText)) {
+    return 'organization';
+  }
+  
+  // الحرفة والصناعة
+  if (/برمجة|صناعة|حرفة|يدوي|فني|تقني|كود|تطوير/.test(normalizedText) ||
+      /programming|craft|technical|code|development/.test(normalizedText)) {
+    return 'craftsmanship';
+  }
+  
+  // الرحلة والالتزام
+  if (/رحلة|سفر|مهمة|التزام|تحدي/.test(normalizedText) ||
+      /trip|travel|mission|commitment|challenge/.test(normalizedText)) {
+    return 'commitment';
+  }
+  
+  // التعب والإرهاق
+  if (/تعب|إرهاق|منهك|مرهق|ضغط/.test(normalizedText) ||
+      /tired|exhausted|fatigue|stress/.test(normalizedText)) {
+    return 'fatigue';
+  }
+  
+  // الخبرة والنجاح
+  if (/خبرة|نجاح|تجربة|مهارة|احترافية/.test(normalizedText) ||
+      /experience|success|expertise|skill/.test(normalizedText)) {
+    return 'expertise';
+  }
+  
+  return null;
+}
+
+// دالة للحصول على الآيات المناسبة للموقف
+function getContextualVerses(situationCategory: string): string[] {
+  const mapping = CONTEXTUAL_VERSE_MAPPING[situationCategory];
+  return mapping ? mapping.verses : [];
+}
+
+// دالة للتحقق من ملاءمة الآية للموقف (المنهج المقاصدي)
+function isVerseContextuallyAppropriate(verse: string, scenarioText: string): boolean {
+  const category = detectSituationCategory(scenarioText);
+  
+  if (!category) return true; // لا يوجد تصنيف محدد، قبول الآية
+  
+  const mapping = CONTEXTUAL_VERSE_MAPPING[category];
+  if (!mapping) return true;
+  
+  // التحقق من الأنماط الممنوعة
+  if (mapping.blockedPatterns) {
+    const normalizedVerse = removeDiacritics(verse);
+    for (const pattern of mapping.blockedPatterns) {
+      if (normalizedVerse.includes(removeDiacritics(pattern))) {
+        return false; // الآية تحتوي على نمط ممنوع لهذا الموقف
+      }
+    }
+  }
+  
+  return true;
+}
+
 // دالة لإزالة التشكيل من النص العربي (Ignore Diacritics)
 function removeDiacritics(text: string): string {
   // Arabic diacritics Unicode range: \u064B-\u065F (Fathah, Dammah, Kasrah, Sukun, Shadda, etc.)
