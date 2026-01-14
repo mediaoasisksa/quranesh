@@ -19,6 +19,7 @@ import TranslationManager from "@/pages/translation-manager";
 import RealLifeExamplesPage from "@/pages/real-life-examples";
 import Analytics from "@/pages/Analytics";
 import DiplomaPage from "@/pages/diploma";
+import AdminPage from "@/pages/admin";
 
 function Router() {
   return (
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/translation-manager" component={TranslationManager} />
+      <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );

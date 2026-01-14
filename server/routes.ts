@@ -13,8 +13,9 @@ import {
   insertUserSchema,
   signupSchema,
   signinSchema,
-  users as usersTable,
+  users,
   exerciseSessions,
+  humanSituations,
   phrases as quranicPhrases,
   diplomaWeeks,
   diplomaVocabulary,
@@ -47,6 +48,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       "JWT_SECRET environment variable is required for authentication",
     );
   }
+
+  // Global admin authentication middleware
+  const requireAdminAuth = async (req: any, res: any, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const { eq } = await import("drizzle-orm");
+      
+      const [user] = await db.select().from(users).where(eq(users.id, decoded.userId));
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      req.adminUser = user;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  };
 
   // Initialize with demo user, phrase data and question banks
   (async () => {
@@ -308,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk translation endpoint (admin only - translates untranslated sentences in batches)
-  app.post("/api/philosophical-sentences/bulk-translate", async (req, res) => {
+  app.post("/api/philosophical-sentences/bulk-translate", requireAdminAuth, async (req, res) => {
     try {
       const { language, limit = 10 } = req.body;
       
@@ -412,8 +437,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Single sentence translation endpoint
-  app.post("/api/philosophical-sentences/:id/translate", async (req, res) => {
+  // Single sentence translation endpoint (admin only)
+  app.post("/api/philosophical-sentences/:id/translate", requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const { language } = req.body;
@@ -1355,12 +1380,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin authentication middleware (defined early for analytics routes)
+  const requireAdminEarly = async (req: any, res: any, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const { eq } = await import("drizzle-orm");
+      
+      const [user] = await db.select().from(users).where(eq(users.id, decoded.userId));
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      req.adminUser = user;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  };
+
   // Admin Analytics Endpoints
-  app.get("/api/admin/analytics/overview", async (_req, res) => {
+  app.get("/api/admin/analytics/overview", requireAdminEarly, async (_req, res) => {
     try {
       // Get total users count
-      const users = await db.select({ id: usersTable.id }).from(usersTable);
-      const totalUsers = users.length;
+      const allUsers = await db.select({ id: users.id }).from(users);
+      const totalUsers = allUsers.length;
 
       // Get total exercises completed
       const sessions = await db.select().from(exerciseSessions);
@@ -1401,7 +1450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/exercise-engagement", async (_req, res) => {
+  app.get("/api/admin/analytics/exercise-engagement", requireAdminEarly, async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
       
@@ -1450,10 +1499,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/user-activity", async (_req, res) => {
+  app.get("/api/admin/analytics/user-activity", requireAdminEarly, async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
-      const users = await db.select().from(usersTable);
+      const allUsersData = await db.select().from(users);
 
       // Calculate user activity by date (last 30 days)
       const thirtyDaysAgo = new Date();
@@ -1494,7 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .sort((a, b) => a.date.localeCompare(b.date));
 
       res.json({
-        totalUsers: users.length,
+        totalUsers: allUsersData.length,
         dailyActivity: result,
       });
     } catch (error) {
@@ -1503,7 +1552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/top-users", async (_req, res) => {
+  app.get("/api/admin/analytics/top-users", requireAdminEarly, async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
       
@@ -1530,8 +1579,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Get user details
-      const users = await db.select().from(usersTable);
-      const userMap = new Map(users.map(u => [u.id, u]));
+      const allUsersData = await db.select().from(users);
+      const userMap = new Map(allUsersData.map((u: User) => [u.id, u]));
 
       // Calculate and sort by total sessions
       const result = Object.values(userStats)
@@ -1913,6 +1962,216 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Diploma stats error:", error);
       res.status(500).json({ message: "Failed to fetch diploma stats" });
+    }
+  });
+
+  // ==================== ADMIN MANAGEMENT API ROUTES ====================
+  
+  // Admin authentication middleware
+  const requireAdmin = async (req: any, res: any, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const { eq } = await import("drizzle-orm");
+      
+      const [user] = await db.select().from(users).where(eq(users.id, decoded.userId));
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      req.adminUser = user;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  };
+  
+  // Get all users (admin only)
+  app.get("/api/admin/users", requireAdmin, async (_req, res) => {
+    try {
+      const allUsers = await db.select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        isAdmin: users.isAdmin,
+        createdAt: users.createdAt,
+      }).from(users);
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Admin users error:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get admin stats
+  app.get("/api/admin/stats", requireAdmin, async (_req, res) => {
+    try {
+      const { sql } = await import("drizzle-orm");
+      
+      const [userCount] = await db.select({ count: sql<number>`count(*)` }).from(users);
+      const [situationCount] = await db.select({ count: sql<number>`count(*)` }).from(humanSituations);
+      const [exerciseCount] = await db.select({ count: sql<number>`count(*)` }).from(exerciseSessions);
+      
+      res.json({
+        totalUsers: userCount?.count || 0,
+        totalSituations: situationCount?.count || 0,
+        totalExercises: exerciseCount?.count || 0,
+      });
+    } catch (error) {
+      console.error("Admin stats error:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // Toggle admin status
+  app.post("/api/admin/users/:userId/toggle-admin", requireAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { isAdmin: newAdminStatus } = req.body;
+      
+      if (typeof newAdminStatus !== 'boolean') {
+        return res.status(400).json({ message: "isAdmin must be a boolean" });
+      }
+      
+      const { eq } = await import("drizzle-orm");
+      
+      await db.update(users)
+        .set({ isAdmin: newAdminStatus })
+        .where(eq(users.id, userId));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Toggle admin error:", error);
+      res.status(500).json({ message: "Failed to toggle admin status" });
+    }
+  });
+
+  // Delete user (with cascade delete of related data)
+  app.delete("/api/admin/users/:userId", requireAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const { userProgress, dailyStats, userDiplomaProgress, diplomaExerciseAttempts } = await import("@shared/schema");
+      
+      // Delete related data first (cascade)
+      await db.delete(exerciseSessions).where(eq(exerciseSessions.userId, userId));
+      await db.delete(userProgress).where(eq(userProgress.userId, userId));
+      await db.delete(dailyStats).where(eq(dailyStats.userId, userId));
+      await db.delete(userDiplomaProgress).where(eq(userDiplomaProgress.userId, userId));
+      await db.delete(diplomaExerciseAttempts).where(eq(diplomaExerciseAttempts.userId, userId));
+      
+      // Delete the user
+      await db.delete(users).where(eq(users.id, userId));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete user error:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Get all human situations
+  app.get("/api/admin/human-situations", requireAdmin, async (_req, res) => {
+    try {
+      const allSituations = await db.select().from(humanSituations);
+      res.json(allSituations);
+    } catch (error) {
+      console.error("Admin situations error:", error);
+      res.status(500).json({ message: "Failed to fetch situations" });
+    }
+  });
+
+  // Add human situation (with validation)
+  app.post("/api/admin/human-situations", requireAdmin, async (req, res) => {
+    try {
+      const { situationAr, situationEn, category, suggestedVerse, contextualLogic, contextualLogicEn } = req.body;
+      
+      // Validation
+      if (!situationAr || typeof situationAr !== 'string') {
+        return res.status(400).json({ message: "situationAr is required" });
+      }
+      if (!situationEn || typeof situationEn !== 'string') {
+        return res.status(400).json({ message: "situationEn is required" });
+      }
+      if (!category || typeof category !== 'string') {
+        return res.status(400).json({ message: "category is required" });
+      }
+      if (!suggestedVerse || typeof suggestedVerse !== 'string') {
+        return res.status(400).json({ message: "suggestedVerse is required" });
+      }
+      
+      const [newSituation] = await db.insert(humanSituations).values({
+        situationAr,
+        situationEn,
+        category,
+        suggestedVerse,
+        contextualLogic: contextualLogic || null,
+        contextualLogicEn: contextualLogicEn || null,
+      }).returning();
+      
+      res.json(newSituation);
+    } catch (error) {
+      console.error("Add situation error:", error);
+      res.status(500).json({ message: "Failed to add situation" });
+    }
+  });
+
+  // Update human situation (with validation)
+  app.put("/api/admin/human-situations/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { situationAr, situationEn, category, suggestedVerse, contextualLogic, contextualLogicEn } = req.body;
+      const { eq } = await import("drizzle-orm");
+      
+      // Validation
+      if (!situationAr || typeof situationAr !== 'string') {
+        return res.status(400).json({ message: "situationAr is required" });
+      }
+      if (!situationEn || typeof situationEn !== 'string') {
+        return res.status(400).json({ message: "situationEn is required" });
+      }
+      if (!category || typeof category !== 'string') {
+        return res.status(400).json({ message: "category is required" });
+      }
+      if (!suggestedVerse || typeof suggestedVerse !== 'string') {
+        return res.status(400).json({ message: "suggestedVerse is required" });
+      }
+      
+      const [updated] = await db.update(humanSituations)
+        .set({ 
+          situationAr, 
+          situationEn, 
+          category, 
+          suggestedVerse, 
+          contextualLogic: contextualLogic || null, 
+          contextualLogicEn: contextualLogicEn || null 
+        })
+        .where(eq(humanSituations.id, id))
+        .returning();
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Update situation error:", error);
+      res.status(500).json({ message: "Failed to update situation" });
+    }
+  });
+
+  // Delete human situation
+  app.delete("/api/admin/human-situations/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      
+      await db.delete(humanSituations).where(eq(humanSituations.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete situation error:", error);
+      res.status(500).json({ message: "Failed to delete situation" });
     }
   });
 
