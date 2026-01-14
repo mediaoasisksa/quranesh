@@ -93,6 +93,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("✓ Demo user created: demo@example.com / password123");
     }
 
+    // Create admin user if it doesn't exist
+    const adminEmail = "admin@quranesh.com";
+    const existingAdminUser = await storage.getUserByEmail(adminEmail);
+    if (!existingAdminUser) {
+      const saltRounds = 12;
+      const adminPasswordHash = await bcrypt.hash("admin234!", saltRounds);
+      const adminUser = await storage.createUser({
+        firstName: "Admin",
+        lastName: "Quranesh",
+        email: adminEmail,
+        passwordHash: adminPasswordHash,
+        memorizationLevel: "hafiz",
+        nativeLanguage: "Arabic",
+        learningGoal: "daily_conversation",
+      });
+      // Set as admin
+      const { eq } = await import("drizzle-orm");
+      await db.update(users).set({ isAdmin: true }).where(eq(users.id, adminUser.id));
+      console.log("✓ Admin user created: admin@quranesh.com");
+    }
+
     const existingPhrases = await storage.getAllPhrases();
     if (existingPhrases.length === 0) {
       for (const phraseData of phrasesData) {
