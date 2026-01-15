@@ -136,6 +136,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log(`✓ Loaded ${philosophicalSentencesData.length} philosophical sentences`);
     }
+    
+    // Add new wisdom data with Quranic verses
+    const { addWisdomData } = await import("./add-wisdom-data");
+    await addWisdomData();
   })();
 
   // Authentication routes
