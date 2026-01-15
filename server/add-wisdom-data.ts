@@ -3,16 +3,16 @@ import { philosophicalSentences } from "@shared/schema";
 
 const wisdomData = [
   // أولاً: في الذات والوعي الداخلي (10 حكم)
-  { arabicText: "قيمتك الحقيقية في جوهرك لا في مظهرك", symbolicMeaning: "إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ (الحجرات 13)", difficulty: 2 },
-  { arabicText: "التغيير الخارجي يبدأ بإصلاح الداخل", symbolicMeaning: "إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ (الرعد 11)", difficulty: 2 },
-  { arabicText: "الهدوء النفسي هو أعلى درجات القوة", symbolicMeaning: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ (الرعد 28)", difficulty: 2 },
-  { arabicText: "النفس أمارة بالسوء إلا من هذبها الوعي", symbolicMeaning: "إِنَّ النَّفْسَ لَأَمَّارَةٌ بِالسُّوءِ (يوسف 53)", difficulty: 3 },
-  { arabicText: "الرضا هو المفتاح لفتح أبواب المزيد", symbolicMeaning: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ (إبراهيم 7)", difficulty: 2 },
-  { arabicText: "الوحدة مع الحق قوة، والكثرة مع الباطل وهم", symbolicMeaning: "كَم مِّن فِئَةٍ قَلِيلَةٍ غَلَبَتْ فِئَةً كَثِيرَةً بِإِذْنِ اللَّهِ (البقرة 249)", difficulty: 3 },
-  { arabicText: "الصدق مع النفس هو أول طريق النجاة", symbolicMeaning: "بَلِ الْإِنسَانُ عَلَىٰ نَفْسِهِ بَصِيرَةٌ (القيامة 14)", difficulty: 2 },
-  { arabicText: "الكبر هو الحجاب الأكبر عن الحقيقة", symbolicMeaning: "سَأَصْرِفُ عَنْ آيَاتِيَ الَّذِينَ يَتَكَبَّرُونَ فِي الْأَرْضِ بِغَيْرِ الْحَقِّ (الأعراف 146)", difficulty: 3 },
-  { arabicText: "لا تحمل هم الغد فلكل يوم رزقه", symbolicMeaning: "وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا (هود 6)", difficulty: 2 },
-  { arabicText: "الظن قد يكون أكبر عدو للحقيقة", symbolicMeaning: "إِنَّ بَعْضَ الظَّنِّ إِثْمٌ (الحجرات 12)", difficulty: 2 },
+  { arabicText: "قيمتك الحقيقية في جوهرك لا في مظهرك", symbolicMeaning: "إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ (الحجرات 13)", difficulty: 2, conceptTags: ["self_worth", "humility", "inner_value", "authenticity"] },
+  { arabicText: "التغيير الخارجي يبدأ بإصلاح الداخل", symbolicMeaning: "إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ (الرعد 11)", difficulty: 2, conceptTags: ["self_improvement", "change", "accountability", "inner_work"] },
+  { arabicText: "الهدوء النفسي هو أعلى درجات القوة", symbolicMeaning: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ (الرعد 28)", difficulty: 2, conceptTags: ["inner_peace", "tranquility", "emotional_control", "spiritual_strength"] },
+  { arabicText: "النفس أمارة بالسوء إلا من هذبها الوعي", symbolicMeaning: "إِنَّ النَّفْسَ لَأَمَّارَةٌ بِالسُّوءِ (يوسف 53)", difficulty: 3, conceptTags: ["self_awareness", "self_discipline", "nafs", "moral_struggle"] },
+  { arabicText: "الرضا هو المفتاح لفتح أبواب المزيد", symbolicMeaning: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ (إبراهيم 7)", difficulty: 2, conceptTags: ["gratitude", "contentment", "abundance", "thankfulness"] },
+  { arabicText: "الوحدة مع الحق قوة، والكثرة مع الباطل وهم", symbolicMeaning: "كَم مِّن فِئَةٍ قَلِيلَةٍ غَلَبَتْ فِئَةً كَثِيرَةً بِإِذْنِ اللَّهِ (البقرة 249)", difficulty: 3, conceptTags: ["truth", "conviction", "perseverance", "minority_strength"] },
+  { arabicText: "الصدق مع النفس هو أول طريق النجاة", symbolicMeaning: "بَلِ الْإِنسَانُ عَلَىٰ نَفْسِهِ بَصِيرَةٌ (القيامة 14)", difficulty: 2, conceptTags: ["honesty", "self_awareness", "introspection", "truth"] },
+  { arabicText: "الكبر هو الحجاب الأكبر عن الحقيقة", symbolicMeaning: "سَأَصْرِفُ عَنْ آيَاتِيَ الَّذِينَ يَتَكَبَّرُونَ فِي الْأَرْضِ بِغَيْرِ الْحَقِّ (الأعراف 146)", difficulty: 3, conceptTags: ["humility", "arrogance", "truth", "self_deception"] },
+  { arabicText: "لا تحمل هم الغد فلكل يوم رزقه", symbolicMeaning: "وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا (هود 6)", difficulty: 2, conceptTags: ["trust", "provision", "worry_free", "reliance_on_god"] },
+  { arabicText: "الظن قد يكون أكبر عدو للحقيقة", symbolicMeaning: "إِنَّ بَعْضَ الظَّنِّ إِثْمٌ (الحجرات 12)", difficulty: 2, conceptTags: ["objectivity", "truth", "assumptions", "critical_thinking"] },
 
   // ثانياً: في القيادة والإدارة (10 حكم)
   { arabicText: "الشورى ليست ضعفاً بل هي اكتمال للرؤية", symbolicMeaning: "وَشَاوِرْهُمْ فِي الْأَمْرِ (آل عمران 159)", difficulty: 2 },
@@ -124,9 +124,10 @@ const wisdomData = [
 ];
 
 export async function addWisdomData() {
-  console.log(`\n📚 إضافة ${wisdomData.length} حكمة فلسفية إلى قاعدة البيانات...\n`);
+  console.log(`\n📚 إضافة/تحديث ${wisdomData.length} حكمة فلسفية في قاعدة البيانات...\n`);
   
   let added = 0;
+  let updated = 0;
   let skipped = 0;
   
   for (const wisdom of wisdomData) {
@@ -139,7 +140,21 @@ export async function addWisdomData() {
         .limit(1);
       
       if (existing.length > 0) {
-        skipped++;
+        // Update existing wisdom with conceptTags if provided
+        if (wisdom.conceptTags && wisdom.conceptTags.length > 0) {
+          const existingTags = (existing[0].conceptTags as string[]) || [];
+          if (existingTags.length === 0) {
+            await db
+              .update(philosophicalSentences)
+              .set({ conceptTags: wisdom.conceptTags })
+              .where(sql`arabic_text = ${wisdom.arabicText}`);
+            updated++;
+          } else {
+            skipped++;
+          }
+        } else {
+          skipped++;
+        }
         continue;
       }
       
@@ -147,19 +162,21 @@ export async function addWisdomData() {
         arabicText: wisdom.arabicText,
         symbolicMeaning: wisdom.symbolicMeaning,
         difficulty: wisdom.difficulty,
+        conceptTags: wisdom.conceptTags || [],
         translations: {},
       });
       added++;
     } catch (error) {
-      console.error(`خطأ في إضافة: ${wisdom.arabicText}`, error);
+      console.error(`خطأ في إضافة/تحديث: ${wisdom.arabicText}`, error);
     }
   }
   
   console.log(`\n✅ تمت الإضافة: ${added} حكمة جديدة`);
-  console.log(`⏭️ تم التخطي: ${skipped} حكمة موجودة مسبقاً`);
+  console.log(`🔄 تم التحديث: ${updated} حكمة بالمفاهيم`);
+  console.log(`⏭️ تم التخطي: ${skipped} حكمة مكتملة مسبقاً`);
   console.log(`📊 المجموع: ${wisdomData.length} حكمة\n`);
   
-  return { added, skipped, total: wisdomData.length };
+  return { added, updated, skipped, total: wisdomData.length };
 }
 
 // Import sql for querying

@@ -133,7 +133,8 @@ export const philosophicalSentences = pgTable("philosophical_sentences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   arabicText: text("arabic_text").notNull(),
   difficulty: integer("difficulty").default(1), // 1-5 scale
-  symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
+  symbolicMeaning: text("symbolic_meaning"), // Expected Quranic verse reference
+  conceptTags: jsonb("concept_tags").$type<string[]>().default([]), // Concept-based tags for flexible matching: e.g., ["justice", "objectivity", "emotional_control"]
   translations: jsonb("translations").$type<Record<string, string>>(), // {"en": "...", "id": "...", "tr": "...", "zh": "...", "sw": "...", "so": "...", "bs": "...", "sq": "..."}
   lastTranslatedAt: timestamp("last_translated_at"), // Track translation freshness
 });

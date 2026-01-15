@@ -623,24 +623,45 @@ If ANY criterion is NO, mark the answer as INCORRECT and suggest a practical alt
       - Should be relevant to providing comfort and hope to someone in distress`;
       break;
     case "transformation":
-      specificInstructions = `This is a PHILOSOPHICAL MATCH exercise. The student must identify a Quranic verse with a philosophical meaning that is close to or opposite to the given Arabic wisdom sentence.
+      specificInstructions = `This is a CONCEPT-BASED PHILOSOPHICAL MATCH exercise. 
       
-      CRITICAL INSTRUCTIONS ABOUT QURANIC TEXT:
-      - ACCEPT ANY authentic Quranic text - whether it's a full verse, partial verse, or even a short phrase from the Quran
-      - Examples of CORRECT answers:
-        * Full verse: "إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ"
-        * Partial verse: "وما تفعلوا من خير" (part of verse 2:215)
-        * Short phrase: "إن مع العسر يسرا"
-      - If the answer contains ANY authentic Quranic words or phrases, consider it CORRECT if it relates to the wisdom sentence
-      - DO NOT reject partial verses or Quranic phrases - they are valid answers!
-      
-      - The verse/phrase should have a philosophical/wisdom meaning that relates to the given sentence
-      - The relationship can be either:
-        * SIMILAR: The Quranic verse conveys a similar wisdom or principle
-        * OPPOSITE: The Quranic verse presents a contrasting or opposite perspective
-      - The answer should demonstrate understanding of both the wisdom sentence and Quranic meaning
-      - Example: If given "من احسن الجزاءه الصغير فتح له الكبير" (Whoever does small good deeds, great things will be opened for them), 
-        acceptable answers include: "وما تفعلوا من خير" (partial verse), "إن الله لا يضيع أجر المحسنين", or any Quranic text about reward for good deeds`;
+🔴 CRITICAL: CONCEPT-BASED EVALUATION (NOT LEXICAL MATCHING)
+You must evaluate based on PHILOSOPHICAL CONCEPTS, not literal/lexical similarity.
+
+STEP 1: Extract the CORE CONCEPT from the wisdom sentence
+- What is the ethical/philosophical PRINCIPLE?
+- Examples of concepts: justice, objectivity, patience, gratitude, humility, emotional_control, self_awareness, accountability, forgiveness, perseverance
+
+STEP 2: Identify the CONCEPTS expressed by the student's Quranic verse
+- What ethical/philosophical principles does this verse teach?
+- A verse can express MULTIPLE concepts
+
+STEP 3: Accept if there is CONCEPTUAL OVERLAP
+- If the verse expresses the SAME principle (even in different words) → ACCEPT as exact_match
+- If the verse expresses a RELATED principle → ACCEPT as valid_but_less_suitable  
+- Only reject if the verse is completely UNRELATED conceptually
+
+📌 EXAMPLE:
+Wisdom: "لا تمنع من اختلاف الرأي عبارة" (Don't let disagreement prevent expression)
+Concepts: [objectivity, open_mindedness, emotional_control]
+
+Student Answer: "ولا يجرمنكم شنآن قوم على ألا تعدلوا" (Don't let hatred of people prevent you from being just)
+Verse Concepts: [justice, objectivity, emotional_control]
+
+EVALUATION: ✅ CORRECT (conceptual overlap: objectivity + emotional_control)
+Both teach: "Don't let emotions/conflict prevent you from doing what's right"
+
+❌ WRONG APPROACH (what NOT to do):
+- Rejecting because words don't match literally
+- Requiring the verse to "look similar" to the wisdom
+- Expecting specific keywords
+
+✅ RIGHT APPROACH:
+- Accept if the UNDERLYING PRINCIPLE is the same or related
+- Accept if both texts teach the same life lesson
+- Accept if a thoughtful student would see the connection
+
+CRITICAL: Accept ANY authentic Quranic text (full or partial verses) that expresses a related concept!`;
       break;
     case "thematic":
       specificInstructions = `This is a THEMATIC exercise. The student must find relevant Quranic verses for life situations.
@@ -990,23 +1011,20 @@ function fallbackValidation(
         ];
       } else if (hasStrongQuranicPattern || hasQuranicVocabulary) {
         exerciseSpecificFeedback =
-          "This might be Quranic text, but please verify it's an authentic verse or phrase from the Quran.";
+          "Your answer appears to be Quranic text. Let me verify the conceptual connection to the wisdom.";
         suggestions = [
-          "Make sure it's authentic Quranic text",
-          "Verify the verse/phrase is from the Quran",
-          "Consider the thematic connection",
+          "Your verse expresses an ethical principle",
+          "Consider how it relates to the wisdom's core concept",
+          "Both similar and contrasting principles are valid connections",
         ];
       } else {
         exerciseSpecificFeedback =
-          "For this exercise, provide a Quranic verse or phrase with similar or opposite philosophical meaning to the wisdom sentence.";
+          "Your answer reflects a related ethical principle, but try to find a verse that matches the wisdom more directly.";
         suggestions = [
-          "Use authentic Quranic text (full or partial verses are acceptable)",
-          "Find a verse that relates philosophically to the given wisdom",
-          'Examples: "وما تفعلوا من خير", "إن مع العسر يسرا"',
+          "Think about the core CONCEPT of the wisdom (e.g., justice, patience, gratitude)",
+          "Find a Quranic verse that teaches the same life lesson",
+          "The verse doesn't need to use similar words - just express a similar or opposite principle",
         ];
-        // Note: No fixed suggestedAnswer for transformation exercises 
-        // because each wisdom requires a different appropriate verse
-        // AI should provide context-specific suggestions
       }
       break;
     case "thematic":
