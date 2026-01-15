@@ -1004,7 +1004,9 @@ function fallbackValidation(
           "Find a verse that relates philosophically to the given wisdom",
           'Examples: "وما تفعلوا من خير", "إن مع العسر يسرا"',
         ];
-        suggestedAnswer = "وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ";
+        // Note: No fixed suggestedAnswer for transformation exercises 
+        // because each wisdom requires a different appropriate verse
+        // AI should provide context-specific suggestions
       }
       break;
     case "thematic":
