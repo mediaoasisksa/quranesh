@@ -183,6 +183,7 @@ export default function Exercise() {
     suggestedVerse?: string | null;
     verseExplanation?: string | null;
     verseExplanationEn?: string | null;
+    verseExplanationTranslations?: Record<string, string> | null;
   }>({
     queryKey: ["/api/roleplay-scenarios/random", userId],
     queryFn: async () => {
