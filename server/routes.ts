@@ -40,6 +40,7 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { validateExerciseAnswer } from "./ai-service";
+import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Validate JWT secret on startup

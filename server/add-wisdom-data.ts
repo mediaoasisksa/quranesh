@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { philosophicalSentences } from "@shared/schema";
+import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
 const wisdomData = [
   // أولاً: في الذات والوعي الداخلي (10 حكم)
@@ -129,9 +130,18 @@ export async function addWisdomData() {
   let added = 0;
   let updated = 0;
   let skipped = 0;
+  let blocked = 0;
   
   for (const wisdom of wisdomData) {
     try {
+      // CRITICAL PROTECTION: Check if text is Quranic - block if it is
+      const validation = validateHumanWisdom(wisdom.arabicText);
+      if (!validation.isValid) {
+        console.warn(`⛔ تم حظر نص قرآني: "${wisdom.arabicText.substring(0, 50)}..." - ${validation.reason}`);
+        blocked++;
+        continue;
+      }
+      
       // Check if wisdom already exists
       const existing = await db
         .select()
@@ -174,9 +184,12 @@ export async function addWisdomData() {
   console.log(`\n✅ تمت الإضافة: ${added} حكمة جديدة`);
   console.log(`🔄 تم التحديث: ${updated} حكمة بالمفاهيم`);
   console.log(`⏭️ تم التخطي: ${skipped} حكمة مكتملة مسبقاً`);
+  if (blocked > 0) {
+    console.log(`⛔ تم الحظر: ${blocked} نص قرآني (محمي من التصنيف كحكمة بشرية)`);
+  }
   console.log(`📊 المجموع: ${wisdomData.length} حكمة\n`);
   
-  return { added, updated, skipped, total: wisdomData.length };
+  return { added, updated, skipped, blocked, total: wisdomData.length };
 }
 
 // Import sql for querying

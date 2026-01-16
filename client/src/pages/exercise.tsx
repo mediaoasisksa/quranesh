@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
+import { isQuranicText, getQuranicLabel, QuranicVerseType } from "@shared/quran-protection";
 
 function getLocalizedQuestion(
   conversationPrompt: any,
@@ -888,22 +889,45 @@ export default function Exercise() {
         );
 
       case "transformation":
+        const textContent = philosophicalSentence?.arabicText || "";
+        const isQuran = isQuranicText(textContent);
+        const quranicLabelInfo = isQuran ? getQuranicLabel(QuranicVerseType.NARRATIVE, language) : null;
+        
         return (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-2">
-                {t('philosophicalSentenceLabel')}
-              </p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className={`text-sm mb-2 cursor-help ${isQuran ? 'text-green-600 dark:text-green-400 font-medium' : 'text-muted-foreground'}`}>
+                      {isQuran ? (
+                        <>📖 {quranicLabelInfo?.label}</>
+                      ) : (
+                        t('philosophicalSentenceLabel')
+                      )}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p className="text-sm">
+                      {isQuran 
+                        ? quranicLabelInfo?.tooltip 
+                        : (language === 'ar' 
+                          ? 'حكمة بشرية للتدريب على إيجاد نظيرها القرآني' 
+                          : 'Human wisdom for practice - find its Quranic equivalent')}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               
               <div className="space-y-3 mb-3">
                 {/* Always show Arabic text */}
                 <p
-                  className="arabic-text text-xl text-foreground"
+                  className={`arabic-text text-xl ${isQuran ? 'text-green-700 dark:text-green-300' : 'text-foreground'}`}
                   lang="ar"
                   dir="rtl"
                   data-testid="text-transformation-philosophical-arabic"
                 >
-                  💎 {philosophicalSentence?.arabicText || "Loading..."}
+                  {isQuran ? '📖' : '💎'} {philosophicalSentence?.arabicText || "Loading..."}
                 </p>
                 
                 {/* Show translation below if available and language is not Arabic */}
@@ -918,6 +942,16 @@ export default function Exercise() {
                   </p>
                 )}
               </div>
+              
+              {isQuran && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-2 mb-3">
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                    ⚠️ {language === 'ar' 
+                      ? 'تنبيه: هذا نص قرآني وليس حكمة بشرية - يُعرض للتدريب اللغوي فقط' 
+                      : 'Note: This is Quranic text, not human wisdom - displayed for linguistic training only'}
+                  </p>
+                </div>
+              )}
               
               <p className="text-sm text-muted-foreground">
                 {t('transformationInstruction')}
