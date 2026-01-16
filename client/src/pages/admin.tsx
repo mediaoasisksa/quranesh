@@ -36,6 +36,17 @@ interface HumanSituation {
   contextualLogicEn: string;
 }
 
+interface QuestionBank {
+  id: string;
+  theme: string;
+  themeEnglish: string;
+  description: string | null;
+  tags: string[];
+  correctPhraseIds: string[];
+  difficulty: number;
+  category: string;
+}
+
 export default function AdminPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -51,6 +62,17 @@ export default function AdminPage() {
     contextualLogicEn: "",
   });
   const [editingSituation, setEditingSituation] = useState<HumanSituation | null>(null);
+  
+  const [newQuestion, setNewQuestion] = useState({
+    theme: "",
+    themeEnglish: "",
+    description: "",
+    tags: "",
+    correctPhraseIds: "",
+    difficulty: 1,
+    category: "thematic",
+  });
+  const [editingQuestion, setEditingQuestion] = useState<QuestionBank | null>(null);
 
   const { data: users, isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/admin/users"],
@@ -64,6 +86,11 @@ export default function AdminPage() {
 
   const { data: stats } = useQuery<{ totalUsers: number; totalSituations: number; totalExercises: number }>({
     queryKey: ["/api/admin/stats"],
+    enabled: !!user?.isAdmin,
+  });
+
+  const { data: questions, isLoading: questionsLoading } = useQuery<QuestionBank[]>({
+    queryKey: ["/api/admin/question-banks"],
     enabled: !!user?.isAdmin,
   });
 
@@ -116,6 +143,42 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/human-situations"] });
       toast({ title: "تم الحذف", description: "تم حذف الموقف بنجاح" });
+    },
+  });
+
+  const addQuestionMutation = useMutation({
+    mutationFn: async (question: typeof newQuestion) => {
+      return apiRequest("POST", "/api/admin/question-banks", {
+        ...question,
+        tags: question.tags ? question.tags.split(",").map(t => t.trim()) : [],
+        correctPhraseIds: question.correctPhraseIds ? question.correctPhraseIds.split(",").map(id => id.trim()) : [],
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/question-banks"] });
+      setNewQuestion({ theme: "", themeEnglish: "", description: "", tags: "", correctPhraseIds: "", difficulty: 1, category: "thematic" });
+      toast({ title: "تمت الإضافة", description: "تم إضافة السؤال بنجاح" });
+    },
+  });
+
+  const updateQuestionMutation = useMutation({
+    mutationFn: async (question: QuestionBank) => {
+      return apiRequest("PUT", `/api/admin/question-banks/${question.id}`, question);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/question-banks"] });
+      setEditingQuestion(null);
+      toast({ title: "تم التحديث", description: "تم تحديث السؤال بنجاح" });
+    },
+  });
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/admin/question-banks/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/question-banks"] });
+      toast({ title: "تم الحذف", description: "تم حذف السؤال بنجاح" });
     },
   });
 
@@ -179,7 +242,7 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               نظرة عامة
@@ -187,6 +250,10 @@ export default function AdminPage() {
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               المستخدمون
+            </TabsTrigger>
+            <TabsTrigger value="questions" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              بنك الأسئلة
             </TabsTrigger>
             <TabsTrigger value="situations" className="gap-2">
               <BookOpen className="h-4 w-4" />
@@ -308,6 +375,200 @@ export default function AdminPage() {
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>إلغاء</AlertDialogCancel>
                                   <AlertDialogAction onClick={() => deleteUserMutation.mutate(u.id)}>
+                                    حذف
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="questions">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>إضافة سؤال جديد</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>الموضوع بالعربية</Label>
+                    <Input
+                      value={newQuestion.theme}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, theme: e.target.value })}
+                      placeholder="المعية في الشدة"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label>الموضوع بالإنجليزية</Label>
+                    <Input
+                      value={newQuestion.themeEnglish}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, themeEnglish: e.target.value })}
+                      placeholder="Divine Companionship in Hardship"
+                    />
+                  </div>
+                  <div>
+                    <Label>الوصف</Label>
+                    <Textarea
+                      value={newQuestion.description}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, description: e.target.value })}
+                      placeholder="وصف تفصيلي للسؤال..."
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label>التصنيف</Label>
+                    <Input
+                      value={newQuestion.category}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, category: e.target.value })}
+                      placeholder="thematic, grammar, vocabulary"
+                    />
+                  </div>
+                  <div>
+                    <Label>الوسوم (مفصولة بفاصلة)</Label>
+                    <Input
+                      value={newQuestion.tags}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, tags: e.target.value })}
+                      placeholder="صبر, أمل, إيمان"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label>مستوى الصعوبة (1-5)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={newQuestion.difficulty}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, difficulty: parseInt(e.target.value) || 1 })}
+                    />
+                  </div>
+                </div>
+                <Button
+                  className="mt-4"
+                  onClick={() => addQuestionMutation.mutate(newQuestion)}
+                  disabled={!newQuestion.theme || !newQuestion.themeEnglish || !newQuestion.category}
+                >
+                  <Plus className="h-4 w-4 ml-2" />
+                  إضافة السؤال
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>بنك الأسئلة ({questions?.length || 0})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {questionsLoading ? (
+                  <div className="text-center py-8">جاري التحميل...</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الموضوع</TableHead>
+                        <TableHead>الموضوع (إنجليزي)</TableHead>
+                        <TableHead>التصنيف</TableHead>
+                        <TableHead>الصعوبة</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {questions?.map((question) => (
+                        <TableRow key={question.id}>
+                          <TableCell className="max-w-xs truncate" dir="rtl">{question.theme}</TableCell>
+                          <TableCell className="max-w-xs truncate">{question.themeEnglish}</TableCell>
+                          <TableCell><Badge variant="outline">{question.category}</Badge></TableCell>
+                          <TableCell>
+                            <Badge variant={question.difficulty <= 2 ? "secondary" : question.difficulty <= 4 ? "default" : "destructive"}>
+                              {question.difficulty}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="space-x-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" onClick={() => setEditingQuestion(question)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>تعديل السؤال</DialogTitle>
+                                </DialogHeader>
+                                {editingQuestion && (
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <Label>الموضوع بالعربية</Label>
+                                      <Input
+                                        value={editingQuestion.theme}
+                                        onChange={(e) => setEditingQuestion({ ...editingQuestion, theme: e.target.value })}
+                                        dir="rtl"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label>الموضوع بالإنجليزية</Label>
+                                      <Input
+                                        value={editingQuestion.themeEnglish}
+                                        onChange={(e) => setEditingQuestion({ ...editingQuestion, themeEnglish: e.target.value })}
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label>الوصف</Label>
+                                      <Textarea
+                                        value={editingQuestion.description || ""}
+                                        onChange={(e) => setEditingQuestion({ ...editingQuestion, description: e.target.value })}
+                                        dir="rtl"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label>التصنيف</Label>
+                                      <Input
+                                        value={editingQuestion.category}
+                                        onChange={(e) => setEditingQuestion({ ...editingQuestion, category: e.target.value })}
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label>مستوى الصعوبة</Label>
+                                      <Input
+                                        type="number"
+                                        min={1}
+                                        max={5}
+                                        value={editingQuestion.difficulty}
+                                        onChange={(e) => setEditingQuestion({ ...editingQuestion, difficulty: parseInt(e.target.value) || 1 })}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                                <DialogFooter>
+                                  <Button onClick={() => editingQuestion && updateQuestionMutation.mutate(editingQuestion)}>
+                                    حفظ التغييرات
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>حذف السؤال؟</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    هل أنت متأكد من حذف هذا السؤال؟ لا يمكن التراجع عن هذا الإجراء.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteQuestionMutation.mutate(question.id)}>
                                     حذف
                                   </AlertDialogAction>
                                 </AlertDialogFooter>

@@ -16,6 +16,7 @@ import {
   users,
   exerciseSessions,
   humanSituations,
+  questionBanks,
   phrases as quranicPhrases,
   diplomaWeeks,
   diplomaVocabulary,
@@ -2197,6 +2198,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete situation error:", error);
       res.status(500).json({ message: "Failed to delete situation" });
+    }
+  });
+
+  // ============== Question Banks Management ==============
+  
+  // Get all question banks
+  app.get("/api/admin/question-banks", requireAdmin, async (_req, res) => {
+    try {
+      const allQuestions = await db.select().from(questionBanks);
+      res.json(allQuestions);
+    } catch (error) {
+      console.error("Admin question banks error:", error);
+      res.status(500).json({ message: "Failed to fetch question banks" });
+    }
+  });
+
+  // Add new question bank
+  app.post("/api/admin/question-banks", requireAdmin, async (req, res) => {
+    try {
+      const { theme, themeEnglish, description, tags, correctPhraseIds, difficulty, category } = req.body;
+      
+      if (!theme || typeof theme !== 'string') {
+        return res.status(400).json({ message: "الموضوع بالعربية مطلوب" });
+      }
+      if (!themeEnglish || typeof themeEnglish !== 'string') {
+        return res.status(400).json({ message: "الموضوع بالإنجليزية مطلوب" });
+      }
+      if (!category || typeof category !== 'string') {
+        return res.status(400).json({ message: "التصنيف مطلوب" });
+      }
+      
+      const validDifficulty = Math.max(1, Math.min(5, parseInt(difficulty) || 1));
+      
+      const [newQuestion] = await db.insert(questionBanks).values({
+        theme,
+        themeEnglish,
+        description: description || null,
+        tags: Array.isArray(tags) ? tags : [],
+        correctPhraseIds: Array.isArray(correctPhraseIds) ? correctPhraseIds : [],
+        difficulty: validDifficulty,
+        category,
+      }).returning();
+      
+      res.json(newQuestion);
+    } catch (error) {
+      console.error("Add question bank error:", error);
+      res.status(500).json({ message: "Failed to add question bank" });
+    }
+  });
+
+  // Update question bank
+  app.put("/api/admin/question-banks/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { theme, themeEnglish, description, tags, correctPhraseIds, difficulty, category } = req.body;
+      
+      if (!theme || typeof theme !== 'string') {
+        return res.status(400).json({ message: "الموضوع بالعربية مطلوب" });
+      }
+      if (!themeEnglish || typeof themeEnglish !== 'string') {
+        return res.status(400).json({ message: "الموضوع بالإنجليزية مطلوب" });
+      }
+      if (!category || typeof category !== 'string') {
+        return res.status(400).json({ message: "التصنيف مطلوب" });
+      }
+      
+      const validDifficulty = Math.max(1, Math.min(5, parseInt(difficulty) || 1));
+      const { eq } = await import("drizzle-orm");
+      
+      const [updated] = await db.update(questionBanks)
+        .set({ 
+          theme, 
+          themeEnglish, 
+          description: description || null,
+          tags: Array.isArray(tags) ? tags : [],
+          correctPhraseIds: Array.isArray(correctPhraseIds) ? correctPhraseIds : [],
+          difficulty: validDifficulty,
+          category,
+        })
+        .where(eq(questionBanks.id, id))
+        .returning();
+      
+      if (!updated) {
+        return res.status(404).json({ message: "السؤال غير موجود" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Update question bank error:", error);
+      res.status(500).json({ message: "Failed to update question bank" });
+    }
+  });
+
+  // Delete question bank
+  app.delete("/api/admin/question-banks/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ message: "معرف السؤال مطلوب" });
+      }
+      
+      const { eq } = await import("drizzle-orm");
+      
+      const deleted = await db.delete(questionBanks).where(eq(questionBanks.id, id)).returning();
+      if (deleted.length === 0) {
+        return res.status(404).json({ message: "السؤال غير موجود" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete question bank error:", error);
+      res.status(500).json({ message: "Failed to delete question bank" });
     }
   });
 
