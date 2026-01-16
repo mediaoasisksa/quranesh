@@ -124,7 +124,7 @@ const wisdomData = [
 ];
 
 export async function addWisdomData() {
-  console.log(`\n📚 إضافة/تحديث ${wisdomData.length} حكمة فلسفية في قاعدة البيانات...\n`);
+  console.log(`\n📚 إضافة/تحديث ${wisdomData.length} حكمة بشرية في قاعدة البيانات...\n`);
   
   let added = 0;
   let updated = 0;

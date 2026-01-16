@@ -105,7 +105,7 @@ export default function TranslationManager() {
                 إدارة الترجمات
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                نظام الترجمة الجماعية للجمل الفلسفية
+                نظام الترجمة الجماعية لجُمل الحكمة البشرية
               </p>
             </div>
           </div>

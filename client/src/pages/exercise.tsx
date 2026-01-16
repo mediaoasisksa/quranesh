@@ -1351,7 +1351,7 @@ export default function Exercise() {
                       {t('type')}
                     </p>
                     <p className="text-foreground" data-testid="text-philosophical-type">
-                      Philosophical Sentence
+                      Human Wisdom Sentence
                     </p>
                   </div>
                   <div>

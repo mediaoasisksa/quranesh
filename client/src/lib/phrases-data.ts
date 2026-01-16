@@ -314,7 +314,7 @@ export const phrasesData: InsertPhrase[] = [
     arabicText: "وَمَا تُنفِقُوا مِنْ خَيْرٍ فَلِأَنفُسِكُمْ",
     englishTranslation: "Whatever good you spend is for yourselves",
     surahAyah: "البقرة:272",
-    lifeApplication: "فلسفة العطاء والاستثمار",
+    lifeApplication: "حكمة العطاء والاستثمار",
     category: "long",
     difficulty: 3
   },

@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
 
-// قوائم الكلمات المفتاحية للحماية الفلسفية
+// قوائم الكلمات المفتاحية للحماية السياقية
 // منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
 // هذه المواضيع تقنية بحتة ولا تستدعي استدلالاً دينياً
 const PRODUCT_TECH_KEYWORDS = [
@@ -1478,12 +1478,12 @@ export async function validateExerciseAnswer(
   console.log("Suggested Verse:", suggestedVerse);
   console.log("Question Context:", questionContext);
   
-  // === الحماية الفلسفية: منع آيات الخلق للمنتجات البشرية ===
+  // === الحماية السياقية: منع آيات الخلق للمنتجات البشرية ===
   const isProductQuestion = containsProductKeywords(questionContext);
   const userAnswerHasDivineCreation = containsDivineCreationPatterns(userAnswer);
   const suggestedHasDivineCreation = containsDivineCreationPatterns(suggestedVerse);
   
-  console.log("=== PHILOSOPHICAL GUARD ===");
+  console.log("=== CONTEXTUAL GUARD ===");
   console.log("Is Product Question:", isProductQuestion);
   console.log("User Answer Has Divine Creation:", userAnswerHasDivineCreation);
   console.log("Suggested Has Divine Creation:", suggestedHasDivineCreation);
