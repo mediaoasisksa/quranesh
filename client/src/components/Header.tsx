@@ -30,7 +30,7 @@ const Header = () => {
   const navigation = [
     { name: t('features'), href: "/features", external: false },
     { name: t('howItWorks'), href: "/how-it-works", external: false },
-    { name: t('quranMemorization'), href: "https://www.mojzy.com/", external: true },
+    { name: t('quranMemorization'), href: "https://mojzy.com/", external: true },
     { name: t('pricing'), href: "/pricing", external: false },
   ];
 
