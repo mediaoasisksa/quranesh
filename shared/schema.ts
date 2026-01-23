@@ -77,6 +77,7 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
+  phoneNumber: text("phone_number").default(""),
   passwordHash: text("password_hash").notNull(),
   memorizationLevel: text("memorization_level"), // beginner, intermediate, advanced, hafiz
   nativeLanguage: text("native_language"),
@@ -97,6 +98,7 @@ export const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required").transform(email => email.toLowerCase().trim()),
+  phoneNumber: z.string().min(1, "Phone number with country code is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   memorizationLevel: z.string().optional(),
   nativeLanguage: z.string().optional(),

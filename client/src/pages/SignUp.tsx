@@ -37,6 +37,7 @@ const SignUp = () => {
     firstName: "",
     lastName: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
     memorizationLevel: "",
@@ -73,6 +74,7 @@ const SignUp = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        phoneNumber: formData.phoneNumber,
         password: formData.password,
         memorizationLevel: formData.memorizationLevel,
         nativeLanguage: formData.nativeLanguage,
@@ -172,6 +174,21 @@ const SignUp = () => {
                   required
                   className="transition-all duration-200 focus:border-primary"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="+966 5XX XXX XXXX"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  required
+                  className="transition-all duration-200 focus:border-primary"
+                  dir="ltr"
+                />
+                <p className="text-xs text-muted-foreground">{t('phoneNumberHint')}</p>
               </div>
 
               <div className="space-y-2">
