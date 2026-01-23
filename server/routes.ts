@@ -1431,8 +1431,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
-  // Admin Analytics Endpoints
-  app.get("/api/admin/analytics/overview", requireAdminEarly, async (_req, res) => {
+  // Public Analytics Endpoints (available to all users)
+  app.get("/api/analytics/overview", async (_req, res) => {
     try {
       // Get total users count
       const allUsers = await db.select({ id: users.id }).from(users);
@@ -1477,7 +1477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/exercise-engagement", requireAdminEarly, async (_req, res) => {
+  app.get("/api/analytics/exercise-engagement", async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
       
@@ -1526,7 +1526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/user-activity", requireAdminEarly, async (_req, res) => {
+  app.get("/api/analytics/user-activity", async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
       const allUsersData = await db.select().from(users);
@@ -1579,7 +1579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/analytics/top-users", requireAdminEarly, async (_req, res) => {
+  app.get("/api/analytics/top-users", async (_req, res) => {
     try {
       const sessions = await db.select().from(exerciseSessions);
       

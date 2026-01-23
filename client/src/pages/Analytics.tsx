@@ -32,15 +32,15 @@ export default function Analytics() {
   const isArabic = language === 'ar';
 
   const { data: overview } = useQuery<OverviewStats>({
-    queryKey: ["/api/admin/analytics/overview"],
+    queryKey: ["/api/analytics/overview"],
   });
 
   const { data: exerciseEngagement } = useQuery<ExerciseEngagement[]>({
-    queryKey: ["/api/admin/analytics/exercise-engagement"],
+    queryKey: ["/api/analytics/exercise-engagement"],
   });
 
   const { data: sessionDuration } = useQuery<SessionDuration[]>({
-    queryKey: ["/api/admin/analytics/session-duration"],
+    queryKey: ["/api/analytics/session-duration"],
   });
 
   const getExerciseTypeLabel = (type: string) => {
