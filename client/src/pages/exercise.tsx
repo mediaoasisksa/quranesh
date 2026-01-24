@@ -414,6 +414,7 @@ export default function Exercise() {
           philosophicalSentenceId: exerciseType === "transformation" ? philosophicalSentence?.id : undefined,
           language: language,
           suggestedVerse: isConversationExercise ? conversationPrompt?.suggestedVerse : undefined,
+          conversationPromptId: isConversationExercise ? conversationPrompt?.id : undefined,
         }),
       });
 
