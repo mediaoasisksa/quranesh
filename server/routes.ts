@@ -1298,7 +1298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI-powered answer validation
   app.post("/api/validate-answer", async (req, res) => {
     try {
-      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId, language, suggestedVerse } = req.body;
+      const { userAnswer, exerciseType, phraseId, questionBankId, philosophicalSentenceId, language, suggestedVerse, conversationPromptId } = req.body;
 
       if (!userAnswer || !exerciseType) {
         return res.status(400).json({
@@ -1308,6 +1308,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get user's language preference (default to English if not provided)
       const userLanguage = language || "en";
+
+      // Handle Evidence-style exercises with direct phrase matching
+      if (exerciseType === "conversation" && conversationPromptId) {
+        const prompt = await storage.getConversationPrompt(conversationPromptId);
+        if (prompt && prompt.evidencePhrase) {
+          const { normalizeArabic, checkAnswerMatch, getEvidenceErrorMessage } = await import("@shared/arabic-normalizer");
+          
+          const matchResult = checkAnswerMatch(
+            userAnswer,
+            prompt.evidencePhrase,
+            (prompt.answerMode as 'EXACT_PHRASE' | 'CONTAINS_PHRASE') || 'CONTAINS_PHRASE',
+            prompt.acceptedVariants || undefined
+          );
+          
+          const errorMsg = getEvidenceErrorMessage(matchResult, prompt.hint || undefined);
+          
+          return res.json({
+            isCorrect: matchResult.isMatch,
+            score: matchResult.isMatch ? 100 : 0,
+            feedback: matchResult.isMatch 
+              ? errorMsg.description
+              : errorMsg.description,
+            matchType: matchResult.matchType,
+            suggestions: matchResult.isMatch ? [] : ['اكتب العبارة القرآنية المطلوبة كما وردت في الآية'],
+            confidence: matchResult.isMatch ? 100 : 0,
+          });
+        }
+      }
 
       let phraseData = null;
 

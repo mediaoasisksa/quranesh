@@ -166,6 +166,14 @@ export const conversationPrompts = pgTable("conversation_prompts", {
   symbolicMeaning: text("symbolic_meaning"), // Behavioral/symbolic interpretation
   isPracticalDailyUse: integer("is_practical_daily_use").default(1), // 1 = practical conversation, 0 = story/narrative context
   usageDomain: text("usage_domain"), // e.g., "greeting", "time", "request", "offer", "invitation"
+  // Evidence-style exercise fields
+  claim: text("claim"), // المعنى المطلوب إثباته
+  evidencePhrase: text("evidence_phrase"), // العبارة القرآنية المحددة كدليل
+  ayahText: text("ayah_text"), // نص الآية كاملة
+  sourceRef: text("source_ref"), // مرجع السورة:الآية
+  answerMode: text("answer_mode").default("CONTAINS_PHRASE"), // EXACT_PHRASE أو CONTAINS_PHRASE
+  acceptedVariants: text("accepted_variants").array(), // بدائل مقبولة للإجابة
+  hint: text("hint"), // تلميح للمستخدم
 });
 
 export const insertConversationPromptSchema = createInsertSchema(conversationPrompts).omit({
