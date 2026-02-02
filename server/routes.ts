@@ -851,6 +851,326 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get phrases filtered by Surah number
+  app.get("/api/phrases/by-surah/:surahNumber", async (req, res) => {
+    try {
+      const surahNumber = parseInt(req.params.surahNumber);
+      const { userId, exerciseType } = req.query;
+      
+      if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
+        return res.status(400).json({ message: "Invalid surah number. Must be between 1 and 114." });
+      }
+
+      let phrases = await storage.getAllPhrases();
+      
+      // Filter by surah number - check surahAyah field which contains reference like "البقرة:255"
+      const surahNames: Record<number, string[]> = {
+        1: ["الفاتحة", "Al-Fatiha"],
+        2: ["البقرة", "Al-Baqarah"],
+        3: ["آل عمران", "Ali 'Imran"],
+        4: ["النساء", "An-Nisa"],
+        5: ["المائدة", "Al-Ma'idah"],
+        6: ["الأنعام", "Al-An'am"],
+        7: ["الأعراف", "Al-A'raf"],
+        8: ["الأنفال", "Al-Anfal"],
+        9: ["التوبة", "At-Tawbah"],
+        10: ["يونس", "Yunus"],
+        11: ["هود", "Hud"],
+        12: ["يوسف", "Yusuf"],
+        13: ["الرعد", "Ar-Ra'd"],
+        14: ["إبراهيم", "Ibrahim"],
+        15: ["الحجر", "Al-Hijr"],
+        16: ["النحل", "An-Nahl"],
+        17: ["الإسراء", "Al-Isra"],
+        18: ["الكهف", "Al-Kahf"],
+        19: ["مريم", "Maryam"],
+        20: ["طه", "Ta-Ha"],
+        21: ["الأنبياء", "Al-Anbiya"],
+        22: ["الحج", "Al-Hajj"],
+        23: ["المؤمنون", "Al-Mu'minun"],
+        24: ["النور", "An-Nur"],
+        25: ["الفرقان", "Al-Furqan"],
+        26: ["الشعراء", "Ash-Shu'ara"],
+        27: ["النمل", "An-Naml"],
+        28: ["القصص", "Al-Qasas"],
+        29: ["العنكبوت", "Al-'Ankabut"],
+        30: ["الروم", "Ar-Rum"],
+        31: ["لقمان", "Luqman"],
+        32: ["السجدة", "As-Sajdah"],
+        33: ["الأحزاب", "Al-Ahzab"],
+        34: ["سبأ", "Saba"],
+        35: ["فاطر", "Fatir"],
+        36: ["يس", "Ya-Sin"],
+        37: ["الصافات", "As-Saffat"],
+        38: ["ص", "Sad"],
+        39: ["الزمر", "Az-Zumar"],
+        40: ["غافر", "Ghafir"],
+        41: ["فصلت", "Fussilat"],
+        42: ["الشورى", "Ash-Shura"],
+        43: ["الزخرف", "Az-Zukhruf"],
+        44: ["الدخان", "Ad-Dukhan"],
+        45: ["الجاثية", "Al-Jathiyah"],
+        46: ["الأحقاف", "Al-Ahqaf"],
+        47: ["محمد", "Muhammad"],
+        48: ["الفتح", "Al-Fath"],
+        49: ["الحجرات", "Al-Hujurat"],
+        50: ["ق", "Qaf"],
+        51: ["الذاريات", "Adh-Dhariyat"],
+        52: ["الطور", "At-Tur"],
+        53: ["النجم", "An-Najm"],
+        54: ["القمر", "Al-Qamar"],
+        55: ["الرحمن", "Ar-Rahman"],
+        56: ["الواقعة", "Al-Waqi'ah"],
+        57: ["الحديد", "Al-Hadid"],
+        58: ["المجادلة", "Al-Mujadilah"],
+        59: ["الحشر", "Al-Hashr"],
+        60: ["الممتحنة", "Al-Mumtahanah"],
+        61: ["الصف", "As-Saf"],
+        62: ["الجمعة", "Al-Jumu'ah"],
+        63: ["المنافقون", "Al-Munafiqun"],
+        64: ["التغابن", "At-Taghabun"],
+        65: ["الطلاق", "At-Talaq"],
+        66: ["التحريم", "At-Tahrim"],
+        67: ["الملك", "Al-Mulk"],
+        68: ["القلم", "Al-Qalam"],
+        69: ["الحاقة", "Al-Haqqah"],
+        70: ["المعارج", "Al-Ma'arij"],
+        71: ["نوح", "Nuh"],
+        72: ["الجن", "Al-Jinn"],
+        73: ["المزمل", "Al-Muzzammil"],
+        74: ["المدثر", "Al-Muddaththir"],
+        75: ["القيامة", "Al-Qiyamah"],
+        76: ["الإنسان", "Al-Insan"],
+        77: ["المرسلات", "Al-Mursalat"],
+        78: ["النبأ", "An-Naba"],
+        79: ["النازعات", "An-Nazi'at"],
+        80: ["عبس", "'Abasa"],
+        81: ["التكوير", "At-Takwir"],
+        82: ["الانفطار", "Al-Infitar"],
+        83: ["المطففين", "Al-Mutaffifin"],
+        84: ["الانشقاق", "Al-Inshiqaq"],
+        85: ["البروج", "Al-Buruj"],
+        86: ["الطارق", "At-Tariq"],
+        87: ["الأعلى", "Al-A'la"],
+        88: ["الغاشية", "Al-Ghashiyah"],
+        89: ["الفجر", "Al-Fajr"],
+        90: ["البلد", "Al-Balad"],
+        91: ["الشمس", "Ash-Shams"],
+        92: ["الليل", "Al-Layl"],
+        93: ["الضحى", "Ad-Duha"],
+        94: ["الشرح", "Ash-Sharh"],
+        95: ["التين", "At-Tin"],
+        96: ["العلق", "Al-'Alaq"],
+        97: ["القدر", "Al-Qadr"],
+        98: ["البينة", "Al-Bayyinah"],
+        99: ["الزلزلة", "Az-Zalzalah"],
+        100: ["العاديات", "Al-'Adiyat"],
+        101: ["القارعة", "Al-Qari'ah"],
+        102: ["التكاثر", "At-Takathur"],
+        103: ["العصر", "Al-'Asr"],
+        104: ["الهمزة", "Al-Humazah"],
+        105: ["الفيل", "Al-Fil"],
+        106: ["قريش", "Quraysh"],
+        107: ["الماعون", "Al-Ma'un"],
+        108: ["الكوثر", "Al-Kawthar"],
+        109: ["الكافرون", "Al-Kafirun"],
+        110: ["النصر", "An-Nasr"],
+        111: ["المسد", "Al-Masad"],
+        112: ["الإخلاص", "Al-Ikhlas"],
+        113: ["الفلق", "Al-Falaq"],
+        114: ["الناس", "An-Nas"],
+      };
+      
+      const surahNamesForNumber = surahNames[surahNumber] || [];
+      
+      phrases = phrases.filter((p) => {
+        if (!p.surahAyah) return false;
+        return surahNamesForNumber.some(name => 
+          p.surahAyah!.includes(name) || 
+          p.surahAyah!.toLowerCase().includes(name.toLowerCase())
+        );
+      });
+
+      // If userId provided, filter out completed exercises
+      if (userId && typeof userId === "string" && exerciseType && typeof exerciseType === "string") {
+        const completedSessions = await storage.getUserExerciseSessions(userId);
+        const completedPhraseIds = new Set(
+          completedSessions
+            .filter((session) => session.exerciseType === exerciseType)
+            .map((session) => session.phraseId)
+        );
+        phrases = phrases.filter((p) => !completedPhraseIds.has(p.id));
+      }
+
+      res.json({
+        surahNumber,
+        surahName: surahNamesForNumber[0] || "",
+        surahNameEnglish: surahNamesForNumber[1] || "",
+        phrases,
+        total: phrases.length
+      });
+    } catch (error) {
+      console.error("Error fetching phrases by surah:", error);
+      res.status(500).json({ message: "Failed to fetch phrases by surah" });
+    }
+  });
+
+  // Get available surahs that have phrases
+  app.get("/api/surahs/available", async (req, res) => {
+    try {
+      const phrases = await storage.getAllPhrases();
+      
+      const surahData: Record<number, { nameArabic: string; nameEnglish: string; count: number }> = {};
+      
+      const surahNames: Record<string, { number: number; english: string }> = {
+        "الفاتحة": { number: 1, english: "Al-Fatiha" },
+        "البقرة": { number: 2, english: "Al-Baqarah" },
+        "آل عمران": { number: 3, english: "Ali 'Imran" },
+        "النساء": { number: 4, english: "An-Nisa" },
+        "المائدة": { number: 5, english: "Al-Ma'idah" },
+        "الأنعام": { number: 6, english: "Al-An'am" },
+        "الأعراف": { number: 7, english: "Al-A'raf" },
+        "الأنفال": { number: 8, english: "Al-Anfal" },
+        "التوبة": { number: 9, english: "At-Tawbah" },
+        "يونس": { number: 10, english: "Yunus" },
+        "هود": { number: 11, english: "Hud" },
+        "يوسف": { number: 12, english: "Yusuf" },
+        "الرعد": { number: 13, english: "Ar-Ra'd" },
+        "إبراهيم": { number: 14, english: "Ibrahim" },
+        "الحجر": { number: 15, english: "Al-Hijr" },
+        "النحل": { number: 16, english: "An-Nahl" },
+        "الإسراء": { number: 17, english: "Al-Isra" },
+        "الكهف": { number: 18, english: "Al-Kahf" },
+        "مريم": { number: 19, english: "Maryam" },
+        "طه": { number: 20, english: "Ta-Ha" },
+        "الأنبياء": { number: 21, english: "Al-Anbiya" },
+        "الحج": { number: 22, english: "Al-Hajj" },
+        "المؤمنون": { number: 23, english: "Al-Mu'minun" },
+        "النور": { number: 24, english: "An-Nur" },
+        "الفرقان": { number: 25, english: "Al-Furqan" },
+        "الشعراء": { number: 26, english: "Ash-Shu'ara" },
+        "النمل": { number: 27, english: "An-Naml" },
+        "القصص": { number: 28, english: "Al-Qasas" },
+        "العنكبوت": { number: 29, english: "Al-'Ankabut" },
+        "الروم": { number: 30, english: "Ar-Rum" },
+        "لقمان": { number: 31, english: "Luqman" },
+        "السجدة": { number: 32, english: "As-Sajdah" },
+        "الأحزاب": { number: 33, english: "Al-Ahzab" },
+        "سبأ": { number: 34, english: "Saba" },
+        "فاطر": { number: 35, english: "Fatir" },
+        "يس": { number: 36, english: "Ya-Sin" },
+        "الصافات": { number: 37, english: "As-Saffat" },
+        "ص": { number: 38, english: "Sad" },
+        "الزمر": { number: 39, english: "Az-Zumar" },
+        "غافر": { number: 40, english: "Ghafir" },
+        "فصلت": { number: 41, english: "Fussilat" },
+        "الشورى": { number: 42, english: "Ash-Shura" },
+        "الزخرف": { number: 43, english: "Az-Zukhruf" },
+        "الدخان": { number: 44, english: "Ad-Dukhan" },
+        "الجاثية": { number: 45, english: "Al-Jathiyah" },
+        "الأحقاف": { number: 46, english: "Al-Ahqaf" },
+        "محمد": { number: 47, english: "Muhammad" },
+        "الفتح": { number: 48, english: "Al-Fath" },
+        "الحجرات": { number: 49, english: "Al-Hujurat" },
+        "ق": { number: 50, english: "Qaf" },
+        "الذاريات": { number: 51, english: "Adh-Dhariyat" },
+        "الطور": { number: 52, english: "At-Tur" },
+        "النجم": { number: 53, english: "An-Najm" },
+        "القمر": { number: 54, english: "Al-Qamar" },
+        "الرحمن": { number: 55, english: "Ar-Rahman" },
+        "الواقعة": { number: 56, english: "Al-Waqi'ah" },
+        "الحديد": { number: 57, english: "Al-Hadid" },
+        "المجادلة": { number: 58, english: "Al-Mujadilah" },
+        "الحشر": { number: 59, english: "Al-Hashr" },
+        "الممتحنة": { number: 60, english: "Al-Mumtahanah" },
+        "الصف": { number: 61, english: "As-Saf" },
+        "الجمعة": { number: 62, english: "Al-Jumu'ah" },
+        "المنافقون": { number: 63, english: "Al-Munafiqun" },
+        "التغابن": { number: 64, english: "At-Taghabun" },
+        "الطلاق": { number: 65, english: "At-Talaq" },
+        "التحريم": { number: 66, english: "At-Tahrim" },
+        "الملك": { number: 67, english: "Al-Mulk" },
+        "القلم": { number: 68, english: "Al-Qalam" },
+        "الحاقة": { number: 69, english: "Al-Haqqah" },
+        "المعارج": { number: 70, english: "Al-Ma'arij" },
+        "نوح": { number: 71, english: "Nuh" },
+        "الجن": { number: 72, english: "Al-Jinn" },
+        "المزمل": { number: 73, english: "Al-Muzzammil" },
+        "المدثر": { number: 74, english: "Al-Muddaththir" },
+        "القيامة": { number: 75, english: "Al-Qiyamah" },
+        "الإنسان": { number: 76, english: "Al-Insan" },
+        "المرسلات": { number: 77, english: "Al-Mursalat" },
+        "النبأ": { number: 78, english: "An-Naba" },
+        "النازعات": { number: 79, english: "An-Nazi'at" },
+        "عبس": { number: 80, english: "'Abasa" },
+        "التكوير": { number: 81, english: "At-Takwir" },
+        "الانفطار": { number: 82, english: "Al-Infitar" },
+        "المطففين": { number: 83, english: "Al-Mutaffifin" },
+        "الانشقاق": { number: 84, english: "Al-Inshiqaq" },
+        "البروج": { number: 85, english: "Al-Buruj" },
+        "الطارق": { number: 86, english: "At-Tariq" },
+        "الأعلى": { number: 87, english: "Al-A'la" },
+        "الغاشية": { number: 88, english: "Al-Ghashiyah" },
+        "الفجر": { number: 89, english: "Al-Fajr" },
+        "البلد": { number: 90, english: "Al-Balad" },
+        "الشمس": { number: 91, english: "Ash-Shams" },
+        "الليل": { number: 92, english: "Al-Layl" },
+        "الضحى": { number: 93, english: "Ad-Duha" },
+        "الشرح": { number: 94, english: "Ash-Sharh" },
+        "التين": { number: 95, english: "At-Tin" },
+        "العلق": { number: 96, english: "Al-'Alaq" },
+        "القدر": { number: 97, english: "Al-Qadr" },
+        "البينة": { number: 98, english: "Al-Bayyinah" },
+        "الزلزلة": { number: 99, english: "Az-Zalzalah" },
+        "العاديات": { number: 100, english: "Al-'Adiyat" },
+        "القارعة": { number: 101, english: "Al-Qari'ah" },
+        "التكاثر": { number: 102, english: "At-Takathur" },
+        "العصر": { number: 103, english: "Al-'Asr" },
+        "الهمزة": { number: 104, english: "Al-Humazah" },
+        "الفيل": { number: 105, english: "Al-Fil" },
+        "قريش": { number: 106, english: "Quraysh" },
+        "الماعون": { number: 107, english: "Al-Ma'un" },
+        "الكوثر": { number: 108, english: "Al-Kawthar" },
+        "الكافرون": { number: 109, english: "Al-Kafirun" },
+        "النصر": { number: 110, english: "An-Nasr" },
+        "المسد": { number: 111, english: "Al-Masad" },
+        "الإخلاص": { number: 112, english: "Al-Ikhlas" },
+        "الفلق": { number: 113, english: "Al-Falaq" },
+        "الناس": { number: 114, english: "An-Nas" },
+      };
+      
+      for (const phrase of phrases) {
+        if (!phrase.surahAyah) continue;
+        
+        for (const [arabicName, info] of Object.entries(surahNames)) {
+          if (phrase.surahAyah.includes(arabicName)) {
+            if (!surahData[info.number]) {
+              surahData[info.number] = {
+                nameArabic: arabicName,
+                nameEnglish: info.english,
+                count: 0
+              };
+            }
+            surahData[info.number].count++;
+            break;
+          }
+        }
+      }
+      
+      const availableSurahs = Object.entries(surahData)
+        .map(([num, data]) => ({
+          number: parseInt(num),
+          ...data
+        }))
+        .sort((a, b) => a.number - b.number);
+      
+      res.json(availableSurahs);
+    } catch (error) {
+      console.error("Error fetching available surahs:", error);
+      res.status(500).json({ message: "Failed to fetch available surahs" });
+    }
+  });
+
   // Question bank routes
   app.get("/api/question-banks", async (req, res) => {
     try {
