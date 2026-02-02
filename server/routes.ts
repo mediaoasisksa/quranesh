@@ -528,13 +528,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Conversation prompt routes
   app.get("/api/conversation-prompts/random", async (req, res) => {
     try {
-      const { userId, language } = req.query;
+      const { userId, language, surah } = req.query;
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({ message: "userId is required" });
       }
 
       const lang = typeof language === "string" ? language : "ar";
-      const prompt = await storage.getRandomConversationPrompt(userId, lang);
+      const surahNumber = surah ? parseInt(surah as string) : undefined;
+      const prompt = await storage.getRandomConversationPrompt(userId, lang, surahNumber);
       if (!prompt) {
         return res.status(404).json({ message: "No conversation prompts available" });
       }
@@ -557,12 +558,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Roleplay scenario routes
   app.get("/api/roleplay-scenarios/random", async (req, res) => {
     try {
-      const { userId } = req.query;
+      const { userId, surah } = req.query;
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({ message: "userId is required" });
       }
 
-      const scenario = await storage.getRandomRoleplayScenario(userId);
+      const surahNumber = surah ? parseInt(surah as string) : undefined;
+      const scenario = await storage.getRandomRoleplayScenario(userId, surahNumber);
       if (!scenario) {
         return res.status(404).json({ message: "No roleplay scenarios available" });
       }
@@ -585,12 +587,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Daily contextual exercise routes
   app.get("/api/daily-contextual/random", async (req, res) => {
     try {
-      const { userId } = req.query;
+      const { userId, surah } = req.query;
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({ message: "userId is required" });
       }
 
-      const exerciseData = await storage.getRandomDailyContextualExercise(userId);
+      const surahNumber = surah ? parseInt(surah as string) : undefined;
+      const exerciseData = await storage.getRandomDailyContextualExercise(userId, surahNumber);
       if (!exerciseData) {
         return res.status(404).json({ message: "No daily contextual exercises available" });
       }

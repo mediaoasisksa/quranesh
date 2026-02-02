@@ -102,10 +102,10 @@ export interface IStorage {
   getAllConversationPrompts(): Promise<ConversationPrompt[]>;
   getConversationPrompt(id: string): Promise<ConversationPrompt | undefined>;
   createConversationPrompt(prompt: InsertConversationPrompt): Promise<ConversationPrompt>;
-  getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined>;
+  getRandomConversationPrompt(userId: string, language?: string, surahNumber?: number): Promise<ConversationPrompt | undefined>;
 
   // Daily contextual exercise methods
-  getRandomDailyContextualExercise(userId: string): Promise<{
+  getRandomDailyContextualExercise(userId: string, surahNumber?: number): Promise<{
     exercise: DailySentenceExercise;
     sentence: DailySentence;
     correctExpression: QuranicExpression;
@@ -124,7 +124,7 @@ export interface IStorage {
   getAllRoleplayScenarios(): Promise<RoleplayScenario[]>;
   getRoleplayScenario(id: string): Promise<RoleplayScenario | undefined>;
   createRoleplayScenario(scenario: InsertRoleplayScenario): Promise<RoleplayScenario>;
-  getRandomRoleplayScenario(userId: string): Promise<RoleplayScenario | undefined>;
+  getRandomRoleplayScenario(userId: string, surahNumber?: number): Promise<RoleplayScenario | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -475,7 +475,7 @@ export class DatabaseStorage implements IStorage {
     return prompt;
   }
 
-  async getRandomConversationPrompt(userId: string, language: string = "ar"): Promise<ConversationPrompt | undefined> {
+  async getRandomConversationPrompt(userId: string, language: string = "ar", surahNumber?: number): Promise<ConversationPrompt | undefined> {
     // Get all conversation prompts that the user hasn't completed yet
     const completedPromptIds = await db
       .select({ phraseId: exerciseSessions.phraseId })
@@ -490,7 +490,7 @@ export class DatabaseStorage implements IStorage {
     const completedIds = completedPromptIds.map((session) => session.phraseId);
 
     // Get all prompts except completed ones, PRIORITIZING practical daily use prompts
-    const availablePrompts = completedIds.length > 0
+    let availablePrompts = completedIds.length > 0
       ? await db
           .select()
           .from(conversationPrompts)
@@ -498,6 +498,22 @@ export class DatabaseStorage implements IStorage {
       : await db.select().from(conversationPrompts);
 
     if (availablePrompts.length === 0) return undefined;
+
+    // Filter by surah if specified - extract surah number from suggestedVerse (format: "Surah Name, X:Y" or "سورة اسم، X:Y")
+    if (surahNumber) {
+      const surahFiltered = availablePrompts.filter(p => {
+        if (!p.suggestedVerse) return false;
+        // Try to extract surah reference from suggestedVerse (e.g., "البقرة: 255" or "2:255")
+        const match = p.suggestedVerse.match(/(\d+):\d+/);
+        if (match) {
+          return parseInt(match[1]) === surahNumber;
+        }
+        return false;
+      });
+      if (surahFiltered.length > 0) {
+        availablePrompts = surahFiltered;
+      }
+    }
 
     // Filter for practical daily use prompts first
     const practicalPrompts = availablePrompts.filter(p => p.isPracticalDailyUse === 1);
@@ -532,7 +548,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Daily contextual exercise methods
-  async getRandomDailyContextualExercise(userId: string): Promise<{
+  async getRandomDailyContextualExercise(userId: string, surahNumber?: number): Promise<{
     exercise: DailySentenceExercise;
     sentence: DailySentence;
     correctExpression: QuranicExpression;
@@ -565,6 +581,23 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (availableExercises.length === 0) return undefined;
+
+    // Filter by surah if specified (requires joining with quranic expressions to get surah number)
+    if (surahNumber) {
+      const filteredByExpressions: typeof availableExercises = [];
+      for (const exercise of availableExercises) {
+        const [expr] = await db
+          .select()
+          .from(quranicExpressions)
+          .where(eq(quranicExpressions.id, exercise.correctExpressionId));
+        if (expr?.surahNumber === surahNumber) {
+          filteredByExpressions.push(exercise);
+        }
+      }
+      if (filteredByExpressions.length > 0) {
+        availableExercises = filteredByExpressions;
+      }
+    }
 
     // Pick random exercise
     const exercise = availableExercises[Math.floor(Math.random() * availableExercises.length)];
@@ -666,7 +699,7 @@ export class DatabaseStorage implements IStorage {
     return scenario;
   }
 
-  async getRandomRoleplayScenario(userId: string): Promise<RoleplayScenario | undefined> {
+  async getRandomRoleplayScenario(userId: string, surahNumber?: number): Promise<RoleplayScenario | undefined> {
     // Get all completed roleplay scenario IDs for this user
     const completedScenarioIds = (
       await db
@@ -697,6 +730,22 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (availableScenarios.length === 0) return undefined;
+
+    // Filter by surah if specified - extract surah number from suggestedVerse
+    if (surahNumber) {
+      const surahFiltered = availableScenarios.filter(s => {
+        if (!s.suggestedVerse) return false;
+        // Try to extract surah reference from suggestedVerse (e.g., "البقرة: 255" or "2:255")
+        const match = s.suggestedVerse.match(/(\d+):\d+/);
+        if (match) {
+          return parseInt(match[1]) === surahNumber;
+        }
+        return false;
+      });
+      if (surahFiltered.length > 0) {
+        availableScenarios = surahFiltered;
+      }
+    }
 
     // Return random scenario
     return availableScenarios[
@@ -1000,7 +1049,7 @@ export class MemStorage implements IStorage {
     return prompt;
   }
 
-  async getRandomConversationPrompt(userId: string): Promise<ConversationPrompt | undefined> {
+  async getRandomConversationPrompt(userId: string, _language?: string, _surahNumber?: number): Promise<ConversationPrompt | undefined> {
     // Get all conversation prompts that the user hasn't completed yet
     const completedPromptIds = Array.from(this.exerciseSessions.values())
       .filter(
@@ -1019,7 +1068,7 @@ export class MemStorage implements IStorage {
   }
 
   // Daily contextual exercise methods (placeholder for MemStorage)
-  async getRandomDailyContextualExercise(_userId: string): Promise<{
+  async getRandomDailyContextualExercise(_userId: string, _surahNumber?: number): Promise<{
     exercise: DailySentenceExercise;
     sentence: DailySentence;
     correctExpression: QuranicExpression;
@@ -1067,7 +1116,7 @@ export class MemStorage implements IStorage {
     throw new Error("MemStorage doesn't support roleplay scenarios");
   }
 
-  async getRandomRoleplayScenario(_userId: string): Promise<RoleplayScenario | undefined> {
+  async getRandomRoleplayScenario(_userId: string, _surahNumber?: number): Promise<RoleplayScenario | undefined> {
     return undefined;
   }
 }

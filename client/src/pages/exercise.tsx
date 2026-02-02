@@ -173,10 +173,15 @@ export default function Exercise() {
     suggestedVerse: string;
     category: string | null;
     symbolicMeaning?: string | null;
+    surahNumber?: number | null;
   }>({
-    queryKey: ["/api/conversation-prompts/random", userId, language],
+    queryKey: ["/api/conversation-prompts/random", userId, language, selectedSurah],
     queryFn: async () => {
-      const response = await fetch(`/api/conversation-prompts/random?userId=${userId}&language=${language}`);
+      let url = `/api/conversation-prompts/random?userId=${userId}&language=${language}`;
+      if (selectedSurah) {
+        url += `&surah=${selectedSurah}`;
+      }
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch conversation prompt");
       return response.json();
     },
@@ -202,10 +207,15 @@ export default function Exercise() {
     verseExplanation?: string | null;
     verseExplanationEn?: string | null;
     verseExplanationTranslations?: Record<string, string> | null;
+    surahNumber?: number | null;
   }>({
-    queryKey: ["/api/roleplay-scenarios/random", userId],
+    queryKey: ["/api/roleplay-scenarios/random", userId, selectedSurah],
     queryFn: async () => {
-      const response = await fetch(`/api/roleplay-scenarios/random?userId=${userId}`);
+      let url = `/api/roleplay-scenarios/random?userId=${userId}`;
+      if (selectedSurah) {
+        url += `&surah=${selectedSurah}`;
+      }
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch roleplay scenario");
       return response.json();
     },
@@ -213,9 +223,13 @@ export default function Exercise() {
   });
 
   const { data: dailyContextualExercise, isLoading: dailyContextualLoading } = useQuery<any>({
-    queryKey: ["/api/daily-contextual/random", userId],
+    queryKey: ["/api/daily-contextual/random", userId, selectedSurah],
     queryFn: async () => {
-      const response = await fetch(`/api/daily-contextual/random?userId=${userId}`);
+      let url = `/api/daily-contextual/random?userId=${userId}`;
+      if (selectedSurah) {
+        url += `&surah=${selectedSurah}`;
+      }
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch daily contextual exercise");
       return response.json();
     },
