@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Check, X, RotateCcw, ArrowRight, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw, ArrowRight, AlertTriangle, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AudioButton from "@/components/audio-button";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,6 +22,14 @@ import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import { isQuranicText, getQuranicLabel, QuranicVerseType } from "@shared/quran-protection";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { surahList, type Surah } from "@/data/surah-list";
 
 function getLocalizedQuestion(
   conversationPrompt: any,
@@ -94,6 +102,15 @@ export default function Exercise() {
   const [showExplanation, setShowExplanation] = useState(false);
   // نظام الدرجات الجديد: exact_match (أخضر)، valid_but_less_suitable (أصفر)، incorrect (أحمر)
   const [feedbackGrade, setFeedbackGrade] = useState<'exact_match' | 'valid_but_less_suitable' | 'incorrect'>('incorrect');
+  
+  // Surah selection and navigation
+  const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
+  const [showSurahSelector, setShowSurahSelector] = useState(false);
+
+  // Fetch available surahs
+  const { data: availableSurahs = [] } = useQuery<{ number: number; nameArabic: string; nameEnglish: string; count: number }[]>({
+    queryKey: ["/api/surahs/available"],
+  });
 
   // Fetch data based on exercise type
   const isThematicExercise = exerciseType === "thematic";
@@ -549,6 +566,7 @@ export default function Exercise() {
 
       // Reset the exercise state
       resetExercise();
+      setSelectedOption(null);
 
       // Remove the appropriate cache entries based on current exercise type
       if (currentExerciseType === "transformation") {
@@ -582,6 +600,77 @@ export default function Exercise() {
       setLocation("/dashboard");
     }
   };
+
+  // Navigate to previous surah
+  const goToPreviousSurah = () => {
+    if (!selectedSurah || selectedSurah <= 1) return;
+    
+    const prevSurahNum = selectedSurah - 1;
+    const prevSurah = availableSurahs.find(s => s.number === prevSurahNum);
+    
+    if (prevSurah) {
+      setSelectedSurah(prevSurahNum);
+      resetExercise();
+      setSelectedOption(null);
+      toast({
+        title: language === 'ar' ? `سورة ${prevSurah.nameArabic}` : prevSurah.nameEnglish,
+        description: language === 'ar' ? `${prevSurah.count} تمرين متاح` : `${prevSurah.count} exercises available`,
+      });
+    } else {
+      // Find the closest available surah before this one
+      const closestPrev = availableSurahs
+        .filter(s => s.number < selectedSurah)
+        .sort((a, b) => b.number - a.number)[0];
+      
+      if (closestPrev) {
+        setSelectedSurah(closestPrev.number);
+        resetExercise();
+        setSelectedOption(null);
+        toast({
+          title: language === 'ar' ? `سورة ${closestPrev.nameArabic}` : closestPrev.nameEnglish,
+          description: language === 'ar' ? `${closestPrev.count} تمرين متاح` : `${closestPrev.count} exercises available`,
+        });
+      }
+    }
+  };
+
+  // Navigate to next surah
+  const goToNextSurah = () => {
+    if (!selectedSurah || selectedSurah >= 114) return;
+    
+    const nextSurahNum = selectedSurah + 1;
+    const nextSurah = availableSurahs.find(s => s.number === nextSurahNum);
+    
+    if (nextSurah) {
+      setSelectedSurah(nextSurahNum);
+      resetExercise();
+      setSelectedOption(null);
+      toast({
+        title: language === 'ar' ? `سورة ${nextSurah.nameArabic}` : nextSurah.nameEnglish,
+        description: language === 'ar' ? `${nextSurah.count} تمرين متاح` : `${nextSurah.count} exercises available`,
+      });
+    } else {
+      // Find the closest available surah after this one
+      const closestNext = availableSurahs
+        .filter(s => s.number > selectedSurah)
+        .sort((a, b) => a.number - b.number)[0];
+      
+      if (closestNext) {
+        setSelectedSurah(closestNext.number);
+        resetExercise();
+        setSelectedOption(null);
+        toast({
+          title: language === 'ar' ? `سورة ${closestNext.nameArabic}` : closestNext.nameEnglish,
+          description: language === 'ar' ? `${closestNext.count} تمرين متاح` : `${closestNext.count} exercises available`,
+        });
+      }
+    }
+  };
+
+  // Get current surah info
+  const currentSurahInfo = selectedSurah 
+    ? availableSurahs.find(s => s.number === selectedSurah) || surahList.find(s => s.number === selectedSurah)
+    : null;
 
   const renderExerciseContent = () => {
     if (isThematicExercise && questionBank) {
@@ -1162,6 +1251,91 @@ export default function Exercise() {
 
       {/* Exercise Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Surah Selector Bar */}
+        <div className="mb-6 bg-card rounded-lg border p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span className="font-medium text-foreground">
+                {language === 'ar' ? 'اختر السورة:' : 'Select Surah:'}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2 flex-1 max-w-md">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={goToPreviousSurah}
+                disabled={!selectedSurah || selectedSurah <= 1}
+                data-testid="button-prev-surah"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              
+              <Select
+                value={selectedSurah?.toString() || ""}
+                onValueChange={(value) => {
+                  const surahNum = parseInt(value);
+                  setSelectedSurah(surahNum);
+                  resetExercise();
+                  setSelectedOption(null);
+                  const surah = availableSurahs.find(s => s.number === surahNum);
+                  if (surah) {
+                    toast({
+                      title: language === 'ar' ? `سورة ${surah.nameArabic}` : surah.nameEnglish,
+                      description: language === 'ar' ? `${surah.count} تمرين متاح` : `${surah.count} exercises available`,
+                    });
+                  }
+                }}
+              >
+                <SelectTrigger className="flex-1" data-testid="select-surah">
+                  <SelectValue placeholder={language === 'ar' ? 'اختر سورة...' : 'Choose a Surah...'} />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {availableSurahs.length > 0 ? (
+                    availableSurahs.map((surah) => (
+                      <SelectItem key={surah.number} value={surah.number.toString()}>
+                        <span className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm">{surah.number}.</span>
+                          <span className="arabic-text">{surah.nameArabic}</span>
+                          <span className="text-muted-foreground text-sm">({surah.count})</span>
+                        </span>
+                      </SelectItem>
+                    ))
+                  ) : (
+                    surahList.map((surah) => (
+                      <SelectItem key={surah.number} value={surah.number.toString()}>
+                        <span className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm">{surah.number}.</span>
+                          <span className="arabic-text">{surah.nameArabic}</span>
+                        </span>
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={goToNextSurah}
+                disabled={!selectedSurah || selectedSurah >= 114}
+                data-testid="button-next-surah"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {selectedSurah && currentSurahInfo && (
+              <div className="text-sm text-muted-foreground">
+                {language === 'ar' 
+                  ? `سورة ${(currentSurahInfo as any).nameArabic || ''}`
+                  : (currentSurahInfo as any).nameEnglish || (currentSurahInfo as Surah).nameEnglish}
+              </div>
+            )}
+          </div>
+        </div>
+
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
