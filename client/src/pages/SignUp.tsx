@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
+import { countryCodes } from "@/data/country-codes";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +38,7 @@ const SignUp = () => {
     firstName: "",
     lastName: "",
     email: "",
+    countryCode: "+966:SA",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
@@ -70,10 +72,13 @@ const SignUp = () => {
     }
 
     try {
+      // Extract dial code from format "+XXX:CC"
+      const dialCode = formData.countryCode.split(':')[0];
       const signupData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        countryCode: dialCode,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
         memorizationLevel: formData.memorizationLevel,
@@ -178,16 +183,36 @@ const SignUp = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  placeholder="+966 5XX XXX XXXX"
-                  value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                  required
-                  className="transition-all duration-200 focus:border-primary"
-                  dir="ltr"
-                />
+                <div className="flex gap-2" dir="ltr">
+                  <Select
+                    value={formData.countryCode}
+                    onValueChange={(value) => handleInputChange("countryCode", value)}
+                  >
+                    <SelectTrigger className="w-[140px] transition-all duration-200 focus:border-primary">
+                      <SelectValue placeholder="+966" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {countryCodes.map((country) => (
+                        <SelectItem key={country.code} value={`${country.dialCode}:${country.code}`}>
+                          <span className="flex items-center gap-2">
+                            <span>{country.flag}</span>
+                            <span>{country.dialCode}</span>
+                            <span className="text-muted-foreground text-xs">{country.name}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="5XX XXX XXXX"
+                    value={formData.phoneNumber}
+                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                    required
+                    className="flex-1 transition-all duration-200 focus:border-primary"
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground">{t('phoneNumberHint')}</p>
               </div>
 

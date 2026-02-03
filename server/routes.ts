@@ -169,6 +169,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
         email: validatedData.email,
+        countryCode: validatedData.countryCode,
+        phoneNumber: validatedData.phoneNumber,
         passwordHash,
         memorizationLevel: validatedData.memorizationLevel,
         nativeLanguage: validatedData.nativeLanguage,
