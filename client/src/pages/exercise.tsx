@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Check, X, RotateCcw, ArrowRight, AlertTriangle, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw, ArrowRight, AlertTriangle, ChevronLeft, ChevronRight, BookOpen, Lightbulb, BookOpenCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AudioButton from "@/components/audio-button";
 import { apiRequest } from "@/lib/queryClient";
@@ -103,6 +103,11 @@ export default function Exercise() {
   // نظام الدرجات الجديد: exact_match (أخضر)، valid_but_less_suitable (أصفر)، incorrect (أحمر)
   const [feedbackGrade, setFeedbackGrade] = useState<'exact_match' | 'valid_but_less_suitable' | 'incorrect'>('incorrect');
   
+  // Meaning-Based Learning states
+  const [showHint, setShowHint] = useState(false);
+  const [meaningBreakdown, setMeaningBreakdown] = useState<{ words: Array<{ arabic: string; transliteration: string; meaning: string }>; overallMeaning: string } | null>(null);
+  const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
+
   // Surah selection and navigation
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [showSurahSelector, setShowSurahSelector] = useState(false);
@@ -487,6 +492,31 @@ export default function Exercise() {
         setConnectionExplanation(null);
       }
 
+      // Fetch meaning breakdown for conversation/roleplay when answer is correct
+      if (result.isCorrect && (isConversationExercise || isRoleplayExercise)) {
+        const verseText = isConversationExercise
+          ? conversationPrompt?.suggestedVerse
+          : roleplayScenario?.suggestedVerse;
+        if (verseText) {
+          setIsLoadingBreakdown(true);
+          try {
+            const breakdownRes = await fetch("/api/meaning-breakdown", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ arabicPhrase: verseText, language }),
+            });
+            if (breakdownRes.ok) {
+              const breakdown = await breakdownRes.json();
+              setMeaningBreakdown(breakdown);
+            }
+          } catch (e) {
+            console.error("Breakdown fetch error:", e);
+          } finally {
+            setIsLoadingBreakdown(false);
+          }
+        }
+      }
+
       // Show appropriate toast based on result
       if (result.isCorrect) {
         toast({
@@ -568,6 +598,9 @@ export default function Exercise() {
     setShowSuggested(false);
     setShowRoleplayVerse(false);
     setConnectionExplanation(null);
+    setShowHint(false);
+    setMeaningBreakdown(null);
+    setIsLoadingBreakdown(false);
   };
 
   const goToNextExercise = async () => {
@@ -777,32 +810,85 @@ export default function Exercise() {
 
       case "conversation":
         return (
-          <div className="space-y-4">
-            <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-foreground font-medium mb-2">
-                {t('conversationPromptLabel') || "في هذا الموقف:"}
-              </p>
-              <p
-                className={language === 'ar' ? "arabic-text text-xl text-foreground mb-3" : "text-xl text-foreground mb-3"}
-                lang={language}
-                data-testid="text-conversation-prompt"
-              >
-                {getLocalizedQuestion(conversationPrompt, language)}
-              </p>
+          <div className="space-y-5">
+            {/* Step 1: Context/Scenario */}
+            <div className="bg-muted/50 rounded-lg p-5">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl mt-1">💬</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">
+                    {language === 'ar' ? 'السيناريو:' : 'Scenario:'}
+                  </p>
+                  <p
+                    className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'arabic-text' : ''}`}
+                    lang={language}
+                    data-testid="text-conversation-prompt"
+                  >
+                    {getLocalizedQuestion(conversationPrompt, language)}
+                  </p>
+                </div>
+              </div>
             </div>
-            {conversationPrompt?.suggestedVerse && !showSuggested && !isAnswered && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full border-primary/50 text-primary hover:bg-primary/10"
-                onClick={() => setShowSuggested(true)}
-                data-testid="button-show-solution"
-              >
-                {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
-              </Button>
+
+            {/* Step 2: Target Meaning - show CONCEPT not Arabic text */}
+            {conversationPrompt?.symbolicMeaning && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-amber-300 dark:border-amber-700">
+                <p className="text-sm font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
+                  <BookOpenCheck className="h-4 w-4" />
+                  {language === 'ar' ? 'المعنى المطلوب:' : 'Target Meaning:'}
+                </p>
+                <p className={`text-base text-amber-900 dark:text-amber-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
+                  {language === 'ar' 
+                    ? `كيف تعبّر عن مفهوم "${conversationPrompt.symbolicMeaning}" باستخدام عبارة قرآنية؟`
+                    : `How would you express the concept of "${conversationPrompt.symbolicMeaning}" using a Quranic phrase?`}
+                </p>
+              </div>
             )}
+
+            {/* Step 3: Hint Button */}
+            {conversationPrompt?.suggestedVerse && !isAnswered && (
+              <div className="flex gap-2">
+                {!showHint && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                    onClick={() => setShowHint(true)}
+                    data-testid="button-hint"
+                  >
+                    <Lightbulb className="h-4 w-4 mr-2" />
+                    {language === 'ar' ? 'تلميح' : 'Hint'}
+                  </Button>
+                )}
+                {!showSuggested && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/50 text-primary hover:bg-primary/10"
+                    onClick={() => setShowSuggested(true)}
+                    data-testid="button-show-solution"
+                  >
+                    {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Hint Card - shows first word or translation */}
+            {showHint && conversationPrompt?.suggestedVerse && !showSuggested && !isAnswered && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
+                  💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
+                </p>
+                <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
+                  {conversationPrompt.suggestedVerse.split(' ').slice(0, 2).join(' ')} ...
+                </p>
+              </div>
+            )}
+
+            {/* Full Solution (shown when requested or after answering) */}
             {conversationPrompt?.suggestedVerse && (showSuggested || isAnswered) && (
-              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30">
+              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-primary mb-2">
                   {t('suggestedVerse') || "آية مقترحة:"}
                 </p>
@@ -815,17 +901,55 @@ export default function Exercise() {
                 </p>
               </div>
             )}
-            <p className="text-foreground">
-              {t('conversationInstruction') || "اكتب كلمة أو مفردة أو جملة استخدمها القرآن:"}
-            </p>
-            <Textarea
-              className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder={t('conversationPlaceholder')}
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              disabled={isAnswered}
-              data-testid="textarea-conversation-answer"
-            />
+
+            {/* Step 4: Arabic Input */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">
+                {language === 'ar' ? 'إجابتك بالعربية:' : 'Your answer in Arabic:'}
+              </p>
+              <Textarea
+                className="arabic-text text-right text-lg min-h-[100px]"
+                placeholder={t('conversationPlaceholder')}
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                disabled={isAnswered}
+                data-testid="textarea-conversation-answer"
+              />
+            </div>
+
+            {/* Step 5: Meaning Breakdown Card (shown after correct answer) */}
+            {isAnswered && isCorrect && meaningBreakdown && meaningBreakdown.words.length > 0 && (
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-5 border-2 border-emerald-300 dark:border-emerald-700 animate-in fade-in duration-500" data-testid="card-meaning-breakdown">
+                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200 mb-3 flex items-center gap-2">
+                  <BookOpenCheck className="h-4 w-4" />
+                  {language === 'ar' ? 'تحليل المفردات:' : 'Vocabulary Breakdown:'}
+                </p>
+                <div className="space-y-2 mb-4">
+                  {meaningBreakdown.words.map((word, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-white/60 dark:bg-black/20 rounded-md p-2">
+                      <span className="arabic-text text-lg font-semibold text-emerald-800 dark:text-emerald-200 min-w-[60px] text-center" dir="rtl" lang="ar">{word.arabic}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{word.transliteration}</span>
+                      <span className="text-sm text-foreground flex-1">{word.meaning}</span>
+                    </div>
+                  ))}
+                </div>
+                {meaningBreakdown.overallMeaning && (
+                  <div className="pt-3 border-t border-emerald-200 dark:border-emerald-700">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                      <span className="font-semibold">{language === 'ar' ? 'المعنى الكامل: ' : 'Full meaning: '}</span>
+                      {meaningBreakdown.overallMeaning}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            {isAnswered && isCorrect && isLoadingBreakdown && (
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 animate-pulse">
+                <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                  {language === 'ar' ? 'جارٍ تحليل المفردات...' : 'Analyzing vocabulary...'}
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -925,21 +1049,22 @@ export default function Exercise() {
         const getVerseExplanation = () => {
           if (language === 'ar') return roleplayScenario?.verseExplanation;
           if (language === 'en') return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
-          // Check translations JSONB field for other languages
           const translations = roleplayScenario?.verseExplanationTranslations as Record<string, string> | null;
           if (translations && translations[language]) return translations[language];
-          // Fallback to English, then Arabic
           return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
         };
         return (
-          <div className="space-y-4">
-            <div className="bg-muted/50 rounded-lg p-4">
-              <div className="flex items-start space-x-3 rtl:space-x-reverse">
-                <span className="text-2xl">👥</span>
+          <div className="space-y-5">
+            {/* Step 1: Context/Scenario */}
+            <div className="bg-muted/50 rounded-lg p-5">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl mt-1">👥</span>
                 <div className="flex-1">
-                  <p className="text-foreground font-medium mb-2">{t('scenario')}:</p>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">
+                    {language === 'ar' ? 'السيناريو:' : 'Scenario:'}
+                  </p>
                   <p
-                    className={`text-foreground ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     data-testid="text-roleplay-scenario"
                   >
                     {roleplayScenario ? getLocalizedScenario(roleplayScenario, language) : t('roleplayScenarioText')}
@@ -947,48 +1072,120 @@ export default function Exercise() {
                 </div>
               </div>
             </div>
-            
-            {roleplayScenario?.suggestedVerse && !showRoleplayVerse && !isAnswered && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowRoleplayVerse(true)}
-                className="text-primary border-primary hover:bg-primary/10"
-              >
-                💡 {t('revealVerse') || 'Reveal Verse'}
-              </Button>
-            )}
-            
-            {roleplayScenario?.suggestedVerse && (showRoleplayVerse || isAnswered) && (
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-                <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
-                  {t('suggestedVerse') || "Suggested verse:"}
+
+            {/* Step 2: Target Meaning prompt */}
+            {getVerseExplanation() && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-amber-300 dark:border-amber-700">
+                <p className="text-sm font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
+                  <BookOpenCheck className="h-4 w-4" />
+                  {language === 'ar' ? 'المعنى المطلوب:' : 'Target Meaning:'}
                 </p>
-                <p className="arabic-text text-lg text-green-800 dark:text-green-200 mb-3" dir="rtl" lang="ar">
+                <p className={`text-base text-amber-900 dark:text-amber-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
+                  {getVerseExplanation()}
+                </p>
+              </div>
+            )}
+
+            {/* Step 3: Hint & Reveal Buttons */}
+            {roleplayScenario?.suggestedVerse && !isAnswered && (
+              <div className="flex gap-2">
+                {!showHint && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                    onClick={() => setShowHint(true)}
+                    data-testid="button-hint"
+                  >
+                    <Lightbulb className="h-4 w-4 mr-2" />
+                    {language === 'ar' ? 'تلميح' : 'Hint'}
+                  </Button>
+                )}
+                {!showRoleplayVerse && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/50 text-primary hover:bg-primary/10"
+                    onClick={() => setShowRoleplayVerse(true)}
+                  >
+                    {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Hint Card - shows first word */}
+            {showHint && roleplayScenario?.suggestedVerse && !showRoleplayVerse && !isAnswered && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
+                  💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
+                </p>
+                <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
+                  {roleplayScenario.suggestedVerse.split(' ').slice(0, 2).join(' ')} ...
+                </p>
+              </div>
+            )}
+
+            {/* Full Solution */}
+            {roleplayScenario?.suggestedVerse && (showRoleplayVerse || isAnswered) && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800 animate-in fade-in duration-300">
+                <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
+                  {t('suggestedVerse') || "آية مقترحة:"}
+                </p>
+                <p className="arabic-text text-lg text-green-800 dark:text-green-200" dir="rtl" lang="ar">
                   {roleplayScenario.suggestedVerse}
                 </p>
-                {getVerseExplanation() && (
-                  <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
-                    <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">
-                      {t('whyThisVerse') || "Why this verse?"}
-                    </p>
-                    <p className={`text-sm text-green-700 dark:text-green-300 ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={dir}>
-                      {getVerseExplanation()}
+              </div>
+            )}
+            
+            {/* Step 4: Arabic Input */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">
+                {language === 'ar' ? 'إجابتك بالعربية:' : 'Your answer in Arabic:'}
+              </p>
+              <Textarea
+                className="arabic-text text-right text-lg min-h-[100px]"
+                placeholder={t('roleplayPlaceholder')}
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                disabled={isAnswered}
+                data-testid="textarea-roleplay-answer"
+              />
+            </div>
+
+            {/* Step 5: Meaning Breakdown Card (shown after correct answer) */}
+            {isAnswered && isCorrect && meaningBreakdown && meaningBreakdown.words.length > 0 && (
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-5 border-2 border-emerald-300 dark:border-emerald-700 animate-in fade-in duration-500" data-testid="card-meaning-breakdown">
+                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200 mb-3 flex items-center gap-2">
+                  <BookOpenCheck className="h-4 w-4" />
+                  {language === 'ar' ? 'تحليل المفردات:' : 'Vocabulary Breakdown:'}
+                </p>
+                <div className="space-y-2 mb-4">
+                  {meaningBreakdown.words.map((word, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-white/60 dark:bg-black/20 rounded-md p-2">
+                      <span className="arabic-text text-lg font-semibold text-emerald-800 dark:text-emerald-200 min-w-[60px] text-center" dir="rtl" lang="ar">{word.arabic}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{word.transliteration}</span>
+                      <span className="text-sm text-foreground flex-1">{word.meaning}</span>
+                    </div>
+                  ))}
+                </div>
+                {meaningBreakdown.overallMeaning && (
+                  <div className="pt-3 border-t border-emerald-200 dark:border-emerald-700">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                      <span className="font-semibold">{language === 'ar' ? 'المعنى الكامل: ' : 'Full meaning: '}</span>
+                      {meaningBreakdown.overallMeaning}
                     </p>
                   </div>
                 )}
               </div>
             )}
-            
-            <p className="text-foreground">{t('yourResponseInArabic')}:</p>
-            <Textarea
-              className="arabic-text text-right text-lg min-h-[100px]"
-              placeholder={t('roleplayPlaceholder')}
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              disabled={isAnswered}
-              data-testid="textarea-roleplay-answer"
-            />
+            {isAnswered && isCorrect && isLoadingBreakdown && (
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 animate-pulse">
+                <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                  {language === 'ar' ? 'جارٍ تحليل المفردات...' : 'Analyzing vocabulary...'}
+                </p>
+              </div>
+            )}
           </div>
         );
 

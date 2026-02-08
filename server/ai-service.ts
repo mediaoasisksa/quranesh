@@ -1862,6 +1862,56 @@ Explanation:`;
 }
 
 // Generate linguistic note for daily contextual exercise
+export async function generateMeaningBreakdown(
+  arabicPhrase: string,
+  userLanguage: string = "en",
+): Promise<{ words: Array<{ arabic: string; transliteration: string; meaning: string }>; overallMeaning: string }> {
+  try {
+    const languageName = languageNames[userLanguage] || "English";
+
+    const prompt = `Analyze this Quranic Arabic phrase and provide a vocabulary breakdown in ${languageName}.
+
+Arabic Phrase: "${arabicPhrase}"
+
+Return ONLY valid JSON (no markdown, no code blocks) in this exact format:
+{
+  "words": [
+    { "arabic": "word1", "transliteration": "word1 transliterated", "meaning": "meaning in ${languageName}" },
+    { "arabic": "word2", "transliteration": "word2 transliterated", "meaning": "meaning in ${languageName}" }
+  ],
+  "overallMeaning": "Complete meaning of the phrase in ${languageName} (1-2 sentences)"
+}
+
+Rules:
+- Break down each meaningful word (skip common particles like و unless significant)
+- Include root meanings where helpful
+- Keep meanings concise but clear
+- Transliteration should be simple Latin characters`;
+
+    const response = await translateWithRetry(prompt, 3, 1000);
+
+    const candidate = response.data.candidates[0];
+    if (!candidate.content?.parts?.[0]?.text) {
+      throw new Error("No valid breakdown from AI");
+    }
+
+    const text = candidate.content.parts[0].text.trim();
+    const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleanedText);
+
+    return {
+      words: parsed.words || [],
+      overallMeaning: parsed.overallMeaning || "",
+    };
+  } catch (error) {
+    console.error("Error generating meaning breakdown:", error);
+    return {
+      words: [],
+      overallMeaning: arabicPhrase,
+    };
+  }
+}
+
 export async function generateLinguisticNote(
   expression: string,
   surahAyah: string,

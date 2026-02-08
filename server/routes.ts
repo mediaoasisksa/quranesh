@@ -1620,6 +1620,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Meaning breakdown for vocabulary learning
+  app.post("/api/meaning-breakdown", async (req, res) => {
+    try {
+      const { arabicPhrase, language } = req.body;
+      if (!arabicPhrase) {
+        return res.status(400).json({ error: "Missing arabicPhrase" });
+      }
+      const { generateMeaningBreakdown } = await import("./ai-service");
+      const breakdown = await generateMeaningBreakdown(arabicPhrase, language || "en");
+      res.json(breakdown);
+    } catch (error: any) {
+      console.error("Meaning breakdown error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // AI-powered answer validation
   app.post("/api/validate-answer", async (req, res) => {
     try {
