@@ -7,10 +7,17 @@ if (!GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is required");
 }
 
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 async function generateRealLifeExample(exampleNumber: number): Promise<any> {
-  const prompt = `Generate a practical real-life example of someone using a Quranic verse or phrase in everyday conversation.
+  const prompt = `You are an Applied Arabic Linguistics Teacher training non-native speakers to quote Quranic phrases in daily conversations.
+
+THE TRIGGER-RESPONSE RULE:
+Every example follows: TRIGGER (daily situation) → RESPONSE (short Quranic phrase a native speaker would naturally quote).
+The situation MUST contain keyword-synonyms that directly map to the verse's keywords.
+If a native Arabic speaker wouldn't naturally quote this verse in this situation, DO NOT use it.
+
+Generate a practical real-life example of someone using a Quranic verse or phrase in everyday conversation.
 
 Example format:
 - Situation (Arabic): أم يطلب منها أبناؤها أن تطبخ لهم
@@ -23,11 +30,12 @@ Example format:
 - Category: family
 
 Requirements:
-1. Must be contextually appropriate and practical
-2. Verse should fit the situation naturally
+1. The situation must contain KEYWORDS that map to the verse (Trigger-Response keyword mapping)
+2. A native Arabic speaker would naturally quote this verse in this situation
 3. Common everyday situations (family, work, friends, daily life)
-4. Verse should be short (2-10 words)
-5. Return ONLY a valid JSON object with these keys:
+4. Verse should be short (2-8 words) and actually quoted in daily speech
+5. The connection must be LINGUISTIC and IMMEDIATE — not abstract or theological
+6. Return ONLY a valid JSON object with these keys:
    situationAr, situationEn, verseArabic, verseTranslation, surahReference, usageNoteAr, usageNoteEn, category
 
 Generate example #${exampleNumber}:`;

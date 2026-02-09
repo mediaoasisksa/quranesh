@@ -55,7 +55,7 @@ async function getRandomAyahs(count: number): Promise<Array<{ surah: string; aya
 }
 
 async function generateElements(ayahs: Array<{ surah: string; ayah: number; text: string }>, usedPhrases: string[], targetCount: number): Promise<QuranicElement[]> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   
   const usedPhrasesText = usedPhrases.length > 0 
     ? `العبارات التالية تم استخدامها سابقاً ويجب تجنبها:\n${usedPhrases.slice(-500).join('\n')}\n\n`

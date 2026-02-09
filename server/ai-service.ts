@@ -579,36 +579,27 @@ function createValidationPrompt(
       - Example: If given "والله غفور رحيم" and asked to replace "رحيم", a good answer would be "والله غفور عزيز"`;
       break;
     case "conversation":
-      specificInstructions = `This is a CONVERSATION exercise. The student must provide PRACTICAL Quranic expressions or authentic Islamic phrases that are SUITABLE FOR DAILY CONVERSATION.
+      specificInstructions = `This is a CONVERSATION exercise using the TRIGGER-RESPONSE framework.
+The scenario (TRIGGER) describes a real-life situation. The student must provide the natural Quranic phrase (RESPONSE) that a native Arabic speaker would quote in that situation.
 
-CRITICAL REQUIREMENTS:
-1. **PRACTICAL DAILY USE**: The answer MUST be a Quranic expression or Islamic phrase that can be used naturally in daily conversation
-2. **CONTEXT APPROPRIATENESS**: The expression must FIT the conversational context, not just reference it
-3. **AUTHENTIC ISLAMIC TEXT**: Must be from Quran, Hadith, or widely-used Islamic expressions
-4. **CONCISE & PRACTICAL**: While no strict word limit, prefer expressions that are practical and memorable (ideally under ~20 words)
-5. **NO STORY REFERENCES**: Reject answers that reference Quranic stories or narrative contexts
+EVALUATION — THE TRIGGER-RESPONSE TEST:
+1. Does the student's answer contain KEYWORDS that map to the scenario's meaning?
+   - The scenario says "doing good deeds" → answer should contain "المحسنين" or similar
+   - The scenario says "hardship" → answer should contain "العسر" or similar
+2. Would a native Arabic speaker naturally quote this phrase in this situation?
+3. Is this an authentic Quranic verse or widely-used Islamic expression?
+4. Is it short and practical for daily conversation (2-8 words preferred)?
 
-EXAMPLES OF WHAT TO REJECT:
-❌ "الساعة آتية" - This refers to the Day of Judgment, NOT suitable for asking about an appointment time
-❌ "ذٰلِكَ مَا كُنَّا نَبْغِ" - This is from the story of Moses and Khidr, NOT for making appointments
-❌ "وَأَلْفَيَا سَيِّدَهَا لَدَى ٱلْبَابِ" - This is from the story of Yusuf, NOT for asking someone to open the door
+ACCEPT if the answer's KEYWORDS semantically match the scenario's keywords, even if it's not the exact expected verse.
+REJECT if:
+❌ The answer is from a Quranic story/narrative that isn't quoted in daily speech
+❌ The answer requires deep theological interpretation to see the connection
+❌ The answer's keywords have NO direct mapping to the scenario
 
-EXAMPLES OF WHAT TO ACCEPT:
-✅ "إن شاء الله" - Practical, short, used daily for future events
-✅ "جزاك الله خيراً" - Practical, commonly used for thanks
-✅ "بارك الله فيك" - Practical, used daily for blessings
-✅ "على بركة الله" - Practical, used when starting something
-✅ "رضينا بالله ربا والإسلام دينا ومحمدا رسولا" - Authentic hadith, expresses contentment/satisfaction
-✅ "لا حول ولا قوة إلا بالله" - Commonly used in difficult situations
-✅ "حسبنا الله ونعم الوكيل" - Used to express trust in Allah
-
-EVALUATION CRITERIA:
-- Is this an authentic Quranic verse, hadith, or widely-used Islamic expression? (YES/NO)
-- Can it be used naturally in daily conversation? (YES/NO)
-- Does it FIT the conversational context? (YES/NO)
-- Is it free from story/narrative references? (YES/NO)
-
-If ANY criterion is NO, mark the answer as INCORRECT and suggest a practical alternative.`;
+EXAMPLES:
+✅ Scenario about "gratitude for blessings" → "الحمد لله" (keyword: حمد = gratitude)
+✅ Scenario about "trusting Allah in difficulty" → "حسبنا الله ونعم الوكيل" (keyword: حسب = sufficient)
+❌ Scenario about "making an appointment" → "الساعة آتية" (this is about Day of Judgment, NOT appointments)`;
       break;
     case "completion":
       specificInstructions = `This is a COMPLETION exercise. The student must complete a Quranic verse or phrase.
@@ -623,13 +614,22 @@ If ANY criterion is NO, mark the answer as INCORRECT and suggest a practical alt
       - Should use appropriate Islamic terminology`;
       break;
     case "roleplay":
-      specificInstructions = `This is a ROLEPLAY exercise. The student must apply Quranic wisdom to real situations.
-      - The answer should be a genuine Quranic verse or authentic Islamic text
-      - Should be contextually appropriate for the given scenario (consoling a hopeless friend)
-      - Should offer hope, comfort, or encouragement as required by the scenario
-      - Should demonstrate practical application of Islamic knowledge
-      - Must be in Arabic and contain Quranic language patterns
-      - Should be relevant to providing comfort and hope to someone in distress`;
+      specificInstructions = `This is a ROLEPLAY exercise using the TRIGGER-RESPONSE framework.
+The scenario places the student in a real-life situation (TRIGGER). They must respond with the Quranic phrase (RESPONSE) that a native Arabic speaker would naturally quote in that exact moment.
+
+EVALUATION — THE TRIGGER-RESPONSE TEST:
+1. Does the student's answer contain KEYWORDS that map to the scenario's core meaning?
+   - Scenario about "someone regretting sins" → answer should relate to "mercy/forgiveness" (رحمة/مغفرة)
+   - Scenario about "intense love for Allah" → answer should contain "أشد حبا" or similar
+2. Would a native Arabic speaker naturally quote this in the described situation?
+3. Is it authentic Quranic text?
+4. Is the connection LINGUISTIC and IMMEDIATE (not abstract or requiring deep interpretation)?
+
+ACCEPT if keywords map directly and a native speaker would naturally say it.
+REJECT if:
+❌ The connection is abstract/philosophical rather than linguistic
+❌ The verse is from a specific Quranic narrative not quoted in daily speech
+❌ No keyword mapping exists between scenario and answer`;
       break;
     case "transformation":
       specificInstructions = `This is a CONCEPT-BASED PHILOSOPHICAL MATCH exercise. 
@@ -1623,24 +1623,34 @@ export async function generateNewQuranicPhrase(
     console.log("Category:", category);
     console.log("Difficulty:", difficulty);
 
-    const prompt = `You are an expert in Quranic Arabic. Generate a NEW Quranic phrase or verse that would be suitable for an Arabic learning exercise.
+    const prompt = `You are an Applied Arabic Linguistics Teacher. Generate a Quranic phrase that can be used as a natural response in daily Arabic conversations.
 
 Exercise Type: ${exerciseType}
 Category: ${category} (short, long, commands, or proverbs)
 Difficulty: ${difficulty} (1-5 scale)
 
-Please provide a REAL Quranic verse or phrase (not made up) with the following information:
+THE TRIGGER-RESPONSE RULE:
+Pick a REAL Quranic verse or phrase that native Arabic speakers actually quote in daily life.
+It must be short enough to use in conversation (2-8 words preferred).
+It must have clear, practical keywords that map to everyday situations.
+
+Examples of good phrases:
+- "إن مع العسر يسرا" → quoted when someone faces hardship (keyword: hardship → ease)
+- "والله يحب المحسنين" → quoted to encourage good deeds (keyword: doers of good)
+- "لا تقنطوا من رحمة الله" → quoted to comfort someone in despair (keyword: despair → mercy)
+
+Provide:
 1. Arabic Text (with proper diacritics/tashkeel)
 2. English Translation
 3. Surah and Ayah reference (e.g., البقرة:2)
-4. Life Application (brief practical application in Arabic)
+4. Life Application — describe the specific daily situation (TRIGGER) where this phrase is the natural RESPONSE
 
 Respond ONLY with a JSON object in this exact format:
 {
   "arabicText": "the Arabic text with diacritics",
   "englishTranslation": "the English translation",
   "surahAyah": "السورة:رقم الآية",
-  "lifeApplication": "practical application in Arabic"
+  "lifeApplication": "the specific daily situation where a native speaker would quote this phrase"
 }`;
 
     const response = await axios.post(GEMINI_API_URL, {
@@ -1933,31 +1943,37 @@ export async function validateScenarioVerseMatch(
   correctedVerse?: string;
 }> {
   try {
-    const prompt = `You are a Quranic Arabic education expert. Validate whether this scenario-verse pair is a STRICT SEMANTIC MATCH.
+    const prompt = `You are an Applied Arabic Linguistics Teacher validating a Trigger-Response exercise pair.
 
-RULE: The Scenario must be a DIRECT PARAPHRASE of the Verse's meaning. They must be mirror images.
-- Reading the scenario should make a learner recall THIS EXACT verse (not just any verse about the topic).
-- Generic verses that could fit many scenarios are NOT acceptable unless the scenario is equally specific.
+THE TRIGGER-RESPONSE TEST:
+A valid exercise means: the Scenario (TRIGGER) contains keyword-synonyms that directly map to the Verse's (RESPONSE) keywords, AND a native Arabic speaker would naturally quote this verse in this situation.
+
+RULE 1 — KEYWORD MAPPING: The scenario must contain synonyms of the verse's core keywords.
+  ✅ "Someone doing good deeds secretly" + "والله يحب المحسنين" → "doing good" maps to "المحسنين"
+  ❌ "Heaven's hidden rewards" + "لقد لقينا من سفرنا هذا نصبا" → NO keyword mapping
+
+RULE 2 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote this verse in this situation?
+RULE 3 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
+RULE 4 — NO ABSTRACT CONNECTIONS: The link must be linguistic and immediate, not theological.
 
 TYPE: ${type === 'conversation' ? 'Conversation Exercise' : 'Roleplay Scenario'}
 
 SCENARIO: "${scenarioText}"
 VERSE: "${verseText}"
 
-Evaluate and return ONLY valid JSON:
+Evaluate using the 4 rules above and return ONLY valid JSON:
 {
   "isMatch": true/false,
   "confidence": 0-100,
-  "reason": "Brief explanation of why match/mismatch",
-  "correctedScenario": "If mismatch: rewrite scenario to be a direct paraphrase of this verse's meaning. If match: omit this field.",
-  "correctedVerse": "If the verse is too generic for the scenario: suggest a more specific authentic Quranic verse that fits. If match: omit this field."
+  "reason": "Which rules pass/fail and why",
+  "correctedScenario": "If mismatch: rewrite scenario so its keywords map directly to the verse. If match: omit.",
+  "correctedVerse": "If verse is too generic: suggest a better authentic Quranic verse. If match: omit."
 }
 
-VALIDATION CRITERIA:
-- confidence >= 70 = match
-- The scenario should make THIS verse (not just any verse) the obvious answer
-- Generic matches (e.g., scenario about ANY struggle + "Allah loves doers of good") = MISMATCH
-- Specific matches (e.g., scenario about sin regret + "Despair not of Allah's mercy") = MATCH`;
+SCORING:
+- confidence >= 70 = MATCH (keywords map + native speaker would quote it)
+- confidence 40-69 = WEAK (theme related but keywords don't map directly)
+- confidence < 40 = MISMATCH (abstract connection or no keyword mapping)`;
 
     const response = await translateWithRetry(prompt, 4, 5000, 500);
     const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();

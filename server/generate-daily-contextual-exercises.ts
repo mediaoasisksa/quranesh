@@ -3,9 +3,10 @@ import { db } from "./db";
 import { dailySentences, quranicExpressions, dailySentenceExercises } from "@shared/schema";
 import type { InsertDailySentence, InsertQuranicExpression, InsertDailySentenceExercise } from "@shared/schema";
 import { validateExerciseBeforePublish } from "@shared/quranic-contextual-checker";
+import { CONTENT_LOGIC_ROLE, TRIGGER_RESPONSE_RULES, VALIDATION_CHECKLIST } from "./content-logic";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const THEMES = [
   "patience", "gratitude", "trust", "hope", "guidance", "wisdom", "mercy",
@@ -32,21 +33,21 @@ async function delay(ms: number): Promise<void> {
 async function generateExerciseBatch(batchNumber: number, count: number): Promise<GeneratedExercise[]> {
   const theme = THEMES[batchNumber % THEMES.length];
   
-  const prompt = `Generate ${count} daily contextual exercises for learning Arabic through Quranic expressions.
+  const prompt = `${CONTENT_LOGIC_ROLE}
+
+${TRIGGER_RESPONSE_RULES}
 
 Theme: ${theme}
 
-For each exercise, create:
-1. An English sentence describing a daily life situation
-2. A short Quranic expression (2-6 words in Arabic) that matches the situation
-3. Two distractor Quranic expressions that DON'T match (different themes)
+TASK: Generate ${count} daily contextual exercises following the Trigger-Response framework.
+Each exercise is a TRIGGER (daily situation sentence) → RESPONSE (short Quranic expression).
 
-Requirements:
-- Sentences should be practical, everyday situations
-- Quranic expressions must be REAL verses from the Quran (provide exact Surah:Ayah reference)
-- All expressions should be 2-6 words only
-- Include brief meaning/context for each expression
-- Provide explanation in English and Arabic
+For each exercise:
+1. Pick a short Quranic expression (2-6 words) that native speakers actually quote in daily life
+2. Write an English sentence describing a SPECIFIC daily situation whose KEYWORDS map to the expression
+3. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
+
+${VALIDATION_CHECKLIST}
 
 Return valid JSON array with this structure:
 [
@@ -98,7 +99,7 @@ IMPORTANT:
 - Return ONLY valid JSON, no markdown formatting
 - All Quranic verses MUST be authentic
 - Ensure variety in situations and expressions
-- Focus on practical, conversational usage`;
+- Focus on practical, conversational usage — only phrases native speakers actually quote`;
 
   try {
     const result = await model.generateContent(prompt);

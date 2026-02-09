@@ -30,7 +30,7 @@ interface TranslationResult {
 async function translateSentence(englishText: string, retries = 3): Promise<TranslationResult | null> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       const prompt = `Translate this daily expression into 8 languages.
 Return ONLY a valid JSON object with these exact keys: id, tr, zh, sw, so, bs, sq, ru

@@ -19,16 +19,32 @@ The backend utilizes Express.js and TypeScript (ESM) to provide a RESTful API. Z
 ## Database
 A PostgreSQL database, managed by Drizzle ORM, stores phrases, conversation prompts, user progress, exercise sessions, daily statistics, symbolic meanings, and multilingual content. It includes classifications like `isPracticalDailyUse`, `usageDomain`, and `register`. The phrase bank contains 224+ Quranic expressions, significantly expanded from Surah Yusuf, covering themes of family relations, wisdom, storytelling, guidance, trust, betrayal, patience, and divine wisdom. The question bank has 132 entries, categorized by Surah (Al-Baqarah, Luqman) and themes such as Quran recitation, learning programs, and etiquette (Adab).
 
-## Exercise System
-The system offers dynamic conversation practice, role-play, and grammar transformation exercises, generated based on user knowledge and difficulty. A non-repetition system ensures continuous access to fresh exercises. Gemini AI generates new Quranic phrases and exercises, validates answers (accepting partial verses), and provides real-time feedback and long-term analytics. The system prioritizes short, practical Quranic expressions for conversational use.
+## Content Logic — Trigger-Response Framework (server/content-logic.ts)
+The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generated exercises follow the **Trigger-Response** framework:
+- **TRIGGER** (Scenario): A real-life situation, feeling, or question containing keyword-synonyms
+- **RESPONSE** (Quranic Phrase): The natural, eloquent Quranic phrase a native Arabic speaker would quote in that situation
 
-A **Maqasidi (purpose-based) verse selection system** maps 9 situation categories (e.g., facilitation, consolation, commitment) to appropriate verses from prophets' speech, prioritizing emotional context. It prevents the use of divine-attribute verses in routine human contexts. The system includes a `human_situations` table with 20 mapped situations, keywords, and contextual logic. Roleplay scenarios include `emotional_state` and `verse_source` fields, with 37 scenarios covering various emotional states.
+**Strict Rules:**
+1. **Keyword Mapping**: Scenario must contain synonyms that directly map to the verse's keywords (e.g., "doing good deeds" → "المحسنين")
+2. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
+3. **No Abstract Connections**: The link must be linguistic and immediate — not philosophical or theological
+4. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
+5. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
+
+This doctrine is enforced in: `server/content-logic.ts` (shared constants), `server/add-conversation-prompts.ts` (generation), `server/generate-daily-contextual-exercises.ts` (daily exercises), `server/ai-service.ts` (validation, phrase generation, answer evaluation).
+
+## Exercise System
+The system offers dynamic conversation practice, role-play, and grammar transformation exercises, generated based on user knowledge and difficulty. A non-repetition system ensures continuous access to fresh exercises. Gemini AI (gemini-2.0-flash) generates new Quranic phrases and exercises, validates answers using the Trigger-Response framework, and provides real-time feedback and long-term analytics. The system prioritizes short, practical Quranic expressions for conversational use.
+
+A **Maqasidi (purpose-based) verse selection system** maps 9 situation categories (e.g., facilitation, consolation, commitment) to appropriate verses from prophets' speech, prioritizing emotional context. It prevents the use of divine-attribute verses in routine human contexts. The system includes a `human_situations` table with 20 mapped situations, keywords, and contextual logic. Roleplay scenarios include `emotional_state` and `verse_source` fields, with 60 scenarios covering various emotional states — each scenario is a direct paraphrase of its assigned verse's meaning.
 
 The application features 350 conversation prompts for diverse daily situations, including 48 practical daily scenarios and 49 phonetic practice exercises focused on Quranic supplications with detailed phonetic notes.
 There are 60 psychological roleplay scenarios, covering 25+ psychological themes like hope, trust, anxiety, and resilience, all designed to elicit thoughtful Quranic responses.
 Daily contextual exercises are the primary exercise type, offering multiple-choice questions with AI semantic validation to accept contextually appropriate Quranic expressions beyond strict keyword matching. Multilingual display logic ensures content is presented in the user's preferred language with appropriate fallbacks.
 Specialized **Psychological Daily Exercises** (55+) cover 11 psychological themes, presenting emotionally resonant scenarios paired with Quranic guidance.
 The **Philosophical Match Exercise** pairs 2,400+ universal philosophical wisdom entries (excluding direct Quranic references) with relevant Quranic words, phrases, or verses.
+
+The **frontend recall workflow** ensures active learning: no "Show Solution" button before submission, hints show only the first word of the verse, and the full verse is revealed only after the user submits their answer.
 
 ## Translation Management
 An administrative `/translation-manager` interface allows bulk translation of philosophical sentences and conversation prompts into 9 languages using Gemini AI, providing statistics, single-sentence translation, and robust error handling.
@@ -46,7 +62,7 @@ HyperPay's COPYandPAY Widget is integrated for subscription management, supporti
 - `drizzle-orm`: Type-safe ORM
 - `@tanstack/react-query`: Server state management
 - `express`: Node.js web framework
-- Gemini AI (gemini-2.0-flash-exp): Content generation, translation, validation, explanations
+- Gemini AI (gemini-2.0-flash): Content generation, translation, validation, explanations
 
 ## UI and Styling
 - `@radix-ui/*`: Accessible UI primitives
