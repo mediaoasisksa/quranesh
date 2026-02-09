@@ -17,6 +17,8 @@ import {
   exerciseSessions,
   humanSituations,
   questionBanks,
+  conversationPrompts,
+  roleplayScenarios,
   phrases as quranicPhrases,
   diplomaWeeks,
   diplomaVocabulary,
@@ -2680,6 +2682,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete question bank error:", error);
       res.status(500).json({ message: "Failed to delete question bank" });
+    }
+  });
+
+  app.post("/api/admin/repair-scenarios", requireAdmin, async (req, res) => {
+    try {
+      const { type = 'both', batchSize = 10, dryRun = true } = req.body;
+      const { validateScenarioVerseMatch } = await import("./ai-service");
+      const { eq } = await import("drizzle-orm");
+      
+      const results: any[] = [];
+      let checked = 0, matched = 0, fixed = 0, errors = 0;
+      let quotaExhausted = false;
+
+      if (type === 'conversation' || type === 'both') {
+        const prompts = await db.select().from(conversationPrompts).limit(batchSize);
+        for (const prompt of prompts) {
+          if (quotaExhausted) break;
+          if (!prompt.suggestedVerse || !prompt.questionEn) continue;
+          checked++;
+          try {
+            const validation = await validateScenarioVerseMatch(
+              prompt.questionEn, prompt.suggestedVerse, 'conversation'
+            );
+            if (validation.isMatch) {
+              matched++;
+              results.push({ id: prompt.id, type: 'conversation', status: 'match', confidence: validation.confidence });
+            } else {
+              const entry: any = {
+                id: prompt.id, type: 'conversation', status: 'mismatch',
+                confidence: validation.confidence, reason: validation.reason,
+                originalScenario: prompt.questionEn,
+                originalVerse: prompt.suggestedVerse,
+                correctedScenario: validation.correctedScenario,
+                correctedVerse: validation.correctedVerse,
+              };
+              if (!dryRun && validation.correctedScenario) {
+                await db.update(conversationPrompts)
+                  .set({ questionEn: validation.correctedScenario })
+                  .where(eq(conversationPrompts.id, prompt.id));
+                entry.applied = true;
+                fixed++;
+              }
+              results.push(entry);
+            }
+            await new Promise(r => setTimeout(r, 4000));
+          } catch (e) {
+            errors++;
+            const errorStr = String(e);
+            if (errorStr.includes('Quota exceeded') || errorStr.includes('429')) {
+              quotaExhausted = true;
+              results.push({ id: prompt.id, type: 'conversation', status: 'error', error: 'API quota exhausted - try again later' });
+            } else {
+              results.push({ id: prompt.id, type: 'conversation', status: 'error', error: errorStr });
+            }
+          }
+        }
+      }
+
+      if (type === 'roleplay' || type === 'both') {
+        const scenarios = await db.select().from(roleplayScenarios).limit(batchSize);
+        for (const scenario of scenarios) {
+          if (quotaExhausted) break;
+          if (!scenario.suggestedVerse || !scenario.scenarioEn) continue;
+          checked++;
+          try {
+            const validation = await validateScenarioVerseMatch(
+              scenario.scenarioEn, scenario.suggestedVerse, 'roleplay'
+            );
+            if (validation.isMatch) {
+              matched++;
+              results.push({ id: scenario.id, type: 'roleplay', status: 'match', confidence: validation.confidence });
+            } else {
+              const entry: any = {
+                id: scenario.id, type: 'roleplay', status: 'mismatch',
+                confidence: validation.confidence, reason: validation.reason,
+                originalScenario: scenario.scenarioEn,
+                originalVerse: scenario.suggestedVerse,
+                correctedScenario: validation.correctedScenario,
+                correctedVerse: validation.correctedVerse,
+              };
+              if (!dryRun && validation.correctedScenario) {
+                await db.update(roleplayScenarios)
+                  .set({ scenarioEn: validation.correctedScenario })
+                  .where(eq(roleplayScenarios.id, scenario.id));
+                entry.applied = true;
+                fixed++;
+              }
+              results.push(entry);
+            }
+            await new Promise(r => setTimeout(r, 4000));
+          } catch (e) {
+            errors++;
+            const errorStr = String(e);
+            if (errorStr.includes('Quota exceeded') || errorStr.includes('429')) {
+              quotaExhausted = true;
+              results.push({ id: scenario.id, type: 'roleplay', status: 'error', error: 'API quota exhausted - try again later' });
+            } else {
+              results.push({ id: scenario.id, type: 'roleplay', status: 'error', error: errorStr });
+            }
+          }
+        }
+      }
+
+      res.json({
+        summary: { checked, matched, mismatched: checked - matched - errors, fixed, errors, dryRun, quotaExhausted },
+        results,
+      });
+    } catch (error) {
+      console.error("Repair scenarios error:", error);
+      res.status(500).json({ message: "Failed to repair scenarios" });
     }
   });
 

@@ -830,67 +830,50 @@ export default function Exercise() {
               </div>
             </div>
 
-            {/* Step 2: Target Meaning - show CONCEPT not Arabic text */}
-            {conversationPrompt?.symbolicMeaning && (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-amber-300 dark:border-amber-700">
-                <p className="text-sm font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
-                  <BookOpenCheck className="h-4 w-4" />
-                  {language === 'ar' ? 'المعنى المطلوب:' : 'Target Meaning:'}
-                </p>
-                <p className={`text-base text-amber-900 dark:text-amber-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
-                  {language === 'ar' 
-                    ? `كيف تعبّر عن مفهوم "${conversationPrompt.symbolicMeaning}" باستخدام عبارة قرآنية؟`
-                    : `How would you express the concept of "${conversationPrompt.symbolicMeaning}" using a Quranic phrase?`}
-                </p>
-              </div>
+            {/* Step 2: The Challenge - ask for recall */}
+            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
+              <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
+                <BookOpenCheck className="h-4 w-4" />
+                {language === 'ar' ? 'التحدي:' : 'The Challenge:'}
+              </p>
+              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
+                {language === 'ar' 
+                  ? 'أي عبارة قرآنية تناسب هذا المعنى بالضبط؟'
+                  : 'Which Quranic phrase fits this exact meaning?'}
+              </p>
+            </div>
+
+            {/* Step 3: Hint Button (only before answering) */}
+            {conversationPrompt?.suggestedVerse && !isAnswered && !showHint && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                onClick={() => setShowHint(true)}
+                data-testid="button-hint"
+              >
+                <Lightbulb className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'تلميح (الكلمة الأولى)' : 'Hint (first word)'}
+              </Button>
             )}
 
-            {/* Step 3: Hint Button */}
-            {conversationPrompt?.suggestedVerse && !isAnswered && (
-              <div className="flex gap-2">
-                {!showHint && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                    onClick={() => setShowHint(true)}
-                    data-testid="button-hint"
-                  >
-                    <Lightbulb className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'تلميح' : 'Hint'}
-                  </Button>
-                )}
-                {!showSuggested && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-primary/50 text-primary hover:bg-primary/10"
-                    onClick={() => setShowSuggested(true)}
-                    data-testid="button-show-solution"
-                  >
-                    {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {/* Hint Card - shows first word or translation */}
-            {showHint && conversationPrompt?.suggestedVerse && !showSuggested && !isAnswered && (
+            {/* Hint Card - shows ONLY the first word */}
+            {showHint && conversationPrompt?.suggestedVerse && !isAnswered && (
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
                   💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
                 </p>
                 <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
-                  {conversationPrompt.suggestedVerse.split(' ').slice(0, 2).join(' ')} ...
+                  {conversationPrompt.suggestedVerse.split(' ')[0]} ...
                 </p>
               </div>
             )}
 
-            {/* Full Solution (shown when requested or after answering) */}
-            {conversationPrompt?.suggestedVerse && (showSuggested || isAnswered) && (
+            {/* Full Verse - ONLY shown AFTER submitting answer */}
+            {conversationPrompt?.suggestedVerse && isAnswered && (
               <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-primary mb-2">
-                  {t('suggestedVerse') || "آية مقترحة:"}
+                  {language === 'ar' ? 'الآية الصحيحة:' : 'The correct verse:'}
                 </p>
                 <p 
                   className="arabic-text text-lg text-foreground" 
@@ -1073,68 +1056,64 @@ export default function Exercise() {
               </div>
             </div>
 
-            {/* Step 2: Target Meaning prompt */}
-            {getVerseExplanation() && (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-amber-300 dark:border-amber-700">
-                <p className="text-sm font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
-                  <BookOpenCheck className="h-4 w-4" />
-                  {language === 'ar' ? 'المعنى المطلوب:' : 'Target Meaning:'}
-                </p>
-                <p className={`text-base text-amber-900 dark:text-amber-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
-                  {getVerseExplanation()}
-                </p>
-              </div>
+            {/* Step 2: The Challenge - ask for recall */}
+            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
+              <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
+                <BookOpenCheck className="h-4 w-4" />
+                {language === 'ar' ? 'التحدي:' : 'The Challenge:'}
+              </p>
+              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
+                {language === 'ar' 
+                  ? 'أي عبارة قرآنية تناسب هذا الموقف بالضبط؟'
+                  : 'Which Quranic phrase fits this exact situation?'}
+              </p>
+            </div>
+
+            {/* Step 3: Hint Button (only before answering) */}
+            {roleplayScenario?.suggestedVerse && !isAnswered && !showHint && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                onClick={() => setShowHint(true)}
+                data-testid="button-hint"
+              >
+                <Lightbulb className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'تلميح (الكلمة الأولى)' : 'Hint (first word)'}
+              </Button>
             )}
 
-            {/* Step 3: Hint & Reveal Buttons */}
-            {roleplayScenario?.suggestedVerse && !isAnswered && (
-              <div className="flex gap-2">
-                {!showHint && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                    onClick={() => setShowHint(true)}
-                    data-testid="button-hint"
-                  >
-                    <Lightbulb className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'تلميح' : 'Hint'}
-                  </Button>
-                )}
-                {!showRoleplayVerse && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-primary/50 text-primary hover:bg-primary/10"
-                    onClick={() => setShowRoleplayVerse(true)}
-                  >
-                    {language === 'ar' ? 'أرجو إظهار الحل' : 'Show Solution'}
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {/* Hint Card - shows first word */}
-            {showHint && roleplayScenario?.suggestedVerse && !showRoleplayVerse && !isAnswered && (
+            {/* Hint Card - shows ONLY the first word */}
+            {showHint && roleplayScenario?.suggestedVerse && !isAnswered && (
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
                   💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
                 </p>
                 <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
-                  {roleplayScenario.suggestedVerse.split(' ').slice(0, 2).join(' ')} ...
+                  {roleplayScenario.suggestedVerse.split(' ')[0]} ...
                 </p>
               </div>
             )}
 
-            {/* Full Solution */}
-            {roleplayScenario?.suggestedVerse && (showRoleplayVerse || isAnswered) && (
+            {/* Full Verse - ONLY shown AFTER submitting answer */}
+            {roleplayScenario?.suggestedVerse && isAnswered && (
               <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800 animate-in fade-in duration-300">
                 <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
-                  {t('suggestedVerse') || "آية مقترحة:"}
+                  {language === 'ar' ? 'الآية الصحيحة:' : 'The correct verse:'}
                 </p>
                 <p className="arabic-text text-lg text-green-800 dark:text-green-200" dir="rtl" lang="ar">
                   {roleplayScenario.suggestedVerse}
                 </p>
+                {getVerseExplanation() && (
+                  <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">
+                      {language === 'ar' ? 'لماذا هذه الآية؟' : 'Why this verse?'}
+                    </p>
+                    <p className={`text-sm text-green-700 dark:text-green-300 ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={dir}>
+                      {getVerseExplanation()}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             

@@ -318,8 +318,8 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 if (!GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY environment variable is required");
 }
-// Using gemini-2.0-flash-exp for reliable translations
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+// Using gemini-2.0-flash for reliable translations
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 // نظام التقييم الجديد: ثلاث درجات بدل صح/خطأ
 type ValidationGrade = 'exact_match' | 'valid_but_less_suitable' | 'incorrect';
@@ -1726,7 +1726,8 @@ const languageNames: Record<string, string> = {
 async function translateWithRetry(
   prompt: string,
   maxRetries: number = 3,
-  initialDelay: number = 1000
+  initialDelay: number = 1000,
+  maxOutputTokens: number = 150
 ): Promise<any> {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -1742,7 +1743,7 @@ async function translateWithRetry(
         ],
         generationConfig: {
           temperature: 0.1,
-          maxOutputTokens: 150,
+          maxOutputTokens,
           topP: 0.95,
           topK: 40,
         },
@@ -1753,6 +1754,14 @@ async function translateWithRetry(
       const isRateLimitError = axios.isAxiosError(error) && 
         (error.response?.status === 429 || 
          error.response?.data?.error?.status === 'RESOURCE_EXHAUSTED');
+      
+      const isQuotaExhausted = axios.isAxiosError(error) &&
+        error.response?.data?.error?.message?.includes('Quota exceeded');
+      
+      if (isQuotaExhausted) {
+        console.log(`API quota exhausted. Cannot retry - daily limit reached.`);
+        throw error;
+      }
       
       if (isRateLimitError && attempt < maxRetries - 1) {
         const delay = initialDelay * Math.pow(2, attempt);
@@ -1909,6 +1918,67 @@ Rules:
       words: [],
       overallMeaning: arabicPhrase,
     };
+  }
+}
+
+export async function validateScenarioVerseMatch(
+  scenarioText: string,
+  verseText: string,
+  type: 'conversation' | 'roleplay' = 'conversation'
+): Promise<{
+  isMatch: boolean;
+  confidence: number;
+  reason: string;
+  correctedScenario?: string;
+  correctedVerse?: string;
+}> {
+  try {
+    const prompt = `You are a Quranic Arabic education expert. Validate whether this scenario-verse pair is a STRICT SEMANTIC MATCH.
+
+RULE: The Scenario must be a DIRECT PARAPHRASE of the Verse's meaning. They must be mirror images.
+- Reading the scenario should make a learner recall THIS EXACT verse (not just any verse about the topic).
+- Generic verses that could fit many scenarios are NOT acceptable unless the scenario is equally specific.
+
+TYPE: ${type === 'conversation' ? 'Conversation Exercise' : 'Roleplay Scenario'}
+
+SCENARIO: "${scenarioText}"
+VERSE: "${verseText}"
+
+Evaluate and return ONLY valid JSON:
+{
+  "isMatch": true/false,
+  "confidence": 0-100,
+  "reason": "Brief explanation of why match/mismatch",
+  "correctedScenario": "If mismatch: rewrite scenario to be a direct paraphrase of this verse's meaning. If match: omit this field.",
+  "correctedVerse": "If the verse is too generic for the scenario: suggest a more specific authentic Quranic verse that fits. If match: omit this field."
+}
+
+VALIDATION CRITERIA:
+- confidence >= 70 = match
+- The scenario should make THIS verse (not just any verse) the obvious answer
+- Generic matches (e.g., scenario about ANY struggle + "Allah loves doers of good") = MISMATCH
+- Specific matches (e.g., scenario about sin regret + "Despair not of Allah's mercy") = MATCH`;
+
+    const response = await translateWithRetry(prompt, 4, 5000, 500);
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    
+    if (!text) {
+      return { isMatch: false, confidence: 0, reason: "AI returned no response" };
+    }
+    
+    const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const result = JSON.parse(cleanedText);
+    
+    return {
+      isMatch: result.isMatch ?? (result.confidence >= 70),
+      confidence: result.confidence ?? 0,
+      reason: result.reason ?? "Unknown",
+      correctedScenario: result.correctedScenario,
+      correctedVerse: result.correctedVerse,
+    };
+  } catch (error) {
+    console.error("Error validating scenario-verse match:", error);
+    return { isMatch: false, confidence: 0, reason: "Validation failed due to error" };
   }
 }
 

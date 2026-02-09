@@ -13,29 +13,54 @@ interface ConversationPrompt {
 }
 
 async function generateConversationPrompts(count: number): Promise<ConversationPrompt[]> {
-  const prompt = `Generate ${count} conversation practice prompts for Arabic learners who have memorized the Quran.
+  const prompt = `You are building a structured Arabic language training tool (NOT a random generator).
+Generate ${count} conversation practice prompts for Arabic learners who have memorized the Quran.
+
+🔴 CRITICAL RULE - STRICT SEMANTIC MAPPING:
+The Scenario and the Suggested Verse MUST be mirror images of each other.
+- The Scenario describes a real-life situation that DIRECTLY paraphrases the verse's meaning.
+- The Verse provides the exact Quranic wording for that meaning.
+- A learner should be able to RECALL the verse just by reading the scenario.
+
+❌ WRONG EXAMPLE (mismatch):
+- Scenario: "Comforting someone who fears hidden rewards" 
+- Verse: "لقد لقينا من سفرنا هذا نصبا" (about travel fatigue) ← COMPLETELY UNRELATED!
+
+✅ CORRECT EXAMPLE (mirror match):
+- Scenario: "Comforting someone who regrets past sins after repenting"
+- Verse: "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ" (Despair not of Allah's mercy)
+  → The scenario IS the verse's meaning restated as a life situation.
+
+✅ CORRECT EXAMPLE:
+- Scenario: "Someone asks you to be patient during hardship"
+- Verse: "إِنَّ مَعَ الْعُسْرِ يُسْرًا" (Indeed, with hardship comes ease)
+
+WORKFLOW: Start with the VERSE first, then create a scenario that is a direct paraphrase of its meaning.
 
 Each prompt should:
-1. Be a practical daily conversation question in English
-2. Have a natural Arabic translation
-3. Include a suggested Quranic verse or phrase that would be an appropriate response
-4. Cover diverse daily situations (greetings, time, requests, offers, invitations, emotions, work, family, health, etc.)
+1. START with an authentic Quranic verse or short phrase
+2. Create a real-life situation that DIRECTLY reflects that verse's meaning
+3. Have a natural Arabic translation of the situation
+4. The situation must be a contextual paraphrase where the verse is the ONLY correct answer
 
 Return ONLY a valid JSON array with this exact structure:
 [
   {
-    "question": "Arabic question",
-    "question_en": "English question",
+    "question": "Arabic situation/scenario",
+    "question_en": "English situation/scenario (direct paraphrase of verse meaning)",
     "suggested_verse": "Quranic verse or phrase in Arabic",
     "category": "category name",
     "usage_domain": "domain (e.g., greeting, time, request, offer, invitation)"
   }
 ]
 
-IMPORTANT:
+VALIDATION CHECKLIST (apply to EVERY item):
+□ Can a learner guess the exact verse from the scenario alone? If NO → rewrite the scenario.
+□ Is the verse the ONLY contextually correct answer? If NO → make the scenario more specific.
+□ Is the verse authentic Quranic text? If NO → replace it.
+□ Does the scenario avoid generic situations that could match many verses? If NO → make it more targeted.
+
 - Generate exactly ${count} unique prompts
-- Make questions practical and conversational
-- Ensure suggested verses are authentic Quranic text
 - Vary the categories and domains
 - Return ONLY the JSON array, no other text`;
 
