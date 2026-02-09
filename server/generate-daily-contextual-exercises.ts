@@ -39,13 +39,19 @@ ${TRIGGER_RESPONSE_RULES}
 
 Theme: ${theme}
 
-TASK: Generate ${count} daily contextual exercises following the Trigger-Response framework.
-Each exercise is a TRIGGER (daily situation sentence) → RESPONSE (short Quranic expression).
+TASK: Generate ${count} daily contextual exercises using the REVERSE-ENGINEERED Trigger-Response framework.
 
-For each exercise:
-1. Pick a short Quranic expression (2-6 words) that native speakers actually quote in daily life
-2. Write an English sentence describing a SPECIFIC daily situation whose KEYWORDS map to the expression
-3. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
+⚠️ MANDATORY WORKFLOW FOR EACH EXERCISE — VERSE FIRST:
+1. SELECT a short Quranic expression FIRST (2-6 words) that native speakers actually quote in daily life
+2. EXTRACT its key Arabic keywords and their exact meanings
+3. WRITE an English scenario sentence that PARAPHRASES those keywords (Semantic Hinting)
+   ❌ BAD: "Something bad happened. What do you say?" (too vague — could match any verse)
+   ✅ GOOD: "You feel grateful for unexpected blessings and want to praise Allah for them" (paraphrases "الحمد")
+4. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
+
+SEMANTIC HINTING RULE:
+The englishText MUST contain a paraphrase or definition of the verse's key vocabulary.
+The user should be able to recall the verse just from reading the scenario.
 
 ${VALIDATION_CHECKLIST}
 
@@ -53,10 +59,10 @@ Return valid JSON array with this structure:
 [
   {
     "sentence": {
-      "englishText": "I feel grateful for the blessings in my life",
+      "englishText": "You feel grateful for all the blessings in your life and want to express praise and thankfulness to Allah",
       "theme": "gratitude",
       "difficulty": 2,
-      "contextNotes": "Expressing thankfulness"
+      "contextNotes": "Semantic hint: 'praise and thankfulness' maps to 'الحمد'"
     },
     "correctExpression": {
       "arabicText": "الحمد لله",
@@ -97,8 +103,9 @@ Return valid JSON array with this structure:
 
 IMPORTANT: 
 - Return ONLY valid JSON, no markdown formatting
-- All Quranic verses MUST be authentic
-- Ensure variety in situations and expressions
+- All Quranic verses MUST be authentic — selected BEFORE writing the scenario
+- The scenario text MUST paraphrase the verse's keywords (Semantic Hinting)
+- NO abstract connections — the link must be obvious without Tafsir
 - Focus on practical, conversational usage — only phrases native speakers actually quote`;
 
   try {

@@ -20,19 +20,26 @@ ${TRIGGER_RESPONSE_RULES}
 
 TASK: Generate ${count} conversation practice exercises for Arabic learners who memorize the Quran.
 
-WORKFLOW:
-1. Pick a short, authentic Quranic phrase (2-8 words) that native Arabic speakers actually quote in daily life
-2. Identify the KEYWORDS in the verse (e.g., "المحسنين" = doers of good)
-3. Write a modern life situation where SYNONYMS of those keywords naturally appear
-4. Write the same scenario in Arabic
-5. Verify: Would a native Arabic speaker naturally say this verse in this situation? If NO → discard.
+⚠️ MANDATORY VERSE-FIRST WORKFLOW:
+1. SELECT a short, authentic Quranic phrase FIRST (2-8 words) that native Arabic speakers actually quote in daily life
+2. EXTRACT the KEY ARABIC KEYWORDS and their exact meanings (e.g., "المحسنين" = doers of good)
+3. WRITE the question with SEMANTIC HINTING — the question must PARAPHRASE or DEFINE the verse's keywords
+4. Write the same scenario in Arabic with the same semantic hints
+5. VERIFY: Can a student who memorized this verse recall it from the question alone? If NO → rewrite.
+
+SEMANTIC HINTING EXAMPLES:
+  ❌ BAD question_en: "What do you say when something bad happens?" (too vague)
+  ✅ GOOD question_en: "What Quranic phrase expresses patience without complaint — 'beautiful patience'?" → فَصَبْرٌ جَمِيلٌ
+  
+  ❌ BAD question_en: "What does the Quran say about doing good?" (too generic)
+  ✅ GOOD question_en: "What does Allah say about His love for the doers of good (المحسنين)?" → وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ
 
 Return ONLY a valid JSON array with this exact structure:
 [
   {
-    "question": "Arabic situation/scenario text",
-    "question_en": "English situation/scenario — must contain keyword synonyms that map to the verse",
-    "suggested_verse": "Short Quranic phrase in Arabic with diacritics",
+    "question": "Arabic situation/scenario text with semantic hints paraphrasing the verse keywords",
+    "question_en": "English scenario with SEMANTIC HINTS — must DEFINE/PARAPHRASE the verse's keywords so user can recall it",
+    "suggested_verse": "Short Quranic phrase in Arabic with diacritics (selected FIRST before writing the question)",
     "category": "category name",
     "usage_domain": "domain (e.g., encouragement, gratitude, patience, trust, greeting, farewell)"
   }
@@ -42,6 +49,8 @@ ${VALIDATION_CHECKLIST}
 
 - Generate exactly ${count} unique exercises
 - Vary the categories and domains
+- Every question MUST contain semantic hints that paraphrase the verse's vocabulary
+- NO abstract connections — the link must be obvious without deep Tafsir
 - Return ONLY the JSON array, no other text`;
 
   try {

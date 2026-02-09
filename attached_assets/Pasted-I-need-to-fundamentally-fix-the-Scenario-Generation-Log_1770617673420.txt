@@ -1,0 +1,29 @@
+I need to fundamentally fix the "Scenario Generation Logic". The current logic is too vague and creates a mismatch between the Scenario and the Target Verse.
+
+**The Problem:**
+The app currently generates a random situation and tries to guess a verse. This leads to illogical answers (e.g., A scenario about "Phone Addiction" -> Answer: "Joseph's Treasury Verse"). This is confusing for the user.
+
+**The Solution: Reverse-Engineered Scenarios**
+You must change the generation workflow. Do not start with a topic. **Start with the Verse.**
+
+**New Strict Workflow for Generating Exercises:**
+
+1. **Step 1: Select the Target Verse FIRST.**
+   - Example Verse: "فَصَبْرٌ جَمِيلٌ" (So patience is most fitting).
+
+2. **Step 2: Extract the Key Concept.**
+   - Concept: "Beautiful Patience" (Patience without complaint).
+
+3. **Step 3: Write the Scenario to "Prime" the User.**
+   - The Scenario MUST contain a paraphrase or the definition of the target words.
+   - *Bad Scenario:* "Something bad happened. What do you say?" (Too vague).
+   - *Good Scenario:* "You are facing a calamity, but you decide to remain calm and **patient** without complaining, just like Jacob (Yaqub) did. What is the Quranic phrase for this **'Beautiful Patience'**?"
+
+**New System Instruction Rules:**
+* **Rule 1 (Semantic Hinting):** The question must explicitly ask for the specific vocabulary used in the verse.
+    - If the answer is "قُلْ هَلْ يَسْتَوِي الَّذِينَ يَعْلَمُونَ...", the scenario must ask: "How does the Quran ask if those who **know** are equal to those who do **not know**?"
+* **Rule 2 (Contextual Fit):** Ensure the verse is used in its *linguistic* sense, not just theological.
+* **Rule 3 (No Abstraction):** Do not use verses that require deep interpretation (Tafsir) to connect to the scenario. The link must be obvious.
+
+**Task:**
+Rewrite the prompt logic to ensure that every generated scenario includes **embedded clues** that lead directly to the specific words of the target verse.

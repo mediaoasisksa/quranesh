@@ -19,15 +19,21 @@ The backend utilizes Express.js and TypeScript (ESM) to provide a RESTful API. Z
 ## Database
 A PostgreSQL database, managed by Drizzle ORM, stores phrases, conversation prompts, user progress, exercise sessions, daily statistics, symbolic meanings, and multilingual content. It includes classifications like `isPracticalDailyUse`, `usageDomain`, and `register`. The phrase bank contains 224+ Quranic expressions, significantly expanded from Surah Yusuf, covering themes of family relations, wisdom, storytelling, guidance, trust, betrayal, patience, and divine wisdom. The question bank has 132 entries, categorized by Surah (Al-Baqarah, Luqman) and themes such as Quran recitation, learning programs, and etiquette (Adab).
 
-## Content Logic — Trigger-Response Framework (server/content-logic.ts)
-The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generated exercises follow the **Trigger-Response** framework:
-- **TRIGGER** (Scenario): A real-life situation, feeling, or question containing keyword-synonyms
-- **RESPONSE** (Quranic Phrase): The natural, eloquent Quranic phrase a native Arabic speaker would quote in that situation
+## Content Logic — Reverse-Engineered Trigger-Response Framework (server/content-logic.ts)
+The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generated exercises follow the **Reverse-Engineered Trigger-Response** framework:
+- **RESPONSE first** (Quranic Phrase): The verse is selected FIRST
+- **TRIGGER** (Scenario): A scenario is then written AROUND the verse, paraphrasing its keywords
+
+**Generation Workflow (Verse-First):**
+1. SELECT the target Quranic verse FIRST (2-8 words, commonly quoted by native speakers)
+2. EXTRACT key Arabic keywords and their meanings
+3. WRITE a scenario that PARAPHRASES those keywords (Semantic Hinting)
+4. VERIFY: Can the student recall the verse from the question alone?
 
 **Strict Rules:**
-1. **Keyword Mapping**: Scenario must contain synonyms that directly map to the verse's keywords (e.g., "doing good deeds" → "المحسنين")
-2. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
-3. **No Abstract Connections**: The link must be linguistic and immediate — not philosophical or theological
+1. **Semantic Hinting (التلميح اللفظي)**: The question must contain a paraphrase/definition of the verse's keywords so the user can recall the exact phrase (e.g., "patience without complaint (beautiful patience)" → "فَصَبْرٌ جَمِيلٌ")
+2. **No Abstraction (منع التفسير العميق)**: No verses requiring deep Tafsir to connect — the link must be OBVIOUS and LINGUISTIC (e.g., ❌ "phone addiction" → "خزائن الأرض" is rejected because only scholars see the connection)
+3. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
 4. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
 5. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
 

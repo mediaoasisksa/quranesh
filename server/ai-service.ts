@@ -579,27 +579,30 @@ function createValidationPrompt(
       - Example: If given "والله غفور رحيم" and asked to replace "رحيم", a good answer would be "والله غفور عزيز"`;
       break;
     case "conversation":
-      specificInstructions = `This is a CONVERSATION exercise using the TRIGGER-RESPONSE framework.
-The scenario (TRIGGER) describes a real-life situation. The student must provide the natural Quranic phrase (RESPONSE) that a native Arabic speaker would quote in that situation.
+      specificInstructions = `This is a CONVERSATION exercise using the REVERSE-ENGINEERED TRIGGER-RESPONSE framework.
+The scenario (TRIGGER) was written AROUND a specific verse. The scenario contains SEMANTIC HINTS — paraphrases and definitions of the target verse's keywords. The student must recall the Quranic phrase (RESPONSE) from those hints.
 
-EVALUATION — THE TRIGGER-RESPONSE TEST:
-1. Does the student's answer contain KEYWORDS that map to the scenario's meaning?
-   - The scenario says "doing good deeds" → answer should contain "المحسنين" or similar
-   - The scenario says "hardship" → answer should contain "العسر" or similar
+EVALUATION — THE SEMANTIC HINTING TEST:
+1. Does the student's answer contain KEYWORDS that match the SEMANTIC HINTS in the scenario?
+   - The scenario defines "patience without complaint (beautiful patience)" → answer should contain "فَصَبْرٌ جَمِيلٌ"
+   - The scenario says "ease paired with hardship" → answer should contain "مَعَ الْعُسْرِ يُسْرًا"
+   - The scenario says "doers of good" → answer should contain "المحسنين"
 2. Would a native Arabic speaker naturally quote this phrase in this situation?
 3. Is this an authentic Quranic verse or widely-used Islamic expression?
-4. Is it short and practical for daily conversation (2-8 words preferred)?
+4. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir?
 
-ACCEPT if the answer's KEYWORDS semantically match the scenario's keywords, even if it's not the exact expected verse.
+ACCEPT if the answer's KEYWORDS semantically match the scenario's semantic hints, even if it's not the exact expected verse.
 REJECT if:
+❌ The answer requires deep theological interpretation to connect to the scenario
 ❌ The answer is from a Quranic story/narrative that isn't quoted in daily speech
-❌ The answer requires deep theological interpretation to see the connection
-❌ The answer's keywords have NO direct mapping to the scenario
+❌ The answer's keywords have NO direct mapping to the scenario's semantic hints
+❌ The connection is abstract/philosophical rather than linguistic
 
 EXAMPLES:
-✅ Scenario about "gratitude for blessings" → "الحمد لله" (keyword: حمد = gratitude)
-✅ Scenario about "trusting Allah in difficulty" → "حسبنا الله ونعم الوكيل" (keyword: حسب = sufficient)
-❌ Scenario about "making an appointment" → "الساعة آتية" (this is about Day of Judgment, NOT appointments)`;
+✅ Scenario hints at "praise and thankfulness" → "الحمد لله" (keyword: حمد = praise)
+✅ Scenario hints at "trusting Allah as sufficient" → "حسبنا الله ونعم الوكيل" (keyword: حسب = sufficient)
+❌ Scenario about "making an appointment" → "الساعة آتية" (this is about Day of Judgment, NOT appointments)
+❌ Scenario about "phone addiction" → "اجعلني على خزائن الأرض" (requires deep interpretation — REJECTED)`;
       break;
     case "completion":
       specificInstructions = `This is a COMPLETION exercise. The student must complete a Quranic verse or phrase.
@@ -614,22 +617,23 @@ EXAMPLES:
       - Should use appropriate Islamic terminology`;
       break;
     case "roleplay":
-      specificInstructions = `This is a ROLEPLAY exercise using the TRIGGER-RESPONSE framework.
-The scenario places the student in a real-life situation (TRIGGER). They must respond with the Quranic phrase (RESPONSE) that a native Arabic speaker would naturally quote in that exact moment.
+      specificInstructions = `This is a ROLEPLAY exercise using the REVERSE-ENGINEERED TRIGGER-RESPONSE framework.
+The scenario was written AROUND a specific verse, with SEMANTIC HINTS that paraphrase the verse's keywords. The student must recall and respond with the correct Quranic phrase.
 
-EVALUATION — THE TRIGGER-RESPONSE TEST:
-1. Does the student's answer contain KEYWORDS that map to the scenario's core meaning?
-   - Scenario about "someone regretting sins" → answer should relate to "mercy/forgiveness" (رحمة/مغفرة)
-   - Scenario about "intense love for Allah" → answer should contain "أشد حبا" or similar
+EVALUATION — THE SEMANTIC HINTING TEST:
+1. Does the student's answer contain KEYWORDS that match the SEMANTIC HINTS embedded in the scenario?
+   - Scenario defines "patience without complaint" → answer should contain "فَصَبْرٌ جَمِيلٌ"
+   - Scenario hints at "despairing of mercy" → answer should contain "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ"
 2. Would a native Arabic speaker naturally quote this in the described situation?
 3. Is it authentic Quranic text?
-4. Is the connection LINGUISTIC and IMMEDIATE (not abstract or requiring deep interpretation)?
+4. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir or abstract interpretation?
 
-ACCEPT if keywords map directly and a native speaker would naturally say it.
+ACCEPT if keywords map directly to the semantic hints and a native speaker would naturally say it.
 REJECT if:
-❌ The connection is abstract/philosophical rather than linguistic
+❌ The connection requires deep theological interpretation (No Abstraction rule)
 ❌ The verse is from a specific Quranic narrative not quoted in daily speech
-❌ No keyword mapping exists between scenario and answer`;
+❌ No keyword mapping exists between scenario's semantic hints and the answer
+❌ The connection is abstract/philosophical rather than linguistic`;
       break;
     case "transformation":
       specificInstructions = `This is a CONCEPT-BASED PHILOSOPHICAL MATCH exercise. 
@@ -1629,28 +1633,34 @@ Exercise Type: ${exerciseType}
 Category: ${category} (short, long, commands, or proverbs)
 Difficulty: ${difficulty} (1-5 scale)
 
-THE TRIGGER-RESPONSE RULE:
-Pick a REAL Quranic verse or phrase that native Arabic speakers actually quote in daily life.
-It must be short enough to use in conversation (2-8 words preferred).
-It must have clear, practical keywords that map to everyday situations.
+VERSE-FIRST WORKFLOW:
+1. SELECT a REAL Quranic verse or phrase FIRST that native Arabic speakers actually quote in daily life.
+2. It must be short enough to use in conversation (2-8 words preferred).
+3. EXTRACT its key Arabic keywords and their exact meanings.
+4. WRITE a life application scenario that PARAPHRASES those keywords (Semantic Hinting).
+   The scenario must DEFINE/PARAPHRASE the verse's vocabulary so a student can recall it.
 
-Examples of good phrases:
-- "إن مع العسر يسرا" → quoted when someone faces hardship (keyword: hardship → ease)
-- "والله يحب المحسنين" → quoted to encourage good deeds (keyword: doers of good)
-- "لا تقنطوا من رحمة الله" → quoted to comfort someone in despair (keyword: despair → mercy)
+NO ABSTRACTION RULE:
+The connection between the scenario and the verse must be OBVIOUS and LINGUISTIC.
+Do NOT use verses that require deep Tafsir to connect to the situation.
+
+Examples of good phrases with semantic hinting:
+- "إن مع العسر يسرا" → "When facing hardship, this verse reminds you that ease is paired with it" (keyword: العسر=hardship, يسرا=ease)
+- "والله يحب المحسنين" → "When someone does good deeds, this verse affirms Allah's love for the doers of good" (keyword: المحسنين=doers of good)
+- "لا تقنطوا من رحمة الله" → "When someone despairs of forgiveness, this verse tells them not to despair of Allah's mercy" (keyword: تقنطوا=despair, رحمة=mercy)
 
 Provide:
 1. Arabic Text (with proper diacritics/tashkeel)
 2. English Translation
 3. Surah and Ayah reference (e.g., البقرة:2)
-4. Life Application — describe the specific daily situation (TRIGGER) where this phrase is the natural RESPONSE
+4. Life Application — a scenario with SEMANTIC HINTS that paraphrase the verse's keywords, so a student who memorized this verse can recall it
 
 Respond ONLY with a JSON object in this exact format:
 {
   "arabicText": "the Arabic text with diacritics",
   "englishTranslation": "the English translation",
   "surahAyah": "السورة:رقم الآية",
-  "lifeApplication": "the specific daily situation where a native speaker would quote this phrase"
+  "lifeApplication": "scenario with semantic hints paraphrasing the verse's keywords"
 }`;
 
     const response = await axios.post(GEMINI_API_URL, {
@@ -1943,37 +1953,42 @@ export async function validateScenarioVerseMatch(
   correctedVerse?: string;
 }> {
   try {
-    const prompt = `You are an Applied Arabic Linguistics Teacher validating a Trigger-Response exercise pair.
+    const prompt = `You are an Applied Arabic Linguistics Teacher validating a Reverse-Engineered Trigger-Response exercise pair.
 
-THE TRIGGER-RESPONSE TEST:
-A valid exercise means: the Scenario (TRIGGER) contains keyword-synonyms that directly map to the Verse's (RESPONSE) keywords, AND a native Arabic speaker would naturally quote this verse in this situation.
+THE VALIDATION TEST — 5 RULES:
 
-RULE 1 — KEYWORD MAPPING: The scenario must contain synonyms of the verse's core keywords.
-  ✅ "Someone doing good deeds secretly" + "والله يحب المحسنين" → "doing good" maps to "المحسنين"
-  ❌ "Heaven's hidden rewards" + "لقد لقينا من سفرنا هذا نصبا" → NO keyword mapping
+RULE 1 — SEMANTIC HINTING: Does the scenario contain PARAPHRASES or DEFINITIONS of the verse's key Arabic keywords?
+  ✅ Scenario says "patience without complaint (beautiful patience)" for verse "فَصَبْرٌ جَمِيلٌ" → PASS
+  ✅ Scenario says "ease paired with hardship" for verse "إِنَّ مَعَ الْعُسْرِ يُسْرًا" → PASS
+  ❌ Scenario says "something bad happened" for verse "فَصَبْرٌ جَمِيلٌ" → FAIL (too vague, no semantic hint)
 
-RULE 2 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote this verse in this situation?
-RULE 3 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
-RULE 4 — NO ABSTRACT CONNECTIONS: The link must be linguistic and immediate, not theological.
+RULE 2 — NO ABSTRACTION: The link must be OBVIOUS and LINGUISTIC — no deep Tafsir needed.
+  ❌ "Phone addiction" + "اجعلني على خزائن الأرض" → FAIL (requires deep interpretation)
+  ❌ "Career planning" + "كن فيكون" → FAIL (divine creation ≠ human planning)
+  ✅ "Feeling exhausted after a journey" + "لَقَدْ لَقِينَا مِن سَفَرِنَا هَٰذَا نَصَبًا" → PASS (direct)
+
+RULE 3 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote this verse in this situation?
+RULE 4 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
+RULE 5 — RECALL TEST: Can a student who memorized this verse recall it from the scenario alone?
 
 TYPE: ${type === 'conversation' ? 'Conversation Exercise' : 'Roleplay Scenario'}
 
 SCENARIO: "${scenarioText}"
 VERSE: "${verseText}"
 
-Evaluate using the 4 rules above and return ONLY valid JSON:
+Evaluate using ALL 5 rules and return ONLY valid JSON:
 {
   "isMatch": true/false,
   "confidence": 0-100,
-  "reason": "Which rules pass/fail and why",
-  "correctedScenario": "If mismatch: rewrite scenario so its keywords map directly to the verse. If match: omit.",
-  "correctedVerse": "If verse is too generic: suggest a better authentic Quranic verse. If match: omit."
+  "reason": "Which rules pass/fail and why — especially check Semantic Hinting and No Abstraction",
+  "correctedScenario": "If mismatch: rewrite scenario with SEMANTIC HINTS that paraphrase/define the verse's keywords so the user can recall it. If match: omit.",
+  "correctedVerse": "If verse requires deep interpretation or is too generic: suggest a better authentic Quranic verse. If match: omit."
 }
 
 SCORING:
-- confidence >= 70 = MATCH (keywords map + native speaker would quote it)
-- confidence 40-69 = WEAK (theme related but keywords don't map directly)
-- confidence < 40 = MISMATCH (abstract connection or no keyword mapping)`;
+- confidence >= 70 = MATCH (semantic hints present, obvious connection, native speaker would quote it)
+- confidence 40-69 = WEAK (theme related but scenario is too vague — missing semantic hints)
+- confidence < 40 = MISMATCH (abstract connection, requires Tafsir, or no keyword paraphrase)`;
 
     const response = await translateWithRetry(prompt, 4, 5000, 500);
     const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
