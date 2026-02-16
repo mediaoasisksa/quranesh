@@ -482,6 +482,22 @@ export async function validateArabicAnswer(
   expectedAnswer?: string,
   userLanguage: string = "en",
 ): Promise<AIValidationResult> {
+  // === حماية مبكرة: رفض الإجابات القصيرة قبل استدعاء AI ===
+  const stripped = userAnswer.replace(/[\u064B-\u065F\u0670\s]/g, "").trim();
+  if (stripped.length < 3 || ["ال", "و", "ف", "ب", "ك", "ل", "لل", "بال", "وال", "فال", "كال"].includes(stripped)) {
+    console.log("EARLY REJECT: Input too short or prefix-only:", stripped);
+    return {
+      isCorrect: false,
+      grade: 'incorrect' as ValidationGrade,
+      score: 0,
+      feedback: "الإجابة قصيرة جداً. اكتب كلمة أو عبارة قرآنية كاملة.",
+      suggestions: ["اكتب آية أو عبارة قرآنية كاملة"],
+      suggestedAnswer: undefined,
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
+
   try {
     console.log("=== GEMINI AI VALIDATION ===");
     console.log("API Key present:", !!GEMINI_API_KEY);
@@ -855,7 +871,8 @@ function fallbackValidation(
 
   // Basic fallback validation with exercise-specific checks
   const hasArabic = /[\u0600-\u06FF]/.test(userAnswer);
-  const hasContent = userAnswer.trim().length > 2;
+  const strippedForLength = userAnswer.replace(/[\u064B-\u065F\u0670\s]/g, "").trim();
+  const hasContent = strippedForLength.length >= 3 && !["ال", "و", "ف", "ب", "ك", "ل", "لل", "بال", "وال", "فال", "كال"].includes(strippedForLength);
 
   let exerciseSpecificFeedback = "";
   let suggestions: string[] = [];
@@ -1490,6 +1507,27 @@ export async function validateExerciseAnswer(
   userLanguage: string = "en",
   providedSuggestedVerse?: string,
 ): Promise<AIValidationResult> {
+  // === حماية ضد الإجابات القصيرة جداً أو البادئات العامة ===
+  const strippedAnswer = userAnswer.replace(/[\u064B-\u065F\u0670\s]/g, "").trim();
+  const COMMON_PREFIXES = ["ال", "و", "ف", "ب", "ك", "ل", "لل", "بال", "وال", "فال", "كال"];
+  
+  if (strippedAnswer.length < 3 || COMMON_PREFIXES.includes(strippedAnswer)) {
+    console.log("REJECTED: Input too short or common prefix only:", strippedAnswer);
+    return {
+      isCorrect: false,
+      grade: 'incorrect' as ValidationGrade,
+      score: 0,
+      feedback: "الإجابة قصيرة جداً. اكتب كلمة أو عبارة قرآنية كاملة وليس مجرد حروف أو بادئات.",
+      suggestions: [
+        "اكتب آية أو عبارة قرآنية كاملة",
+        "الحد الأدنى 3 أحرف ذات معنى",
+      ],
+      suggestedAnswer: undefined,
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
+
   // استخراج الإجابة المتوقعة - الأولوية للآية المرسلة مباشرة من Frontend
   const suggestedVerse = providedSuggestedVerse || phraseData?.suggestedVerse || phraseData?.arabicText || phraseData?.expectedAnswer || "";
   const questionContext = phraseData?.question || phraseData?.arabicText || "";

@@ -1650,6 +1650,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      const strippedInput = userAnswer.replace(/[\u064B-\u065F\u0670\s]/g, "").trim();
+      const TRIVIAL_PREFIXES = ["ال", "و", "ف", "ب", "ك", "ل", "لل", "بال", "وال", "فال", "كال"];
+      if (strippedInput.length < 3 || TRIVIAL_PREFIXES.includes(strippedInput)) {
+        return res.json({
+          isCorrect: false,
+          score: 0,
+          feedback: "الإجابة قصيرة جداً. اكتب كلمة أو عبارة قرآنية كاملة وليس مجرد حروف أو بادئات.",
+          suggestions: ["اكتب آية أو عبارة قرآنية كاملة"],
+          confidence: 1.0,
+        });
+      }
+
       // Get user's language preference (default to English if not provided)
       const userLanguage = language || "en";
 

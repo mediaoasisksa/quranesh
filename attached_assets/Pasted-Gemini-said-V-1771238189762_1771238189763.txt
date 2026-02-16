@@ -1,0 +1,41 @@
+Gemini said
+بناءً على الصور التي أرسلتها، المشكلة واضحة جداً.
+
+المشكلة: نظام التحقق من الإجابة (Validation Logic) "متساهل جداً" أو "ساذج". يبدو أنه يعتبر الإجابة صحيحة إذا كتب المستخدم أي حرفين موجودين في القرآن (مثل "الـ" التعريف)، أو أن هناك خطأ في كود المقارنة يجعله يرجع True دائماً.
+
+هذا يقتل العملية التعليمية لأن المستخدم يكتب "ال" ويحصل على "ممتاز"!
+
+إليك التوجيه (Prompt) الذي يجب أن ترسله لـ Replit لإصلاح هذا الخلل فوراً، مصمماً ليفهم أن المعيار هو "المعنى" وليس مجرد "تطابق أحرف".
+
+📋 انسخ هذا التوجيه (Prompt) وألصقه في Replit:
+الموضوع: إصلاح ثغرة التحقق من الإجابة (Validation Logic Bug)
+
+I have a critical logic bug in the exercise validation system.
+
+The Problem:
+Look at the current behavior: When the user is asked to write a Quranic word matching a wisdom, they can simply type generic prefixes like "ال" (Al), and the system marks it as "Correct/Excellent".
+
+This is a false positive. The validation is too loose. It seems to be matching any substring or is failing to check semantic relevance.
+
+Please fix the validation logic (checkAnswer function or similar) with the following strict rules:
+
+1. Minimum Length Check:
+Reject any input that is less than 3 characters long. "ال" should be instantly rejected as "Too short".
+
+2. Strict Semantic Matching (If using AI):
+If you are using an LLM to check the answer, update the System Prompt.
+
+Current (Likely): "Is this text found in the Quran?" (This is bad because "Al" is in the Quran).
+
+New Requirement: "Does this user input represent a complete word or phrase that matches the meaning of the exercise? If the user only types a prefix like 'Al', return False."
+
+3. Exact/Fuzzy Matching (If using Database):
+If you are comparing against a list of correct answers, do not use string.includes(). Use a stricter comparison (e.g., Levenshtein distance) or exact word matching. The input must match a significant portion of the target answer.
+
+Action Plan:
+
+Locate the validation function in the backend or frontend.
+
+Implement a filter to ignore common prefixes (ال, و, ف) if they are the only input.
+
+Ensure the answer is relevant to the specific "Human Wisdom" prompt, not just any random Arabic letters.
