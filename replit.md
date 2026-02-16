@@ -62,6 +62,9 @@ The **Philosophical Match Exercise** pairs 2,400+ universal philosophical wisdom
 
 The **frontend recall workflow** ensures active learning: no "Show Solution" button before submission, hints show only the first word of the verse, and the full verse is revealed only after the user submits their answer.
 
+## Global Quranic Chat
+Real-time chat system with 11 language-specific rooms (English, French, Indonesian, Urdu, Turkish, Russian, Spanish, Bengali, Hindi, German, Swahili). Uses Socket.io for bi-directional messaging and Gemini AI for automatic Arabic↔target-language translation. Messages are persisted in the `chat_messages` table. The chat is accessible at `/chat` with a lobby showing all rooms and individual chat room views with WhatsApp-style message bubbles. Each message shows the translated text with a "Show original" toggle for learning.
+
 ## Translation Management
 An administrative `/translation-manager` interface allows bulk translation of philosophical sentences and conversation prompts into 9 languages using Gemini AI, providing statistics, single-sentence translation, and robust error handling.
 
@@ -78,6 +81,7 @@ HyperPay's COPYandPAY Widget is integrated for subscription management, supporti
 - `drizzle-orm`: Type-safe ORM
 - `@tanstack/react-query`: Server state management
 - `express`: Node.js web framework
+- `socket.io` / `socket.io-client`: Real-time bidirectional chat
 - Gemini AI (gemini-2.0-flash): Content generation, translation, validation, explanations
 
 ## UI and Styling

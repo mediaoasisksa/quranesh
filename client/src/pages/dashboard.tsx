@@ -329,6 +329,35 @@ export default function Dashboard() {
                 </Button>
               </CardContent>
             </Card>
+
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-emerald-200 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20"
+              onClick={() => setLocation("/chat")}
+              data-testid="card-global-chat"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-2 text-foreground">
+                      Global Quranic Chat
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Join 11 language rooms with AI-powered Arabic translation
+                    </p>
+                  </div>
+                  <Languages className="h-10 w-10 text-emerald-600 shrink-0" />
+                </div>
+                <Button 
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocation("/chat");
+                  }}
+                >
+                  Enter Chat Rooms
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
 

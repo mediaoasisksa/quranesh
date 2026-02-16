@@ -26,6 +26,7 @@ import {
   userDiplomaProgress,
   diplomaExerciseAttempts,
   analyticsEvents,
+  chatMessages,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -2791,6 +2792,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Repair scenarios error:", error);
       res.status(500).json({ message: "Failed to repair scenarios" });
+    }
+  });
+
+  app.get("/api/chat/rooms", async (_req, res) => {
+    const { CHAT_ROOMS } = await import("./chat");
+    res.json(CHAT_ROOMS);
+  });
+
+  app.get("/api/chat/messages/:roomId", async (req, res) => {
+    try {
+      const { desc, eq } = await import("drizzle-orm");
+      const { roomId } = req.params;
+      const messages = await db
+        .select()
+        .from(chatMessages)
+        .where(eq(chatMessages.roomId, roomId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(100);
+      res.json(messages.reverse());
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch messages" });
     }
   });
 

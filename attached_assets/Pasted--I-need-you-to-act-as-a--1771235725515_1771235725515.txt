@@ -1,0 +1,88 @@
+الموضوع: إضافة ميزة "غرف الدردشة العالمية" مع ترجمة فورية بالذكاء الاصطناعي
+
+I need you to act as a Senior Full Stack Developer.
+
+Please add a new feature to my existing project called "Global Quranic Chat". This feature consists of 11 separate chat rooms, each dedicated to a specific language.
+
+Here are the specific requirements:
+
+1. The Rooms:
+Create a lobby page or a sidebar that lists 11 rooms for the following languages:
+
+English
+
+French
+
+Indonesian
+
+Urdu
+
+Turkish
+
+Russian
+
+Spanish
+
+Bengali
+
+Hindi
+
+German
+
+Swahili
+
+2. The Tech Stack:
+
+Backend: Use Socket.io (with Node.js/Express) for real-time bi-directional event-based communication.
+
+AI Translation: Integrate with OpenAI API (GPT-4o or GPT-3.5-turbo) or Replit AI to handle translations.
+
+3. The Translation Logic (Crucial):
+The chat must bridge the gap between Arabic speakers (Teachers/Donors) and Non-Arabic speakers (Students).
+
+Scenario A: If a user types in Arabic inside a specific room (e.g., The English Room), the AI must automatically detect it's Arabic and translate it to the Target Room Language (English).
+
+Scenario B: If a user types in the Room's Language (e.g., English), the AI must translate it to Arabic.
+
+Display: The chat bubble should display the Translated Text clearly, and perhaps show the original text in a smaller font below it (or via a "show original" toggle) so users can learn.
+
+4. User Interface (UI):
+
+Clean, responsive chat interface (like WhatsApp or Telegram).
+
+Show the name of the current room (e.g., "English Quran Circle").
+
+Input field with a send button.
+
+Message bubbles should distinguish between "Me" (right) and "Others" (left).
+
+5. Implementation Steps:
+
+Install necessary packages (socket.io, openai, etc.).
+
+Set up the Socket.io server to handle join_room, send_message, and receive_message events.
+
+Create a helper function translateMessage(text, targetLang) using the AI API.
+
+Update the Frontend to allow switching rooms and displaying messages.
+
+Please start by installing the dependencies and setting up the Socket.io server structure.
+
+💡 نصائح إضافية لنجاح الكود (لك أنت):
+مفاتيح الـ API:
+سيطلب منك Replit (أو الكود) مفتاح OPENAI_API_KEY. تأكد من إضافته في قسم Secrets (القفل) في Replit، وليس في الكود مباشرة للأمان.
+
+Key: OPENAI_API_KEY
+
+Value: sk-.... (مفتاحك الخاص).
+
+لماذا 11 غرفة؟
+لقد وضعت لك قائمة بأهم 11 لغة يتحدثها المسلمون حول العالم (الإندونيسية، الأردية، التركية، البنغالية، الهندية، السواحلية... إلخ) بالإضافة للغات العالمية (إنجليزي، فرنسي، روسي). يمكنك تعديل القائمة في التوجيه إذا أردت لغات أخرى.
+
+التكلفة (Tokens):
+انتبه أن استخدام الـ AI للترجمة في كل رسالة قد يستهلك رصيدك في OpenAI إذا كان الشات مزدحماً جداً.
+
+خيار بديل: إذا أردت توفير التكلفة، يمكنك لاحقاً طلب تعديل الكود لاستخدام Google Translate API بدلاً من GPT، فهي أرخص وأسرع للترجمة المباشرة، لكن GPT أفضل في فهم السياق الديني (مثل ترجمة "الرحمة" أو "التقوى").
+
+طريقة العرض:
+طلبت في الكود أن يظهر "النص المترجم" وبخطر صغير "النص الأصلي". هذا أفضل تعليمياً، لكي يرى الطالب الكلمة العربية ويرى معناها بلغته، والعكس صحيح.

@@ -20,6 +20,7 @@ import RealLifeExamplesPage from "@/pages/real-life-examples";
 import Analytics from "@/pages/Analytics";
 import DiplomaPage from "@/pages/diploma";
 import AdminPage from "@/pages/admin";
+import ChatPage from "@/pages/chat";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/real-life-examples" component={RealLifeExamplesPage} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/diploma" component={DiplomaPage} />
+      <Route path="/chat" component={ChatPage} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={Profile} />

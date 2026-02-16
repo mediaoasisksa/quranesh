@@ -550,3 +550,23 @@ export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).om
 
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
+
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roomId: text("room_id").notNull(),
+  userId: text("user_id").notNull(),
+  userName: text("user_name").notNull(),
+  originalText: text("original_text").notNull(),
+  translatedText: text("translated_text"),
+  originalLang: text("original_lang"),
+  targetLang: text("target_lang"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
