@@ -43,15 +43,23 @@ TASK: Generate ${count} daily contextual exercises using the REVERSE-ENGINEERED 
 
 ⚠️ MANDATORY WORKFLOW FOR EACH EXERCISE — VERSE FIRST:
 1. SELECT a short Quranic expression FIRST (2-6 words) that native speakers actually quote in daily life
-2. EXTRACT its key Arabic keywords and their exact meanings
-3. WRITE an English scenario sentence that PARAPHRASES those keywords (Semantic Hinting)
-   ❌ BAD: "Something bad happened. What do you say?" (too vague — could match any verse)
-   ✅ GOOD: "You feel grateful for unexpected blessings and want to praise Allah for them" (paraphrases "الحمد")
-4. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
+2. EXTRACT its LOCK WORDS (كلمات القفل): ≥2 key Arabic keywords + their meanings + core concept
+3. CHECK: If any Lock Word is a synonym/metaphor for a common word (e.g., رواسي ↔ جبال), note the SEMANTIC TRAIT (not the common word)
+4. WRITE an English scenario sentence that PARAPHRASES ≥2 Lock Words (Semantic Hinting)
+   ❌ BAD: "Something bad happened. What do you say?" (too vague — 0 lock words)
+   ❌ BAD: "A verse about mountains" when the verse says "رواسي" (synonym violation — must use "anchored/firmly-set")
+   ✅ GOOD: "You feel grateful for unexpected blessings and want to praise Allah for them" (lock words: حمد=praise, لله=to Allah)
+5. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
+6. QA CHECK: If the scenario uses a common word where the verse uses a different word → REWRITE using semantic trait or exact Quranic word
 
-SEMANTIC HINTING RULE:
-The englishText MUST contain a paraphrase or definition of the verse's key vocabulary.
-The user should be able to recall the verse just from reading the scenario.
+LOCK WORDS RULE (كلمات القفل):
+The englishText MUST contain paraphrases of ≥2 Lock Words from the verse.
+If the question has only 1 lock word, it's too vague and could match multiple verses — REJECTED.
+
+SYNONYM/METAPHOR RULE:
+If the verse uses a literary/Quranic word (رواسي, بروج, فلك, etc.) instead of a common word (جبال, أبراج, سفينة),
+the scenario must use the SEMANTIC TRAIT or exact Quranic word — NOT the common synonym.
+Example: رواسي → use "anchored/firmly-set mountains" or "رواسي" — NOT just "mountains".
 
 ${VALIDATION_CHECKLIST}
 
@@ -104,7 +112,8 @@ Return valid JSON array with this structure:
 IMPORTANT: 
 - Return ONLY valid JSON, no markdown formatting
 - All Quranic verses MUST be authentic — selected BEFORE writing the scenario
-- The scenario text MUST paraphrase the verse's keywords (Semantic Hinting)
+- The scenario text MUST contain ≥2 LOCK WORDS from the verse as paraphrases
+- If the verse uses a synonym/metaphor for a common word, use the SEMANTIC TRAIT or exact Quranic word in the scenario
 - NO abstract connections — the link must be obvious without Tafsir
 - Focus on practical, conversational usage — only phrases native speakers actually quote`;
 

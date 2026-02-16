@@ -580,28 +580,31 @@ function createValidationPrompt(
       break;
     case "conversation":
       specificInstructions = `This is a CONVERSATION exercise using the REVERSE-ENGINEERED TRIGGER-RESPONSE framework.
-The scenario (TRIGGER) was written AROUND a specific verse. The scenario contains SEMANTIC HINTS — paraphrases and definitions of the target verse's keywords. The student must recall the Quranic phrase (RESPONSE) from those hints.
+The scenario (TRIGGER) was written AROUND a specific verse using LOCK WORDS (كلمات القفل) — paraphrases of ≥2 of the verse's unique keywords. The student must recall the Quranic phrase (RESPONSE) from those Lock Words.
 
-EVALUATION — THE SEMANTIC HINTING TEST:
-1. Does the student's answer contain KEYWORDS that match the SEMANTIC HINTS in the scenario?
-   - The scenario defines "patience without complaint (beautiful patience)" → answer should contain "فَصَبْرٌ جَمِيلٌ"
-   - The scenario says "ease paired with hardship" → answer should contain "مَعَ الْعُسْرِ يُسْرًا"
-   - The scenario says "doers of good" → answer should contain "المحسنين"
-2. Would a native Arabic speaker naturally quote this phrase in this situation?
-3. Is this an authentic Quranic verse or widely-used Islamic expression?
-4. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir?
+EVALUATION — THE LOCK WORDS + SEMANTIC HINTING TEST:
+1. Does the student's answer contain KEYWORDS that match the LOCK WORDS embedded in the scenario?
+   - Scenario has lock words "patience + without complaint (beautiful)" → answer should contain "فَصَبْرٌ جَمِيلٌ"
+   - Scenario has lock words "ease + hardship + paired with" → answer should contain "مَعَ الْعُسْرِ يُسْرًا"
+   - Scenario has lock words "love + doers of good" → answer should contain "المحسنين"
+2. Does the answer contain ≥2 keywords that map to the scenario's Lock Words?
+3. Would a native Arabic speaker naturally quote this phrase in this situation?
+4. Is this an authentic Quranic verse or widely-used Islamic expression?
+5. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir?
+6. SYNONYM CHECK: If the scenario uses a common word (e.g., جبال) but the answer uses a Quranic synonym (e.g., رواسي), verify the semantic trait matches.
 
-ACCEPT if the answer's KEYWORDS semantically match the scenario's semantic hints, even if it's not the exact expected verse.
+ACCEPT if the answer's keywords map to ≥2 of the scenario's Lock Words, even if not the exact expected verse.
 REJECT if:
 ❌ The answer requires deep theological interpretation to connect to the scenario
 ❌ The answer is from a Quranic story/narrative that isn't quoted in daily speech
-❌ The answer's keywords have NO direct mapping to the scenario's semantic hints
+❌ The answer's keywords have NO direct mapping to the scenario's Lock Words
 ❌ The connection is abstract/philosophical rather than linguistic
+❌ The answer uses a synonym where the scenario specified the exact semantic trait
 
 EXAMPLES:
-✅ Scenario hints at "praise and thankfulness" → "الحمد لله" (keyword: حمد = praise)
-✅ Scenario hints at "trusting Allah as sufficient" → "حسبنا الله ونعم الوكيل" (keyword: حسب = sufficient)
-❌ Scenario about "making an appointment" → "الساعة آتية" (this is about Day of Judgment, NOT appointments)
+✅ Scenario lock words: "praise + thankfulness" → "الحمد لله" (حمد = praise, لله = to Allah)
+✅ Scenario lock words: "trusting + sufficient" → "حسبنا الله ونعم الوكيل" (حسب = sufficient)
+❌ Scenario about "making an appointment" → "الساعة آتية" (Day of Judgment, NOT appointments)
 ❌ Scenario about "phone addiction" → "اجعلني على خزائن الأرض" (requires deep interpretation — REJECTED)`;
       break;
     case "completion":
@@ -618,21 +621,23 @@ EXAMPLES:
       break;
     case "roleplay":
       specificInstructions = `This is a ROLEPLAY exercise using the REVERSE-ENGINEERED TRIGGER-RESPONSE framework.
-The scenario was written AROUND a specific verse, with SEMANTIC HINTS that paraphrase the verse's keywords. The student must recall and respond with the correct Quranic phrase.
+The scenario was written AROUND a specific verse, with LOCK WORDS (كلمات القفل) — ≥2 paraphrases of the verse's unique keywords. The student must recall and respond with the correct Quranic phrase.
 
-EVALUATION — THE SEMANTIC HINTING TEST:
-1. Does the student's answer contain KEYWORDS that match the SEMANTIC HINTS embedded in the scenario?
-   - Scenario defines "patience without complaint" → answer should contain "فَصَبْرٌ جَمِيلٌ"
-   - Scenario hints at "despairing of mercy" → answer should contain "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ"
-2. Would a native Arabic speaker naturally quote this in the described situation?
-3. Is it authentic Quranic text?
-4. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir or abstract interpretation?
+EVALUATION — THE LOCK WORDS + SEMANTIC HINTING TEST:
+1. Does the student's answer contain KEYWORDS that match the LOCK WORDS embedded in the scenario?
+   - Scenario lock words: "patience + without complaint" → answer should contain "فَصَبْرٌ جَمِيلٌ"
+   - Scenario lock words: "despairing + mercy" → answer should contain "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ"
+2. Does the answer contain ≥2 keywords that map to the scenario's Lock Words?
+3. Would a native Arabic speaker naturally quote this in the described situation?
+4. Is it authentic Quranic text?
+5. Is the connection OBVIOUS and LINGUISTIC — not requiring deep Tafsir or abstract interpretation?
+6. SYNONYM CHECK: If the scenario uses a semantic trait (e.g., "anchoring/stabilizing") instead of a common word, does the answer match via the Quranic word (e.g., رواسي)?
 
-ACCEPT if keywords map directly to the semantic hints and a native speaker would naturally say it.
+ACCEPT if ≥2 keywords map to the Lock Words and a native speaker would naturally say it.
 REJECT if:
 ❌ The connection requires deep theological interpretation (No Abstraction rule)
 ❌ The verse is from a specific Quranic narrative not quoted in daily speech
-❌ No keyword mapping exists between scenario's semantic hints and the answer
+❌ <2 keyword mappings exist between scenario's Lock Words and the answer
 ❌ The connection is abstract/philosophical rather than linguistic`;
       break;
     case "transformation":
@@ -1636,31 +1641,42 @@ Difficulty: ${difficulty} (1-5 scale)
 VERSE-FIRST WORKFLOW:
 1. SELECT a REAL Quranic verse or phrase FIRST that native Arabic speakers actually quote in daily life.
 2. It must be short enough to use in conversation (2-8 words preferred).
-3. EXTRACT its key Arabic keywords and their exact meanings.
-4. WRITE a life application scenario that PARAPHRASES those keywords (Semantic Hinting).
-   The scenario must DEFINE/PARAPHRASE the verse's vocabulary so a student can recall it.
+3. EXTRACT its LOCK WORDS (كلمات القفل): ≥2 key Arabic keywords + their meanings + core concept.
+4. CHECK: If any Lock Word is a synonym/metaphor for a common word (e.g., رواسي ↔ جبال), note the SEMANTIC TRAIT (not the common word).
+5. WRITE a life application scenario that contains ≥2 LOCK WORDS as paraphrases/definitions.
+   The scenario must make the verse recallable — a student who memorized it can recall it from the scenario alone.
+
+LOCK WORDS RULE (كلمات القفل):
+The lifeApplication MUST contain paraphrases/definitions of ≥2 Lock Words from the verse.
+A single keyword is NOT enough — it could match multiple verses.
+
+SYNONYM/METAPHOR RULE:
+If the verse uses a literary/Quranic word instead of a common word, the scenario must use the SEMANTIC TRAIT or exact Quranic word — NOT the common synonym.
 
 NO ABSTRACTION RULE:
 The connection between the scenario and the verse must be OBVIOUS and LINGUISTIC.
 Do NOT use verses that require deep Tafsir to connect to the situation.
 
-Examples of good phrases with semantic hinting:
-- "إن مع العسر يسرا" → "When facing hardship, this verse reminds you that ease is paired with it" (keyword: العسر=hardship, يسرا=ease)
-- "والله يحب المحسنين" → "When someone does good deeds, this verse affirms Allah's love for the doers of good" (keyword: المحسنين=doers of good)
-- "لا تقنطوا من رحمة الله" → "When someone despairs of forgiveness, this verse tells them not to despair of Allah's mercy" (keyword: تقنطوا=despair, رحمة=mercy)
+Examples with Lock Words:
+- "إن مع العسر يسرا" → Lock words: العسر (hardship) + يسرا (ease) + مع (with)
+  → "When facing hardship, this verse reminds you that ease is paired WITH it"
+- "والله يحب المحسنين" → Lock words: يحب (loves) + المحسنين (doers of good)
+  → "When someone does good deeds, this verse affirms Allah's LOVE for the DOERS OF GOOD"
+- "لا تقنطوا من رحمة الله" → Lock words: تقنطوا (despair) + رحمة (mercy)
+  → "When someone DESPAIRS of forgiveness, this verse tells them not to DESPAIR of Allah's MERCY"
 
 Provide:
 1. Arabic Text (with proper diacritics/tashkeel)
 2. English Translation
 3. Surah and Ayah reference (e.g., البقرة:2)
-4. Life Application — a scenario with SEMANTIC HINTS that paraphrase the verse's keywords, so a student who memorized this verse can recall it
+4. Life Application — a scenario with ≥2 LOCK WORDS paraphrasing the verse's keywords
 
 Respond ONLY with a JSON object in this exact format:
 {
   "arabicText": "the Arabic text with diacritics",
   "englishTranslation": "the English translation",
   "surahAyah": "السورة:رقم الآية",
-  "lifeApplication": "scenario with semantic hints paraphrasing the verse's keywords"
+  "lifeApplication": "scenario with ≥2 lock words paraphrasing the verse's keywords"
 }`;
 
     const response = await axios.post(GEMINI_API_URL, {
@@ -1955,40 +1971,50 @@ export async function validateScenarioVerseMatch(
   try {
     const prompt = `You are an Applied Arabic Linguistics Teacher validating a Reverse-Engineered Trigger-Response exercise pair.
 
-THE VALIDATION TEST — 5 RULES:
+THE VALIDATION TEST — 7 RULES:
 
-RULE 1 — SEMANTIC HINTING: Does the scenario contain PARAPHRASES or DEFINITIONS of the verse's key Arabic keywords?
-  ✅ Scenario says "patience without complaint (beautiful patience)" for verse "فَصَبْرٌ جَمِيلٌ" → PASS
-  ✅ Scenario says "ease paired with hardship" for verse "إِنَّ مَعَ الْعُسْرِ يُسْرًا" → PASS
-  ❌ Scenario says "something bad happened" for verse "فَصَبْرٌ جَمِيلٌ" → FAIL (too vague, no semantic hint)
+RULE 1 — LOCK WORDS (كلمات القفل): Does the scenario contain paraphrases/definitions of ≥2 LOCK WORDS from the verse?
+  ✅ Scenario has lock words "patience + without complaint (beautiful)" for verse "فَصَبْرٌ جَمِيلٌ" → PASS (2 lock words)
+  ✅ Scenario has "ease + hardship + paired with" for verse "إِنَّ مَعَ الْعُسْرِ يُسْرًا" → PASS (3 lock words)
+  ❌ Scenario says "something bad happened" for verse "فَصَبْرٌ جَمِيلٌ" → FAIL (0 lock words)
+  ❌ Scenario says "patience" only for verse "فَصَبْرٌ جَمِيلٌ" → FAIL (only 1 lock word — too vague)
 
-RULE 2 — NO ABSTRACTION: The link must be OBVIOUS and LINGUISTIC — no deep Tafsir needed.
+RULE 2 — SYNONYM/METAPHOR CHECK: If the verse uses a literary/Quranic word (e.g., رواسي) instead of a common word (e.g., جبال), the scenario must use the SEMANTIC TRAIT or exact Quranic word — NOT the common synonym.
+  ❌ Scenario says "ذكر الجبال" but verse says "رواسي" → FAIL (synonym violation — must use "الرسوخ/الثبات" or "رواسي")
+  ✅ Scenario says "تثبيت الأرض بالجبال الراسية" → PASS (uses semantic trait "الرسوخ/الثبات")
+  ❌ Scenario says "wishing someone well" but verse says "رحمة الله وبركاته" → FAIL (too vague, no lock words)
+  ✅ Scenario says "رحمة الله + بركاته + عليكم" → PASS (3 lock words, specific)
+
+RULE 3 — NO ABSTRACTION: The link must be OBVIOUS and LINGUISTIC — no deep Tafsir needed.
   ❌ "Phone addiction" + "اجعلني على خزائن الأرض" → FAIL (requires deep interpretation)
-  ❌ "Career planning" + "كن فيكون" → FAIL (divine creation ≠ human planning)
   ✅ "Feeling exhausted after a journey" + "لَقَدْ لَقِينَا مِن سَفَرِنَا هَٰذَا نَصَبًا" → PASS (direct)
 
-RULE 3 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote this verse in this situation?
-RULE 4 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
-RULE 5 — RECALL TEST: Can a student who memorized this verse recall it from the scenario alone?
+RULE 4 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote this verse in this situation?
+RULE 5 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
+RULE 6 — RECALL TEST: Can a student who memorized this verse recall it from the scenario alone?
+RULE 7 — PRACTICAL DAILY USE: Is the verse short (2-8 words) and commonly quoted?
 
 TYPE: ${type === 'conversation' ? 'Conversation Exercise' : 'Roleplay Scenario'}
 
 SCENARIO: "${scenarioText}"
 VERSE: "${verseText}"
 
-Evaluate using ALL 5 rules and return ONLY valid JSON:
+Evaluate using ALL 7 rules and return ONLY valid JSON:
 {
   "isMatch": true/false,
   "confidence": 0-100,
-  "reason": "Which rules pass/fail and why — especially check Semantic Hinting and No Abstraction",
-  "correctedScenario": "If mismatch: rewrite scenario with SEMANTIC HINTS that paraphrase/define the verse's keywords so the user can recall it. If match: omit.",
+  "lockWordsFound": ["list of Lock Words from the verse that appear as paraphrases in the scenario"],
+  "lockWordsCount": number,
+  "synonymViolation": "If scenario uses a common word where the verse uses a different word, explain. Otherwise null.",
+  "reason": "Which rules pass/fail and why — especially check Lock Words count and Synonym violations",
+  "correctedScenario": "If mismatch: rewrite scenario with ≥2 LOCK WORDS as paraphrases. If synonym violation: rewrite using semantic trait or exact Quranic word. If match: omit.",
   "correctedVerse": "If verse requires deep interpretation or is too generic: suggest a better authentic Quranic verse. If match: omit."
 }
 
 SCORING:
-- confidence >= 70 = MATCH (semantic hints present, obvious connection, native speaker would quote it)
-- confidence 40-69 = WEAK (theme related but scenario is too vague — missing semantic hints)
-- confidence < 40 = MISMATCH (abstract connection, requires Tafsir, or no keyword paraphrase)`;
+- confidence >= 70 = MATCH (≥2 lock words, no synonym violations, native speaker would quote it)
+- confidence 40-69 = WEAK (theme related but <2 lock words, or has synonym violation)
+- confidence < 40 = MISMATCH (abstract connection, requires Tafsir, 0 lock words, or major synonym violation)`;
 
     const response = await translateWithRetry(prompt, 4, 5000, 500);
     const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();

@@ -26,16 +26,24 @@ The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generat
 
 **Generation Workflow (Verse-First):**
 1. SELECT the target Quranic verse FIRST (2-8 words, commonly quoted by native speakers)
-2. EXTRACT key Arabic keywords and their meanings
-3. WRITE a scenario that PARAPHRASES those keywords (Semantic Hinting)
-4. VERIFY: Can the student recall the verse from the question alone?
+2. EXTRACT Lock Words (كلمات القفل): ≥2 key Arabic keywords + their meanings + core concept
+3. CHECK: If any Lock Word is a synonym/metaphor for a common word, note the SEMANTIC TRAIT (not the common word)
+4. WRITE a question that contains ≥2 Lock Words as paraphrases/definitions
+5. VERIFY: Can the student recall the verse from the question alone? Are there ≥2 Lock Words?
 
 **Strict Rules:**
-1. **Semantic Hinting (التلميح اللفظي)**: The question must contain a paraphrase/definition of the verse's keywords so the user can recall the exact phrase (e.g., "patience without complaint (beautiful patience)" → "فَصَبْرٌ جَمِيلٌ")
-2. **No Abstraction (منع التفسير العميق)**: No verses requiring deep Tafsir to connect — the link must be OBVIOUS and LINGUISTIC (e.g., ❌ "phone addiction" → "خزائن الأرض" is rejected because only scholars see the connection)
-3. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
-4. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
-5. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
+1. **Lock Words (كلمات القفل)**: Every question must contain paraphrases/definitions of ≥2 of the verse's unique keywords ("Lock Words"). A single keyword is too vague — it could match multiple verses. Example: "صبر + لا شكوى / جميل" = 2 lock words → only "فَصَبْرٌ جَمِيلٌ" fits.
+2. **Synonym/Metaphor Rule (قاعدة المرادف)**: When the verse uses a literary/Quranic word (e.g., رواسي) instead of a common word (e.g., جبال), the question must use the SEMANTIC TRAIT ("الرسوخ/الثبات") or the exact Quranic word — NOT the common synonym. Golden Rule: المعنى → الصفة → اللفظ القرآني → الآية.
+3. **Semantic Hinting (التلميح اللفظي)**: The question must embed the MEANING of the verse's keywords so the user can recall the exact phrase.
+4. **No Abstraction (منع التفسير العميق)**: No verses requiring deep Tafsir to connect — the link must be OBVIOUS and LINGUISTIC (e.g., ❌ "phone addiction" → "خزائن الأرض" is rejected because only scholars see the connection)
+5. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
+6. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
+7. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
+
+**QA Auto-Rejection Rules:**
+- If the scenario uses a COMMON WORD but the verse uses a DIFFERENT WORD for the same concept → REJECT and rewrite
+- If the question has only 1 lock word → REJECT (too ambiguous)
+- If the question is a general topic without specific Lock Words → REJECT
 
 This doctrine is enforced in: `server/content-logic.ts` (shared constants), `server/add-conversation-prompts.ts` (generation), `server/generate-daily-contextual-exercises.ts` (daily exercises), `server/ai-service.ts` (validation, phrase generation, answer evaluation).
 
