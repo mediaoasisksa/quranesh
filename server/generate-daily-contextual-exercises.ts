@@ -51,6 +51,7 @@ TASK: Generate ${count} daily contextual exercises using the REVERSE-ENGINEERED 
    ✅ GOOD: "You feel grateful for unexpected blessings and want to praise Allah for them" (lock words: حمد=praise, لله=to Allah)
 5. Pick two DISTRACTOR Quranic expressions from DIFFERENT themes that clearly DON'T fit
 6. QA CHECK: If the scenario uses a common word where the verse uses a different word → REWRITE using semantic trait or exact Quranic word
+7. MEANING CHECK: NEVER ask about surah names/numbers or "which surah starts with X?" — teach the LINGUISTIC MEANING of the Quranic word, then ask the student to recall it
 
 LOCK WORDS RULE (كلمات القفل):
 The englishText MUST contain paraphrases of ≥2 Lock Words from the verse.

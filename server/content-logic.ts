@@ -96,7 +96,23 @@ Only use short Quranic phrases (2-8 words) that a person could naturally say in 
 
 RULE 7 — NATIVE SPEAKER TEST:
 If a native Arabic speaker wouldn't naturally quote this verse in this specific situation, DO NOT use it.
+
+RULE 8 — MEANING → QURANIC WORD (المعنى → الكلمة القرآنية):
+NEVER ask about surah names, surah numbers, or "which surah starts with X?"
+This is memorization trivia, NOT language teaching.
+Instead, teach the LINGUISTIC MEANING of the Quranic word, then ask the student to recall the word.
+
+  ❌ WRONG: "ما السورة التي تبدأ بـ يا أيها المزمل؟" → This tests surah knowledge, not vocabulary
+  ✅ RIGHT: "ما الكلمة القرآنية التي تعني: المتغطي بثوبه/الملتف بلباسه؟" → Teaches the MEANING of المزمل
+
+  FORMULA: Give the linguistic meaning → Ask for the Quranic word/phrase
+  EXAMPLES:
+    المزمل (المتغطي بثوبه) → "ما الكلمة القرآنية التي تعني: المتغطي بثوبه؟"
+    الفلق (الصبح) → "ما الكلمة القرآنية التي تعني: انشقاق الظلام عن نور الصباح؟"
+    الكوثر (الخير الكثير) → "ما الكلمة القرآنية التي تعني: الخير الكثير والوفرة؟"
+    الصراط المستقيم (الطريق الصحيح) → "ما العبارة القرآنية التي تعني: الطريق الواضح الصحيح؟"
 `;
+
 
 export const VALIDATION_CHECKLIST = `
 VALIDATION CHECKLIST (apply to EVERY exercise):
@@ -114,6 +130,7 @@ QA AUTO-REJECTION RULES:
 ✘ If the scenario contains a COMMON WORD (e.g., "جبال") but the verse uses a DIFFERENT WORD for the same concept (e.g., "رواسي") → REJECT and rewrite the question using the semantic trait or exact Quranic word.
 ✘ If the question has only 1 lock word → REJECT (too ambiguous — could match multiple verses).
 ✘ If the question is a general topic (e.g., "ذكر الجبال", "wishing someone well") without specific Lock Words → REJECT.
+✘ If the question asks about surah names, surah numbers, or "which surah starts with X?" → REJECT. This is memorization trivia, not language teaching. Rewrite to ask about the LINGUISTIC MEANING of the Quranic word.
 `;
 
 export const EXERCISE_FORMAT = `

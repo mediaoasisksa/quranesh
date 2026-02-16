@@ -179,6 +179,11 @@ export default function Exercise() {
     category: string | null;
     symbolicMeaning?: string | null;
     surahNumber?: number | null;
+    claim?: string | null;
+    evidencePhrase?: string | null;
+    hint?: string | null;
+    acceptedVariants?: string[] | null;
+    answerMode?: string | null;
   }>({
     queryKey: ["/api/conversation-prompts/random", userId, language, selectedSurah],
     queryFn: async () => {
@@ -836,10 +841,12 @@ export default function Exercise() {
                 <BookOpenCheck className="h-4 w-4" />
                 {language === 'ar' ? 'التحدي:' : 'The Challenge:'}
               </p>
-              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
-                {language === 'ar' 
-                  ? 'أي عبارة قرآنية تناسب هذا المعنى بالضبط؟'
-                  : 'Which Quranic phrase fits this exact meaning?'}
+              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${conversationPrompt?.claim ? 'text-right' : (language === 'ar' ? 'text-right' : '')}`} dir={conversationPrompt?.claim ? 'rtl' : dir} lang={conversationPrompt?.claim ? 'ar' : undefined}>
+                {conversationPrompt?.claim 
+                  ? conversationPrompt.claim
+                  : (language === 'ar' 
+                    ? 'أي عبارة قرآنية تناسب هذا المعنى بالضبط؟'
+                    : 'Which Quranic phrase fits this exact meaning?')}
               </p>
             </div>
 
@@ -881,6 +888,19 @@ export default function Exercise() {
                   data-testid="text-conversation-verse"
                 >
                   {conversationPrompt.suggestedVerse}
+                </p>
+              </div>
+            )}
+
+            {/* Post-answer explanation — shows brief linguistic explanation after answering */}
+            {isAnswered && conversationPrompt?.hint && (
+              <div className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/20 dark:to-cyan-900/20 rounded-lg p-4 border border-sky-300 dark:border-sky-700 animate-in fade-in duration-500">
+                <p className="text-sm font-bold text-sky-800 dark:text-sky-200 mb-2 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  {language === 'ar' ? 'شرح المفردة:' : 'Word Explanation:'}
+                </p>
+                <p className="arabic-text text-base text-sky-900 dark:text-sky-100 leading-relaxed" dir="rtl" lang="ar">
+                  {conversationPrompt.hint}
                 </p>
               </div>
             )}

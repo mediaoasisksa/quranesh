@@ -39,15 +39,27 @@ export function normalizeArabic(text: string): string {
 }
 
 /**
- * Check if answer matches evidence phrase
- * التحقق من تطابق الإجابة مع العبارة المطلوبة
+ * Strip definite article (ال) from Arabic word for flexible matching
+ * تجريد أل التعريف من الكلمة للمقارنة المرنة
+ */
+export function stripDefiniteArticle(text: string): string {
+  if (!text) return '';
+  let stripped = text.trim();
+  // Remove leading ال (with or without hamza variants)
+  stripped = stripped.replace(/^(ال|أل|إل)/, '');
+  return stripped;
+}
+
+/**
+ * Check if answer matches evidence phrase with أل-flexible matching
+ * التحقق من تطابق الإجابة مع العبارة المطلوبة (مع مرونة في أل التعريف)
  */
 export function checkAnswerMatch(
   userAnswer: string,
   evidencePhrase: string,
   answerMode: 'EXACT_PHRASE' | 'CONTAINS_PHRASE',
   acceptedVariants?: string[]
-): { isMatch: boolean; matchType: 'exact' | 'partial' | 'variant' | 'none' } {
+): { isMatch: boolean; matchType: 'exact' | 'partial' | 'variant' | 'article_flexible' | 'none'; canonicalForm?: string } {
   const normalizedAnswer = normalizeArabic(userAnswer);
   const normalizedEvidence = normalizeArabic(evidencePhrase);
   
@@ -61,8 +73,31 @@ export function checkAnswerMatch(
     for (const variant of acceptedVariants) {
       const normalizedVariant = normalizeArabic(variant);
       if (normalizedAnswer === normalizedVariant) {
-        return { isMatch: true, matchType: 'variant' };
+        return { isMatch: true, matchType: 'variant', canonicalForm: evidencePhrase };
       }
+    }
+  }
+  
+  // مرونة أل التعريف — accept with/without ال
+  const answerWords = normalizedAnswer.split(' ');
+  const evidenceWords = normalizedEvidence.split(' ');
+  if (answerWords.length === evidenceWords.length) {
+    const allWordsMatch = answerWords.every((word, i) => {
+      if (word === evidenceWords[i]) return true;
+      const strippedAnswer = stripDefiniteArticle(word);
+      const strippedEvidence = stripDefiniteArticle(evidenceWords[i]);
+      return strippedAnswer === strippedEvidence && strippedAnswer.length > 0;
+    });
+    if (allWordsMatch && normalizedAnswer !== normalizedEvidence) {
+      return { isMatch: true, matchType: 'article_flexible', canonicalForm: evidencePhrase };
+    }
+  }
+  // Also check single-word case: answer without ال matches evidence with ال (or vice versa)
+  if (answerWords.length === 1 && evidenceWords.length === 1) {
+    const strippedA = stripDefiniteArticle(normalizedAnswer);
+    const strippedE = stripDefiniteArticle(normalizedEvidence);
+    if (strippedA === strippedE && strippedA.length > 0) {
+      return { isMatch: true, matchType: 'article_flexible', canonicalForm: evidencePhrase };
     }
   }
   
@@ -96,11 +131,8 @@ export function validateEvidenceExercise(
     errors.push('العبارة المطلوبة غير موجودة في نص الآية');
   }
   
-  // التحقق من طول العبارة (2-10 كلمات)
+  // التحقق من طول العبارة (1-10 كلمات — single Quranic words allowed)
   const wordCount = evidencePhrase.trim().split(/\s+/).length;
-  if (wordCount < 2) {
-    errors.push('العبارة قصيرة جداً (أقل من كلمتين)');
-  }
   if (wordCount > 10) {
     errors.push('العبارة طويلة جداً (أكثر من 10 كلمات)');
   }
@@ -122,10 +154,16 @@ export function validateEvidenceExercise(
  * توليد رسالة خطأ أفضل للمستخدم
  */
 export function getEvidenceErrorMessage(
-  matchResult: { isMatch: boolean; matchType: string },
+  matchResult: { isMatch: boolean; matchType: string; canonicalForm?: string },
   hint?: string
 ): { title: string; description: string } {
   if (matchResult.isMatch) {
+    if (matchResult.matchType === 'article_flexible' && matchResult.canonicalForm) {
+      return {
+        title: 'إجابة صحيحة',
+        description: `صحيح، والصيغة القرآنية: ${matchResult.canonicalForm}`
+      };
+    }
     return {
       title: 'إجابة صحيحة',
       description: matchResult.matchType === 'exact' 

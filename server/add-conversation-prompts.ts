@@ -28,6 +28,7 @@ TASK: Generate ${count} conversation practice exercises for Arabic learners who 
 5. Write the same scenario in Arabic with the same Lock Words
 6. VERIFY: Can a student who memorized this verse recall it from the question alone? If NO → rewrite.
 7. QA CHECK: Does the question use any common word where the verse uses a different word? If YES → rewrite.
+8. MEANING CHECK: Does the question teach LINGUISTIC MEANING, not surah identification? NEVER ask "which surah starts with X?" or "ما السورة التي تبدأ بـ...؟" — instead ask "what Quranic word means X?"
 
 LOCK WORDS + SEMANTIC HINTING EXAMPLES:
   ❌ BAD question_en: "What do you say when something bad happens?" (0 lock words — too vague)

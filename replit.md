@@ -39,11 +39,13 @@ The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generat
 5. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
 6. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
 7. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
+8. **Meaning → Quranic Word (المعنى → الكلمة القرآنية)**: NEVER ask about surah names/numbers ("ما السورة التي تبدأ بـ...؟"). Instead, teach the LINGUISTIC MEANING of the Quranic word, then ask the student to recall it. Formula: Give meaning → Ask for Quranic word. Example: "ما الكلمة القرآنية التي تعني: المتغطي بثوبه؟" → المزمل
 
 **QA Auto-Rejection Rules:**
 - If the scenario uses a COMMON WORD but the verse uses a DIFFERENT WORD for the same concept → REJECT and rewrite
 - If the question has only 1 lock word → REJECT (too ambiguous)
 - If the question is a general topic without specific Lock Words → REJECT
+- If the question asks about surah names/numbers or "which surah starts with X?" → REJECT (memorization trivia, not language teaching)
 
 This doctrine is enforced in: `server/content-logic.ts` (shared constants), `server/add-conversation-prompts.ts` (generation), `server/generate-daily-contextual-exercises.ts` (daily exercises), `server/ai-service.ts` (validation, phrase generation, answer evaluation).
 

@@ -1670,11 +1670,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({
             isCorrect: matchResult.isMatch,
             score: matchResult.isMatch ? 100 : 0,
-            feedback: matchResult.isMatch 
-              ? errorMsg.description
-              : errorMsg.description,
+            feedback: errorMsg.description,
             matchType: matchResult.matchType,
-            suggestions: matchResult.isMatch ? [] : ['اكتب العبارة القرآنية المطلوبة كما وردت في الآية'],
+            canonicalForm: matchResult.canonicalForm || null,
+            suggestions: matchResult.isMatch ? [] : ['اكتب الكلمة/العبارة القرآنية المطلوبة'],
             confidence: matchResult.isMatch ? 100 : 0,
           });
         }

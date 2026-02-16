@@ -601,9 +601,12 @@ REJECT if:
 ❌ The connection is abstract/philosophical rather than linguistic
 ❌ The answer uses a synonym where the scenario specified the exact semantic trait
 
+IMPORTANT: If the scenario asks about a LINGUISTIC MEANING (e.g., "المتغطي بثوبه"), accept the Quranic word (المزمل) even without the full verse context. Single-word vocabulary answers ARE valid when the exercise teaches vocabulary.
+
 EXAMPLES:
 ✅ Scenario lock words: "praise + thankfulness" → "الحمد لله" (حمد = praise, لله = to Allah)
 ✅ Scenario lock words: "trusting + sufficient" → "حسبنا الله ونعم الوكيل" (حسب = sufficient)
+✅ Scenario: "المتغطي بثوبه" → "المزمل" (vocabulary exercise — single word answer is correct)
 ❌ Scenario about "making an appointment" → "الساعة آتية" (Day of Judgment, NOT appointments)
 ❌ Scenario about "phone addiction" → "اجعلني على خزائن الأرض" (requires deep interpretation — REJECTED)`;
       break;
@@ -1657,6 +1660,12 @@ NO ABSTRACTION RULE:
 The connection between the scenario and the verse must be OBVIOUS and LINGUISTIC.
 Do NOT use verses that require deep Tafsir to connect to the situation.
 
+MEANING → QURANIC WORD RULE:
+NEVER ask about surah names, surah numbers, or "which surah starts with X?"
+Instead, teach the LINGUISTIC MEANING of the Quranic word, then ask the student to recall the word.
+❌ WRONG: "ما السورة التي تبدأ بـ يا أيها المزمل؟"
+✅ RIGHT: "ما الكلمة القرآنية التي تعني: المتغطي بثوبه/الملتف بلباسه؟"
+
 Examples with Lock Words:
 - "إن مع العسر يسرا" → Lock words: العسر (hardship) + يسرا (ease) + مع (with)
   → "When facing hardship, this verse reminds you that ease is paired WITH it"
@@ -1993,6 +2002,7 @@ RULE 4 — NATIVE SPEAKER TEST: Would a native Arabic speaker naturally quote th
 RULE 5 — SPECIFICITY: The scenario must make THIS verse (not just any verse) the obvious answer.
 RULE 6 — RECALL TEST: Can a student who memorized this verse recall it from the scenario alone?
 RULE 7 — PRACTICAL DAILY USE: Is the verse short (2-8 words) and commonly quoted?
+RULE 8 — MEANING → QURANIC WORD: Does the question teach linguistic meaning, NOT surah identification? (NEVER "which surah starts with X?" — instead "what Quranic word means X?")
 
 TYPE: ${type === 'conversation' ? 'Conversation Exercise' : 'Roleplay Scenario'}
 
