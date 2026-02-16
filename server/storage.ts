@@ -70,6 +70,7 @@ export interface IStorage {
   createExerciseSession(
     session: InsertExerciseSession,
   ): Promise<ExerciseSession>;
+  recordSeenExercise(userId: string, exerciseType: string, phraseId: string, correctAnswer: string): Promise<void>;
   getUserExerciseSessions(userId: string): Promise<ExerciseSession[]>;
   getRecentSessions(userId: string, limit: number): Promise<ExerciseSession[]>;
 
@@ -230,6 +231,32 @@ export class DatabaseStorage implements IStorage {
     return session;
   }
 
+  async recordSeenExercise(userId: string, exerciseType: string, phraseId: string, correctAnswer: string): Promise<void> {
+    const existing = await db
+      .select({ id: exerciseSessions.id })
+      .from(exerciseSessions)
+      .where(
+        and(
+          eq(exerciseSessions.userId, userId),
+          eq(exerciseSessions.exerciseType, exerciseType),
+          eq(exerciseSessions.phraseId, phraseId),
+          eq(exerciseSessions.isCorrect, "seen")
+        )
+      )
+      .limit(1);
+
+    if (existing.length === 0) {
+      await db.insert(exerciseSessions).values({
+        userId,
+        exerciseType,
+        phraseId,
+        userAnswer: "",
+        correctAnswer,
+        isCorrect: "seen",
+      });
+    }
+  }
+
   async getUserExerciseSessions(userId: string): Promise<ExerciseSession[]> {
     return await db
       .select()
@@ -380,8 +407,23 @@ export class DatabaseStorage implements IStorage {
     const unusedSentences = allSentences.filter(s => !usedIds.includes(s.id));
 
     if (unusedSentences.length === 0) {
-      // All sentences have been used, return a random one
-      return allSentences[Math.floor(Math.random() * allSentences.length)];
+      // All sentences seen/completed - pick the LEAST RECENTLY seen one
+      const sessionsForType = await db
+        .select({ phraseId: exerciseSessions.phraseId, completedAt: exerciseSessions.completedAt })
+        .from(exerciseSessions)
+        .where(
+          and(
+            eq(exerciseSessions.userId, userId),
+            eq(exerciseSessions.exerciseType, "transformation")
+          )
+        )
+        .orderBy(exerciseSessions.completedAt);
+
+      const oldestSeenId = sessionsForType.length > 0 ? sessionsForType[0].phraseId : null;
+      const oldestSentence = oldestSeenId
+        ? allSentences.find(s => s.id === oldestSeenId)
+        : allSentences[0];
+      return oldestSentence || allSentences[0];
     }
 
     // Return a random unused sentence
@@ -497,7 +539,28 @@ export class DatabaseStorage implements IStorage {
           .where(notInArray(conversationPrompts.id, completedIds))
       : await db.select().from(conversationPrompts);
 
-    if (availablePrompts.length === 0) return undefined;
+    // If all prompts are seen/completed, pick the LEAST RECENTLY seen one
+    if (availablePrompts.length === 0) {
+      const allPrompts = await db.select().from(conversationPrompts);
+      if (allPrompts.length === 0) return undefined;
+
+      const sessionsForType = await db
+        .select({ phraseId: exerciseSessions.phraseId, completedAt: exerciseSessions.completedAt })
+        .from(exerciseSessions)
+        .where(
+          and(
+            eq(exerciseSessions.userId, userId),
+            eq(exerciseSessions.exerciseType, "conversation")
+          )
+        )
+        .orderBy(exerciseSessions.completedAt);
+
+      const oldestSeenId = sessionsForType.length > 0 ? sessionsForType[0].phraseId : null;
+      const oldestPrompt = oldestSeenId
+        ? allPrompts.find(p => String(p.id) === oldestSeenId)
+        : allPrompts[0];
+      return oldestPrompt || allPrompts[0];
+    }
 
     // Filter by surah if specified - extract surah number from suggestedVerse (format: "Surah Name, X:Y" or "سورة اسم، X:Y")
     if (surahNumber) {
@@ -575,12 +638,28 @@ export class DatabaseStorage implements IStorage {
           .where(notInArray(dailySentenceExercises.id, completedIds))
       : await db.select().from(dailySentenceExercises);
 
-    // If all exercises are completed, allow repetition - get all exercises
+    // If all exercises are seen/completed, pick the LEAST RECENTLY seen one
     if (availableExercises.length === 0) {
-      availableExercises = await db.select().from(dailySentenceExercises);
-    }
+      const allExercises = await db.select().from(dailySentenceExercises);
+      if (allExercises.length === 0) return undefined;
 
-    if (availableExercises.length === 0) return undefined;
+      const sessionsForType = await db
+        .select({ phraseId: exerciseSessions.phraseId, completedAt: exerciseSessions.completedAt })
+        .from(exerciseSessions)
+        .where(
+          and(
+            eq(exerciseSessions.userId, userId),
+            eq(exerciseSessions.exerciseType, "daily_contextual")
+          )
+        )
+        .orderBy(exerciseSessions.completedAt);
+
+      const oldestSeenId = sessionsForType.length > 0 ? sessionsForType[0].phraseId : null;
+      const oldestExercise = oldestSeenId
+        ? allExercises.find(e => String(e.id) === oldestSeenId)
+        : allExercises[0];
+      availableExercises = oldestExercise ? [oldestExercise] : [allExercises[0]];
+    }
 
     // Filter by surah if specified (requires joining with quranic expressions to get surah number)
     if (surahNumber) {
@@ -724,12 +803,28 @@ export class DatabaseStorage implements IStorage {
       availableScenarios = await db.select().from(roleplayScenarios);
     }
 
-    // If all scenarios have been completed, allow repetition
+    // If all scenarios have been seen/completed, pick the LEAST RECENTLY seen one
     if (availableScenarios.length === 0) {
-      availableScenarios = await db.select().from(roleplayScenarios);
-    }
+      const allScenarios = await db.select().from(roleplayScenarios);
+      if (allScenarios.length === 0) return undefined;
 
-    if (availableScenarios.length === 0) return undefined;
+      const sessionsForType = await db
+        .select({ phraseId: exerciseSessions.phraseId, completedAt: exerciseSessions.completedAt })
+        .from(exerciseSessions)
+        .where(
+          and(
+            eq(exerciseSessions.userId, userId),
+            eq(exerciseSessions.exerciseType, "roleplay")
+          )
+        )
+        .orderBy(exerciseSessions.completedAt);
+
+      const oldestSeenId = sessionsForType.length > 0 ? sessionsForType[0].phraseId : null;
+      const oldestScenario = oldestSeenId
+        ? allScenarios.find(s => String(s.id) === oldestSeenId)
+        : allScenarios[0];
+      availableScenarios = oldestScenario ? [oldestScenario] : [allScenarios[0]];
+    }
 
     // Filter by surah if specified - extract surah number from suggestedVerse
     if (surahNumber) {
@@ -873,6 +968,18 @@ export class MemStorage implements IStorage {
     };
     this.exerciseSessions.set(id, session);
     return session;
+  }
+
+  async recordSeenExercise(userId: string, exerciseType: string, phraseId: string, correctAnswer: string): Promise<void> {
+    const existing = Array.from(this.exerciseSessions.values()).find(
+      s => s.userId === userId && s.exerciseType === exerciseType && s.phraseId === phraseId && s.isCorrect === "seen"
+    );
+    if (!existing) {
+      const id = randomUUID();
+      this.exerciseSessions.set(id, {
+        id, userId, exerciseType, phraseId, userAnswer: "", correctAnswer, isCorrect: "seen", completedAt: new Date(),
+      });
+    }
   }
 
   async getUserExerciseSessions(userId: string): Promise<ExerciseSession[]> {

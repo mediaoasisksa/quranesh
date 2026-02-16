@@ -1,0 +1,66 @@
+المشكلة الحالية في "المنطق" الذي يعمل به البرنامج هي أنه يحاول البحث عن "رابط عاطفي" أو وعظي (مثل الصبر) لكنه يأتي بآية تتحدث عن "وصف مادي" (التعب الجسدي من السفر)، وهذا يسبب تشتتاً للمتعلم ولا يخدم هدف "تعليم اللغة العربية".
+
+أنت تريد تطبيق "الهندسة العكسية" (Reverse Engineering):
+أي أن يبدأ الذكاء الاصطناعي من الكلمة العربية (الجواب)، ثم يصنع القصة التي تشرح هذه الكلمة حصراً.
+
+إليك التوجيه (Prompt) الذي سيغير منطق توليد الأسئلة ليصبح "لغوياً تعليمياً" دقيقاً:
+
+📋 انسخ هذا التوجيه وأرسله لـ Replit:
+الموضوع: تحسين منطق توليد التمارين (Reverse Engineering Logic)
+
+I need to completely refactor the logic for generating Quranic exercises.
+
+The Problem:
+Currently, the AI generates a complex emotional scenario (e.g., a sick patient needing hope) and then tries to force a Quranic verse to fit it. This leads to mismatches (e.g., using a verse about "travel fatigue" for "patience in illness"). This confuses the user.
+
+The Goal:
+The goal is to teach Arabic Vocabulary, not just theological concepts. We need to use Reverse Engineering.
+
+The New Logic (Strictly Follow This):
+
+Step 1: Select the Target Word (The Anchor)
+First, pick a specific Quranic word or phrase you want to teach (e.g., "نَصَب" - Nasaba / Fatigue).
+
+Step 2: Analyze the Literal Meaning
+Understand the linguistic definition of the word.
+
+Example: "Nasaaba" means physical exhaustion, toil, or hardship.
+
+Step 3: Generate the Scenario (The Wrapper)
+Create a modern, relatable scenario where this specific word is the most accurate description.
+
+Constraint: Do not make it overly spiritual if the word is physical. Keep it grounded in language learning.
+
+Step 4: Construct the Prompt
+Ask the user to find the Quranic word that describes the situation.
+
+Example of the NEW Logic:
+
+Target Word: "نَصَبًا" (Fatigue/Hardship).
+
+Generated Scenario: "You have been walking and working all day long without rest. You feel extreme physical exhaustion."
+
+The Task: "Write the Quranic word from Surah Al-Kahf that means 'extreme fatigue' or 'hardship'."
+
+Correct Answer: "نصبا" (from the verse Laqad laqina min safarina hadha nasaba).
+
+Please update the generateExercise prompt/function to follow this "Answer-First" methodology. Ensure the focus is on linguistic accuracy.
+
+💡 الفرق بين الطريقة القديمة والجديدة:
+السيناريو القديم (الخاطئ):
+
+المدخل: "أريد آية عن الصبر للمريض".
+
+النتيجة: الذكاء الاصطناعي يبحث عن "تعب" فيجد "لقد لقينا من سفرنا هذا نصبا" -> (خطأ في السياق: الآية عن سفر موسى وليست عن مرض).
+
+السيناريو الجديد (المطلوب):
+
+المدخل (الهدف): أريد تعليم كلمة "نَصَبًا".
+
+المنطق: ماذا تعني "نصبا"؟ تعني التعب والمشقة.
+
+السيناريو المولد: "شخص سافر مسافة طويلة وشعر بالإرهاق الشديد".
+
+السؤال: ما هي الكلمة القرآنية التي تصف تعب السفر؟
+
+الجواب: "نَصَبًا".

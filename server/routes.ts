@@ -308,6 +308,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No philosophical sentences available" });
       }
 
+      storage.recordSeenExercise(userId, "transformation", String(sentence.id), sentence.arabicText || "")
+        .catch(err => console.error("Failed to record seen session:", err));
+
       // If language is specified and not Arabic, get the translation
       const targetLanguage = typeof language === "string" ? language : "ar";
       const translatedSentence = await storage.getTranslatedPhilosophicalSentence(
@@ -544,6 +547,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!prompt) {
         return res.status(404).json({ message: "No conversation prompts available" });
       }
+
+      storage.recordSeenExercise(userId, "conversation", String(prompt.id), prompt.suggestedVerse || "")
+        .catch(err => console.error("Failed to record seen session:", err));
+
       res.json(prompt);
     } catch (error) {
       console.error("Error fetching conversation prompt:", error);
@@ -573,6 +580,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!scenario) {
         return res.status(404).json({ message: "No roleplay scenarios available" });
       }
+
+      storage.recordSeenExercise(userId, "roleplay", String(scenario.id), scenario.suggestedVerse || "")
+        .catch(err => console.error("Failed to record seen session:", err));
+
       res.json(scenario);
     } catch (error) {
       console.error("Error fetching roleplay scenario:", error);
@@ -602,6 +613,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!exerciseData) {
         return res.status(404).json({ message: "No daily contextual exercises available" });
       }
+
+      storage.recordSeenExercise(userId, "daily_contextual", String(exerciseData.exercise.id), exerciseData.correctExpression?.arabicText || "")
+        .catch(err => console.error("Failed to record seen session:", err));
 
       // Shuffle options (correct + 3 distractors = 4 total options)
       const options = [
@@ -728,12 +742,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Calculate actual accuracy from today's exercise sessions
+      // Calculate actual accuracy from today's exercise sessions (exclude "seen" records)
       const todaySessions = await storage.getUserExerciseSessions(
         req.params.userId,
       );
       const todaySessionsFiltered = todaySessions.filter((session) => {
         if (!session.completedAt) return false;
+        if (session.isCorrect === "seen") return false;
         const sessionDate = new Date(session.completedAt)
           .toISOString()
           .split("T")[0];
@@ -852,6 +867,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+
+      if (userId && typeof userId === "string") {
+        storage.recordSeenExercise(userId, exerciseType, String(randomPhrase.id), randomPhrase.arabicText || "")
+          .catch(err => console.error("Failed to record seen session:", err));
+      }
+
       res.json(randomPhrase);
     } catch (error) {
       console.error("Error fetching random phrase:", error);
@@ -1872,7 +1893,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uniqueUsers: Set<string>;
       }> = {};
 
-      sessions.forEach((session) => {
+      sessions.filter(s => s.isCorrect !== "seen").forEach((session) => {
         if (!exerciseStats[session.exerciseType]) {
           exerciseStats[session.exerciseType] = {
             count: 0,
@@ -1973,7 +1994,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         correctSessions: number;
       }> = {};
 
-      sessions.forEach((session) => {
+      sessions.filter(s => s.isCorrect !== "seen").forEach((session) => {
         if (!userStats[session.userId]) {
           userStats[session.userId] = {
             userId: session.userId,
