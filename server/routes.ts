@@ -2718,6 +2718,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/conversation-prompts", requireAdmin, async (_req, res) => {
+    try {
+      const prompts = await db.select().from(conversationPrompts);
+      res.json(prompts);
+    } catch (error) {
+      console.error("Get conversation prompts error:", error);
+      res.status(500).json({ message: "Failed to fetch conversation prompts" });
+    }
+  });
+
+  app.post("/api/admin/conversation-prompts", requireAdmin, async (req, res) => {
+    try {
+      const { question, questionEn, suggestedVerse, category, symbolicMeaning, hint, claim, evidencePhrase, ayahText, sourceRef } = req.body;
+      if (!question || !suggestedVerse) {
+        return res.status(400).json({ message: "السؤال والآية المقترحة مطلوبان" });
+      }
+      const [newPrompt] = await db.insert(conversationPrompts).values({
+        question, questionEn: questionEn || null, suggestedVerse, category: category || null,
+        symbolicMeaning: symbolicMeaning || null, hint: hint || null, claim: claim || null,
+        evidencePhrase: evidencePhrase || null, ayahText: ayahText || null, sourceRef: sourceRef || null,
+      }).returning();
+      res.json(newPrompt);
+    } catch (error) {
+      console.error("Add conversation prompt error:", error);
+      res.status(500).json({ message: "Failed to add conversation prompt" });
+    }
+  });
+
+  app.put("/api/admin/conversation-prompts/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const { question, questionEn, suggestedVerse, category, symbolicMeaning, hint, claim, evidencePhrase, ayahText, sourceRef } = req.body;
+      const [updated] = await db.update(conversationPrompts).set({
+        question, questionEn, suggestedVerse, category, symbolicMeaning, hint, claim, evidencePhrase, ayahText, sourceRef,
+      }).where(eq(conversationPrompts.id, id)).returning();
+      if (!updated) return res.status(404).json({ message: "السؤال غير موجود" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Update conversation prompt error:", error);
+      res.status(500).json({ message: "Failed to update conversation prompt" });
+    }
+  });
+
+  app.delete("/api/admin/conversation-prompts/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const deleted = await db.delete(conversationPrompts).where(eq(conversationPrompts.id, id)).returning();
+      if (deleted.length === 0) return res.status(404).json({ message: "السؤال غير موجود" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete conversation prompt error:", error);
+      res.status(500).json({ message: "Failed to delete conversation prompt" });
+    }
+  });
+
+  app.get("/api/admin/roleplay-scenarios", requireAdmin, async (_req, res) => {
+    try {
+      const scenarios = await db.select().from(roleplayScenarios);
+      res.json(scenarios);
+    } catch (error) {
+      console.error("Get roleplay scenarios error:", error);
+      res.status(500).json({ message: "Failed to fetch roleplay scenarios" });
+    }
+  });
+
+  app.post("/api/admin/roleplay-scenarios", requireAdmin, async (req, res) => {
+    try {
+      const { scenario, scenarioEn, theme, emotionalState, difficulty, suggestedVerse, verseSource, verseExplanation, verseExplanationEn, psychologicalDepth } = req.body;
+      if (!scenario || !theme) {
+        return res.status(400).json({ message: "السيناريو والموضوع مطلوبان" });
+      }
+      const [newScenario] = await db.insert(roleplayScenarios).values({
+        scenario, scenarioEn: scenarioEn || null, theme, emotionalState: emotionalState || null,
+        difficulty: difficulty || 1, suggestedVerse: suggestedVerse || null, verseSource: verseSource || null,
+        verseExplanation: verseExplanation || null, verseExplanationEn: verseExplanationEn || null,
+        psychologicalDepth: psychologicalDepth || null,
+      }).returning();
+      res.json(newScenario);
+    } catch (error) {
+      console.error("Add roleplay scenario error:", error);
+      res.status(500).json({ message: "Failed to add roleplay scenario" });
+    }
+  });
+
+  app.put("/api/admin/roleplay-scenarios/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const { scenario, scenarioEn, theme, emotionalState, difficulty, suggestedVerse, verseSource, verseExplanation, verseExplanationEn, psychologicalDepth } = req.body;
+      const [updated] = await db.update(roleplayScenarios).set({
+        scenario, scenarioEn, theme, emotionalState, difficulty, suggestedVerse, verseSource, verseExplanation, verseExplanationEn, psychologicalDepth,
+      }).where(eq(roleplayScenarios.id, id)).returning();
+      if (!updated) return res.status(404).json({ message: "السيناريو غير موجود" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Update roleplay scenario error:", error);
+      res.status(500).json({ message: "Failed to update roleplay scenario" });
+    }
+  });
+
+  app.delete("/api/admin/roleplay-scenarios/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const deleted = await db.delete(roleplayScenarios).where(eq(roleplayScenarios.id, id)).returning();
+      if (deleted.length === 0) return res.status(404).json({ message: "السيناريو غير موجود" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete roleplay scenario error:", error);
+      res.status(500).json({ message: "Failed to delete roleplay scenario" });
+    }
+  });
+
+  app.get("/api/admin/phrases", requireAdmin, async (_req, res) => {
+    try {
+      const allPhrases = await db.select().from(quranicPhrases);
+      res.json(allPhrases);
+    } catch (error) {
+      console.error("Get phrases error:", error);
+      res.status(500).json({ message: "Failed to fetch phrases" });
+    }
+  });
+
+  app.post("/api/admin/phrases", requireAdmin, async (req, res) => {
+    try {
+      const { arabicText, englishTranslation, surahAyah, lifeApplication, category, difficulty, symbolicMeaning, isPracticalDailyUse, usageDomain, register: reg } = req.body;
+      if (!arabicText || !englishTranslation || !surahAyah || !lifeApplication || !category) {
+        return res.status(400).json({ message: "جميع الحقول الأساسية مطلوبة" });
+      }
+      const [newPhrase] = await db.insert(quranicPhrases).values({
+        arabicText, englishTranslation, surahAyah, lifeApplication, category,
+        difficulty: difficulty || 1, symbolicMeaning: symbolicMeaning || null,
+        isPracticalDailyUse: isPracticalDailyUse || 0, usageDomain: usageDomain || null, register: reg || null,
+      }).returning();
+      res.json(newPhrase);
+    } catch (error) {
+      console.error("Add phrase error:", error);
+      res.status(500).json({ message: "Failed to add phrase" });
+    }
+  });
+
+  app.put("/api/admin/phrases/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const { arabicText, englishTranslation, surahAyah, lifeApplication, category, difficulty, symbolicMeaning, isPracticalDailyUse, usageDomain, register: reg } = req.body;
+      const [updated] = await db.update(quranicPhrases).set({
+        arabicText, englishTranslation, surahAyah, lifeApplication, category,
+        difficulty, symbolicMeaning, isPracticalDailyUse, usageDomain, register: reg,
+      }).where(eq(quranicPhrases.id, id)).returning();
+      if (!updated) return res.status(404).json({ message: "العبارة غير موجودة" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Update phrase error:", error);
+      res.status(500).json({ message: "Failed to update phrase" });
+    }
+  });
+
+  app.delete("/api/admin/phrases/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { eq } = await import("drizzle-orm");
+      const deleted = await db.delete(quranicPhrases).where(eq(quranicPhrases.id, id)).returning();
+      if (deleted.length === 0) return res.status(404).json({ message: "العبارة غير موجودة" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete phrase error:", error);
+      res.status(500).json({ message: "Failed to delete phrase" });
+    }
+  });
+
   app.post("/api/admin/repair-scenarios", requireAdmin, async (req, res) => {
     try {
       const { type = 'both', batchSize = 10, dryRun = true } = req.body;
