@@ -1,12 +1,80 @@
 {
   "plans": [
     {
+      "id": "learner",
+      "name": "تدريب ألفاظ اللغة العربية القرآنية",
+      "nameEn": "Quranic Arabic Training",
+      "price": 10,
+      "currency": "SAR",
+      "duration": "year",
+      "durationDays": 365,
+      "features": [
+        "دخول كامل لدروس الألفاظ",
+        "اختبارات تفاعلية",
+        "تتبع تقدم",
+        "شهادة إتمام رمزية"
+      ],
+      "featuresEn": [
+        "Full access to expression lessons",
+        "Interactive exercises",
+        "Progress tracking",
+        "Symbolic completion certificate"
+      ]
+    },
+    {
+      "id": "sponsor-5",
+      "name": "راعي 5 متعلمين",
+      "nameEn": "Sponsor 5 Learners",
+      "price": 50,
+      "currency": "SAR",
+      "duration": "year",
+      "durationDays": 365,
+      "sponsoredCount": 5,
+      "features": [
+        "رعاية 5 متعلمين لمدة سنة",
+        "صدقة جارية ما دام حرف يُتلى",
+        "شهادة راعي تعليمي"
+      ],
+      "featuresEn": [
+        "Sponsor 5 learners for one year",
+        "Ongoing charity as long as Quran is recited",
+        "Educational sponsor certificate"
+      ]
+    },
+    {
+      "id": "sponsor-10",
+      "name": "راعي 10 متعلمين",
+      "nameEn": "Sponsor 10 Learners",
+      "price": 100,
+      "currency": "SAR",
+      "duration": "year",
+      "durationDays": 365,
+      "sponsoredCount": 10,
+      "features": [
+        "رعاية 10 متعلمين لمدة سنة",
+        "من دل على خير فله مثل أجر فاعله",
+        "شهادة راعي تعليمي مميز"
+      ],
+      "featuresEn": [
+        "Sponsor 10 learners for one year",
+        "Whoever guides to good has the reward of the doer",
+        "Distinguished educational sponsor certificate"
+      ]
+    },
+    {
       "id": "certificate",
-      "name": "Official Performance Certificate",
+      "name": "شهادة أداء رسمية",
+      "nameEn": "Official Performance Certificate",
       "price": 40,
       "currency": "SAR",
       "duration": "one-time",
+      "durationDays": 0,
       "features": [
+        "شهادة رسمية بمستواك في اللغة العربية",
+        "شهادة رقمية مناسبة للسيرة المهنية",
+        "رابط تحقق للمؤسسات وأصحاب العمل"
+      ],
+      "featuresEn": [
         "Official acknowledgment of your Arabic language performance",
         "Digital certificate suitable for professional portfolios",
         "Verification link for employers and institutions"

@@ -94,6 +94,28 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
+export const subscriptions = pgTable("subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  planType: text("plan_type").notNull(),
+  amount: integer("amount").notNull(),
+  currency: text("currency").default("SAR").notNull(),
+  startDate: timestamp("start_date").default(sql`now()`).notNull(),
+  endDate: timestamp("end_date").notNull(),
+  status: text("status").default("active").notNull(),
+  transactionId: text("transaction_id"),
+  sponsoredUsers: integer("sponsored_users").default(0),
+  createdAt: timestamp("created_at").default(sql`now()`).notNull(),
+});
+
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+
 // Separate schema for signup requests (accepts password, not passwordHash)
 export const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),

@@ -71,8 +71,8 @@ An administrative `/translation-manager` interface allows bulk translation of ph
 ## Authentication
 The application uses JWT tokens and bcrypt for secure user authentication, supporting a demo user and ensuring data isolation.
 
-## Payment Integration
-HyperPay's COPYandPAY Widget is integrated for subscription management, supporting various card types and SAR currency, ensuring PCI compliance.
+## Payment & Subscription System
+HyperPay's COPYandPAY Widget handles payments (VISA/Mastercard/MADA), with credentials loaded exclusively from environment variables (HYPERPAY_PROD_* for production, HYPERPAY_* for test). The `subscriptions` table tracks active user subscriptions with plan type, amount, start/end dates, and transaction ID. Plans: learner (10 SAR/year), sponsor-5 (50 SAR/year, sponsors 5 learners), sponsor-10 (100 SAR/year, sponsors 10 learners), certificate (40 SAR one-time). The `/api/subscription-status` endpoint checks subscription validity; admin users bypass subscription requirements. The `SubscriptionGate` component on the frontend blocks exercise access for non-subscribed users.
 
 # External Dependencies
 

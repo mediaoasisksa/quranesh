@@ -27,6 +27,7 @@ import {
   diplomaExerciseAttempts,
   analyticsEvents,
   chatMessages,
+  subscriptions,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -1287,48 +1288,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HyperPay Payment Integration
-  // Load pricing data
   const pricingPath = path.resolve(import.meta.dirname, "..", "pricing.json");
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
-  // HyperPay Configuration
-  // Use production credentials if available, otherwise fall back to test environment
   const HYPERPAY_CONFIG = {
-    serverUrl: process.env.HYPERPAY_PROD_ACCESS_TOKEN 
+    serverUrl: process.env.HYPERPAY_PROD_ACCESS_TOKEN
       ? "https://eu-prod.oppwa.com"
-      : "https://eu-test.oppwa.com",
-    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN ||
-      "OGFjN2E0Yzk5NGFlZWE0ZDAxOTRiMWU0NWI2ZTAzZmZ8eDlqWjNxMkNOVUxOPVAlSG9waiU=",
-    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER ||
-      "8ac7a4c994aeea4d0194b1e58b280403",
-    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA ||
-      "8ac7a4c994aeea4d0194b1e6e7090408",
+      : (process.env.HYPERPAY_SERVER_URL || "https://eu-test.oppwa.com"),
+    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || process.env.HYPERPAY_ACCESS_TOKEN || "",
+    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || "",
+    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || process.env.HYPERPAY_ENTITY_ID_MADA || "",
     isProduction: !!process.env.HYPERPAY_PROD_ACCESS_TOKEN,
   };
 
-  // Log environment on startup
-  console.log(`🔐 HyperPay Environment: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'}`);
-  console.log(`📍 HyperPay Server: ${HYPERPAY_CONFIG.serverUrl}`);
+  console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
     res.json(pricingData);
   });
 
-  // Create HyperPay checkout
   app.post("/api/create-checkout", async (req, res) => {
     try {
-      console.log("=== RAW REQUEST BODY ===");
-      console.log("Full request body:", JSON.stringify(req.body, null, 2));
-      console.log("========================");
-      
-      const { planId, paymentMethod, customerDetails } = req.body;
-      
-      console.log("=== EXTRACTED VALUES ===");
-      console.log("planId:", planId);
-      console.log("paymentMethod:", paymentMethod);
-      console.log("paymentMethod type:", typeof paymentMethod);
-      console.log("========================");
+      const { planId, paymentMethod, customerDetails, userId } = req.body;
 
       // Find the selected plan
       const selectedPlan = pricingData.plans.find(
@@ -1346,28 +1328,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique transaction ID
       const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
-      // CRITICAL: Select correct entity ID based on payment method
-      // MADA cards require MADA entity ID, VISA/MASTER cards require VISA/MASTER entity ID
       const entityId = paymentMethod === "MADA"
         ? HYPERPAY_CONFIG.entityIdMada
         : HYPERPAY_CONFIG.entityIdVisaMaster;
-      
-      console.log("=== DYNAMIC ENTITY ID SELECTION ===");
-      console.log("Payment method:", paymentMethod);
-      console.log("Selected entity ID:", entityId);
-      console.log("MADA entity ID:", HYPERPAY_CONFIG.entityIdMada);
-      console.log("VISA/MASTER entity ID:", HYPERPAY_CONFIG.entityIdVisaMaster);
-      console.log("===================================");
 
       // Determine callback URL based on environment
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
       const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:5000';
       const baseUrl = `${protocol}://${host}`;
-      const callbackUrl = `${baseUrl}/api/payment-callback?entityId=${entityId}`;
+      const callbackUrl = `${baseUrl}/api/payment-callback?entityId=${entityId}&planId=${planId}&userId=${userId || ''}`;
 
-      // Prepare checkout request
-      // NOTE: According to HyperPay Widget documentation, shopperResultUrl should NOT be set here
-      // It should be set in the form's action attribute on the frontend
       const checkoutData = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
@@ -1386,20 +1356,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "customParameters[3DS2_enrolled]": "true",
       };
 
-      // Debug: Log the checkout data being sent
-      console.log("=== CHECKOUT CREATION DEBUG ===");
-      console.log("Payment method received from frontend:", paymentMethod);
-      console.log("Entity ID selected for this payment:", entityId);
-      console.log("Callback URL:", callbackUrl);
-      console.log("Base URL:", baseUrl);
-      console.log("Selected plan:", selectedPlan);
-      console.log("Customer details:", customerDetails);
-      console.log(
-        "Creating checkout with data:",
-        JSON.stringify(checkoutData, null, 2),
-      );
-
-      // Convert checkout data to URL-encoded format for HyperPay
       const formData = new URLSearchParams();
       Object.entries(checkoutData).forEach(([key, value]) => {
         if (typeof value === "object" && value !== null) {
@@ -1411,11 +1367,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
-      console.log("=== FORM DATA BEING SENT ===");
-      console.log("Form data:", formData.toString());
-      console.log("============================");
-
-      // Send request to HyperPay
       const response = await axios.post(
         `${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`,
         formData,
@@ -1427,20 +1378,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
-      console.log("=== HYPERPAY RESPONSE ===");
-      console.log("Status:", response.status);
-      console.log("Response data:", JSON.stringify(response.data, null, 2));
-      console.log("Checkout ID:", response.data.id);
-      console.log("Integrity object:", response.data.integrity);
-      console.log("========================");
-
       // HyperPay returns integrity as an object { value: string, algorithm: string }
-      // We need to format it for the script tag's integrity attribute
       let integrityHash = null;
       if (response.data.integrity && response.data.integrity.value) {
         const algorithm = response.data.integrity.algorithm.toLowerCase().replace('-', '');
         integrityHash = `${algorithm}-${response.data.integrity.value}`;
-        console.log("Formatted integrity hash:", integrityHash);
       }
 
       res.json({
@@ -1487,10 +1429,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
-        // Here you would typically:
-        // 1. Update user subscription in database
-        // 2. Send confirmation email
-        // 3. Log the transaction
+        const { planId, userId } = req.query as { planId?: string; userId?: string };
+        if (planId && userId) {
+          const plan = pricingData.plans.find((p: any) => p.id === planId);
+          if (plan && plan.durationDays > 0) {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + plan.durationDays);
+            await db.insert(subscriptions).values({
+              userId,
+              planType: planId,
+              amount: plan.price,
+              currency: plan.currency,
+              endDate,
+              status: "active",
+              transactionId: paymentResult.id,
+              sponsoredUsers: plan.sponsoredCount || 0,
+            });
+          }
+        }
 
         res.json({
           success: true,
@@ -1512,81 +1468,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Handle HyperPay redirect after payment
-  // Debug endpoint to validate checkout ID
-  app.get("/api/validate-checkout/:checkoutId", async (req, res) => {
-    try {
-      const { checkoutId } = req.params;
-      console.log("=== VALIDATING CHECKOUT ID ===");
-      console.log("Checkout ID:", checkoutId);
-
-      // Use POST request with proper parameters for HyperPay
-      const formData = new URLSearchParams();
-      formData.append("entityId", HYPERPAY_CONFIG.entityIdVisaMaster);
-      formData.append("amount", "100.00");
-      formData.append("currency", "SAR");
-      formData.append("paymentType", "DB");
-      formData.append("merchantTransactionId", `TX${Date.now()}`);
-      formData.append("customer.email", "test@example.com");
-      formData.append("customer.givenName", "Test");
-      formData.append("customer.surname", "User");
-      formData.append("billing.street1", "123 Test Street");
-      formData.append("billing.city", "Riyadh");
-      formData.append("billing.state", "Riyadh");
-      formData.append("billing.country", "SA");
-      formData.append("billing.postcode", "12345");
-      formData.append("customParameters[3DS2_enrolled]", "true");
-
-      const response = await axios.post(
-        `${HYPERPAY_CONFIG.serverUrl}/v1/checkouts`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        },
-      );
-
-      console.log(
-        "Validation response:",
-        JSON.stringify(response.data, null, 2),
-      );
-      res.json({
-        valid: true,
-        checkoutId,
-        response: response.data,
-      });
-    } catch (error: any) {
-      console.error(
-        "Checkout validation error:",
-        error.response?.data || error.message,
-      );
-      res.status(400).json({
-        valid: false,
-        error: error.response?.data || error.message,
-      });
-    }
-  });
-
   app.get("/api/payment-callback", async (req, res) => {
     try {
-      const { resourcePath, entityId } = req.query;
-
-      console.log("=== PAYMENT CALLBACK RECEIVED ===");
-      console.log("Full query params:", req.query);
-      console.log("resourcePath:", resourcePath);
-      console.log("entityId:", entityId);
+      const { resourcePath, entityId, planId, userId } = req.query;
 
       if (!resourcePath) {
-        console.log("Missing resourcePath, redirecting to pricing with error");
         return res.redirect("/pricing?error=missing_parameters");
       }
 
-      // Verify payment with HyperPay
-      // The entityId should be passed from our shopperResultUrl
       const verificationEntityId = entityId as string || HYPERPAY_CONFIG.entityIdVisaMaster;
-      console.log("Using entityId for verification:", verificationEntityId);
 
       const response = await axios.get(
         `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`,
@@ -1601,29 +1491,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       const paymentResult = response.data;
-      console.log("Payment verification result:", JSON.stringify(paymentResult, null, 2));
-
-      // Check if payment was successful
       const isSuccessful = paymentResult.result.code.startsWith("000");
 
       if (isSuccessful) {
-        console.log("Payment successful, redirecting to success page");
-        // Redirect to success page with success parameters
+        if (planId && userId) {
+          const plan = pricingData.plans.find((p: any) => p.id === planId);
+          if (plan && plan.durationDays > 0) {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + plan.durationDays);
+            await db.insert(subscriptions).values({
+              userId: userId as string,
+              planType: planId as string,
+              amount: plan.price,
+              currency: plan.currency,
+              endDate,
+              status: "active",
+              transactionId: paymentResult.id,
+              sponsoredUsers: plan.sponsoredCount || 0,
+            });
+          }
+        }
         res.redirect(
           `/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`,
         );
       } else {
-        console.log("Payment failed, redirecting with error");
-        // Redirect to success page with error parameters
         res.redirect(
           `/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`,
         );
       }
     } catch (error: any) {
-      console.error("Payment verification error:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
+      console.error("Payment callback error:", error.response?.data || error.message);
       res.redirect("/payment-success?success=false&error=verification_failed");
+    }
+  });
+
+  app.get("/api/subscription-status", async (req, res) => {
+    try {
+      const { eq, and, gt, desc } = await import("drizzle-orm");
+      const { userId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ message: "Missing userId" });
+      }
+
+      const user = await db.select().from(users).where(eq(users.id, String(userId))).limit(1);
+      if (user.length > 0 && user[0].isAdmin) {
+        return res.json({ hasActiveSubscription: true, isAdmin: true, plan: null });
+      }
+
+      const now = new Date();
+      const activeSubs = await db.select().from(subscriptions)
+        .where(and(
+          eq(subscriptions.userId, String(userId)),
+          eq(subscriptions.status, "active"),
+          gt(subscriptions.endDate, now)
+        ))
+        .orderBy(desc(subscriptions.endDate))
+        .limit(1);
+
+      if (activeSubs.length > 0) {
+        return res.json({
+          hasActiveSubscription: true,
+          plan: activeSubs[0].planType,
+          expiresAt: activeSubs[0].endDate,
+        });
+      }
+
+      res.json({ hasActiveSubscription: false });
+    } catch (error) {
+      console.error("Subscription status error:", error);
+      res.status(500).json({ message: "Failed to check subscription" });
+    }
+  });
+
+  app.get("/api/admin/subscriptions", requireAdminAuth, async (req, res) => {
+    try {
+      const { desc } = await import("drizzle-orm");
+      const allSubs = await db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+      res.json(allSubs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch subscriptions" });
     }
   });
 

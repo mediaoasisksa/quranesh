@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { Loader2, CreditCard, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuth } from '@/hooks/use-auth';
 
 interface PricingPlan {
   id: string;
@@ -41,6 +42,7 @@ declare global {
 
 export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: PaymentFormProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
   
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     email: '',
@@ -82,11 +84,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     setError(null);
 
     try {
-      console.log('=== FRONTEND PAYMENT REQUEST ===');
-      console.log('Payment method state:', paymentMethod);
-      console.log('Plan ID:', selectedPlan.id);
-      console.log('Customer details:', customerDetails);
-      
       const response = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: {
@@ -95,16 +92,12 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
         body: JSON.stringify({
           planId: selectedPlan.id,
           paymentMethod: paymentMethod,
-          customerDetails
+          customerDetails,
+          userId: user?.id || '',
         }),
       });
 
       const data = await response.json();
-
-      console.log('=== FRONTEND CHECKOUT DEBUG ===');
-      console.log('Response status:', response.status);
-      console.log('Response data:', data);
-      console.log('Checkout ID received:', data.checkoutId);
 
       if (!response.ok) {
         // Provide more helpful error messages
@@ -119,12 +112,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       setIntegrity(data.integrity);
       setCallbackUrl(data.callbackUrl);
 
-      // Load HyperPay widget script with integrity hash for security
-      console.log('Loading HyperPay widget with checkoutId:', data.checkoutId);
-      console.log('Widget URL:', data.widgetUrl);
-      console.log('Integrity hash:', data.integrity);
-      console.log('Callback URL:', data.callbackUrl);
-      
       const script = document.createElement('script');
       script.src = `${data.widgetUrl}/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
       
@@ -135,7 +122,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       }
       
       script.onload = () => {
-        console.log('HyperPay widget script loaded successfully');
         setIsLoading(false);
       };
       script.onerror = (error) => {

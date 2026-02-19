@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { surahList, type Surah } from "@/data/surah-list";
+import SubscriptionGate from "@/components/subscription-gate";
 
 function getLocalizedQuestion(
   conversationPrompt: any,
@@ -1418,6 +1419,7 @@ export default function Exercise() {
   };
 
   return (
+    <SubscriptionGate>
     <div className="min-h-screen bg-background" dir={dir}>
       {/* Language Toggle - Top Right Corner */}
       <div className="fixed top-4 right-4 z-50">
@@ -1903,5 +1905,6 @@ export default function Exercise() {
         </Card>
       </main>
     </div>
+    </SubscriptionGate>
   );
 }
