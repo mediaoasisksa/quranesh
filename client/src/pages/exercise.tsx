@@ -185,6 +185,7 @@ export default function Exercise() {
     hint?: string | null;
     acceptedVariants?: string[] | null;
     answerMode?: string | null;
+    sourceRef?: string | null;
   }>({
     queryKey: ["/api/conversation-prompts/random", userId, language, selectedSurah],
     queryFn: async () => {
@@ -218,6 +219,7 @@ export default function Exercise() {
     verseExplanation?: string | null;
     verseExplanationEn?: string | null;
     verseExplanationTranslations?: Record<string, string> | null;
+    verseSource?: string | null;
     surahNumber?: number | null;
   }>({
     queryKey: ["/api/roleplay-scenarios/random", userId, selectedSurah],
@@ -881,7 +883,7 @@ export default function Exercise() {
             {conversationPrompt?.suggestedVerse && isAnswered && (
               <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-primary mb-2">
-                  {language === 'ar' ? 'الآية الصحيحة:' : 'The correct verse:'}
+                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
                 </p>
                 <p 
                   className="arabic-text text-lg text-foreground" 
@@ -890,6 +892,11 @@ export default function Exercise() {
                 >
                   {conversationPrompt.suggestedVerse}
                 </p>
+                {conversationPrompt.sourceRef && (
+                  <p className="text-sm text-primary/80 mt-1" dir="rtl">
+                    ({conversationPrompt.sourceRef})
+                  </p>
+                )}
               </div>
             )}
 
@@ -1120,11 +1127,16 @@ export default function Exercise() {
             {roleplayScenario?.suggestedVerse && isAnswered && (
               <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800 animate-in fade-in duration-300">
                 <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
-                  {language === 'ar' ? 'الآية الصحيحة:' : 'The correct verse:'}
+                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
                 </p>
                 <p className="arabic-text text-lg text-green-800 dark:text-green-200" dir="rtl" lang="ar">
                   {roleplayScenario.suggestedVerse}
                 </p>
+                {roleplayScenario.verseSource && (
+                  <p className="text-sm text-green-600 dark:text-green-400 mt-1" dir="rtl">
+                    ({roleplayScenario.verseSource})
+                  </p>
+                )}
                 {getVerseExplanation() && (
                   <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
                     <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">
@@ -1374,6 +1386,28 @@ export default function Exercise() {
                 })}
               </div>
             </div>
+
+            {/* Correct Quranic Expression Card (shown after answering) */}
+            {isAnswered && correctExpression && (
+              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
+                <p className="text-sm font-medium text-primary mb-2">
+                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
+                </p>
+                <p className="arabic-text text-xl font-semibold text-foreground" lang="ar" dir="rtl">
+                  {correctExpression.arabicText}
+                </p>
+                {correctExpression.surahAyah && correctExpression.surahAyah !== 'derived' && (
+                  <p className="text-sm text-primary/80 mt-1" dir="rtl">
+                    ({correctExpression.surahAyah})
+                  </p>
+                )}
+                {correctExpression.meaning && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {correctExpression.meaning}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Explanation Card (shown after answering) */}
             {isAnswered && explanation && (

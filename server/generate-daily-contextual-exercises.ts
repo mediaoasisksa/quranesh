@@ -4,6 +4,7 @@ import { dailySentences, quranicExpressions, dailySentenceExercises } from "@sha
 import type { InsertDailySentence, InsertQuranicExpression, InsertDailySentenceExercise } from "@shared/schema";
 import { validateExerciseBeforePublish } from "@shared/quranic-contextual-checker";
 import { CONTENT_LOGIC_ROLE, TRIGGER_RESPONSE_RULES, VALIDATION_CHECKLIST } from "./content-logic";
+import { validateQuranicAnswer, isNonQuranicPhrase } from "./quran-validator";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -110,13 +111,39 @@ Return valid JSON array with this structure:
   }
 ]
 
-IMPORTANT: 
+CRITICAL MANDATORY RULES:
 - Return ONLY valid JSON, no markdown formatting
 - All Quranic verses MUST be authentic — selected BEFORE writing the scenario
 - The scenario text MUST contain ≥2 LOCK WORDS from the verse as paraphrases
 - If the verse uses a synonym/metaphor for a common word, use the SEMANTIC TRAIT or exact Quranic word in the scenario
 - NO abstract connections — the link must be obvious without Tafsir
-- Focus on practical, conversational usage — only phrases native speakers actually quote`;
+- Focus on practical, conversational usage — only phrases native speakers actually quote
+
+⛔ ABSOLUTE PROHIBITIONS — WILL BE AUTO-REJECTED:
+1. EVERY answer (correctExpression) MUST be 100% literal Quranic text — a word, phrase, or partial verse that exists verbatim in the Mushaf.
+2. NEVER use common Islamic du'as, hadiths, proverbs, or everyday phrases as answers. Examples of BANNED answers:
+   - "إن شاء الله" (common phrase, NOT a standalone Quranic verse)
+   - "بارك الله لك" / "بارك الله فيك" (du'a, NOT Quranic)
+   - "على بركة الله" (common phrase, NOT Quranic)
+   - "جزاك الله خيراً" (du'a, NOT Quranic)
+   - "سبحان الله" alone (dhikr, needs Quranic context)
+   - "مسلمة" alone (random word, NOT a meaningful Quranic phrase)
+   - "الله أكبر" alone (takbir, NOT a Quranic verse)
+3. EVERY answer MUST include surahAyah with format "سورة_name:verse_number" (e.g., "الكهف:24", "يونس:58")
+4. ALL distractors MUST also be authentic Quranic text with surahAyah references
+5. Questions must be LINGUISTIC only — one of these types:
+   - Word meaning: "ما الكلمة القرآنية التي تعني (…)?"
+   - Phrase meaning: "ما العبارة القرآنية التي تعني (…)?"
+   - Grammar/structure: "اختر العبارة التي فيها (نفي/استثناء/توكيد/شرط/أمر…)"
+   - Vocabulary from text: "ما الآية/الجزء الذي ورد فيه لفظ (…)?"
+6. NO interpretation (tafsir), no contemplation (tadabbur), no reasons of revelation, no rulings, no sermons
+7. If you cannot find a literal Quranic match for a scenario, CHANGE THE SCENARIO to match an existing Quranic phrase — never invent an answer
+
+CORRECT EXAMPLES:
+- "Making plans for the future" → Answer: "إِلَّا أَن يَشَاءَ اللَّهُ" (الكهف:24) — NOT "إن شاء الله"
+- "Congratulating someone" → Answer: "فَلْيَفْرَحُوا" (يونس:58) — NOT "بارك الله لك"
+- "Starting a journey" → Answer: "سِيرُوا فِي الْأَرْضِ" (العنكبوت:20) — NOT "على بركة الله"
+- "Describing good things" → Answer: "طَيِّبَاتٍ" (البقرة:172) — NOT "مسلمة"`;
 
   try {
     const result = await model.generateContent(prompt);
@@ -166,7 +193,27 @@ async function main() {
       // Insert each exercise into database
       for (const exercise of exercises) {
         try {
-          // التحقق السياقي قبل الإدراج (المركزية القرآنية)
+          const quranicCheck = validateQuranicAnswer(
+            exercise.correctExpression.arabicText || '',
+            exercise.correctExpression.surahAyah || ''
+          );
+          if (!quranicCheck.isValid) {
+            console.log(`   ⛔ REJECTED (not Quranic): ${exercise.correctExpression.arabicText} — ${quranicCheck.reason}`);
+            continue;
+          }
+
+          const hasInvalidDistractor = exercise.distractors?.some((d: any) => {
+            const dCheck = validateQuranicAnswer(d.arabicText || '', d.surahAyah || '');
+            if (!dCheck.isValid) {
+              console.log(`   ⛔ REJECTED distractor: ${d.arabicText} — ${dCheck.reason}`);
+            }
+            return !dCheck.isValid;
+          });
+          if (hasInvalidDistractor) {
+            console.log(`   ⛔ Skipping exercise — invalid distractor`);
+            continue;
+          }
+
           const contextualCheck = validateExerciseBeforePublish(
             exercise.sentence.englishText || '',
             exercise.correctExpression.arabicText || ''
@@ -174,8 +221,7 @@ async function main() {
           
           if (!contextualCheck.isValid) {
             console.log(`   ⚠️ خطأ في المرجعية: ${contextualCheck.errorMessage}`);
-            console.log(`   💡 التصحيح المقترح: ${contextualCheck.suggestedCorrection}`);
-            continue; // تخطي هذا التمرين
+            continue;
           }
           
           // Insert sentence

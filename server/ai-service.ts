@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
+import { isNonQuranicPhrase } from "./quran-validator";
 
 // قوائم الكلمات المفتاحية للحماية السياقية
 // منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
@@ -482,16 +483,27 @@ export async function validateArabicAnswer(
   expectedAnswer?: string,
   userLanguage: string = "en",
 ): Promise<AIValidationResult> {
-  // === حماية مبكرة: رفض الإجابات القصيرة قبل استدعاء AI ===
   const stripped = userAnswer.replace(/[\u064B-\u065F\u0670\s]/g, "").trim();
   if (stripped.length < 3 || ["ال", "و", "ف", "ب", "ك", "ل", "لل", "بال", "وال", "فال", "كال"].includes(stripped)) {
-    console.log("EARLY REJECT: Input too short or prefix-only:", stripped);
     return {
       isCorrect: false,
       grade: 'incorrect' as ValidationGrade,
       score: 0,
       feedback: "الإجابة قصيرة جداً. اكتب كلمة أو عبارة قرآنية كاملة.",
       suggestions: ["اكتب آية أو عبارة قرآنية كاملة"],
+      suggestedAnswer: undefined,
+      connectionExplanation: undefined,
+      confidence: 1.0,
+    };
+  }
+
+  if (isNonQuranicPhrase(userAnswer)) {
+    return {
+      isCorrect: false,
+      grade: 'incorrect' as ValidationGrade,
+      score: 0,
+      feedback: "هذه عبارة إسلامية شائعة لكنها ليست نصاً قرآنياً حرفياً. اكتب آية أو عبارة من القرآن الكريم مع ذكر اسم السورة.",
+      suggestions: ["اكتب نصاً قرآنياً حرفياً موجوداً في المصحف"],
       suggestedAnswer: undefined,
       connectionExplanation: undefined,
       confidence: 1.0,
