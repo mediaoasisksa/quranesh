@@ -1292,13 +1292,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
   const HYPERPAY_CONFIG = {
-    serverUrl: process.env.HYPERPAY_PROD_ACCESS_TOKEN
-      ? "https://eu-prod.oppwa.com"
-      : (process.env.HYPERPAY_SERVER_URL || "https://eu-test.oppwa.com"),
-    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || process.env.HYPERPAY_ACCESS_TOKEN || "",
-    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || "",
-    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || process.env.HYPERPAY_ENTITY_ID_MADA || "",
-    isProduction: !!process.env.HYPERPAY_PROD_ACCESS_TOKEN,
+    serverUrl: "https://eu-prod.oppwa.com",
+    accessToken: process.env.HYPERPAY_ACCESS_TOKEN || "",
+    entityIdVisaMaster: process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID || "",
+    entityIdMada: process.env.HYPERPAY_ENTITY_ID_MADA || process.env.HYPERPAY_MADA_ENTITY_ID || "",
+    isProduction: true,
   };
 
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
