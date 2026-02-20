@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, MessageSquare, Book, ExternalLink } from "lucide-react";
+import { ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
@@ -53,37 +53,6 @@ const Hero = () => {
               {t('startLearningNow')}
               <ArrowRight className="w-5 h-5" />
             </Button>
-            <a
-              href="https://www.mojzy.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={async () => {
-                try {
-                  await fetch("/api/analytics/track", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      eventName: "click_mojzy_button",
-                      userId: null,
-                      metadata: { source: "hero", language },
-                    }),
-                  });
-                } catch (error) {
-                  console.error("Failed to track event:", error);
-                }
-              }}
-            >
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                data-testid="button-mojzy-hero"
-              >
-                <Book className="w-5 h-5" />
-                {language === 'ar' ? 'تحفيظ القرآن (مُجْزِي)' : t('quranMemorization')}
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-            </a>
             <Link href="/how-it-works">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6" data-testid="button-how-it-works">
                 <MessageSquare className="w-5 h-5" />
