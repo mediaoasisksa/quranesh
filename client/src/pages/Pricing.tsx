@@ -25,6 +25,8 @@ const Pricing = () => {
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
   const isArabic = language === "ar";
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSponsorRole = urlParams.get("role") === "sponsor";
 
   useEffect(() => {
     const fetchPricing = async () => {
@@ -106,26 +108,38 @@ const Pricing = () => {
         <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-6 text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              {isArabic ? (
+              {isSponsorRole ? (
+                isArabic ? (
+                  <>باقات <span className="text-primary">الكفالة</span></>
+                ) : (
+                  <>Sponsorship <span className="text-primary">Plans</span></>
+                )
+              ) : isArabic ? (
                 <>خطط <span className="text-primary">الاشتراك</span></>
               ) : (
                 <>Subscription <span className="text-primary">Plans</span></>
               )}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              {isArabic
-                ? "اشترك في منصة قرآنش لتعلم اللغة العربية القرآنية أو ادعم متعلمين آخرين"
-                : "Subscribe to Quranesh for Quranic Arabic training or sponsor other learners"}
+              {isSponsorRole
+                ? (isArabic
+                  ? "اختر باقة الكفالة لدعم متعلمي القرآن غير الناطقين بالعربية"
+                  : "Choose a sponsorship plan to support non-Arabic speaking Quran learners")
+                : (isArabic
+                  ? "اشترك في منصة قرآنش لتعلم اللغة العربية القرآنية أو ادعم متعلمين آخرين"
+                  : "Subscribe to Quranesh for Quranic Arabic training or sponsor other learners")}
             </p>
           </div>
         </section>
 
         <section className="py-12 pb-20">
           <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {pricingPlans.map((plan: any, index: number) => {
+            <div className={`grid grid-cols-1 ${isSponsorRole ? "md:grid-cols-2 max-w-3xl" : "md:grid-cols-2 lg:grid-cols-4 max-w-6xl"} gap-6 mx-auto`}>
+              {pricingPlans
+                .filter((plan: any) => isSponsorRole ? plan.id.startsWith("sponsor-") : true)
+                .map((plan: any, index: number) => {
                 const Icon = planIcons[plan.id] || Star;
-                const isPopular = plan.id === "learner";
+                const isPopular = isSponsorRole ? plan.id === "sponsor-5" : plan.id === "learner";
                 return (
                   <Card
                     key={plan.id}

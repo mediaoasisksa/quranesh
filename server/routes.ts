@@ -28,6 +28,8 @@ import {
   analyticsEvents,
   chatMessages,
   subscriptions,
+  sponsorships,
+  scholarshipMatches,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -45,6 +47,54 @@ import fs from "fs";
 import path from "path";
 import { validateExerciseAnswer } from "./ai-service";
 import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
+
+async function assignWaitingStudents() {
+  const { eq, lt, asc, and, sql: sqlTag } = await import("drizzle-orm");
+  const waitingStudents = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.scholarshipStatus, "waiting"), eq(users.userType, "sponsored_student")));
+
+  for (const student of waitingStudents) {
+    const existingMatch = await db
+      .select()
+      .from(scholarshipMatches)
+      .where(eq(scholarshipMatches.studentId, student.id))
+      .limit(1);
+    if (existingMatch.length > 0) continue;
+
+    const updated = await db.execute(
+      sqlTag`UPDATE sponsorships SET used_seats = used_seats + 1, is_fully_used = (used_seats + 1 >= total_seats) WHERE used_seats < total_seats RETURNING id, total_seats, used_seats`
+    );
+
+    const rows = (updated as any).rows || (updated as any);
+    if (!rows || rows.length === 0) break;
+
+    const spId = rows[0].id;
+
+    await db.insert(scholarshipMatches).values({
+      studentId: student.id,
+      sponsorshipId: spId,
+    });
+
+    await db.update(users).set({
+      scholarshipStatus: "active",
+    }).where(eq(users.id, student.id));
+
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 365);
+    await db.insert(subscriptions).values({
+      userId: student.id,
+      planType: "learner",
+      amount: 0,
+      currency: "SAR",
+      endDate,
+      status: "active",
+      transactionId: `scholarship-${spId}`,
+      sponsoredUsers: 0,
+    });
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Validate JWT secret on startup
@@ -153,7 +203,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = signupSchema.parse(req.body);
 
-      // Check if user already exists
       const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
         return res
@@ -161,14 +210,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .json({ message: "User already exists with this email" });
       }
 
-      // Hash password
       const saltRounds = 12;
       const passwordHash = await bcrypt.hash(
         validatedData.password,
         saltRounds,
       );
 
-      // Create user with hashed password (map to database schema)
+      const userType = validatedData.userType || "self_funded";
+      let scholarshipStatus = "none";
+      let nextRoute = "/pricing";
+      let scholarshipAssigned = false;
+
+      if (userType === "sponsored_student") {
+        const { lt } = await import("drizzle-orm");
+        const availableSponsorship = await db
+          .select()
+          .from(sponsorships)
+          .where(lt(sponsorships.usedSeats, sponsorships.totalSeats))
+          .orderBy(sponsorships.createdAt)
+          .limit(1);
+
+        if (availableSponsorship.length > 0) {
+          scholarshipStatus = "active";
+          scholarshipAssigned = true;
+          nextRoute = "/dashboard";
+        } else {
+          scholarshipStatus = "waiting";
+          nextRoute = "/scholarship-status";
+        }
+      } else if (userType === "sponsor") {
+        nextRoute = "/pricing?role=sponsor";
+      }
+
       const userData = {
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
@@ -179,19 +252,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         memorizationLevel: validatedData.memorizationLevel,
         nativeLanguage: validatedData.nativeLanguage,
         learningGoal: validatedData.learningGoal,
+        userType,
+        scholarshipStatus,
       };
 
       const user = await storage.createUser(userData);
 
-      // Remove password hash from response
+      if (scholarshipAssigned) {
+        const { sql: sqlTag, eq } = await import("drizzle-orm");
+        const updated = await db.execute(
+          sqlTag`UPDATE sponsorships SET used_seats = used_seats + 1, is_fully_used = (used_seats + 1 >= total_seats) WHERE used_seats < total_seats RETURNING id`
+        );
+
+        const rows = (updated as any).rows || (updated as any);
+        if (rows && rows.length > 0) {
+          const spId = rows[0].id;
+          await db.insert(scholarshipMatches).values({
+            studentId: user.id,
+            sponsorshipId: spId,
+          });
+
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + 365);
+          await db.insert(subscriptions).values({
+            userId: user.id,
+            planType: "learner",
+            amount: 0,
+            currency: "SAR",
+            endDate,
+            status: "active",
+            transactionId: `scholarship-${spId}`,
+            sponsoredUsers: 0,
+          });
+        } else {
+          await db.update(users).set({ scholarshipStatus: "waiting" }).where(eq(users.id, user.id));
+          nextRoute = "/scholarship-status";
+        }
+      }
+
       const { passwordHash: _, ...userResponse } = user;
 
       res.status(201).json({
         message: "User created successfully",
         user: userResponse,
+        nextRoute,
+        scholarshipStatus,
       });
     } catch (error) {
-      // Handle database unique constraint errors
       if (
         error &&
         typeof error === "object" &&
@@ -201,13 +308,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Email already exists" });
       }
 
-      // Handle validation errors
       if (error instanceof Error && error.name === "ZodError") {
         return res
           .status(400)
           .json({ message: "Invalid input data", errors: error.message });
       }
 
+      console.error("Signup error:", error);
       res.status(500).json({ message: "Failed to create user" });
     }
   });
@@ -1433,16 +1540,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (plan && plan.durationDays > 0) {
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + plan.durationDays);
-            await db.insert(subscriptions).values({
-              userId,
-              planType: planId,
-              amount: plan.price,
-              currency: plan.currency,
-              endDate,
-              status: "active",
-              transactionId: paymentResult.id,
-              sponsoredUsers: plan.sponsoredCount || 0,
-            });
+
+            const { eq } = await import("drizzle-orm");
+            const userRecord = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+            const isSponsor = userRecord.length > 0 && userRecord[0].userType === "sponsor";
+            const isSponsorPlan = planId.startsWith("sponsor-");
+
+            if (isSponsor && isSponsorPlan && plan.sponsoredCount) {
+              await db.insert(sponsorships).values({
+                sponsorId: userId,
+                planType: planId,
+                totalSeats: plan.sponsoredCount,
+                usedSeats: 0,
+                isFullyUsed: false,
+                transactionId: paymentResult.id,
+              });
+
+              await db.insert(subscriptions).values({
+                userId,
+                planType: planId,
+                amount: plan.price,
+                currency: plan.currency,
+                endDate,
+                status: "active",
+                transactionId: paymentResult.id,
+                sponsoredUsers: plan.sponsoredCount || 0,
+              });
+
+              await assignWaitingStudents();
+            } else {
+              await db.insert(subscriptions).values({
+                userId,
+                planType: planId,
+                amount: plan.price,
+                currency: plan.currency,
+                endDate,
+                status: "active",
+                transactionId: paymentResult.id,
+                sponsoredUsers: plan.sponsoredCount || 0,
+              });
+            }
           }
         }
 
@@ -1497,6 +1634,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (plan && plan.durationDays > 0) {
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + plan.durationDays);
+
+            const { eq } = await import("drizzle-orm");
+            const userRecord = await db.select().from(users).where(eq(users.id, userId as string)).limit(1);
+            const isSponsor = userRecord.length > 0 && userRecord[0].userType === "sponsor";
+            const isSponsorPlan = (planId as string).startsWith("sponsor-");
+
+            if (isSponsor && isSponsorPlan && plan.sponsoredCount) {
+              await db.insert(sponsorships).values({
+                sponsorId: userId as string,
+                planType: planId as string,
+                totalSeats: plan.sponsoredCount,
+                usedSeats: 0,
+                isFullyUsed: false,
+                transactionId: paymentResult.id,
+              });
+              await assignWaitingStudents();
+            }
+
             await db.insert(subscriptions).values({
               userId: userId as string,
               planType: planId as string,
@@ -1558,6 +1713,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Subscription status error:", error);
       res.status(500).json({ message: "Failed to check subscription" });
+    }
+  });
+
+  app.get("/api/scholarship/availability", async (req, res) => {
+    try {
+      const { lt, sql: sqlFn } = await import("drizzle-orm");
+      const available = await db
+        .select()
+        .from(sponsorships)
+        .where(lt(sponsorships.usedSeats, sponsorships.totalSeats));
+
+      let totalAvailable = 0;
+      for (const sp of available) {
+        totalAvailable += (sp.totalSeats - sp.usedSeats);
+      }
+
+      const { eq } = await import("drizzle-orm");
+      const waitingCount = await db
+        .select()
+        .from(users)
+        .where(eq(users.scholarshipStatus, "waiting"));
+
+      res.json({
+        availableSeats: totalAvailable,
+        waitingStudents: waitingCount.length,
+        hasSeats: totalAvailable > 0,
+      });
+    } catch (error) {
+      console.error("Scholarship availability error:", error);
+      res.status(500).json({ message: "Failed to check scholarship availability" });
+    }
+  });
+
+  app.get("/api/scholarship/status", async (req, res) => {
+    try {
+      const { userId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ message: "Missing userId" });
+      }
+
+      const { eq } = await import("drizzle-orm");
+      const user = await db.select().from(users).where(eq(users.id, String(userId))).limit(1);
+      if (user.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const match = await db
+        .select()
+        .from(scholarshipMatches)
+        .where(eq(scholarshipMatches.studentId, String(userId)))
+        .limit(1);
+
+      res.json({
+        userType: user[0].userType,
+        scholarshipStatus: user[0].scholarshipStatus,
+        hasMatch: match.length > 0,
+        matchDetails: match.length > 0 ? { assignedAt: match[0].assignedAt } : null,
+      });
+    } catch (error) {
+      console.error("Scholarship status error:", error);
+      res.status(500).json({ message: "Failed to check scholarship status" });
+    }
+  });
+
+  app.get("/api/admin/sponsorships", requireAdminAuth, async (req, res) => {
+    try {
+      const { desc } = await import("drizzle-orm");
+      const allSponsorships = await db.select().from(sponsorships).orderBy(desc(sponsorships.createdAt));
+      const allMatches = await db.select().from(scholarshipMatches);
+      res.json({ sponsorships: allSponsorships, matches: allMatches });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch sponsorships" });
     }
   });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Heart, BookOpen, GraduationCap, ArrowLeft, Users, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
@@ -25,7 +25,11 @@ import LanguageToggle from "@/components/language-toggle";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import { countryCodes } from "@/data/country-codes";
 
+type UserType = "sponsor" | "self_funded" | "sponsored_student" | null;
+
 const SignUp = () => {
+  const [step, setStep] = useState<"choose" | "form">("choose");
+  const [userType, setUserType] = useState<UserType>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,7 +37,10 @@ const SignUp = () => {
   const [success, setSuccess] = useState("");
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
-  const { t, dir } = useLanguage();
+  const { t, language, dir } = useLanguage();
+  const isArabic = language === "ar";
+  const [scholarshipInfo, setScholarshipInfo] = useState<{ availableSeats: number; waitingStudents: number } | null>(null);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -47,8 +54,20 @@ const SignUp = () => {
     learningGoal: "",
   });
 
+  useEffect(() => {
+    fetch("/api/scholarship/availability")
+      .then(r => r.json())
+      .then(data => setScholarshipInfo(data))
+      .catch(() => {});
+  }, []);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleUserTypeSelect = (type: UserType) => {
+    setUserType(type);
+    setStep("form");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,22 +76,19 @@ const SignUp = () => {
     setError("");
     setSuccess("");
 
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError(t('passwordsDoNotMatch'));
+      setError(isArabic ? "كلمتا المرور غير متطابقتين" : t('passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
-    // Validate password length
     if (formData.password.length < 8) {
-      setError(t('passwordTooShort'));
+      setError(isArabic ? "يجب أن تكون كلمة المرور 8 أحرف على الأقل" : t('passwordTooShort'));
       setLoading(false);
       return;
     }
 
     try {
-      // Extract dial code from format "+XXX:CC"
       const dialCode = formData.countryCode.split(':')[0];
       const signupData = {
         firstName: formData.firstName,
@@ -84,370 +100,417 @@ const SignUp = () => {
         memorizationLevel: formData.memorizationLevel,
         nativeLanguage: formData.nativeLanguage,
         learningGoal: formData.learningGoal,
+        userType: userType || "self_funded",
       };
 
       const response = await fetch("/api/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(t('accountCreatedSuccess'));
+        let successMsg = isArabic ? "تم إنشاء الحساب بنجاح!" : t('accountCreatedSuccess');
+
+        if (data.scholarshipStatus === "waiting") {
+          successMsg = isArabic
+            ? "تم تسجيلك بنجاح! أنت الآن في قائمة الانتظار."
+            : "Registered successfully! You're on the waiting list.";
+        } else if (data.scholarshipStatus === "active") {
+          successMsg = isArabic
+            ? "تم تسجيلك وتفعيل المنحة بنجاح!"
+            : "Registered and scholarship activated successfully!";
+        }
+
+        setSuccess(successMsg);
+
         setTimeout(() => {
-          setLocation("/signin");
+          if (data.scholarshipStatus === "waiting") {
+            setLocation("/scholarship-status");
+          } else if (userType === "sponsor") {
+            setLocation("/signin");
+          } else {
+            setLocation("/signin");
+          }
         }, 2000);
       } else {
-        setError(data.message || t('accountCreationFailed'));
+        setError(data.message || (isArabic ? "فشل إنشاء الحساب" : t('accountCreationFailed')));
       }
     } catch (err) {
-      setError(t('networkError'));
+      setError(isArabic ? "خطأ في الشبكة" : t('networkError'));
     } finally {
       setLoading(false);
     }
   };
 
+  const userTypeCards = [
+    {
+      type: "sponsor" as UserType,
+      icon: Heart,
+      title: isArabic ? "الكافل / الداعم" : "Sponsor",
+      description: isArabic
+        ? "أريد دعم غير الناطقين بالعربية لفهم القرآن"
+        : "I want to support non-Arabic speakers to understand the Quran",
+      detail: isArabic
+        ? "ستشتري باقة تُضاف كمقعد دراسي مجاني لمن لا يستطيع الدفع"
+        : "Your purchase adds free learning seats for those who can't afford it",
+      color: "border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950",
+      iconColor: "text-amber-600",
+      bgGradient: "from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20",
+    },
+    {
+      type: "self_funded" as UserType,
+      icon: BookOpen,
+      title: isArabic ? "الطالب المستقل" : "Self-Funded Student",
+      description: isArabic
+        ? "أريد شراء باقة لنفسي لتعلم العربية القرآنية"
+        : "I want to buy a plan for myself to learn Quranic Arabic",
+      detail: isArabic
+        ? "اشترِ باقتك وابدأ رحلة التعلم فوراً"
+        : "Purchase your plan and start your learning journey immediately",
+      color: "border-primary hover:bg-primary/5",
+      iconColor: "text-primary",
+      bgGradient: "from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5",
+    },
+    {
+      type: "sponsored_student" as UserType,
+      icon: GraduationCap,
+      title: isArabic ? "طالب المنحة المدعوم" : "Sponsored Student",
+      description: isArabic
+        ? "أريد تعلم العربية القرآنية عن طريق المنح المجانية المدعومة"
+        : "I want to learn Quranic Arabic through free sponsored scholarships",
+      detail: scholarshipInfo && scholarshipInfo.availableSeats > 0
+        ? (isArabic
+          ? `${scholarshipInfo.availableSeats} مقعد متاح حالياً`
+          : `${scholarshipInfo.availableSeats} seats currently available`)
+        : (isArabic
+          ? "سيتم وضعك في قائمة الانتظار حتى يتوفر كافل"
+          : "You'll be placed on a waiting list until a sponsor is available"),
+      color: "border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950",
+      iconColor: "text-emerald-600",
+      bgGradient: "from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6" dir={dir}>
-      {/* Language Toggle - Top Right Corner */}
       <div className="fixed top-4 right-4 z-50">
         <LanguageToggle />
       </div>
 
-      <div className="w-full max-w-lg">
-        {/* Logo */}
+      <div className="w-full max-w-3xl">
         <div className="flex items-center justify-center mb-8">
           <Link href="/" className="cursor-pointer">
-            <img 
-              src={logoImage} 
-              alt="Quranesh Logo" 
+            <img
+              src={logoImage}
+              alt="Quranesh Logo"
               className="h-24 w-auto object-contain hover:opacity-90 transition-opacity"
             />
           </Link>
         </div>
 
-        <Card className="border-2 shadow-lg">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t('signUp')}</CardTitle>
-            <CardDescription>
-              {t('createNewAccount')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">{t('firstName')}</Label>
-                  <Input
-                    id="firstName"
-                    placeholder={t('firstName')}
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      handleInputChange("firstName", e.target.value)
-                    }
-                    required
-                    className="transition-all duration-200 focus:border-primary"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">{t('lastName')}</Label>
-                  <Input
-                    id="lastName"
-                    placeholder={t('lastName')}
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      handleInputChange("lastName", e.target.value)
-                    }
-                    required
-                    className="transition-all duration-200 focus:border-primary"
-                  />
-                </div>
-              </div>
+        {step === "choose" && (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                {isArabic ? "إنشاء حساب جديد" : "Create Your Account"}
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                {isArabic ? "اختر المسار الذي يناسبك" : "Choose the path that suits you"}
+              </p>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t('email')}
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  required
-                  className="transition-all duration-200 focus:border-primary"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
-                <div className="flex gap-2" dir="ltr">
-                  <Select
-                    value={formData.countryCode}
-                    onValueChange={(value) => handleInputChange("countryCode", value)}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {userTypeCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <Card
+                    key={card.type}
+                    className={`cursor-pointer border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${card.color}`}
+                    onClick={() => handleUserTypeSelect(card.type)}
                   >
-                    <SelectTrigger className="w-[140px] transition-all duration-200 focus:border-primary">
-                      <SelectValue placeholder="+966" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {countryCodes.map((country) => (
-                        <SelectItem key={country.code} value={`${country.dialCode}:${country.code}`}>
-                          <span className="flex items-center gap-2">
-                            <span>{country.flag}</span>
-                            <span>{country.dialCode}</span>
-                            <span className="text-muted-foreground text-xs">{country.name}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    placeholder="5XX XXX XXXX"
-                    value={formData.phoneNumber}
-                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                    required
-                    className="flex-1 transition-all duration-200 focus:border-primary"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{t('phoneNumberHint')}</p>
-              </div>
+                    <CardHeader className={`text-center pb-3 pt-6 bg-gradient-to-b ${card.bgGradient} rounded-t-lg`}>
+                      <div className={`w-16 h-16 mx-auto mb-3 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center ${card.iconColor}`}>
+                        <Icon className="w-8 h-8" />
+                      </div>
+                      <CardTitle className="text-lg font-bold">{card.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 text-center space-y-3">
+                      <p className="text-sm text-foreground leading-relaxed">{card.description}</p>
+                      <div className="flex items-center gap-2 justify-center">
+                        {card.type === "sponsored_student" && scholarshipInfo ? (
+                          scholarshipInfo.availableSeats > 0 ? (
+                            <span className="inline-flex items-center gap-1 text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">
+                              <Users className="w-3 h-3" />
+                              {card.detail}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full">
+                              <Clock className="w-3 h-3" />
+                              {card.detail}
+                            </span>
+                          )
+                        ) : (
+                          <p className="text-xs text-muted-foreground">{card.detail}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t('createPassword')}
-                    value={formData.password}
-                    onChange={(e) =>
-                      handleInputChange("password", e.target.value)
-                    }
-                    required
-                    className="pr-10 transition-all duration-200 focus:border-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder={t('confirmPasswordPlaceholder')}
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      handleInputChange("confirmPassword", e.target.value)
-                    }
-                    required
-                    className="pr-10 transition-all duration-200 focus:border-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('memorizationLevel')}</Label>
-                <Select
-                  value={formData.memorizationLevel}
-                  onValueChange={(value) =>
-                    handleInputChange("memorizationLevel", value)
-                  }
-                >
-                  <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder={t('selectMemorizationLevel')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="para-1-3">{t('para1to3')}</SelectItem>
-                    <SelectItem value="para-4-10">{t('para4to10')}</SelectItem>
-                    <SelectItem value="para-11-20">{t('para11to20')}</SelectItem>
-                    <SelectItem value="para-21-30">{t('para21to30')}</SelectItem>
-                    <SelectItem value="complete">
-                      {t('completeQuran')}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('nativeLanguage')}</Label>
-                <Select
-                  value={formData.nativeLanguage}
-                  onValueChange={(value) =>
-                    handleInputChange("nativeLanguage", value)
-                  }
-                >
-                  <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder={t('selectNativeLanguage')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="english">{t('english')}</SelectItem>
-                    <SelectItem value="urdu">{t('urdu')}</SelectItem>
-                    <SelectItem value="hindi">{t('hindi')}</SelectItem>
-                    <SelectItem value="bengali">{t('bengali')}</SelectItem>
-                    <SelectItem value="indonesian">{t('indonesian')}</SelectItem>
-                    <SelectItem value="malay">{t('malay')}</SelectItem>
-                    <SelectItem value="turkish">{t('turkish')}</SelectItem>
-                    <SelectItem value="persian">{t('persian')}</SelectItem>
-                    <SelectItem value="other">{t('other')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('learningGoal')}</Label>
-                <Select
-                  value={formData.learningGoal}
-                  onValueChange={(value) =>
-                    handleInputChange("learningGoal", value)
-                  }
-                >
-                  <SelectTrigger className="transition-all duration-200 focus:border-primary">
-                    <SelectValue placeholder={t('selectLearningGoal')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily-conversation">
-                      {t('dailyConversation')}
-                    </SelectItem>
-                    <SelectItem value="understand-quran">
-                      {t('understandQuran')}
-                    </SelectItem>
-                    <SelectItem value="islamic-studies">
-                      {t('islamicStudies')}
-                    </SelectItem>
-                    <SelectItem value="teaching">{t('teachingDawah')}</SelectItem>
-                    <SelectItem value="cultural-connection">
-                      {t('culturalConnection')}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {error && (
-                <div className="text-red-600 text-sm text-center p-3 bg-red-50 border border-red-200 rounded-md">
-                  {error}
-                </div>
-              )}
-
-              {success && (
-                <div className="text-green-600 text-sm text-center p-3 bg-green-50 border border-green-200 rounded-md">
-                  {success}
-                </div>
-              )}
-
-              <div className="flex items-start gap-2">
-                <input
-                  type="checkbox"
-                  className="rounded border-border mt-1"
-                  required
-                />
-                <span className="text-sm text-muted-foreground">
-                  {t('agreeToTerms')}{" "}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    {t('termsOfService')}
-                  </Link>{" "}
-                  {t('and')}{" "}
-                  <Link
-                    href="/privacy"
-                    className="text-primary hover:underline"
-                  >
-                    {t('privacyPolicy')}
-                  </Link>
-                </span>
-              </div>
-
-              <Button
-                type="submit"
-                variant="default"
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? `${t('createAccount')}...` : t('createAccount')}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    {t('orContinueWith')}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" type="button" className="w-full">
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  Google
-                </Button>
-                <Button variant="outline" type="button" className="w-full">
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                  Facebook
-                </Button>
-              </div>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              {t('alreadyHaveAccount')}{" "}
-              <Link
-                href="/signin"
-                className="text-primary hover:underline font-medium"
-              >
-                {t('signIn')}
+            <div className="text-center text-sm text-muted-foreground mt-6">
+              {isArabic ? "لديك حساب بالفعل؟" : t('alreadyHaveAccount')}{" "}
+              <Link href="/signin" className="text-primary hover:underline font-medium">
+                {isArabic ? "تسجيل الدخول" : t('signIn')}
               </Link>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
+
+        {step === "form" && (
+          <Card className="border-2 shadow-lg max-w-lg mx-auto">
+            <CardHeader className="text-center">
+              <div className="flex items-center justify-between mb-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setStep("choose"); setError(""); setSuccess(""); }}
+                  className="gap-1"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {isArabic ? "رجوع" : "Back"}
+                </Button>
+                <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                  {userTypeCards.find(c => c.type === userType)?.title}
+                </span>
+              </div>
+              <CardTitle className="text-2xl font-bold">{isArabic ? "إنشاء حساب" : t('signUp')}</CardTitle>
+              <CardDescription>
+                {isArabic ? "أكمل بياناتك للتسجيل" : t('createNewAccount')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">{isArabic ? "الاسم الأول" : t('firstName')}</Label>
+                    <Input
+                      id="firstName"
+                      placeholder={isArabic ? "الاسم الأول" : t('firstName')}
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">{isArabic ? "الاسم الأخير" : t('lastName')}</Label>
+                    <Input
+                      id="lastName"
+                      placeholder={isArabic ? "الاسم الأخير" : t('lastName')}
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">{isArabic ? "البريد الإلكتروني" : t('email')}</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder={isArabic ? "البريد الإلكتروني" : t('email')}
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">{isArabic ? "رقم الهاتف" : t('phoneNumber')}</Label>
+                  <div className="flex gap-2" dir="ltr">
+                    <Select
+                      value={formData.countryCode}
+                      onValueChange={(value) => handleInputChange("countryCode", value)}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="+966" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {countryCodes.map((country) => (
+                          <SelectItem key={country.code} value={`${country.dialCode}:${country.code}`}>
+                            <span className="flex items-center gap-2">
+                              <span>{country.flag}</span>
+                              <span>{country.dialCode}</span>
+                              <span className="text-muted-foreground text-xs">{country.name}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="5XX XXX XXXX"
+                      value={formData.phoneNumber}
+                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                      required
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">{isArabic ? "كلمة المرور" : t('password')}</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={isArabic ? "أنشئ كلمة مرور" : t('createPassword')}
+                      value={formData.password}
+                      onChange={(e) => handleInputChange("password", e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">{isArabic ? "تأكيد كلمة المرور" : t('confirmPassword')}</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder={isArabic ? "أعد كتابة كلمة المرور" : t('confirmPasswordPlaceholder')}
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {userType !== "sponsor" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>{isArabic ? "مستوى الحفظ" : t('memorizationLevel')}</Label>
+                      <Select
+                        value={formData.memorizationLevel}
+                        onValueChange={(value) => handleInputChange("memorizationLevel", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={isArabic ? "اختر مستوى الحفظ" : t('selectMemorizationLevel')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="para-1-3">{t('para1to3')}</SelectItem>
+                          <SelectItem value="para-4-10">{t('para4to10')}</SelectItem>
+                          <SelectItem value="para-11-20">{t('para11to20')}</SelectItem>
+                          <SelectItem value="para-21-30">{t('para21to30')}</SelectItem>
+                          <SelectItem value="complete">{t('completeQuran')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{isArabic ? "اللغة الأم" : t('nativeLanguage')}</Label>
+                      <Select
+                        value={formData.nativeLanguage}
+                        onValueChange={(value) => handleInputChange("nativeLanguage", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={isArabic ? "اختر لغتك الأم" : t('selectNativeLanguage')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="english">{t('english')}</SelectItem>
+                          <SelectItem value="urdu">{t('urdu')}</SelectItem>
+                          <SelectItem value="hindi">{t('hindi')}</SelectItem>
+                          <SelectItem value="bengali">{t('bengali')}</SelectItem>
+                          <SelectItem value="indonesian">{t('indonesian')}</SelectItem>
+                          <SelectItem value="malay">{t('malay')}</SelectItem>
+                          <SelectItem value="turkish">{t('turkish')}</SelectItem>
+                          <SelectItem value="persian">{t('persian')}</SelectItem>
+                          <SelectItem value="other">{t('other')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{isArabic ? "هدف التعلم" : t('learningGoal')}</Label>
+                      <Select
+                        value={formData.learningGoal}
+                        onValueChange={(value) => handleInputChange("learningGoal", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={isArabic ? "اختر هدف التعلم" : t('selectLearningGoal')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily-conversation">{t('dailyConversation')}</SelectItem>
+                          <SelectItem value="understand-quran">{t('understandQuran')}</SelectItem>
+                          <SelectItem value="islamic-studies">{t('islamicStudies')}</SelectItem>
+                          <SelectItem value="teaching">{t('teachingDawah')}</SelectItem>
+                          <SelectItem value="cultural-connection">{t('culturalConnection')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+
+                {error && (
+                  <div className="text-red-600 text-sm text-center p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md">
+                    {error}
+                  </div>
+                )}
+
+                {success && (
+                  <div className="text-green-600 text-sm text-center p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-md">
+                    {success}
+                  </div>
+                )}
+
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" className="rounded border-border mt-1" required />
+                  <span className="text-sm text-muted-foreground">
+                    {t('agreeToTerms')}{" "}
+                    <Link href="/terms" className="text-primary hover:underline">{t('termsOfService')}</Link>{" "}
+                    {t('and')}{" "}
+                    <Link href="/privacy" className="text-primary hover:underline">{t('privacyPolicy')}</Link>
+                  </span>
+                </div>
+
+                <Button type="submit" variant="default" className="w-full" disabled={loading}>
+                  {loading
+                    ? (isArabic ? "جارٍ إنشاء الحساب..." : `${t('createAccount')}...`)
+                    : (isArabic ? "إنشاء الحساب" : t('createAccount'))}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-sm text-muted-foreground">
+                {isArabic ? "لديك حساب بالفعل؟" : t('alreadyHaveAccount')}{" "}
+                <Link href="/signin" className="text-primary hover:underline font-medium">
+                  {isArabic ? "تسجيل الدخول" : t('signIn')}
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

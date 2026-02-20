@@ -80,9 +80,11 @@ export const users = pgTable("users", {
   countryCode: text("country_code").default(""),
   phoneNumber: text("phone_number").default(""),
   passwordHash: text("password_hash").notNull(),
-  memorizationLevel: text("memorization_level"), // beginner, intermediate, advanced, hafiz
+  memorizationLevel: text("memorization_level"),
   nativeLanguage: text("native_language"),
   learningGoal: text("learning_goal"),
+  userType: text("user_type").default("self_funded").notNull(), // sponsor, self_funded, sponsored_student
+  scholarshipStatus: text("scholarship_status").default("none").notNull(), // none, waiting, active
   isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`now()`).notNull(),
@@ -127,7 +129,42 @@ export const signupSchema = z.object({
   memorizationLevel: z.string().optional(),
   nativeLanguage: z.string().optional(),
   learningGoal: z.string().optional(),
+  userType: z.enum(["sponsor", "self_funded", "sponsored_student"]).default("self_funded"),
 });
+
+export const sponsorships = pgTable("sponsorships", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sponsorId: text("sponsor_id").notNull(),
+  planType: text("plan_type").notNull(),
+  totalSeats: integer("total_seats").notNull(),
+  usedSeats: integer("used_seats").default(0).notNull(),
+  isFullyUsed: boolean("is_fully_used").default(false).notNull(),
+  transactionId: text("transaction_id"),
+  createdAt: timestamp("created_at").default(sql`now()`).notNull(),
+});
+
+export const insertSponsorshipSchema = createInsertSchema(sponsorships).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Sponsorship = typeof sponsorships.$inferSelect;
+export type InsertSponsorship = z.infer<typeof insertSponsorshipSchema>;
+
+export const scholarshipMatches = pgTable("scholarship_matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  studentId: text("student_id").notNull(),
+  sponsorshipId: text("sponsorship_id").notNull(),
+  assignedAt: timestamp("assigned_at").default(sql`now()`).notNull(),
+});
+
+export const insertScholarshipMatchSchema = createInsertSchema(scholarshipMatches).omit({
+  id: true,
+  assignedAt: true,
+});
+
+export type ScholarshipMatch = typeof scholarshipMatches.$inferSelect;
+export type InsertScholarshipMatch = z.infer<typeof insertScholarshipMatchSchema>;
 
 // Schema for signin requests
 export const signinSchema = z.object({

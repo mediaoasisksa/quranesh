@@ -21,6 +21,7 @@ import Analytics from "@/pages/Analytics";
 import DiplomaPage from "@/pages/diploma";
 import AdminPage from "@/pages/admin";
 import ChatPage from "@/pages/chat";
+import ScholarshipStatus from "@/pages/ScholarshipStatus";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route path="/translation-manager" component={TranslationManager} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/scholarship-status" component={ScholarshipStatus} />
       <Route component={NotFound} />
     </Switch>
   );

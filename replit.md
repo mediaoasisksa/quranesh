@@ -69,10 +69,13 @@ Real-time chat system with 11 language-specific rooms (English, French, Indonesi
 An administrative `/translation-manager` interface allows bulk translation of philosophical sentences and conversation prompts into 9 languages using Gemini AI, providing statistics, single-sentence translation, and robust error handling.
 
 ## Authentication
-The application uses JWT tokens and bcrypt for secure user authentication, supporting a demo user and ensuring data isolation.
+The application uses JWT tokens and bcrypt for secure user authentication, supporting a demo user and ensuring data isolation. Users have a `userType` field (sponsor, self_funded, sponsored_student) and `scholarshipStatus` field (none, waiting, active).
 
 ## Payment & Subscription System
 HyperPay's COPYandPAY Widget handles payments (VISA/Mastercard/MADA), with credentials loaded exclusively from environment variables (HYPERPAY_PROD_* for production, HYPERPAY_* for test). The `subscriptions` table tracks active user subscriptions with plan type, amount, start/end dates, and transaction ID. Plans: learner (10 SAR/year), sponsor-5 (50 SAR/year, sponsors 5 learners), sponsor-10 (100 SAR/year, sponsors 10 learners), certificate (40 SAR one-time). The `/api/subscription-status` endpoint checks subscription validity; admin users bypass subscription requirements. The `SubscriptionGate` component on the frontend blocks exercise access for non-subscribed users.
+
+## Scholarship Wallet System
+Three user paths on signup: Sponsor (الكافل), Self-Funded Student (الطالب المستقل), Sponsored Student (طالب المنحة). The `sponsorships` table tracks sponsor donations with total_seats/used_seats, and `scholarship_matches` links students to sponsors. When a sponsor pays, seats are added to the wallet. Sponsored students get auto-assigned if seats are available, otherwise placed on a waiting list. The `assignWaitingStudents()` function uses atomic SQL updates to prevent race conditions. Key endpoints: `/api/scholarship/availability`, `/api/scholarship/status`, `/api/admin/sponsorships`. The `/scholarship-status` page shows waiting list information.
 
 # External Dependencies
 
