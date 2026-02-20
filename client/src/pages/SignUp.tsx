@@ -112,29 +112,40 @@ const SignUp = () => {
       const data = await response.json();
 
       if (response.ok) {
+        if (data.token && data.user) {
+          signIn(data.user, data.token);
+        }
+
         let successMsg = isArabic ? "تم إنشاء الحساب بنجاح!" : t('accountCreatedSuccess');
+        let redirectPath = "/pricing";
 
         if (data.scholarshipStatus === "waiting") {
           successMsg = isArabic
             ? "تم تسجيلك بنجاح! أنت الآن في قائمة الانتظار."
             : "Registered successfully! You're on the waiting list.";
+          redirectPath = "/scholarship-status";
         } else if (data.scholarshipStatus === "active") {
           successMsg = isArabic
             ? "تم تسجيلك وتفعيل المنحة بنجاح!"
             : "Registered and scholarship activated successfully!";
+          redirectPath = "/exercises";
+        } else if (userType === "sponsor") {
+          successMsg = isArabic
+            ? "تم إنشاء حسابك! اختر باقة الكفالة"
+            : "Account created! Choose your sponsorship plan";
+          redirectPath = "/pricing?role=sponsor";
+        } else {
+          successMsg = isArabic
+            ? "تم إنشاء حسابك! اختر باقة الاشتراك"
+            : "Account created! Choose your subscription plan";
+          redirectPath = "/pricing";
         }
 
         setSuccess(successMsg);
 
         setTimeout(() => {
-          if (data.scholarshipStatus === "waiting") {
-            setLocation("/scholarship-status");
-          } else if (userType === "sponsor") {
-            setLocation("/signin");
-          } else {
-            setLocation("/signin");
-          }
-        }, 2000);
+          setLocation(redirectPath);
+        }, 1500);
       } else {
         setError(data.message || (isArabic ? "فشل إنشاء الحساب" : t('accountCreationFailed')));
       }

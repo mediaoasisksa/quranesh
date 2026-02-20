@@ -292,9 +292,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { passwordHash: _, ...userResponse } = user;
 
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: "24h" },
+      );
+
       res.status(201).json({
         message: "User created successfully",
         user: userResponse,
+        token,
+        tokenType: "Bearer",
+        expiresIn: "24h",
         nextRoute,
         scholarshipStatus,
       });
