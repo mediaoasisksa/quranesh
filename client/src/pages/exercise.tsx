@@ -817,39 +817,45 @@ export default function Exercise() {
         );
 
       case "conversation":
+        const convQuestionText = getLocalizedQuestion(conversationPrompt, language);
+        const convHasSurah = convQuestionText && (convQuestionText.includes('سورة') || convQuestionText.toLowerCase().includes('surah'));
         return (
           <div className="space-y-5">
-            {/* Step 1: Context/Scenario */}
+            {/* Step 1: Surah Target / Question */}
             <div className="bg-muted/50 rounded-lg p-5">
               <div className="flex items-start gap-3">
-                <span className="text-2xl mt-1">💬</span>
+                <span className="text-2xl mt-1">📖</span>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-muted-foreground mb-2">
-                    {language === 'ar' ? 'السيناريو:' : 'Scenario:'}
+                    {convHasSurah
+                      ? (language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:')
+                      : (language === 'ar' ? 'التمرين:' : 'Exercise:')}
                   </p>
                   <p
                     className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'arabic-text' : ''}`}
                     lang={language}
                     data-testid="text-conversation-prompt"
                   >
-                    {getLocalizedQuestion(conversationPrompt, language)}
+                    {convQuestionText}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Step 2: The Challenge - ask for recall */}
+            {/* Step 2: Vocabulary Challenge */}
             <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
               <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
                 <BookOpenCheck className="h-4 w-4" />
-                {language === 'ar' ? 'التحدي:' : 'The Challenge:'}
+                {convHasSurah
+                  ? (language === 'ar' ? 'ما الكلمة التي تعني:' : 'Find the word that means:')
+                  : (language === 'ar' ? 'أجب بعبارة قرآنية:' : 'Answer with a Quranic expression:')}
               </p>
               <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${conversationPrompt?.claim ? 'text-right' : (language === 'ar' ? 'text-right' : '')}`} dir={conversationPrompt?.claim ? 'rtl' : dir} lang={conversationPrompt?.claim ? 'ar' : undefined}>
                 {conversationPrompt?.claim 
                   ? conversationPrompt.claim
-                  : (language === 'ar' 
-                    ? 'أي عبارة قرآنية تناسب هذا المعنى بالضبط؟'
-                    : 'Which Quranic phrase fits this exact meaning?')}
+                  : (convHasSurah
+                    ? (language === 'ar' ? 'ما الكلمة القرآنية المطلوبة؟' : 'What is the Quranic word?')
+                    : (language === 'ar' ? 'ما العبارة القرآنية المناسبة؟' : 'What Quranic expression fits?'))}
               </p>
             </div>
 
@@ -1064,36 +1070,42 @@ export default function Exercise() {
           if (translations && translations[language]) return translations[language];
           return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
         };
+        const rpScenarioText = roleplayScenario ? getLocalizedScenario(roleplayScenario, language) : '';
+        const rpHasSurah = rpScenarioText && (rpScenarioText.includes('سورة') || rpScenarioText.toLowerCase().includes('surah'));
         return (
           <div className="space-y-5">
-            {/* Step 1: Context/Scenario */}
+            {/* Step 1: Surah Target / Scenario */}
             <div className="bg-muted/50 rounded-lg p-5">
               <div className="flex items-start gap-3">
-                <span className="text-2xl mt-1">👥</span>
+                <span className="text-2xl mt-1">📖</span>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-muted-foreground mb-2">
-                    {language === 'ar' ? 'السيناريو:' : 'Scenario:'}
+                    {rpHasSurah
+                      ? (language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:')
+                      : (language === 'ar' ? 'التمرين:' : 'Exercise:')}
                   </p>
                   <p
                     className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     data-testid="text-roleplay-scenario"
                   >
-                    {roleplayScenario ? getLocalizedScenario(roleplayScenario, language) : t('roleplayScenarioText')}
+                    {rpScenarioText || t('roleplayScenarioText')}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Step 2: The Challenge - ask for recall */}
+            {/* Step 2: Vocabulary Challenge */}
             <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
               <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
                 <BookOpenCheck className="h-4 w-4" />
-                {language === 'ar' ? 'التحدي:' : 'The Challenge:'}
+                {rpHasSurah
+                  ? (language === 'ar' ? 'ما الكلمة التي تعني:' : 'Find the word that means:')
+                  : (language === 'ar' ? 'أجب بعبارة قرآنية:' : 'Answer with a Quranic expression:')}
               </p>
               <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
-                {language === 'ar' 
-                  ? 'أي عبارة قرآنية تناسب هذا الموقف بالضبط؟'
-                  : 'Which Quranic phrase fits this exact situation?'}
+                {rpHasSurah
+                  ? (language === 'ar' ? 'ما الكلمة أو العبارة القرآنية المطلوبة؟' : 'What is the Quranic word or phrase?')
+                  : (language === 'ar' ? 'ما العبارة القرآنية المناسبة؟' : 'What Quranic expression fits?')}
               </p>
             </div>
 

@@ -19,35 +19,26 @@ The backend utilizes Express.js and TypeScript (ESM) to provide a RESTful API. Z
 ## Database
 A PostgreSQL database, managed by Drizzle ORM, stores phrases, conversation prompts, user progress, exercise sessions, daily statistics, symbolic meanings, and multilingual content. It includes classifications like `isPracticalDailyUse`, `usageDomain`, and `register`. The phrase bank contains 224+ Quranic expressions, significantly expanded from Surah Yusuf, covering themes of family relations, wisdom, storytelling, guidance, trust, betrayal, patience, and divine wisdom. The question bank has 132 entries, categorized by Surah (Al-Baqarah, Luqman) and themes such as Quran recitation, learning programs, and etiquette (Adab).
 
-## Content Logic — Reverse-Engineered Trigger-Response Framework (server/content-logic.ts)
-The app is a **Functional Arabic Language Trainer** (NOT a quiz). All AI-generated exercises follow the **Reverse-Engineered Trigger-Response** framework:
-- **RESPONSE first** (Quranic Phrase): The verse is selected FIRST
-- **TRIGGER** (Scenario): A scenario is then written AROUND the verse, paraphrasing its keywords
+## Content Logic — Vocabulary Search Framework (server/content-logic.ts)
+The app is a **Quranic Arabic Vocabulary Trainer** for beginners (non-Arabic speakers who memorize the Quran). Exercises follow a **Vocabulary Search** (البحث عن المفردات) gamification approach:
 
-**Generation Workflow (Verse-First):**
-1. SELECT the target Quranic verse FIRST (2-8 words, commonly quoted by native speakers)
-2. EXTRACT Lock Words (كلمات القفل): ≥2 key Arabic keywords + their meanings + core concept
-3. CHECK: If any Lock Word is a synonym/metaphor for a common word, note the SEMANTIC TRAIT (not the common word)
-4. WRITE a question that contains ≥2 Lock Words as paraphrases/definitions
-5. VERIFY: Can the student recall the verse from the question alone? Are there ≥2 Lock Words?
+**Scope Restriction:** ONLY Al-Fatiha + last 20 surahs (Ad-Duha to An-Nas) — the surahs beginners memorize first.
+
+**Exercise Types:**
+- Type A: Find the Arabic Word — "في سورة [X]، ما الكلمة التي تعني [meaning]؟"
+- Type B: What Does This Word Mean — "ما معنى كلمة [X] في سورة [Y]؟"
+- Type C: Complete the Verse — "أكمل الآية من سورة [X]: ..."
 
 **Strict Rules:**
-1. **Lock Words (كلمات القفل)**: Every question must contain paraphrases/definitions of ≥2 of the verse's unique keywords ("Lock Words"). A single keyword is too vague — it could match multiple verses. Example: "صبر + لا شكوى / جميل" = 2 lock words → only "فَصَبْرٌ جَمِيلٌ" fits.
-2. **Synonym/Metaphor Rule (قاعدة المرادف)**: When the verse uses a literary/Quranic word (e.g., رواسي) instead of a common word (e.g., جبال), the question must use the SEMANTIC TRAIT ("الرسوخ/الثبات") or the exact Quranic word — NOT the common synonym. Golden Rule: المعنى → الصفة → اللفظ القرآني → الآية.
-3. **Semantic Hinting (التلميح اللفظي)**: The question must embed the MEANING of the verse's keywords so the user can recall the exact phrase.
-4. **No Abstraction (منع التفسير العميق)**: No verses requiring deep Tafsir to connect — the link must be OBVIOUS and LINGUISTIC (e.g., ❌ "phone addiction" → "خزائن الأرض" is rejected because only scholars see the connection)
-5. **Native Speaker Test**: If a native Arabic speaker wouldn't naturally quote this verse in this situation, it's rejected
-6. **Specificity**: The scenario must make THIS verse (not just any verse) the obvious answer
-7. **Practical Daily Use**: Only short phrases (2-8 words) that people actually quote in conversation
-8. **Meaning → Quranic Word (المعنى → الكلمة القرآنية)**: NEVER ask about surah names/numbers ("ما السورة التي تبدأ بـ...؟"). Instead, teach the LINGUISTIC MEANING of the Quranic word, then ask the student to recall it. Formula: Give meaning → Ask for Quranic word. Example: "ما الكلمة القرآنية التي تعني: المتغطي بثوبه؟" → المزمل
+1. **Surah Targeting**: Every question MUST mention the surah name explicitly
+2. **Vocabulary Focus**: Questions focus on DIRECT word meaning — NO interpretation, NO emotional scenarios
+3. **Simple Hints**: First letter ("الكلمة تبدأ بحرف الـ ص..."), fill-in-the-blank, or word position
+4. **Beginner Level**: Focus on high-frequency Quranic words from short surahs
+5. **No Abstraction**: No deep Tafsir, no complex social/emotional scenarios
 
-**QA Auto-Rejection Rules:**
-- If the scenario uses a COMMON WORD but the verse uses a DIFFERENT WORD for the same concept → REJECT and rewrite
-- If the question has only 1 lock word → REJECT (too ambiguous)
-- If the question is a general topic without specific Lock Words → REJECT
-- If the question asks about surah names/numbers or "which surah starts with X?" → REJECT (memorization trivia, not language teaching)
+**UI Labels:** "ابحث في السورة:" replaces "السيناريو:", "ما الكلمة التي تعني:" replaces "التحدي:"
 
-This doctrine is enforced in: `server/content-logic.ts` (shared constants), `server/add-conversation-prompts.ts` (generation), `server/generate-daily-contextual-exercises.ts` (daily exercises), `server/ai-service.ts` (validation, phrase generation, answer evaluation).
+This doctrine is enforced in: `server/content-logic.ts` (shared constants), `server/ai-service.ts` (validation, generation).
 
 ## Exercise System
 The system offers dynamic conversation practice, role-play, and grammar transformation exercises, generated based on user knowledge and difficulty. A non-repetition system ensures continuous access to fresh exercises. Gemini AI (gemini-2.0-flash) generates new Quranic phrases and exercises, validates answers using the Trigger-Response framework, and provides real-time feedback and long-term analytics. The system prioritizes short, practical Quranic expressions for conversational use.
