@@ -81,6 +81,7 @@ export default function Exercise() {
   const isConversationExercise = exerciseType === "conversation";
   const isRoleplayExercise = exerciseType === "roleplay";
   const isDailyContextualExercise = exerciseType === "daily_contextual";
+  const isVocabQuizExercise = isConversationExercise || isRoleplayExercise || isDailyContextualExercise;
 
   // For transformation exercises, fetch philosophical sentences
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
@@ -139,33 +140,21 @@ export default function Exercise() {
     options: { text: string; isCorrect: boolean }[];
     ayahNumber: number;
   }>({
-    queryKey: ["/api/vocabulary-exercise", language, isConversationExercise ? 'conv' : 'role'],
+    queryKey: ["/api/vocabulary-exercise", language, exerciseType],
     queryFn: async () => {
       const response = await fetch(`/api/vocabulary-exercise?language=${language}`);
       if (!response.ok) throw new Error("Failed to fetch vocabulary exercise");
       return response.json();
     },
-    enabled: !!exerciseType && (isConversationExercise || isRoleplayExercise),
+    enabled: !!exerciseType && isVocabQuizExercise,
     staleTime: 0,
     gcTime: 0,
   });
 
-  const { data: dailyContextualExercise, isLoading: dailyContextualLoading } = useQuery<any>({
-    queryKey: ["/api/daily-contextual/random", userId, selectedSurah],
-    queryFn: async () => {
-      let url = `/api/daily-contextual/random?userId=${userId}`;
-      if (selectedSurah) {
-        url += `&surah=${selectedSurah}`;
-      }
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch daily contextual exercise");
-      return response.json();
-    },
-    enabled: !!exerciseType && isDailyContextualExercise,
-  });
+  // daily_contextual now uses the same VOCAB_BANK as conversation/roleplay (via isVocabQuizExercise)
 
-  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : ((isConversationExercise || isRoleplayExercise) ? vocabLoading : (isDailyContextualExercise ? dailyContextualLoading : phraseLoading)));
-  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : ((isConversationExercise || isRoleplayExercise) ? vocabExercise : (isDailyContextualExercise ? dailyContextualExercise : phrase)));
+  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isVocabQuizExercise ? vocabLoading : phraseLoading));
+  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isVocabQuizExercise ? vocabExercise : phrase));
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -222,124 +211,10 @@ export default function Exercise() {
   }
 
   const checkAnswer = async () => {
-    // Handle daily_contextual exercises with AI semantic validation
-    if (isDailyContextualExercise) {
-      if (!selectedOption) {
-        toast({
-          title: t('noAnswerProvided'),
-          description: t('pleaseProvideAnswer'),
-          variant: "destructive",
-        });
-        return;
-      }
+    // Handle all vocabulary quiz exercises (conversation, roleplay, daily_contextual)
+    // They all use the same VOCAB_BANK MCQ format
 
-      setIsValidating(true);
-
-      try {
-        // Find the selected expression object
-        const selectedExpression = dailyContextualExercise?.options?.find(
-          (opt: any) => opt.id === selectedOption
-        );
-
-        if (!selectedExpression) {
-          throw new Error("Selected expression not found");
-        }
-
-        // Get context information
-        const sentence = dailyContextualExercise?.sentence;
-        const sentenceText = language === 'ar' 
-          ? sentence?.arabicText 
-          : (language === 'en' 
-              ? sentence?.englishText 
-              : (sentence?.translations?.[language] || sentence?.englishText || sentence?.arabicText));
-
-        // Call AI validation with semantic analysis
-        const response = await fetch("/api/validate-answer", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userAnswer: selectedExpression.arabicText,
-            exerciseType: "daily_contextual",
-            phraseId: dailyContextualExercise?.exercise?.id,
-            context: `Daily situation: ${sentenceText}\n\nSelected expression: ${selectedExpression.arabicText} (${selectedExpression.surahAyah})`,
-            language: language,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Validation failed");
-        }
-
-        const result = await response.json();
-        
-        setIsCorrect(result.isCorrect);
-        setFeedback(result.feedback);
-        setIsAnswered(true);
-        
-        // تحديد درجة الـ feedback بناءً على حقل grade من الـ API
-        if (result.grade === 'exact_match' || result.grade === 'valid_but_less_suitable' || result.grade === 'incorrect') {
-          setFeedbackGrade(result.grade);
-        } else if (result.isCorrect) {
-          setFeedbackGrade('exact_match');
-        } else {
-          setFeedbackGrade('incorrect');
-        }
-
-        // Submit session
-        const correctId = dailyContextualExercise?.correctExpression?.id;
-        submitSessionMutation.mutate({
-          userId,
-          exerciseType: "daily_contextual",
-          phraseId: dailyContextualExercise?.exercise?.id || "unknown",
-          userAnswer: selectedOption,
-          correctAnswer: correctId,
-          isCorrect: result.isCorrect ? "true" : "false",
-        });
-
-        toast({
-          title: result.isCorrect ? t('correct') : t('incorrect'),
-          description: result.feedback || (result.isCorrect 
-            ? "Excellent! Your semantic understanding is correct." 
-            : "Not quite right. Review the semantic analysis below."),
-          variant: result.isCorrect ? "default" : "destructive",
-        });
-
-      } catch (error) {
-        console.error("AI validation error:", error);
-        
-        // Fallback to simple comparison if AI fails
-        const correctId = dailyContextualExercise?.correctExpression?.id;
-        const correct = selectedOption === correctId;
-        
-        setIsCorrect(correct);
-        setIsAnswered(true);
-
-        submitSessionMutation.mutate({
-          userId,
-          exerciseType: "daily_contextual",
-          phraseId: dailyContextualExercise?.exercise?.id || "unknown",
-          userAnswer: selectedOption,
-          correctAnswer: correctId,
-          isCorrect: correct ? "true" : "false",
-        });
-
-        toast({
-          title: correct ? t('correct') : t('incorrect'),
-          description: correct 
-            ? "Great job! You selected the right Quranic expression." 
-            : "Not quite right. Review the explanation below.",
-          variant: correct ? "default" : "destructive",
-        });
-      } finally {
-        setIsValidating(false);
-      }
-
-      return;
-    }
-
-    if (isConversationExercise || isRoleplayExercise) {
+    if (isVocabQuizExercise) {
       if (!vocabExercise || !selectedOption) return;
       setIsValidating(true);
       const correctOption = vocabExercise.options.find(o => o.isCorrect);
@@ -352,7 +227,7 @@ export default function Exercise() {
       setFeedbackGrade(answeredCorrectly ? 'exact_match' : 'incorrect');
       submitSessionMutation.mutate({
         userId,
-        exerciseType: exerciseType || 'conversation',
+        exerciseType: exerciseType || 'daily_contextual',
         phraseId: vocabExercise.id,
         userAnswer: selectedOption,
         correctAnswer: correctOption?.text || '',
@@ -437,7 +312,7 @@ export default function Exercise() {
       }
 
       // Fetch meaning breakdown for conversation/roleplay when answer is correct
-      if (result.isCorrect && (isConversationExercise || isRoleplayExercise)) {
+      if (result.isCorrect && isVocabQuizExercise) {
         const verseText = vocabExercise?.answer;
         if (verseText) {
           setIsLoadingBreakdown(true);
@@ -515,7 +390,7 @@ export default function Exercise() {
         ? questionBank.id
         : isTransformationExercise && philosophicalSentence
         ? philosophicalSentence.id
-        : (isConversationExercise || isRoleplayExercise) && vocabExercise
+        : isVocabQuizExercise && vocabExercise
         ? vocabExercise.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
@@ -561,13 +436,9 @@ export default function Exercise() {
         queryClient.removeQueries({
           queryKey: ["/api/philosophical-sentences/random", userId, language],
         });
-      } else if (currentExerciseType === "conversation" || currentExerciseType === "roleplay") {
+      } else if (currentExerciseType === "conversation" || currentExerciseType === "roleplay" || currentExerciseType === "daily_contextual") {
         queryClient.removeQueries({
           queryKey: ["/api/vocabulary-exercise"],
-        });
-      } else if (currentExerciseType === "daily_contextual") {
-        queryClient.removeQueries({
-          queryKey: ["/api/daily-contextual/random", userId],
         });
       } else {
         queryClient.removeQueries({
@@ -747,6 +618,7 @@ export default function Exercise() {
 
       case "conversation":
       case "roleplay":
+      case "daily_contextual":
         return (
           <div className="space-y-5">
             {/* Surah Badge + Ayah */}
@@ -1064,170 +936,6 @@ export default function Exercise() {
           </div>
         );
 
-      case "daily_contextual":
-        const sentence = dailyContextualExercise?.sentence;
-        const options = dailyContextualExercise?.options || [];
-        const correctExpression = dailyContextualExercise?.correctExpression;
-        const explanation = dailyContextualExercise?.exercise?.explanation;
-        const learningNote = dailyContextualExercise?.exercise?.learningNote;
-
-        return (
-          <div className="space-y-6">
-            {/* Daily Sentence */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6 border-2 border-blue-200 dark:border-blue-800">
-              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">
-                {t('dailySentenceLabel')}
-              </p>
-              {language === "ar" ? (
-                <p
-                  className="arabic-text text-2xl font-medium text-foreground"
-                  dir="rtl"
-                  lang="ar"
-                  data-testid="text-daily-sentence"
-                >
-                  {sentence?.arabicText || sentence?.englishText || "Loading..."}
-                </p>
-              ) : language === "en" ? (
-                <p
-                  className="text-2xl font-medium text-foreground"
-                  data-testid="text-daily-sentence"
-                >
-                  {sentence?.englishText || "Loading..."}
-                </p>
-              ) : (
-                <>
-                  <p
-                    className="text-2xl font-medium text-foreground mb-2"
-                    data-testid="text-daily-sentence"
-                  >
-                    {(sentence?.translations as Record<string, string>)?.[language] || sentence?.englishText || "Translation not available"}
-                  </p>
-                  {sentence?.arabicText && (
-                    <p className="arabic-text text-lg text-muted-foreground/70 mt-2 text-right" dir="rtl" lang="ar">
-                      {sentence.arabicText}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Instruction */}
-            <div className="bg-muted/30 rounded-lg p-4">
-              <p className="text-sm font-semibold text-foreground mb-3">
-                {t('selectQuranicExpression')}
-              </p>
-
-              {/* Three Options */}
-              <div className="space-y-3">
-                {options.map((option: any, index: number) => {
-                  const isSelected = selectedOption === option.id;
-                  const isCorrectOption = option.id === correctExpression?.id;
-                  const showFeedback = isAnswered;
-
-                  return (
-                    <button
-                      key={option.id}
-                      onClick={() => !isAnswered && setSelectedOption(option.id)}
-                      disabled={isAnswered}
-                      className={`w-full text-right p-4 rounded-lg border-2 transition-all duration-200 ${
-                        isAnswered
-                          ? isCorrectOption
-                            ? "bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600"
-                            : isSelected
-                            ? "bg-red-50 dark:bg-red-900/30 border-red-500 dark:border-red-600"
-                            : "bg-muted/50 border-muted"
-                          : isSelected
-                          ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-600 shadow-md"
-                          : "bg-background border-border hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm"
-                      }`}
-                      data-testid={`button-option-${index}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 text-right">
-                          <p className="arabic-text text-lg font-semibold mb-1" lang="ar" dir="rtl">
-                            {option.arabicText}
-                          </p>
-                          {option.surahAyah && option.surahAyah !== 'derived' && (
-                            <p className="text-sm text-muted-foreground">
-                              {option.surahAyah}
-                            </p>
-                          )}
-                        </div>
-                        <div className="mr-4">
-                          {showFeedback && isCorrectOption && (
-                            <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
-                          )}
-                          {showFeedback && !isCorrectOption && isSelected && (
-                            <X className="h-6 w-6 text-red-600 dark:text-red-400" />
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Correct Quranic Expression Card (shown after answering) */}
-            {isAnswered && correctExpression && (
-              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
-                <p className="text-sm font-medium text-primary mb-2">
-                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
-                </p>
-                <p className="arabic-text text-xl font-semibold text-foreground" lang="ar" dir="rtl">
-                  {correctExpression.arabicText}
-                </p>
-                {correctExpression.surahAyah && correctExpression.surahAyah !== 'derived' && (
-                  <p className="text-sm text-primary/80 mt-1" dir="rtl">
-                    ({correctExpression.surahAyah})
-                  </p>
-                )}
-                {correctExpression.meaning && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {correctExpression.meaning}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Explanation Card (shown after answering) */}
-            {isAnswered && explanation && (
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-5 border border-amber-200 dark:border-amber-800">
-                <p className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-2">
-                  {t('whyThisExpression')}
-                </p>
-                <p className="text-foreground">
-                  {(explanation as Record<string, string>)[language] || explanation.en}
-                </p>
-
-                {learningNote && (
-                  <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-700">
-                    <button
-                      onClick={() => setShowExplanation(!showExplanation)}
-                      className="flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
-                      data-testid="button-learn-more"
-                    >
-                      {t('learnMore')}
-                      <ArrowRight className={`h-4 w-4 transition-transform ${showExplanation ? 'rotate-90' : ''}`} />
-                    </button>
-                    
-                    {showExplanation && (
-                      <div className="mt-3 p-3 bg-white/50 dark:bg-black/20 rounded">
-                        <p className="text-sm font-semibold text-foreground mb-1">
-                          {t('linguisticNote')}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {(learningNote as Record<string, string>)[language] || learningNote.en}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        );
-
       default:
         return <p className="text-muted-foreground">Unknown exercise type.</p>;
     }
@@ -1479,7 +1187,7 @@ export default function Exercise() {
             )}
 
             {/* Action Buttons (hidden for conversation/roleplay which have their own buttons) */}
-            {!(isConversationExercise || isRoleplayExercise) && (
+            {!isVocabQuizExercise && (
             <div className="flex justify-between items-center mt-6">
               <Button
                 variant="outline"
@@ -1518,7 +1226,7 @@ export default function Exercise() {
         </Card>
 
         {/* Context Information (hidden for conversation/roleplay vocabulary quizzes) */}
-        {!(isConversationExercise || isRoleplayExercise) && <Card>
+        {!isVocabQuizExercise && <Card>
           <CardHeader>
             <CardTitle>
               {isThematicExercise ? t('aboutThisQuestion') : t('aboutThisPhrase')}
@@ -1616,7 +1324,7 @@ export default function Exercise() {
                   </div>
                 )}
               </div>
-            ) : (isConversationExercise || isRoleplayExercise) && vocabExercise ? (
+            ) : isVocabQuizExercise && vocabExercise ? (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
