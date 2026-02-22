@@ -45,7 +45,7 @@ import { philosophicalSentencesData } from "../client/src/lib/philosophical-sent
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { validateExerciseAnswer } from "./ai-service";
+import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer } from "./ai-service";
 import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
 async function assignWaitingStudents() {
@@ -647,6 +647,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Failed to translate sentence",
         error: error instanceof Error ? error.message : "Unknown error"
       });
+    }
+  });
+
+  // Vocabulary Exercise routes (AI-generated, vocabulary-focused from allowed surahs only)
+  app.get("/api/vocabulary-exercise", async (req, res) => {
+    try {
+      const { language } = req.query;
+      const lang = typeof language === "string" ? language : "en";
+      const exercise = await generateVocabularyExercise(lang);
+      res.json(exercise);
+    } catch (error) {
+      console.error("Error generating vocabulary exercise:", error);
+      res.status(500).json({ message: "Failed to generate vocabulary exercise" });
+    }
+  });
+
+  app.post("/api/vocabulary-exercise/validate", async (req, res) => {
+    try {
+      const { userAnswer, correctAnswer, questionText, surahAyah, language } = req.body;
+      if (!userAnswer || !correctAnswer) {
+        return res.status(400).json({ message: "userAnswer and correctAnswer are required" });
+      }
+      const result = await validateVocabularyAnswer(
+        userAnswer,
+        correctAnswer,
+        questionText || "",
+        surahAyah || "",
+        language || "en"
+      );
+      res.json(result);
+    } catch (error) {
+      console.error("Error validating vocabulary answer:", error);
+      res.status(500).json({ message: "Failed to validate answer" });
     }
   });
 

@@ -2142,3 +2142,399 @@ Note:`;
     };
   }
 }
+
+import { ALLOWED_SURAHS, ALLOWED_SURAHS_EN, CONTENT_LOGIC_ROLE, TRIGGER_RESPONSE_RULES, EXERCISE_FORMAT, VALIDATION_CHECKLIST } from "./content-logic";
+
+export interface VocabularyExercise {
+  id: string;
+  surahAr: string;
+  surahEn: string;
+  questionAr: string;
+  questionEn: string;
+  hint: string;
+  answer: string;
+  answerMeaning: string;
+  surahAyah: string;
+  exerciseType: 'find_word' | 'word_meaning' | 'complete_verse';
+}
+
+export async function generateVocabularyExercise(userLanguage: string = 'en'): Promise<VocabularyExercise> {
+  const randomSurahIndex = Math.floor(Math.random() * ALLOWED_SURAHS.length);
+  const targetSurahAr = ALLOWED_SURAHS[randomSurahIndex];
+  const targetSurahEn = ALLOWED_SURAHS_EN[randomSurahIndex];
+  
+  const exerciseTypes = ['find_word', 'word_meaning', 'complete_verse'];
+  const randomType = exerciseTypes[Math.floor(Math.random() * exerciseTypes.length)];
+
+  const prompt = `${CONTENT_LOGIC_ROLE}
+
+${TRIGGER_RESPONSE_RULES}
+
+TASK: Generate exactly 1 vocabulary exercise from سورة ${targetSurahAr} (${targetSurahEn}).
+Exercise type: ${randomType === 'find_word' ? 'Type A — Find the Arabic Word' : randomType === 'word_meaning' ? 'Type B — What Does This Word Mean' : 'Type C — Complete the Verse'}
+
+${EXERCISE_FORMAT}
+
+${VALIDATION_CHECKLIST}
+
+CRITICAL: The question MUST mention "سورة ${targetSurahAr}" explicitly.
+CRITICAL: The answer MUST be a real word/phrase from this surah with verse number.
+CRITICAL: Keep it SIMPLE for beginners who don't speak Arabic.
+
+User's interface language: ${userLanguage === 'ar' ? 'Arabic' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}
+
+Return ONLY valid JSON (no markdown, no backticks):
+{
+  "questionAr": "The question in Arabic (must include سورة ${targetSurahAr})",
+  "questionEn": "The same question translated to ${userLanguage === 'ar' ? 'English' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}",
+  "hint": "Simple hint: first letter, fill-in-blank, or word position (in Arabic)",
+  "answer": "The correct Arabic word/phrase from the Quran",
+  "answerMeaning": "The meaning in ${userLanguage === 'ar' ? 'English' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}",
+  "surahAyah": "${targetSurahAr}:verse_number"
+}`;
+
+  try {
+    const response = await axios.post(GEMINI_API_URL, {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.9,
+        maxOutputTokens: 1024,
+      }
+    });
+
+    const candidate = response.data?.candidates?.[0];
+    if (!candidate?.content?.parts?.[0]?.text) {
+      throw new Error("No response from AI");
+    }
+
+    let text = candidate.content.parts[0].text.trim();
+    text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    
+    const parsed = JSON.parse(text);
+    
+    return {
+      id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      surahAr: targetSurahAr,
+      surahEn: targetSurahEn,
+      questionAr: parsed.questionAr,
+      questionEn: parsed.questionEn,
+      hint: parsed.hint,
+      answer: parsed.answer,
+      answerMeaning: parsed.answerMeaning,
+      surahAyah: parsed.surahAyah,
+      exerciseType: randomType as VocabularyExercise['exerciseType'],
+    };
+  } catch (error) {
+    console.error("Error generating vocabulary exercise:", error);
+    const fallbackExercises: VocabularyExercise[] = [
+      {
+        id: `vocab_fallback_${Date.now()}`,
+        surahAr: "الفاتحة",
+        surahEn: "Al-Fatiha",
+        questionAr: "في سورة الفاتحة، ما الكلمة التي تعني 'الطريق المستقيم'؟",
+        questionEn: "In Surah Al-Fatiha, what word means 'the straight path'?",
+        hint: "الكلمة تبدأ بحرف الـ ص... الصـ...",
+        answer: "الصِّرَاطَ",
+        answerMeaning: "The Straight Path",
+        surahAyah: "الفاتحة:6",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}`,
+        surahAr: "الإخلاص",
+        surahEn: "Al-Ikhlas",
+        questionAr: "في سورة الإخلاص، ما معنى كلمة 'أَحَدٌ'؟",
+        questionEn: "In Surah Al-Ikhlas, what does the word 'Ahad' mean?",
+        hint: "تعني الرقم 1 أو الوحيد...",
+        answer: "أَحَدٌ",
+        answerMeaning: "One / Unique",
+        surahAyah: "الإخلاص:1",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}`,
+        surahAr: "الكوثر",
+        surahEn: "Al-Kawthar",
+        questionAr: "في سورة الكوثر، ما الكلمة التي تعني 'الخير الكثير الوفير'؟",
+        questionEn: "In Surah Al-Kawthar, what word means 'abundant goodness'?",
+        hint: "الكلمة تبدأ بحرف الـ ك... الكـ...",
+        answer: "الْكَوْثَرَ",
+        answerMeaning: "Abundance / Abundant Goodness",
+        surahAyah: "الكوثر:1",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}`,
+        surahAr: "العصر",
+        surahEn: "Al-Asr",
+        questionAr: "أكمل الآية من سورة العصر: 'وَالْعَصْرِ * إِنَّ الْإِنسَانَ لَفِي ___'",
+        questionEn: "Complete the verse from Surah Al-Asr: 'By time, indeed mankind is in ___'",
+        hint: "الكلمة تعني الضياع والنقصان",
+        answer: "خُسْرٍ",
+        answerMeaning: "Loss",
+        surahAyah: "العصر:2",
+        exerciseType: 'complete_verse',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}`,
+        surahAr: "الناس",
+        surahEn: "An-Nas",
+        questionAr: "في سورة الناس، ما الكلمة التي تعني 'المتسلل الذي يختفي عند ذكر الله'؟",
+        questionEn: "In Surah An-Nas, what word means 'the retreating whisperer'?",
+        hint: "الكلمة تبدأ بحرف الـ و... الوَ...",
+        answer: "الْوَسْوَاسِ الْخَنَّاسِ",
+        answerMeaning: "The retreating whisperer",
+        surahAyah: "الناس:4",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_6`,
+        surahAr: "الفلق",
+        surahEn: "Al-Falaq",
+        questionAr: "في سورة الفلق، ما معنى كلمة 'الْفَلَقِ'؟",
+        questionEn: "In Surah Al-Falaq, what does the word 'Al-Falaq' mean?",
+        hint: "تعني ضوء الفجر عندما ينشق...",
+        answer: "الْفَلَقِ",
+        answerMeaning: "The Daybreak / The Dawn",
+        surahAyah: "الفلق:1",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_7`,
+        surahAr: "الفاتحة",
+        surahEn: "Al-Fatiha",
+        questionAr: "أكمل الآية من سورة الفاتحة: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ ___'",
+        questionEn: "Complete the verse from Surah Al-Fatiha: 'You alone we worship, and You alone we ___'",
+        hint: "الكلمة تعني: نطلب المساعدة",
+        answer: "نَسْتَعِينُ",
+        answerMeaning: "We ask for help",
+        surahAyah: "الفاتحة:5",
+        exerciseType: 'complete_verse',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_8`,
+        surahAr: "الضحى",
+        surahEn: "Ad-Duha",
+        questionAr: "في سورة الضحى، ما الكلمة التي تعني 'وقت الصباح المشرق'؟",
+        questionEn: "In Surah Ad-Duha, what word means 'the morning brightness'?",
+        hint: "الكلمة تبدأ بحرف الـ ض... الضـ...",
+        answer: "الضُّحَى",
+        answerMeaning: "The Morning Brightness",
+        surahAyah: "الضحى:1",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_9`,
+        surahAr: "الشرح",
+        surahEn: "Ash-Sharh",
+        questionAr: "أكمل الآية من سورة الشرح: 'فَإِنَّ مَعَ الْعُسْرِ ___'",
+        questionEn: "Complete the verse from Surah Ash-Sharh: 'Indeed, with hardship comes ___'",
+        hint: "الكلمة تعني السهولة والراحة",
+        answer: "يُسْرًا",
+        answerMeaning: "Ease / Relief",
+        surahAyah: "الشرح:5",
+        exerciseType: 'complete_verse',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_10`,
+        surahAr: "التين",
+        surahEn: "At-Tin",
+        questionAr: "في سورة التين، ما معنى عبارة 'أَحْسَنِ تَقْوِيمٍ'؟",
+        questionEn: "In Surah At-Tin, what does 'Ahsani Taqweem' mean?",
+        hint: "تعني أفضل شكل وصورة...",
+        answer: "أَحْسَنِ تَقْوِيمٍ",
+        answerMeaning: "The best form / The finest shape",
+        surahAyah: "التين:4",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_11`,
+        surahAr: "القدر",
+        surahEn: "Al-Qadr",
+        questionAr: "في سورة القدر، ما الكلمة التي تعني 'الليلة المباركة العظيمة'؟",
+        questionEn: "In Surah Al-Qadr, what phrase means 'the Night of Decree'?",
+        hint: "الكلمة تبدأ بحرف الـ ل... لَيـ...",
+        answer: "لَيْلَةِ الْقَدْرِ",
+        answerMeaning: "The Night of Decree / Power",
+        surahAyah: "القدر:1",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_12`,
+        surahAr: "الكافرون",
+        surahEn: "Al-Kafirun",
+        questionAr: "في سورة الكافرون، ما معنى كلمة 'أَعْبُدُ'؟",
+        questionEn: "In Surah Al-Kafirun, what does the word 'A'budu' mean?",
+        hint: "تعني أُطيع وأُخلص العبادة...",
+        answer: "أَعْبُدُ",
+        answerMeaning: "I worship",
+        surahAyah: "الكافرون:2",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_13`,
+        surahAr: "النصر",
+        surahEn: "An-Nasr",
+        questionAr: "في سورة النصر، ما الكلمة التي تعني 'الانتصار والتأييد من الله'؟",
+        questionEn: "In Surah An-Nasr, what word means 'the victory/help from Allah'?",
+        hint: "الكلمة تبدأ بحرف الـ ن... النَّـ...",
+        answer: "نَصْرُ",
+        answerMeaning: "Victory / Help",
+        surahAyah: "النصر:1",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_14`,
+        surahAr: "المسد",
+        surahEn: "Al-Masad",
+        questionAr: "في سورة المسد، ما معنى عبارة 'تَبَّتْ يَدَا'؟",
+        questionEn: "In Surah Al-Masad, what does 'Tabbat Yada' mean?",
+        hint: "تعني الخسارة والهلاك...",
+        answer: "تَبَّتْ يَدَا",
+        answerMeaning: "May the hands perish / Ruined are the hands",
+        surahAyah: "المسد:1",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_15`,
+        surahAr: "الفيل",
+        surahEn: "Al-Fil",
+        questionAr: "في سورة الفيل، ما الكلمة التي تعني 'الطيور التي جاءت في جماعات'؟",
+        questionEn: "In Surah Al-Fil, what word means 'birds in flocks'?",
+        hint: "الكلمة تبدأ بحرف الـ أ... أَبـ...",
+        answer: "أَبَابِيلَ",
+        answerMeaning: "Flocks / Birds in groups",
+        surahAyah: "الفيل:3",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_16`,
+        surahAr: "قريش",
+        surahEn: "Quraysh",
+        questionAr: "أكمل الآية من سورة قريش: 'لِإِيلَافِ ___'",
+        questionEn: "Complete the verse from Surah Quraysh: 'For the accustomed security of ___'",
+        hint: "اسم القبيلة المشهورة في مكة",
+        answer: "قُرَيْشٍ",
+        answerMeaning: "Quraysh (the tribe)",
+        surahAyah: "قريش:1",
+        exerciseType: 'complete_verse',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_17`,
+        surahAr: "الماعون",
+        surahEn: "Al-Ma'un",
+        questionAr: "في سورة الماعون، ما معنى كلمة 'الْمَاعُونَ'؟",
+        questionEn: "In Surah Al-Ma'un, what does the word 'Al-Ma'un' mean?",
+        hint: "تعني الأشياء الصغيرة التي يحتاجها الناس...",
+        answer: "الْمَاعُونَ",
+        answerMeaning: "Small kindnesses / Assistance / Basic necessities",
+        surahAyah: "الماعون:7",
+        exerciseType: 'word_meaning',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_18`,
+        surahAr: "الزلزلة",
+        surahEn: "Az-Zalzalah",
+        questionAr: "في سورة الزلزلة، ما الكلمة التي تعني 'وزن أصغر شيء'؟",
+        questionEn: "In Surah Az-Zalzalah, what phrase means 'an atom's weight'?",
+        hint: "الكلمة تبدأ بحرف الـ ذ... ذَرَّ...",
+        answer: "مِثْقَالَ ذَرَّةٍ",
+        answerMeaning: "An atom's weight",
+        surahAyah: "الزلزلة:7",
+        exerciseType: 'find_word',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_19`,
+        surahAr: "العلق",
+        surahEn: "Al-Alaq",
+        questionAr: "أكمل الآية من سورة العلق: 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي ___'",
+        questionEn: "Complete the verse from Surah Al-Alaq: 'Read in the name of your Lord who ___'",
+        hint: "الكلمة تعني: صنع وأوجد",
+        answer: "خَلَقَ",
+        answerMeaning: "Created",
+        surahAyah: "العلق:1",
+        exerciseType: 'complete_verse',
+      },
+      {
+        id: `vocab_fallback_${Date.now()}_20`,
+        surahAr: "التكاثر",
+        surahEn: "At-Takathur",
+        questionAr: "في سورة التكاثر، ما معنى كلمة 'التَّكَاثُرُ'؟",
+        questionEn: "In Surah At-Takathur, what does 'At-Takathur' mean?",
+        hint: "تعني التنافس في جمع الأشياء والتفاخر...",
+        answer: "التَّكَاثُرُ",
+        answerMeaning: "Competition in increase / Rivalry in worldly gain",
+        surahAyah: "التكاثر:1",
+        exerciseType: 'word_meaning',
+      },
+    ];
+    return fallbackExercises[Math.floor(Math.random() * fallbackExercises.length)];
+  }
+}
+
+export async function validateVocabularyAnswer(
+  userAnswer: string,
+  correctAnswer: string,
+  questionText: string,
+  surahAyah: string,
+  userLanguage: string = 'en'
+): Promise<{ isCorrect: boolean; score: number; feedback: string; feedbackTranslation?: string }> {
+  const normalizedUser = removeDiacritics(userAnswer.trim());
+  const normalizedCorrect = removeDiacritics(correctAnswer.trim());
+  
+  if (normalizedUser === normalizedCorrect || 
+      userAnswer.trim() === correctAnswer.trim() ||
+      normalizedUser.includes(normalizedCorrect) || 
+      normalizedCorrect.includes(normalizedUser)) {
+    return {
+      isCorrect: true,
+      score: 100,
+      feedback: userLanguage === 'ar' ? 'إجابة صحيحة! أحسنت! ✅' : 'Correct answer! Well done! ✅',
+    };
+  }
+
+  try {
+    const response = await axios.post(GEMINI_API_URL, {
+      contents: [{ parts: [{ text: `You are validating an Arabic vocabulary exercise answer.
+
+Question: "${questionText}"
+Correct Answer: "${correctAnswer}" (${surahAyah})
+Student's Answer: "${userAnswer}"
+
+Check if the student's answer is the same word/phrase as the correct answer (ignore diacritics/tashkeel differences).
+If the student wrote the same word but with different diacritics, it's CORRECT.
+If the student wrote a completely different word, it's INCORRECT.
+
+Respond in ${userLanguage === 'ar' ? 'Arabic' : 'English'}.
+
+Return ONLY valid JSON:
+{
+  "isCorrect": true/false,
+  "score": 0-100,
+  "feedback": "Brief encouraging feedback in ${userLanguage === 'ar' ? 'Arabic' : 'English'}"
+}` }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 256 }
+    });
+
+    const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (text) {
+      const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      const result = JSON.parse(cleaned);
+      return {
+        isCorrect: result.isCorrect || false,
+        score: result.score || 0,
+        feedback: result.feedback || (userLanguage === 'ar' ? 'حاول مرة أخرى' : 'Try again'),
+      };
+    }
+  } catch (e) {
+    console.error("Error validating vocabulary answer:", e);
+  }
+
+  return {
+    isCorrect: false,
+    score: 0,
+    feedback: userLanguage === 'ar' 
+      ? `الإجابة الصحيحة هي: ${correctAnswer} (${surahAyah})`
+      : `The correct answer is: ${correctAnswer} (${surahAyah})`,
+  };
+}

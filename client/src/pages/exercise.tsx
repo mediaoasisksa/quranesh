@@ -32,49 +32,6 @@ import {
 import { surahList, type Surah } from "@/data/surah-list";
 import SubscriptionGate from "@/components/subscription-gate";
 
-function getLocalizedQuestion(
-  conversationPrompt: any,
-  lang: string
-): string {
-  if (!conversationPrompt) return "...";
-  
-  const langMap: Record<string, string> = {
-    en: conversationPrompt.questionEn || conversationPrompt.question,
-    id: conversationPrompt.questionId || conversationPrompt.question,
-    tr: conversationPrompt.questionTr || conversationPrompt.question,
-    zh: conversationPrompt.questionZh || conversationPrompt.question,
-    sw: conversationPrompt.questionSw || conversationPrompt.question,
-    so: conversationPrompt.questionSo || conversationPrompt.question,
-    bs: conversationPrompt.questionBs || conversationPrompt.question,
-    sq: conversationPrompt.questionSq || conversationPrompt.question,
-    ru: conversationPrompt.questionRu || conversationPrompt.question,
-    ar: conversationPrompt.question,
-  };
-  
-  return langMap[lang] || conversationPrompt.question;
-}
-
-function getLocalizedScenario(
-  roleplayScenario: any,
-  lang: string
-): string {
-  if (!roleplayScenario) return "...";
-  
-  const langMap: Record<string, string> = {
-    en: roleplayScenario.scenarioEn || roleplayScenario.scenario,
-    id: roleplayScenario.scenarioId || roleplayScenario.scenario,
-    tr: roleplayScenario.scenarioTr || roleplayScenario.scenario,
-    zh: roleplayScenario.scenarioZh || roleplayScenario.scenario,
-    sw: roleplayScenario.scenarioSw || roleplayScenario.scenario,
-    so: roleplayScenario.scenarioSo || roleplayScenario.scenario,
-    bs: roleplayScenario.scenarioBs || roleplayScenario.scenario,
-    sq: roleplayScenario.scenarioSq || roleplayScenario.scenario,
-    ru: roleplayScenario.scenarioRu || roleplayScenario.scenario,
-    ar: roleplayScenario.scenario,
-  };
-  
-  return langMap[lang] || roleplayScenario.scenario;
-}
 
 export default function Exercise() {
   const [, params] = useRoute("/exercise/:type/:phraseId?");
@@ -164,75 +121,27 @@ export default function Exercise() {
     enabled: !!exerciseType && isThematicExercise,
   });
 
-  const { data: conversationPrompt, isLoading: conversationLoading } = useQuery<{
+  const { data: vocabExercise, isLoading: vocabLoading } = useQuery<{
     id: string;
-    question: string;
-    questionEn: string | null;
-    questionId: string | null;
-    questionTr: string | null;
-    questionZh: string | null;
-    questionSw: string | null;
-    questionSo: string | null;
-    questionBs: string | null;
-    questionSq: string | null;
-    questionRu: string | null;
-    suggestedVerse: string;
-    category: string | null;
-    symbolicMeaning?: string | null;
-    surahNumber?: number | null;
-    claim?: string | null;
-    evidencePhrase?: string | null;
-    hint?: string | null;
-    acceptedVariants?: string[] | null;
-    answerMode?: string | null;
-    sourceRef?: string | null;
+    surahAr: string;
+    surahEn: string;
+    questionAr: string;
+    questionEn: string;
+    hint: string;
+    answer: string;
+    answerMeaning: string;
+    surahAyah: string;
+    exerciseType: 'find_word' | 'word_meaning' | 'complete_verse';
   }>({
-    queryKey: ["/api/conversation-prompts/random", userId, language, selectedSurah],
+    queryKey: ["/api/vocabulary-exercise", language, isConversationExercise ? 'conv' : 'role'],
     queryFn: async () => {
-      let url = `/api/conversation-prompts/random?userId=${userId}&language=${language}`;
-      if (selectedSurah) {
-        url += `&surah=${selectedSurah}`;
-      }
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch conversation prompt");
+      const response = await fetch(`/api/vocabulary-exercise?language=${language}`);
+      if (!response.ok) throw new Error("Failed to fetch vocabulary exercise");
       return response.json();
     },
-    enabled: !!exerciseType && isConversationExercise,
-  });
-
-  const { data: roleplayScenario, isLoading: roleplayLoading } = useQuery<{
-    id: string;
-    scenario: string;
-    scenarioEn: string | null;
-    scenarioId: string | null;
-    scenarioTr: string | null;
-    scenarioZh: string | null;
-    scenarioSw: string | null;
-    scenarioSo: string | null;
-    scenarioBs: string | null;
-    scenarioSq: string | null;
-    scenarioRu: string | null;
-    theme: string;
-    psychologicalDepth?: string | null;
-    difficulty?: number | null;
-    suggestedVerse?: string | null;
-    verseExplanation?: string | null;
-    verseExplanationEn?: string | null;
-    verseExplanationTranslations?: Record<string, string> | null;
-    verseSource?: string | null;
-    surahNumber?: number | null;
-  }>({
-    queryKey: ["/api/roleplay-scenarios/random", userId, selectedSurah],
-    queryFn: async () => {
-      let url = `/api/roleplay-scenarios/random?userId=${userId}`;
-      if (selectedSurah) {
-        url += `&surah=${selectedSurah}`;
-      }
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch roleplay scenario");
-      return response.json();
-    },
-    enabled: !!exerciseType && isRoleplayExercise,
+    enabled: !!exerciseType && (isConversationExercise || isRoleplayExercise),
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const { data: dailyContextualExercise, isLoading: dailyContextualLoading } = useQuery<any>({
@@ -249,8 +158,8 @@ export default function Exercise() {
     enabled: !!exerciseType && isDailyContextualExercise,
   });
 
-  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isConversationExercise ? conversationLoading : (isRoleplayExercise ? roleplayLoading : (isDailyContextualExercise ? dailyContextualLoading : phraseLoading))));
-  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isConversationExercise ? conversationPrompt : (isRoleplayExercise ? roleplayScenario : (isDailyContextualExercise ? dailyContextualExercise : phrase))));
+  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : ((isConversationExercise || isRoleplayExercise) ? vocabLoading : (isDailyContextualExercise ? dailyContextualLoading : phraseLoading)));
+  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : ((isConversationExercise || isRoleplayExercise) ? vocabExercise : (isDailyContextualExercise ? dailyContextualExercise : phrase)));
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -444,6 +353,49 @@ export default function Exercise() {
       console.log("Question Bank ID:", questionBank?.id);
       console.log("=============================");
 
+      // Handle conversation/roleplay with vocabulary validation
+      if (isConversationExercise || isRoleplayExercise) {
+        if (!vocabExercise) return;
+        try {
+          const response = await fetch('/api/vocabulary-exercise/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userAnswer: userAnswer.trim(),
+              correctAnswer: vocabExercise.answer,
+              questionText: vocabExercise.questionAr,
+              surahAyah: vocabExercise.surahAyah,
+              language,
+            }),
+          });
+          const result = await response.json();
+          setIsCorrect(result.isCorrect);
+          setIsAnswered(true);
+          setFeedback(result.feedback);
+          if (!result.isCorrect) {
+            setSuggestedAnswer(vocabExercise.answer);
+            setShowSuggested(true);
+          }
+          setFeedbackGrade(result.isCorrect ? 'exact_match' : 'incorrect');
+          submitSessionMutation.mutate({
+            userId,
+            exerciseType: exerciseType || 'conversation',
+            phraseId: vocabExercise.id,
+            userAnswer: userAnswer.trim(),
+            correctAnswer: vocabExercise.answer,
+            isCorrect: result.isCorrect ? "true" : "false",
+          });
+        } catch (error) {
+          console.error('Validation error:', error);
+          setFeedback(language === 'ar' ? 'حدث خطأ في التحقق' : 'Validation error occurred');
+          setIsAnswered(true);
+          setIsCorrect(false);
+        } finally {
+          setIsValidating(false);
+        }
+        return;
+      }
+
       // Call AI validation API
       const response = await fetch("/api/validate-answer", {
         method: "POST",
@@ -457,8 +409,6 @@ export default function Exercise() {
           questionBankId: questionBank?.id,
           philosophicalSentenceId: exerciseType === "transformation" ? philosophicalSentence?.id : undefined,
           language: language,
-          suggestedVerse: isConversationExercise ? conversationPrompt?.suggestedVerse : undefined,
-          conversationPromptId: isConversationExercise ? conversationPrompt?.id : undefined,
         }),
       });
 
@@ -502,9 +452,7 @@ export default function Exercise() {
 
       // Fetch meaning breakdown for conversation/roleplay when answer is correct
       if (result.isCorrect && (isConversationExercise || isRoleplayExercise)) {
-        const verseText = isConversationExercise
-          ? conversationPrompt?.suggestedVerse
-          : roleplayScenario?.suggestedVerse;
+        const verseText = vocabExercise?.answer;
         if (verseText) {
           setIsLoadingBreakdown(true);
           try {
@@ -581,10 +529,8 @@ export default function Exercise() {
         ? questionBank.id
         : isTransformationExercise && philosophicalSentence
         ? philosophicalSentence.id
-        : isConversationExercise && conversationPrompt
-        ? conversationPrompt.id
-        : isRoleplayExercise && roleplayScenario
-        ? roleplayScenario.id
+        : (isConversationExercise || isRoleplayExercise) && vocabExercise
+        ? vocabExercise.id
         : phrase?.id || "unknown";
     submitSessionMutation.mutate({
       userId: userId,
@@ -628,13 +574,9 @@ export default function Exercise() {
         queryClient.removeQueries({
           queryKey: ["/api/philosophical-sentences/random", userId, language],
         });
-      } else if (currentExerciseType === "conversation") {
+      } else if (currentExerciseType === "conversation" || currentExerciseType === "roleplay") {
         queryClient.removeQueries({
-          queryKey: ["/api/conversation-prompts/random", userId, language],
-        });
-      } else if (currentExerciseType === "roleplay") {
-        queryClient.removeQueries({
-          queryKey: ["/api/roleplay-scenarios/random", userId],
+          queryKey: ["/api/vocabulary-exercise"],
         });
       } else if (currentExerciseType === "daily_contextual") {
         queryClient.removeQueries({
@@ -817,50 +759,37 @@ export default function Exercise() {
         );
 
       case "conversation":
-        const convQuestionText = getLocalizedQuestion(conversationPrompt, language);
-        const convHasSurah = convQuestionText && (convQuestionText.includes('سورة') || convQuestionText.toLowerCase().includes('surah'));
+      case "roleplay":
         return (
           <div className="space-y-5">
-            {/* Step 1: Surah Target / Question */}
+            {/* Surah Badge */}
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-base font-bold">
+                📖 {language === 'ar' ? `سورة ${vocabExercise?.surahAr}` : `Surah ${vocabExercise?.surahEn}`}
+              </span>
+            </div>
+
+            {/* Question */}
             <div className="bg-muted/50 rounded-lg p-5">
               <div className="flex items-start gap-3">
-                <span className="text-2xl mt-1">📖</span>
+                <span className="text-2xl mt-1">🔍</span>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-muted-foreground mb-2">
-                    {convHasSurah
-                      ? (language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:')
-                      : (language === 'ar' ? 'التمرين:' : 'Exercise:')}
+                    {language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:'}
                   </p>
-                  <p
-                    className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'arabic-text' : ''}`}
-                    lang={language}
+                  <p className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'arabic-text' : ''}`}
+                    lang={language === 'ar' ? 'ar' : undefined}
+                    dir={language === 'ar' ? 'rtl' : 'ltr'}
                     data-testid="text-conversation-prompt"
                   >
-                    {convQuestionText}
+                    {language === 'ar' ? vocabExercise?.questionAr : vocabExercise?.questionEn}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Step 2: Vocabulary Challenge */}
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
-              <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
-                <BookOpenCheck className="h-4 w-4" />
-                {convHasSurah
-                  ? (language === 'ar' ? 'ما الكلمة التي تعني:' : 'Find the word that means:')
-                  : (language === 'ar' ? 'أجب بعبارة قرآنية:' : 'Answer with a Quranic expression:')}
-              </p>
-              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${conversationPrompt?.claim ? 'text-right' : (language === 'ar' ? 'text-right' : '')}`} dir={conversationPrompt?.claim ? 'rtl' : dir} lang={conversationPrompt?.claim ? 'ar' : undefined}>
-                {conversationPrompt?.claim 
-                  ? conversationPrompt.claim
-                  : (convHasSurah
-                    ? (language === 'ar' ? 'ما الكلمة القرآنية المطلوبة؟' : 'What is the Quranic word?')
-                    : (language === 'ar' ? 'ما العبارة القرآنية المناسبة؟' : 'What Quranic expression fits?'))}
-              </p>
-            </div>
-
-            {/* Step 3: Hint Button (only before answering) */}
-            {conversationPrompt?.suggestedVerse && !isAnswered && !showHint && (
+            {/* Hint Button */}
+            {vocabExercise?.hint && !isAnswered && !showHint && (
               <Button
                 variant="outline"
                 size="sm"
@@ -869,104 +798,79 @@ export default function Exercise() {
                 data-testid="button-hint"
               >
                 <Lightbulb className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تلميح (الكلمة الأولى)' : 'Hint (first word)'}
+                {language === 'ar' ? 'تلميح' : 'Hint'}
               </Button>
             )}
 
-            {/* Hint Card - shows ONLY the first word */}
-            {showHint && conversationPrompt?.suggestedVerse && !isAnswered && (
+            {/* Hint Card */}
+            {showHint && vocabExercise?.hint && !isAnswered && (
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
                   💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
                 </p>
                 <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
-                  {conversationPrompt.suggestedVerse.split(' ')[0]} ...
+                  {vocabExercise.hint}
                 </p>
               </div>
             )}
 
-            {/* Full Verse - ONLY shown AFTER submitting answer */}
-            {conversationPrompt?.suggestedVerse && isAnswered && (
+            {/* Answer revealed after submission */}
+            {isAnswered && vocabExercise && (
               <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-primary mb-2">
-                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
+                  {language === 'ar' ? 'الإجابة الصحيحة:' : 'Correct Answer:'}
                 </p>
-                <p 
-                  className="arabic-text text-lg text-foreground" 
-                  lang="ar"
-                  data-testid="text-conversation-verse"
-                >
-                  {conversationPrompt.suggestedVerse}
+                <p className="arabic-text text-xl font-bold text-foreground" lang="ar" dir="rtl" data-testid="text-conversation-verse">
+                  {vocabExercise.answer}
                 </p>
-                {conversationPrompt.sourceRef && (
-                  <p className="text-sm text-primary/80 mt-1" dir="rtl">
-                    ({conversationPrompt.sourceRef})
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Post-answer explanation — shows brief linguistic explanation after answering */}
-            {isAnswered && conversationPrompt?.hint && (
-              <div className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/20 dark:to-cyan-900/20 rounded-lg p-4 border border-sky-300 dark:border-sky-700 animate-in fade-in duration-500">
-                <p className="text-sm font-bold text-sky-800 dark:text-sky-200 mb-2 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  {language === 'ar' ? 'شرح المفردة:' : 'Word Explanation:'}
+                <p className="text-sm text-muted-foreground mt-1">
+                  {vocabExercise.answerMeaning}
                 </p>
-                <p className="arabic-text text-base text-sky-900 dark:text-sky-100 leading-relaxed" dir="rtl" lang="ar">
-                  {conversationPrompt.hint}
+                <p className="text-sm text-primary/80 mt-1" dir="rtl">
+                  ({vocabExercise.surahAyah})
                 </p>
               </div>
             )}
 
-            {/* Step 4: Arabic Input */}
+            {/* Arabic Input */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">
                 {language === 'ar' ? 'إجابتك بالعربية:' : 'Your answer in Arabic:'}
               </p>
               <Textarea
-                className="arabic-text text-right text-lg min-h-[100px]"
-                placeholder={t('conversationPlaceholder')}
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
+                placeholder={language === 'ar' ? 'أجب بالعربية...' : 'Type your answer in Arabic...'}
+                className="arabic-text text-lg min-h-[80px]"
+                dir="rtl"
+                lang="ar"
                 disabled={isAnswered}
-                data-testid="textarea-conversation-answer"
+                data-testid="input-answer"
               />
             </div>
 
-            {/* Step 5: Meaning Breakdown Card (shown after correct answer) */}
-            {isAnswered && isCorrect && meaningBreakdown && meaningBreakdown.words.length > 0 && (
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-5 border-2 border-emerald-300 dark:border-emerald-700 animate-in fade-in duration-500" data-testid="card-meaning-breakdown">
-                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200 mb-3 flex items-center gap-2">
-                  <BookOpenCheck className="h-4 w-4" />
-                  {language === 'ar' ? 'تحليل المفردات:' : 'Vocabulary Breakdown:'}
-                </p>
-                <div className="space-y-2 mb-4">
-                  {meaningBreakdown.words.map((word, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/60 dark:bg-black/20 rounded-md p-2">
-                      <span className="arabic-text text-lg font-semibold text-emerald-800 dark:text-emerald-200 min-w-[60px] text-center" dir="rtl" lang="ar">{word.arabic}</span>
-                      <span className="text-xs text-muted-foreground font-mono">{word.transliteration}</span>
-                      <span className="text-sm text-foreground flex-1">{word.meaning}</span>
-                    </div>
-                  ))}
-                </div>
-                {meaningBreakdown.overallMeaning && (
-                  <div className="pt-3 border-t border-emerald-200 dark:border-emerald-700">
-                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                      <span className="font-semibold">{language === 'ar' ? 'المعنى الكامل: ' : 'Full meaning: '}</span>
-                      {meaningBreakdown.overallMeaning}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-            {isAnswered && isCorrect && isLoadingBreakdown && (
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 animate-pulse">
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  {language === 'ar' ? 'جارٍ تحليل المفردات...' : 'Analyzing vocabulary...'}
-                </p>
-              </div>
-            )}
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              {!isAnswered ? (
+                <Button
+                  className="flex-1"
+                  onClick={checkAnswer}
+                  disabled={!userAnswer.trim() || isValidating}
+                  data-testid="button-check"
+                >
+                  {isValidating ? (
+                    <>{language === 'ar' ? 'جاري التحقق...' : 'Checking...'}</>
+                  ) : (
+                    <>{language === 'ar' ? 'تحقق من الإجابة' : 'Check Answer'}</>
+                  )}
+                </Button>
+              ) : (
+                <Button variant="outline" className="flex-1" onClick={goToNextExercise} data-testid="button-retry">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'حاول مرة أخرى' : 'Try Again'}
+                </Button>
+              )}
+            </div>
           </div>
         );
 
@@ -1059,157 +963,6 @@ export default function Exercise() {
               disabled={isAnswered}
               data-testid="textarea-comparison-answer"
             />
-          </div>
-        );
-
-      case "roleplay":
-        const getVerseExplanation = () => {
-          if (language === 'ar') return roleplayScenario?.verseExplanation;
-          if (language === 'en') return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
-          const translations = roleplayScenario?.verseExplanationTranslations as Record<string, string> | null;
-          if (translations && translations[language]) return translations[language];
-          return roleplayScenario?.verseExplanationEn || roleplayScenario?.verseExplanation;
-        };
-        const rpScenarioText = roleplayScenario ? getLocalizedScenario(roleplayScenario, language) : '';
-        const rpHasSurah = rpScenarioText && (rpScenarioText.includes('سورة') || rpScenarioText.toLowerCase().includes('surah'));
-        return (
-          <div className="space-y-5">
-            {/* Step 1: Surah Target / Scenario */}
-            <div className="bg-muted/50 rounded-lg p-5">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-1">📖</span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">
-                    {rpHasSurah
-                      ? (language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:')
-                      : (language === 'ar' ? 'التمرين:' : 'Exercise:')}
-                  </p>
-                  <p
-                    className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    data-testid="text-roleplay-scenario"
-                  >
-                    {rpScenarioText || t('roleplayScenarioText')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2: Vocabulary Challenge */}
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-700">
-              <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
-                <BookOpenCheck className="h-4 w-4" />
-                {rpHasSurah
-                  ? (language === 'ar' ? 'ما الكلمة التي تعني:' : 'Find the word that means:')
-                  : (language === 'ar' ? 'أجب بعبارة قرآنية:' : 'Answer with a Quranic expression:')}
-              </p>
-              <p className={`text-base text-indigo-900 dark:text-indigo-100 leading-relaxed ${language === 'ar' ? 'text-right' : ''}`} dir={dir}>
-                {rpHasSurah
-                  ? (language === 'ar' ? 'ما الكلمة أو العبارة القرآنية المطلوبة؟' : 'What is the Quranic word or phrase?')
-                  : (language === 'ar' ? 'ما العبارة القرآنية المناسبة؟' : 'What Quranic expression fits?')}
-              </p>
-            </div>
-
-            {/* Step 3: Hint Button (only before answering) */}
-            {roleplayScenario?.suggestedVerse && !isAnswered && !showHint && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                onClick={() => setShowHint(true)}
-                data-testid="button-hint"
-              >
-                <Lightbulb className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تلميح (الكلمة الأولى)' : 'Hint (first word)'}
-              </Button>
-            )}
-
-            {/* Hint Card - shows ONLY the first word */}
-            {showHint && roleplayScenario?.suggestedVerse && !isAnswered && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
-                <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
-                  💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
-                </p>
-                <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
-                  {roleplayScenario.suggestedVerse.split(' ')[0]} ...
-                </p>
-              </div>
-            )}
-
-            {/* Full Verse - ONLY shown AFTER submitting answer */}
-            {roleplayScenario?.suggestedVerse && isAnswered && (
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800 animate-in fade-in duration-300">
-                <p className="text-sm text-green-700 dark:text-green-300 font-medium mb-2">
-                  {language === 'ar' ? 'العبارة القرآنية الصحيحة:' : 'The correct Quranic expression:'}
-                </p>
-                <p className="arabic-text text-lg text-green-800 dark:text-green-200" dir="rtl" lang="ar">
-                  {roleplayScenario.suggestedVerse}
-                </p>
-                {roleplayScenario.verseSource && (
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-1" dir="rtl">
-                    ({roleplayScenario.verseSource})
-                  </p>
-                )}
-                {getVerseExplanation() && (
-                  <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
-                    <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">
-                      {language === 'ar' ? 'لماذا هذه الآية؟' : 'Why this verse?'}
-                    </p>
-                    <p className={`text-sm text-green-700 dark:text-green-300 ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={dir}>
-                      {getVerseExplanation()}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Step 4: Arabic Input */}
-            <div>
-              <p className="text-sm font-semibold text-foreground mb-2">
-                {language === 'ar' ? 'إجابتك بالعربية:' : 'Your answer in Arabic:'}
-              </p>
-              <Textarea
-                className="arabic-text text-right text-lg min-h-[100px]"
-                placeholder={t('roleplayPlaceholder')}
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                disabled={isAnswered}
-                data-testid="textarea-roleplay-answer"
-              />
-            </div>
-
-            {/* Step 5: Meaning Breakdown Card (shown after correct answer) */}
-            {isAnswered && isCorrect && meaningBreakdown && meaningBreakdown.words.length > 0 && (
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-5 border-2 border-emerald-300 dark:border-emerald-700 animate-in fade-in duration-500" data-testid="card-meaning-breakdown">
-                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200 mb-3 flex items-center gap-2">
-                  <BookOpenCheck className="h-4 w-4" />
-                  {language === 'ar' ? 'تحليل المفردات:' : 'Vocabulary Breakdown:'}
-                </p>
-                <div className="space-y-2 mb-4">
-                  {meaningBreakdown.words.map((word, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/60 dark:bg-black/20 rounded-md p-2">
-                      <span className="arabic-text text-lg font-semibold text-emerald-800 dark:text-emerald-200 min-w-[60px] text-center" dir="rtl" lang="ar">{word.arabic}</span>
-                      <span className="text-xs text-muted-foreground font-mono">{word.transliteration}</span>
-                      <span className="text-sm text-foreground flex-1">{word.meaning}</span>
-                    </div>
-                  ))}
-                </div>
-                {meaningBreakdown.overallMeaning && (
-                  <div className="pt-3 border-t border-emerald-200 dark:border-emerald-700">
-                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                      <span className="font-semibold">{language === 'ar' ? 'المعنى الكامل: ' : 'Full meaning: '}</span>
-                      {meaningBreakdown.overallMeaning}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-            {isAnswered && isCorrect && isLoadingBreakdown && (
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 animate-pulse">
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  {language === 'ar' ? 'جارٍ تحليل المفردات...' : 'Analyzing vocabulary...'}
-                </p>
-              </div>
-            )}
           </div>
         );
 
@@ -1845,7 +1598,7 @@ export default function Exercise() {
                   </div>
                 )}
               </div>
-            ) : isConversationExercise && conversationPrompt ? (
+            ) : (isConversationExercise || isRoleplayExercise) && vocabExercise ? (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -1853,40 +1606,28 @@ export default function Exercise() {
                       {t('type')}
                     </p>
                     <p className="text-foreground" data-testid="text-conversation-type">
-                      {t('conversationPromptType')}
+                      {vocabExercise.exerciseType}
                     </p>
                   </div>
-                  {conversationPrompt.category && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {t('category')}
-                      </p>
-                      <p className="text-foreground capitalize" data-testid="text-conversation-category">
-                        {conversationPrompt.category}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      {t('source')}
+                    </p>
+                    <p className="text-foreground" data-testid="text-conversation-source">
+                      {vocabExercise.surahAyah}
+                    </p>
+                  </div>
                 </div>
-                {isAnswered && conversationPrompt.suggestedVerse && (
+                {isAnswered && vocabExercise.answer && (
                   <div className="mt-4">
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Suggested Verse
+                      {language === 'ar' ? 'الإجابة الصحيحة' : 'Correct Answer'}
                     </p>
                     <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse">
-                      {conversationPrompt.suggestedVerse}
+                      {vocabExercise.answer}
                     </p>
-                  </div>
-                )}
-                {conversationPrompt.symbolicMeaning && (
-                  <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
-                      🔑 Symbolic Meaning / الرمزية السلوكية
-                    </p>
-                    <p
-                      className="text-foreground text-sm"
-                      data-testid="text-conversation-symbolic"
-                    >
-                      {conversationPrompt.symbolicMeaning}
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {vocabExercise.answerMeaning}
                     </p>
                   </div>
                 )}
