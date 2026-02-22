@@ -2156,320 +2156,364 @@ export interface VocabularyExercise {
   answerMeaning: string;
   surahAyah: string;
   exerciseType: 'find_word' | 'word_meaning' | 'complete_verse';
+  arabicWord: string;
+  wordMeaning: string;
+  verseContext: string;
+  verseContextMeaning: string;
+  options: { text: string; isCorrect: boolean }[];
+  ayahNumber: number;
+}
+
+const VOCAB_BANK: VocabularyExercise[] = [
+  {
+    id: "v1", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
+    questionAr: "في سورة الفاتحة (آية ٦)، ما معنى كلمة «الصِّرَاطَ»؟",
+    questionEn: "In Surah Al-Fatiha (verse 6), what does the word 'As-Sirat' mean?",
+    hint: "الكلمة تبدأ بحرف الـ ص...", answer: "الصِّرَاطَ", answerMeaning: "The Path",
+    surahAyah: "الفاتحة:6", exerciseType: "word_meaning",
+    arabicWord: "الصِّرَاطَ", wordMeaning: "The Path",
+    verseContext: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", verseContextMeaning: "Guide us to the straight path",
+    options: [{ text: "The Path", isCorrect: true }, { text: "The Light", isCorrect: false }, { text: "The Book", isCorrect: false }, { text: "The Day", isCorrect: false }],
+    ayahNumber: 6,
+  },
+  {
+    id: "v2", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
+    questionAr: "في سورة الفاتحة (آية ٥)، ما معنى «نَسْتَعِينُ»؟",
+    questionEn: "In Surah Al-Fatiha (verse 5), what does 'Nasta'een' mean?",
+    hint: "تعني نطلب المساعدة", answer: "نَسْتَعِينُ", answerMeaning: "We seek help",
+    surahAyah: "الفاتحة:5", exerciseType: "word_meaning",
+    arabicWord: "نَسْتَعِينُ", wordMeaning: "We seek help",
+    verseContext: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", verseContextMeaning: "You alone we worship, and You alone we ask for help",
+    options: [{ text: "We seek help", isCorrect: true }, { text: "We worship", isCorrect: false }, { text: "We believe", isCorrect: false }, { text: "We pray", isCorrect: false }],
+    ayahNumber: 5,
+  },
+  {
+    id: "v3", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
+    questionAr: "في سورة الفاتحة (آية ٣)، ما معنى «الرَّحِيمِ»؟",
+    questionEn: "In Surah Al-Fatiha (verse 3), what does 'Ar-Raheem' mean?",
+    hint: "صفة من صفات الله تتعلق بالرحمة", answer: "الرَّحِيمِ", answerMeaning: "The Most Merciful",
+    surahAyah: "الفاتحة:3", exerciseType: "word_meaning",
+    arabicWord: "الرَّحِيمِ", wordMeaning: "The Most Merciful",
+    verseContext: "الرَّحْمَنِ الرَّحِيمِ", verseContextMeaning: "The Most Gracious, the Most Merciful",
+    options: [{ text: "The Most Merciful", isCorrect: true }, { text: "The King", isCorrect: false }, { text: "The Creator", isCorrect: false }, { text: "The Judge", isCorrect: false }],
+    ayahNumber: 3,
+  },
+  {
+    id: "v4", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
+    questionAr: "في سورة الفاتحة (آية ٥)، ما معنى «نَعْبُدُ»؟",
+    questionEn: "In Surah Al-Fatiha (verse 5), what does 'Na'budu' mean?",
+    hint: "تعني الطاعة والعبادة", answer: "نَعْبُدُ", answerMeaning: "We worship",
+    surahAyah: "الفاتحة:5", exerciseType: "word_meaning",
+    arabicWord: "نَعْبُدُ", wordMeaning: "We worship",
+    verseContext: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", verseContextMeaning: "You alone we worship, and You alone we ask for help",
+    options: [{ text: "We worship", isCorrect: true }, { text: "We love", isCorrect: false }, { text: "We fear", isCorrect: false }, { text: "We remember", isCorrect: false }],
+    ayahNumber: 5,
+  },
+  {
+    id: "v5", surahAr: "الإخلاص", surahEn: "Al-Ikhlas",
+    questionAr: "في سورة الإخلاص (آية ١)، ما معنى «أَحَدٌ»؟",
+    questionEn: "In Surah Al-Ikhlas (verse 1), what does 'Ahad' mean?",
+    hint: "تعني الرقم 1 أو الوحيد", answer: "أَحَدٌ", answerMeaning: "One / Unique",
+    surahAyah: "الإخلاص:1", exerciseType: "word_meaning",
+    arabicWord: "أَحَدٌ", wordMeaning: "One / Unique",
+    verseContext: "قُلْ هُوَ اللَّهُ أَحَدٌ", verseContextMeaning: "Say: He is Allah, the One",
+    options: [{ text: "One / Unique", isCorrect: true }, { text: "Great", isCorrect: false }, { text: "First", isCorrect: false }, { text: "Eternal", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v6", surahAr: "الإخلاص", surahEn: "Al-Ikhlas",
+    questionAr: "في سورة الإخلاص (آية ٢)، ما معنى «الصَّمَدُ»؟",
+    questionEn: "In Surah Al-Ikhlas (verse 2), what does 'As-Samad' mean?",
+    hint: "الذي يحتاجه كل شيء ولا يحتاج أحداً", answer: "الصَّمَدُ", answerMeaning: "The Eternal Refuge / The Self-Sufficient",
+    surahAyah: "الإخلاص:2", exerciseType: "word_meaning",
+    arabicWord: "الصَّمَدُ", wordMeaning: "The Eternal Refuge / The Self-Sufficient",
+    verseContext: "اللَّهُ الصَّمَدُ", verseContextMeaning: "Allah, the Eternal Refuge",
+    options: [{ text: "The Eternal Refuge", isCorrect: true }, { text: "The Mighty", isCorrect: false }, { text: "The Wise", isCorrect: false }, { text: "The Forgiver", isCorrect: false }],
+    ayahNumber: 2,
+  },
+  {
+    id: "v7", surahAr: "الناس", surahEn: "An-Nas",
+    questionAr: "في سورة الناس (آية ٤)، ما معنى «الْوَسْوَاسِ»؟",
+    questionEn: "In Surah An-Nas (verse 4), what does 'Al-Waswas' mean?",
+    hint: "الصوت الخفي الذي يدعو للشر", answer: "الْوَسْوَاسِ", answerMeaning: "The Whisperer",
+    surahAyah: "الناس:4", exerciseType: "word_meaning",
+    arabicWord: "الْوَسْوَاسِ", wordMeaning: "The Whisperer",
+    verseContext: "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ", verseContextMeaning: "From the evil of the retreating whisperer",
+    options: [{ text: "The Whisperer", isCorrect: true }, { text: "The Enemy", isCorrect: false }, { text: "The Darkness", isCorrect: false }, { text: "The Fire", isCorrect: false }],
+    ayahNumber: 4,
+  },
+  {
+    id: "v8", surahAr: "الفلق", surahEn: "Al-Falaq",
+    questionAr: "في سورة الفلق (آية ١)، ما معنى «الْفَلَقِ»؟",
+    questionEn: "In Surah Al-Falaq (verse 1), what does 'Al-Falaq' mean?",
+    hint: "تعني ضوء الفجر عندما ينشق", answer: "الْفَلَقِ", answerMeaning: "The Daybreak / The Dawn",
+    surahAyah: "الفلق:1", exerciseType: "word_meaning",
+    arabicWord: "الْفَلَقِ", wordMeaning: "The Daybreak / The Dawn",
+    verseContext: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", verseContextMeaning: "Say: I seek refuge in the Lord of daybreak",
+    options: [{ text: "The Daybreak", isCorrect: true }, { text: "The Night", isCorrect: false }, { text: "The Stars", isCorrect: false }, { text: "The Mountain", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v9", surahAr: "الكوثر", surahEn: "Al-Kawthar",
+    questionAr: "في سورة الكوثر (آية ١)، ما معنى «الْكَوْثَرَ»؟",
+    questionEn: "In Surah Al-Kawthar (verse 1), what does 'Al-Kawthar' mean?",
+    hint: "الكلمة تبدأ بحرف الـ ك...", answer: "الْكَوْثَرَ", answerMeaning: "Abundance / A river in Paradise",
+    surahAyah: "الكوثر:1", exerciseType: "word_meaning",
+    arabicWord: "الْكَوْثَرَ", wordMeaning: "Abundance / A river in Paradise",
+    verseContext: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", verseContextMeaning: "Indeed, We have granted you Al-Kawthar",
+    options: [{ text: "Abundance", isCorrect: true }, { text: "Patience", isCorrect: false }, { text: "Victory", isCorrect: false }, { text: "Knowledge", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v10", surahAr: "الكوثر", surahEn: "Al-Kawthar",
+    questionAr: "في سورة الكوثر (آية ٢)، ما معنى «انْحَرْ»؟",
+    questionEn: "In Surah Al-Kawthar (verse 2), what does 'Inhar' mean?",
+    hint: "تعني تقديم الذبيحة لله", answer: "انْحَرْ", answerMeaning: "Sacrifice",
+    surahAyah: "الكوثر:2", exerciseType: "word_meaning",
+    arabicWord: "انْحَرْ", wordMeaning: "Sacrifice",
+    verseContext: "فَصَلِّ لِرَبِّكَ وَانْحَرْ", verseContextMeaning: "So pray to your Lord and sacrifice",
+    options: [{ text: "Sacrifice", isCorrect: true }, { text: "Pray", isCorrect: false }, { text: "Fast", isCorrect: false }, { text: "Give", isCorrect: false }],
+    ayahNumber: 2,
+  },
+  {
+    id: "v11", surahAr: "العصر", surahEn: "Al-Asr",
+    questionAr: "في سورة العصر (آية ٢)، ما معنى «خُسْرٍ»؟",
+    questionEn: "In Surah Al-Asr (verse 2), what does 'Khusr' mean?",
+    hint: "عكس الربح والفوز", answer: "خُسْرٍ", answerMeaning: "Loss",
+    surahAyah: "العصر:2", exerciseType: "word_meaning",
+    arabicWord: "خُسْرٍ", wordMeaning: "Loss",
+    verseContext: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", verseContextMeaning: "Indeed, mankind is in loss",
+    options: [{ text: "Loss", isCorrect: true }, { text: "Danger", isCorrect: false }, { text: "Doubt", isCorrect: false }, { text: "Sin", isCorrect: false }],
+    ayahNumber: 2,
+  },
+  {
+    id: "v12", surahAr: "الضحى", surahEn: "Ad-Duha",
+    questionAr: "في سورة الضحى (آية ١)، ما معنى «الضُّحَى»؟",
+    questionEn: "In Surah Ad-Duha (verse 1), what does 'Ad-Duha' mean?",
+    hint: "وقت من أوقات النهار في الصباح", answer: "الضُّحَى", answerMeaning: "The Morning Brightness",
+    surahAyah: "الضحى:1", exerciseType: "word_meaning",
+    arabicWord: "الضُّحَى", wordMeaning: "The Morning Brightness",
+    verseContext: "وَالضُّحَى", verseContextMeaning: "By the morning brightness",
+    options: [{ text: "The Morning Brightness", isCorrect: true }, { text: "The Sunset", isCorrect: false }, { text: "The Night", isCorrect: false }, { text: "The Stars", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v13", surahAr: "الضحى", surahEn: "Ad-Duha",
+    questionAr: "في سورة الضحى (آية ٦)، ما معنى «يَتِيمًا»؟",
+    questionEn: "In Surah Ad-Duha (verse 6), what does 'Yateeman' mean?",
+    hint: "طفل فقد أباه", answer: "يَتِيمًا", answerMeaning: "An orphan",
+    surahAyah: "الضحى:6", exerciseType: "word_meaning",
+    arabicWord: "يَتِيمًا", wordMeaning: "An orphan",
+    verseContext: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَى", verseContextMeaning: "Did He not find you an orphan and gave you shelter?",
+    options: [{ text: "An orphan", isCorrect: true }, { text: "A traveler", isCorrect: false }, { text: "A student", isCorrect: false }, { text: "A stranger", isCorrect: false }],
+    ayahNumber: 6,
+  },
+  {
+    id: "v14", surahAr: "الشرح", surahEn: "Ash-Sharh",
+    questionAr: "في سورة الشرح (آية ٥)، ما معنى «يُسْرًا»؟",
+    questionEn: "In Surah Ash-Sharh (verse 5), what does 'Yusra' mean?",
+    hint: "عكس الصعوبة", answer: "يُسْرًا", answerMeaning: "Ease / Relief",
+    surahAyah: "الشرح:5", exerciseType: "word_meaning",
+    arabicWord: "يُسْرًا", wordMeaning: "Ease / Relief",
+    verseContext: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", verseContextMeaning: "Indeed, with hardship comes ease",
+    options: [{ text: "Ease / Relief", isCorrect: true }, { text: "Reward", isCorrect: false }, { text: "Patience", isCorrect: false }, { text: "Victory", isCorrect: false }],
+    ayahNumber: 5,
+  },
+  {
+    id: "v15", surahAr: "الشرح", surahEn: "Ash-Sharh",
+    questionAr: "في سورة الشرح (آية ١)، ما معنى «شَرَحْنَا»؟",
+    questionEn: "In Surah Ash-Sharh (verse 1), what does 'Sharahna' mean?",
+    hint: "تعني فتحنا ووسّعنا", answer: "شَرَحْنَا", answerMeaning: "We expanded / We opened",
+    surahAyah: "الشرح:1", exerciseType: "word_meaning",
+    arabicWord: "شَرَحْنَا", wordMeaning: "We expanded / We opened",
+    verseContext: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ", verseContextMeaning: "Did We not expand for you your chest?",
+    options: [{ text: "We expanded", isCorrect: true }, { text: "We protected", isCorrect: false }, { text: "We guided", isCorrect: false }, { text: "We tested", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v16", surahAr: "التين", surahEn: "At-Tin",
+    questionAr: "في سورة التين (آية ٤)، ما معنى «تَقْوِيمٍ»؟",
+    questionEn: "In Surah At-Tin (verse 4), what does 'Taqweem' mean?",
+    hint: "تعني الشكل والصورة", answer: "تَقْوِيمٍ", answerMeaning: "Form / Shape / Stature",
+    surahAyah: "التين:4", exerciseType: "word_meaning",
+    arabicWord: "تَقْوِيمٍ", wordMeaning: "Form / Shape / Stature",
+    verseContext: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ", verseContextMeaning: "We created man in the best form",
+    options: [{ text: "Form / Stature", isCorrect: true }, { text: "Place", isCorrect: false }, { text: "Time", isCorrect: false }, { text: "Way", isCorrect: false }],
+    ayahNumber: 4,
+  },
+  {
+    id: "v17", surahAr: "العلق", surahEn: "Al-Alaq",
+    questionAr: "في سورة العلق (آية ١)، ما معنى «اقْرَأْ»؟",
+    questionEn: "In Surah Al-Alaq (verse 1), what does 'Iqra' mean?",
+    hint: "أول كلمة نزلت في القرآن", answer: "اقْرَأْ", answerMeaning: "Read / Recite",
+    surahAyah: "العلق:1", exerciseType: "word_meaning",
+    arabicWord: "اقْرَأْ", wordMeaning: "Read / Recite",
+    verseContext: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ", verseContextMeaning: "Read in the name of your Lord who created",
+    options: [{ text: "Read / Recite", isCorrect: true }, { text: "Write", isCorrect: false }, { text: "Listen", isCorrect: false }, { text: "Speak", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v18", surahAr: "العلق", surahEn: "Al-Alaq",
+    questionAr: "في سورة العلق (آية ٤)، ما معنى «الْقَلَمِ»؟",
+    questionEn: "In Surah Al-Alaq (verse 4), what does 'Al-Qalam' mean?",
+    hint: "أداة الكتابة", answer: "الْقَلَمِ", answerMeaning: "The Pen",
+    surahAyah: "العلق:4", exerciseType: "word_meaning",
+    arabicWord: "الْقَلَمِ", wordMeaning: "The Pen",
+    verseContext: "الَّذِي عَلَّمَ بِالْقَلَمِ", verseContextMeaning: "Who taught by the pen",
+    options: [{ text: "The Pen", isCorrect: true }, { text: "The Book", isCorrect: false }, { text: "The Word", isCorrect: false }, { text: "The Mind", isCorrect: false }],
+    ayahNumber: 4,
+  },
+  {
+    id: "v19", surahAr: "القدر", surahEn: "Al-Qadr",
+    questionAr: "في سورة القدر (آية ١)، ما معنى «أَنزَلْنَاهُ»؟",
+    questionEn: "In Surah Al-Qadr (verse 1), what does 'Anzalnahu' mean?",
+    hint: "تعني أرسلناه من السماء", answer: "أَنزَلْنَاهُ", answerMeaning: "We sent it down / We revealed it",
+    surahAyah: "القدر:1", exerciseType: "word_meaning",
+    arabicWord: "أَنزَلْنَاهُ", wordMeaning: "We sent it down / We revealed it",
+    verseContext: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ", verseContextMeaning: "Indeed, We sent it down on the Night of Decree",
+    options: [{ text: "We sent it down", isCorrect: true }, { text: "We wrote it", isCorrect: false }, { text: "We heard it", isCorrect: false }, { text: "We kept it", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v20", surahAr: "الكافرون", surahEn: "Al-Kafirun",
+    questionAr: "في سورة الكافرون (آية ٢)، ما معنى «أَعْبُدُ»؟",
+    questionEn: "In Surah Al-Kafirun (verse 2), what does 'A'budu' mean?",
+    hint: "تعني أُطيع وأُخلص", answer: "أَعْبُدُ", answerMeaning: "I worship",
+    surahAyah: "الكافرون:2", exerciseType: "word_meaning",
+    arabicWord: "أَعْبُدُ", wordMeaning: "I worship",
+    verseContext: "لَا أَعْبُدُ مَا تَعْبُدُونَ", verseContextMeaning: "I do not worship what you worship",
+    options: [{ text: "I worship", isCorrect: true }, { text: "I know", isCorrect: false }, { text: "I say", isCorrect: false }, { text: "I see", isCorrect: false }],
+    ayahNumber: 2,
+  },
+  {
+    id: "v21", surahAr: "النصر", surahEn: "An-Nasr",
+    questionAr: "في سورة النصر (آية ١)، ما معنى «الْفَتْحُ»؟",
+    questionEn: "In Surah An-Nasr (verse 1), what does 'Al-Fath' mean?",
+    hint: "تعني الانتصار", answer: "الْفَتْحُ", answerMeaning: "The Victory / The Conquest",
+    surahAyah: "النصر:1", exerciseType: "word_meaning",
+    arabicWord: "الْفَتْحُ", wordMeaning: "The Victory / The Conquest",
+    verseContext: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ", verseContextMeaning: "When the victory of Allah comes and the conquest",
+    options: [{ text: "The Victory", isCorrect: true }, { text: "The End", isCorrect: false }, { text: "The Beginning", isCorrect: false }, { text: "The Reward", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v22", surahAr: "المسد", surahEn: "Al-Masad",
+    questionAr: "في سورة المسد (آية ١)، ما معنى «تَبَّتْ»؟",
+    questionEn: "In Surah Al-Masad (verse 1), what does 'Tabbat' mean?",
+    hint: "تعني الهلاك والخسارة", answer: "تَبَّتْ", answerMeaning: "May perish / Ruined",
+    surahAyah: "المسد:1", exerciseType: "word_meaning",
+    arabicWord: "تَبَّتْ", wordMeaning: "May perish / Ruined",
+    verseContext: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ", verseContextMeaning: "May the hands of Abu Lahab perish, and he has perished",
+    options: [{ text: "May perish", isCorrect: true }, { text: "May win", isCorrect: false }, { text: "May rise", isCorrect: false }, { text: "May return", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v23", surahAr: "الفيل", surahEn: "Al-Fil",
+    questionAr: "في سورة الفيل (آية ٣)، ما معنى «أَبَابِيلَ»؟",
+    questionEn: "In Surah Al-Fil (verse 3), what does 'Ababeel' mean?",
+    hint: "طيور جاءت في جماعات", answer: "أَبَابِيلَ", answerMeaning: "Flocks (of birds)",
+    surahAyah: "الفيل:3", exerciseType: "word_meaning",
+    arabicWord: "أَبَابِيلَ", wordMeaning: "Flocks (of birds)",
+    verseContext: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ", verseContextMeaning: "And He sent against them birds in flocks",
+    options: [{ text: "Flocks", isCorrect: true }, { text: "Stones", isCorrect: false }, { text: "Winds", isCorrect: false }, { text: "Clouds", isCorrect: false }],
+    ayahNumber: 3,
+  },
+  {
+    id: "v24", surahAr: "الماعون", surahEn: "Al-Ma'un",
+    questionAr: "في سورة الماعون (آية ١)، ما معنى «يُكَذِّبُ»؟",
+    questionEn: "In Surah Al-Ma'un (verse 1), what does 'Yukadhdhibu' mean?",
+    hint: "عكس التصديق", answer: "يُكَذِّبُ", answerMeaning: "Denies / Rejects",
+    surahAyah: "الماعون:1", exerciseType: "word_meaning",
+    arabicWord: "يُكَذِّبُ", wordMeaning: "Denies / Rejects",
+    verseContext: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ", verseContextMeaning: "Have you seen the one who denies the religion?",
+    options: [{ text: "Denies", isCorrect: true }, { text: "Follows", isCorrect: false }, { text: "Studies", isCorrect: false }, { text: "Teaches", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v25", surahAr: "الهمزة", surahEn: "Al-Humazah",
+    questionAr: "في سورة الهمزة (آية ٢)، ما معنى «جَمَعَ»؟",
+    questionEn: "In Surah Al-Humazah (verse 2), what does 'Jama'a' mean?",
+    hint: "عكس فرّق", answer: "جَمَعَ", answerMeaning: "Collected / Gathered",
+    surahAyah: "الهمزة:2", exerciseType: "word_meaning",
+    arabicWord: "جَمَعَ", wordMeaning: "Collected / Gathered",
+    verseContext: "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ", verseContextMeaning: "Who collected wealth and counted it",
+    options: [{ text: "Collected", isCorrect: true }, { text: "Spent", isCorrect: false }, { text: "Lost", isCorrect: false }, { text: "Hid", isCorrect: false }],
+    ayahNumber: 2,
+  },
+  {
+    id: "v26", surahAr: "الزلزلة", surahEn: "Az-Zalzalah",
+    questionAr: "في سورة الزلزلة (آية ١)، ما معنى «زُلْزِلَتِ»؟",
+    questionEn: "In Surah Az-Zalzalah (verse 1), what does 'Zulzilat' mean?",
+    hint: "حركة الأرض بقوة", answer: "زُلْزِلَتِ", answerMeaning: "Is shaken / Quaked",
+    surahAyah: "الزلزلة:1", exerciseType: "word_meaning",
+    arabicWord: "زُلْزِلَتِ", wordMeaning: "Is shaken / Quaked",
+    verseContext: "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا", verseContextMeaning: "When the earth is shaken with its earthquake",
+    options: [{ text: "Is shaken", isCorrect: true }, { text: "Is split", isCorrect: false }, { text: "Is flooded", isCorrect: false }, { text: "Is burned", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v27", surahAr: "القارعة", surahEn: "Al-Qari'ah",
+    questionAr: "في سورة القارعة (آية ٤)، ما معنى «الْمَبْثُوثِ»؟",
+    questionEn: "In Surah Al-Qari'ah (verse 4), what does 'Al-Mabthooth' mean?",
+    hint: "تعني المنتشر في كل مكان", answer: "الْمَبْثُوثِ", answerMeaning: "Scattered / Spread out",
+    surahAyah: "القارعة:4", exerciseType: "word_meaning",
+    arabicWord: "الْمَبْثُوثِ", wordMeaning: "Scattered / Spread out",
+    verseContext: "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ", verseContextMeaning: "The Day when people will be like scattered moths",
+    options: [{ text: "Scattered", isCorrect: true }, { text: "Gathered", isCorrect: false }, { text: "Flying", isCorrect: false }, { text: "Hidden", isCorrect: false }],
+    ayahNumber: 4,
+  },
+  {
+    id: "v28", surahAr: "التكاثر", surahEn: "At-Takathur",
+    questionAr: "في سورة التكاثر (آية ١)، ما معنى «التَّكَاثُرُ»؟",
+    questionEn: "In Surah At-Takathur (verse 1), what does 'At-Takathur' mean?",
+    hint: "التنافس في جمع الأشياء", answer: "التَّكَاثُرُ", answerMeaning: "Competition in increase / Rivalry in worldly gain",
+    surahAyah: "التكاثر:1", exerciseType: "word_meaning",
+    arabicWord: "التَّكَاثُرُ", wordMeaning: "Competition in increase / Rivalry in worldly gain",
+    verseContext: "أَلْهَاكُمُ التَّكَاثُرُ", verseContextMeaning: "Competition in worldly increase diverts you",
+    options: [{ text: "Competition in increase", isCorrect: true }, { text: "Love of wealth", isCorrect: false }, { text: "Fear of death", isCorrect: false }, { text: "Search for truth", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v29", surahAr: "البينة", surahEn: "Al-Bayyinah",
+    questionAr: "في سورة البينة (آية ١)، ما معنى «الْبَيِّنَةُ»؟",
+    questionEn: "In Surah Al-Bayyinah (verse 1), what does 'Al-Bayyinah' mean?",
+    hint: "تعني الدليل الواضح", answer: "الْبَيِّنَةُ", answerMeaning: "The Clear Evidence / The Clear Proof",
+    surahAyah: "البينة:1", exerciseType: "word_meaning",
+    arabicWord: "الْبَيِّنَةُ", wordMeaning: "The Clear Evidence / The Clear Proof",
+    verseContext: "حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ", verseContextMeaning: "Until there came to them the clear evidence",
+    options: [{ text: "The Clear Proof", isCorrect: true }, { text: "The Warning", isCorrect: false }, { text: "The Angel", isCorrect: false }, { text: "The Messenger", isCorrect: false }],
+    ayahNumber: 1,
+  },
+  {
+    id: "v30", surahAr: "العاديات", surahEn: "Al-Adiyat",
+    questionAr: "في سورة العاديات (آية ١)، ما معنى «الْعَادِيَاتِ»؟",
+    questionEn: "In Surah Al-Adiyat (verse 1), what does 'Al-Adiyat' mean?",
+    hint: "الخيول التي تجري بسرعة", answer: "الْعَادِيَاتِ", answerMeaning: "The charging horses / The runners",
+    surahAyah: "العاديات:1", exerciseType: "word_meaning",
+    arabicWord: "الْعَادِيَاتِ", wordMeaning: "The charging horses / The runners",
+    verseContext: "وَالْعَادِيَاتِ ضَبْحًا", verseContextMeaning: "By the charging horses, panting",
+    options: [{ text: "The charging horses", isCorrect: true }, { text: "The strong winds", isCorrect: false }, { text: "The bright stars", isCorrect: false }, { text: "The heavy clouds", isCorrect: false }],
+    ayahNumber: 1,
+  },
+];
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 export async function generateVocabularyExercise(userLanguage: string = 'en'): Promise<VocabularyExercise> {
-  const randomSurahIndex = Math.floor(Math.random() * ALLOWED_SURAHS.length);
-  const targetSurahAr = ALLOWED_SURAHS[randomSurahIndex];
-  const targetSurahEn = ALLOWED_SURAHS_EN[randomSurahIndex];
-  
-  const exerciseTypes = ['find_word', 'word_meaning', 'complete_verse'];
-  const randomType = exerciseTypes[Math.floor(Math.random() * exerciseTypes.length)];
-
-  const prompt = `${CONTENT_LOGIC_ROLE}
-
-${TRIGGER_RESPONSE_RULES}
-
-TASK: Generate exactly 1 vocabulary exercise from سورة ${targetSurahAr} (${targetSurahEn}).
-Exercise type: ${randomType === 'find_word' ? 'Type A — Find the Arabic Word' : randomType === 'word_meaning' ? 'Type B — What Does This Word Mean' : 'Type C — Complete the Verse'}
-
-${EXERCISE_FORMAT}
-
-${VALIDATION_CHECKLIST}
-
-CRITICAL: The question MUST mention "سورة ${targetSurahAr}" explicitly.
-CRITICAL: The answer MUST be a real word/phrase from this surah with verse number.
-CRITICAL: Keep it SIMPLE for beginners who don't speak Arabic.
-
-User's interface language: ${userLanguage === 'ar' ? 'Arabic' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}
-
-Return ONLY valid JSON (no markdown, no backticks):
-{
-  "questionAr": "The question in Arabic (must include سورة ${targetSurahAr})",
-  "questionEn": "The same question translated to ${userLanguage === 'ar' ? 'English' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}",
-  "hint": "Simple hint: first letter, fill-in-blank, or word position (in Arabic)",
-  "answer": "The correct Arabic word/phrase from the Quran",
-  "answerMeaning": "The meaning in ${userLanguage === 'ar' ? 'English' : userLanguage === 'id' ? 'Indonesian' : userLanguage === 'tr' ? 'Turkish' : userLanguage === 'zh' ? 'Chinese' : userLanguage === 'sw' ? 'Swahili' : userLanguage === 'so' ? 'Somali' : userLanguage === 'bs' ? 'Bosnian' : userLanguage === 'sq' ? 'Albanian' : userLanguage === 'ru' ? 'Russian' : 'English'}",
-  "surahAyah": "${targetSurahAr}:verse_number"
-}`;
-
-  try {
-    const response = await axios.post(GEMINI_API_URL, {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.9,
-        maxOutputTokens: 1024,
-      }
-    });
-
-    const candidate = response.data?.candidates?.[0];
-    if (!candidate?.content?.parts?.[0]?.text) {
-      throw new Error("No response from AI");
-    }
-
-    let text = candidate.content.parts[0].text.trim();
-    text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-    
-    const parsed = JSON.parse(text);
-    
-    return {
-      id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      surahAr: targetSurahAr,
-      surahEn: targetSurahEn,
-      questionAr: parsed.questionAr,
-      questionEn: parsed.questionEn,
-      hint: parsed.hint,
-      answer: parsed.answer,
-      answerMeaning: parsed.answerMeaning,
-      surahAyah: parsed.surahAyah,
-      exerciseType: randomType as VocabularyExercise['exerciseType'],
-    };
-  } catch (error) {
-    console.error("Error generating vocabulary exercise:", error);
-    const fallbackExercises: VocabularyExercise[] = [
-      {
-        id: `vocab_fallback_${Date.now()}`,
-        surahAr: "الفاتحة",
-        surahEn: "Al-Fatiha",
-        questionAr: "في سورة الفاتحة، ما الكلمة التي تعني 'الطريق المستقيم'؟",
-        questionEn: "In Surah Al-Fatiha, what word means 'the straight path'?",
-        hint: "الكلمة تبدأ بحرف الـ ص... الصـ...",
-        answer: "الصِّرَاطَ",
-        answerMeaning: "The Straight Path",
-        surahAyah: "الفاتحة:6",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}`,
-        surahAr: "الإخلاص",
-        surahEn: "Al-Ikhlas",
-        questionAr: "في سورة الإخلاص، ما معنى كلمة 'أَحَدٌ'؟",
-        questionEn: "In Surah Al-Ikhlas, what does the word 'Ahad' mean?",
-        hint: "تعني الرقم 1 أو الوحيد...",
-        answer: "أَحَدٌ",
-        answerMeaning: "One / Unique",
-        surahAyah: "الإخلاص:1",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}`,
-        surahAr: "الكوثر",
-        surahEn: "Al-Kawthar",
-        questionAr: "في سورة الكوثر، ما الكلمة التي تعني 'الخير الكثير الوفير'؟",
-        questionEn: "In Surah Al-Kawthar, what word means 'abundant goodness'?",
-        hint: "الكلمة تبدأ بحرف الـ ك... الكـ...",
-        answer: "الْكَوْثَرَ",
-        answerMeaning: "Abundance / Abundant Goodness",
-        surahAyah: "الكوثر:1",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}`,
-        surahAr: "العصر",
-        surahEn: "Al-Asr",
-        questionAr: "أكمل الآية من سورة العصر: 'وَالْعَصْرِ * إِنَّ الْإِنسَانَ لَفِي ___'",
-        questionEn: "Complete the verse from Surah Al-Asr: 'By time, indeed mankind is in ___'",
-        hint: "الكلمة تعني الضياع والنقصان",
-        answer: "خُسْرٍ",
-        answerMeaning: "Loss",
-        surahAyah: "العصر:2",
-        exerciseType: 'complete_verse',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}`,
-        surahAr: "الناس",
-        surahEn: "An-Nas",
-        questionAr: "في سورة الناس، ما الكلمة التي تعني 'المتسلل الذي يختفي عند ذكر الله'؟",
-        questionEn: "In Surah An-Nas, what word means 'the retreating whisperer'?",
-        hint: "الكلمة تبدأ بحرف الـ و... الوَ...",
-        answer: "الْوَسْوَاسِ الْخَنَّاسِ",
-        answerMeaning: "The retreating whisperer",
-        surahAyah: "الناس:4",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_6`,
-        surahAr: "الفلق",
-        surahEn: "Al-Falaq",
-        questionAr: "في سورة الفلق، ما معنى كلمة 'الْفَلَقِ'؟",
-        questionEn: "In Surah Al-Falaq, what does the word 'Al-Falaq' mean?",
-        hint: "تعني ضوء الفجر عندما ينشق...",
-        answer: "الْفَلَقِ",
-        answerMeaning: "The Daybreak / The Dawn",
-        surahAyah: "الفلق:1",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_7`,
-        surahAr: "الفاتحة",
-        surahEn: "Al-Fatiha",
-        questionAr: "أكمل الآية من سورة الفاتحة: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ ___'",
-        questionEn: "Complete the verse from Surah Al-Fatiha: 'You alone we worship, and You alone we ___'",
-        hint: "الكلمة تعني: نطلب المساعدة",
-        answer: "نَسْتَعِينُ",
-        answerMeaning: "We ask for help",
-        surahAyah: "الفاتحة:5",
-        exerciseType: 'complete_verse',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_8`,
-        surahAr: "الضحى",
-        surahEn: "Ad-Duha",
-        questionAr: "في سورة الضحى، ما الكلمة التي تعني 'وقت الصباح المشرق'؟",
-        questionEn: "In Surah Ad-Duha, what word means 'the morning brightness'?",
-        hint: "الكلمة تبدأ بحرف الـ ض... الضـ...",
-        answer: "الضُّحَى",
-        answerMeaning: "The Morning Brightness",
-        surahAyah: "الضحى:1",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_9`,
-        surahAr: "الشرح",
-        surahEn: "Ash-Sharh",
-        questionAr: "أكمل الآية من سورة الشرح: 'فَإِنَّ مَعَ الْعُسْرِ ___'",
-        questionEn: "Complete the verse from Surah Ash-Sharh: 'Indeed, with hardship comes ___'",
-        hint: "الكلمة تعني السهولة والراحة",
-        answer: "يُسْرًا",
-        answerMeaning: "Ease / Relief",
-        surahAyah: "الشرح:5",
-        exerciseType: 'complete_verse',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_10`,
-        surahAr: "التين",
-        surahEn: "At-Tin",
-        questionAr: "في سورة التين، ما معنى عبارة 'أَحْسَنِ تَقْوِيمٍ'؟",
-        questionEn: "In Surah At-Tin, what does 'Ahsani Taqweem' mean?",
-        hint: "تعني أفضل شكل وصورة...",
-        answer: "أَحْسَنِ تَقْوِيمٍ",
-        answerMeaning: "The best form / The finest shape",
-        surahAyah: "التين:4",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_11`,
-        surahAr: "القدر",
-        surahEn: "Al-Qadr",
-        questionAr: "في سورة القدر، ما الكلمة التي تعني 'الليلة المباركة العظيمة'؟",
-        questionEn: "In Surah Al-Qadr, what phrase means 'the Night of Decree'?",
-        hint: "الكلمة تبدأ بحرف الـ ل... لَيـ...",
-        answer: "لَيْلَةِ الْقَدْرِ",
-        answerMeaning: "The Night of Decree / Power",
-        surahAyah: "القدر:1",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_12`,
-        surahAr: "الكافرون",
-        surahEn: "Al-Kafirun",
-        questionAr: "في سورة الكافرون، ما معنى كلمة 'أَعْبُدُ'؟",
-        questionEn: "In Surah Al-Kafirun, what does the word 'A'budu' mean?",
-        hint: "تعني أُطيع وأُخلص العبادة...",
-        answer: "أَعْبُدُ",
-        answerMeaning: "I worship",
-        surahAyah: "الكافرون:2",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_13`,
-        surahAr: "النصر",
-        surahEn: "An-Nasr",
-        questionAr: "في سورة النصر، ما الكلمة التي تعني 'الانتصار والتأييد من الله'؟",
-        questionEn: "In Surah An-Nasr, what word means 'the victory/help from Allah'?",
-        hint: "الكلمة تبدأ بحرف الـ ن... النَّـ...",
-        answer: "نَصْرُ",
-        answerMeaning: "Victory / Help",
-        surahAyah: "النصر:1",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_14`,
-        surahAr: "المسد",
-        surahEn: "Al-Masad",
-        questionAr: "في سورة المسد، ما معنى عبارة 'تَبَّتْ يَدَا'؟",
-        questionEn: "In Surah Al-Masad, what does 'Tabbat Yada' mean?",
-        hint: "تعني الخسارة والهلاك...",
-        answer: "تَبَّتْ يَدَا",
-        answerMeaning: "May the hands perish / Ruined are the hands",
-        surahAyah: "المسد:1",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_15`,
-        surahAr: "الفيل",
-        surahEn: "Al-Fil",
-        questionAr: "في سورة الفيل، ما الكلمة التي تعني 'الطيور التي جاءت في جماعات'؟",
-        questionEn: "In Surah Al-Fil, what word means 'birds in flocks'?",
-        hint: "الكلمة تبدأ بحرف الـ أ... أَبـ...",
-        answer: "أَبَابِيلَ",
-        answerMeaning: "Flocks / Birds in groups",
-        surahAyah: "الفيل:3",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_16`,
-        surahAr: "قريش",
-        surahEn: "Quraysh",
-        questionAr: "أكمل الآية من سورة قريش: 'لِإِيلَافِ ___'",
-        questionEn: "Complete the verse from Surah Quraysh: 'For the accustomed security of ___'",
-        hint: "اسم القبيلة المشهورة في مكة",
-        answer: "قُرَيْشٍ",
-        answerMeaning: "Quraysh (the tribe)",
-        surahAyah: "قريش:1",
-        exerciseType: 'complete_verse',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_17`,
-        surahAr: "الماعون",
-        surahEn: "Al-Ma'un",
-        questionAr: "في سورة الماعون، ما معنى كلمة 'الْمَاعُونَ'؟",
-        questionEn: "In Surah Al-Ma'un, what does the word 'Al-Ma'un' mean?",
-        hint: "تعني الأشياء الصغيرة التي يحتاجها الناس...",
-        answer: "الْمَاعُونَ",
-        answerMeaning: "Small kindnesses / Assistance / Basic necessities",
-        surahAyah: "الماعون:7",
-        exerciseType: 'word_meaning',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_18`,
-        surahAr: "الزلزلة",
-        surahEn: "Az-Zalzalah",
-        questionAr: "في سورة الزلزلة، ما الكلمة التي تعني 'وزن أصغر شيء'؟",
-        questionEn: "In Surah Az-Zalzalah, what phrase means 'an atom's weight'?",
-        hint: "الكلمة تبدأ بحرف الـ ذ... ذَرَّ...",
-        answer: "مِثْقَالَ ذَرَّةٍ",
-        answerMeaning: "An atom's weight",
-        surahAyah: "الزلزلة:7",
-        exerciseType: 'find_word',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_19`,
-        surahAr: "العلق",
-        surahEn: "Al-Alaq",
-        questionAr: "أكمل الآية من سورة العلق: 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي ___'",
-        questionEn: "Complete the verse from Surah Al-Alaq: 'Read in the name of your Lord who ___'",
-        hint: "الكلمة تعني: صنع وأوجد",
-        answer: "خَلَقَ",
-        answerMeaning: "Created",
-        surahAyah: "العلق:1",
-        exerciseType: 'complete_verse',
-      },
-      {
-        id: `vocab_fallback_${Date.now()}_20`,
-        surahAr: "التكاثر",
-        surahEn: "At-Takathur",
-        questionAr: "في سورة التكاثر، ما معنى كلمة 'التَّكَاثُرُ'؟",
-        questionEn: "In Surah At-Takathur, what does 'At-Takathur' mean?",
-        hint: "تعني التنافس في جمع الأشياء والتفاخر...",
-        answer: "التَّكَاثُرُ",
-        answerMeaning: "Competition in increase / Rivalry in worldly gain",
-        surahAyah: "التكاثر:1",
-        exerciseType: 'word_meaning',
-      },
-    ];
-    return fallbackExercises[Math.floor(Math.random() * fallbackExercises.length)];
-  }
+  const exercise = VOCAB_BANK[Math.floor(Math.random() * VOCAB_BANK.length)];
+  const shuffledOptions = shuffleArray(exercise.options);
+  return {
+    ...exercise,
+    id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    options: shuffledOptions,
+  };
 }
 
 export async function validateVocabularyAnswer(

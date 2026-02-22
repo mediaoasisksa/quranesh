@@ -132,6 +132,12 @@ export default function Exercise() {
     answerMeaning: string;
     surahAyah: string;
     exerciseType: 'find_word' | 'word_meaning' | 'complete_verse';
+    arabicWord: string;
+    wordMeaning: string;
+    verseContext: string;
+    verseContextMeaning: string;
+    options: { text: string; isCorrect: boolean }[];
+    ayahNumber: number;
   }>({
     queryKey: ["/api/vocabulary-exercise", language, isConversationExercise ? 'conv' : 'role'],
     queryFn: async () => {
@@ -333,6 +339,29 @@ export default function Exercise() {
       return;
     }
 
+    if (isConversationExercise || isRoleplayExercise) {
+      if (!vocabExercise || !selectedOption) return;
+      setIsValidating(true);
+      const correctOption = vocabExercise.options.find(o => o.isCorrect);
+      const answeredCorrectly = selectedOption === correctOption?.text;
+      setIsCorrect(answeredCorrectly);
+      setIsAnswered(true);
+      setFeedback(answeredCorrectly 
+        ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
+        : (language === 'ar' ? `❌ الإجابة الصحيحة: ${vocabExercise.wordMeaning}` : `❌ The correct answer: ${vocabExercise.wordMeaning}`));
+      setFeedbackGrade(answeredCorrectly ? 'exact_match' : 'incorrect');
+      submitSessionMutation.mutate({
+        userId,
+        exerciseType: exerciseType || 'conversation',
+        phraseId: vocabExercise.id,
+        userAnswer: selectedOption,
+        correctAnswer: correctOption?.text || '',
+        isCorrect: answeredCorrectly ? "true" : "false",
+      });
+      setIsValidating(false);
+      return;
+    }
+
     // Regular exercises with text input
     if (!userAnswer.trim()) {
       toast({
@@ -352,49 +381,6 @@ export default function Exercise() {
       console.log("Phrase ID:", phraseId);
       console.log("Question Bank ID:", questionBank?.id);
       console.log("=============================");
-
-      // Handle conversation/roleplay with vocabulary validation
-      if (isConversationExercise || isRoleplayExercise) {
-        if (!vocabExercise) return;
-        try {
-          const response = await fetch('/api/vocabulary-exercise/validate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userAnswer: userAnswer.trim(),
-              correctAnswer: vocabExercise.answer,
-              questionText: vocabExercise.questionAr,
-              surahAyah: vocabExercise.surahAyah,
-              language,
-            }),
-          });
-          const result = await response.json();
-          setIsCorrect(result.isCorrect);
-          setIsAnswered(true);
-          setFeedback(result.feedback);
-          if (!result.isCorrect) {
-            setSuggestedAnswer(vocabExercise.answer);
-            setShowSuggested(true);
-          }
-          setFeedbackGrade(result.isCorrect ? 'exact_match' : 'incorrect');
-          submitSessionMutation.mutate({
-            userId,
-            exerciseType: exerciseType || 'conversation',
-            phraseId: vocabExercise.id,
-            userAnswer: userAnswer.trim(),
-            correctAnswer: vocabExercise.answer,
-            isCorrect: result.isCorrect ? "true" : "false",
-          });
-        } catch (error) {
-          console.error('Validation error:', error);
-          setFeedback(language === 'ar' ? 'حدث خطأ في التحقق' : 'Validation error occurred');
-          setIsAnswered(true);
-          setIsCorrect(false);
-        } finally {
-          setIsValidating(false);
-        }
-        return;
-      }
 
       // Call AI validation API
       const response = await fetch("/api/validate-answer", {
@@ -555,6 +541,7 @@ export default function Exercise() {
     setShowHint(false);
     setMeaningBreakdown(null);
     setIsLoadingBreakdown(false);
+    setSelectedOption(null);
   };
 
   const goToNextExercise = async () => {
@@ -762,30 +749,71 @@ export default function Exercise() {
       case "roleplay":
         return (
           <div className="space-y-5">
-            {/* Surah Badge */}
+            {/* Surah Badge + Ayah */}
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-base font-bold">
-                📖 {language === 'ar' ? `سورة ${vocabExercise?.surahAr}` : `Surah ${vocabExercise?.surahEn}`}
+                📖 {language === 'ar' ? `سورة ${vocabExercise?.surahAr} — آية ${vocabExercise?.ayahNumber}` : `Surah ${vocabExercise?.surahEn} — Verse ${vocabExercise?.ayahNumber}`}
               </span>
             </div>
 
-            {/* Question */}
-            <div className="bg-muted/50 rounded-lg p-5">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-1">🔍</span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">
-                    {language === 'ar' ? 'ابحث في السورة:' : 'Search in Surah:'}
-                  </p>
-                  <p className={`text-lg text-foreground leading-relaxed ${language === 'ar' ? 'arabic-text' : ''}`}
-                    lang={language === 'ar' ? 'ar' : undefined}
-                    dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    data-testid="text-conversation-prompt"
-                  >
-                    {language === 'ar' ? vocabExercise?.questionAr : vocabExercise?.questionEn}
-                  </p>
-                </div>
+            {/* Verse Context - show the full verse so they can see the word in context */}
+            {vocabExercise?.verseContext && (
+              <div className="bg-muted/30 rounded-lg p-4 text-center border border-muted">
+                <p className="arabic-text text-xl leading-loose text-foreground" lang="ar" dir="rtl">
+                  {vocabExercise.verseContext}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2" dir={dir}>
+                  {vocabExercise.verseContextMeaning}
+                </p>
               </div>
+            )}
+
+            {/* Arabic Word Highlight */}
+            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-5 text-center border-2 border-primary/20">
+              <p className="text-sm font-semibold text-muted-foreground mb-3" dir={dir}>
+                {language === 'ar' ? 'ما معنى هذه الكلمة؟' : 'What does this word mean?'}
+              </p>
+              <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
+                {vocabExercise?.arabicWord}
+              </p>
+            </div>
+
+            {/* Multiple Choice Options */}
+            <div className="space-y-3" data-testid="options-container">
+              {vocabExercise?.options?.map((option, index) => {
+                const isSelected = selectedOption === option.text;
+                const showResult = isAnswered;
+                const optionIsCorrect = option.isCorrect;
+                let optionClass = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 text-base font-medium ";
+                if (showResult && optionIsCorrect) {
+                  optionClass += "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200";
+                } else if (showResult && isSelected && !optionIsCorrect) {
+                  optionClass += "bg-red-50 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-200";
+                } else if (isSelected && !showResult) {
+                  optionClass += "bg-primary/10 border-primary text-primary";
+                } else {
+                  optionClass += "bg-card border-border hover:border-primary/50 hover:bg-primary/5 text-foreground";
+                }
+                return (
+                  <button
+                    key={index}
+                    className={optionClass}
+                    onClick={() => { if (!isAnswered) setSelectedOption(option.text); }}
+                    disabled={isAnswered}
+                    dir={dir}
+                    data-testid={`option-${index}`}
+                  >
+                    <span className="inline-flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold shrink-0">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span>{option.text}</span>
+                      {showResult && optionIsCorrect && <span className="ml-auto">✅</span>}
+                      {showResult && isSelected && !optionIsCorrect && <span className="ml-auto">❌</span>}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Hint Button */}
@@ -816,38 +844,26 @@ export default function Exercise() {
 
             {/* Answer revealed after submission */}
             {isAnswered && vocabExercise && (
-              <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-4 border border-primary/30 animate-in fade-in duration-300">
-                <p className="text-sm font-medium text-primary mb-2">
-                  {language === 'ar' ? 'الإجابة الصحيحة:' : 'Correct Answer:'}
+              <div className={`rounded-lg p-4 border animate-in fade-in duration-300 ${isCorrect ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700' : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'}`}>
+                <p className={`text-sm font-bold mb-2 ${isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
+                  {isCorrect 
+                    ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
+                    : (language === 'ar' ? '❌ إجابة خاطئة' : '❌ Incorrect')}
                 </p>
-                <p className="arabic-text text-xl font-bold text-foreground" lang="ar" dir="rtl" data-testid="text-conversation-verse">
-                  {vocabExercise.answer}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {vocabExercise.answerMeaning}
-                </p>
-                <p className="text-sm text-primary/80 mt-1" dir="rtl">
-                  ({vocabExercise.surahAyah})
+                <div className="flex items-center gap-3 mt-2">
+                  <p className="arabic-text text-xl font-bold text-foreground" lang="ar" dir="rtl" data-testid="text-conversation-verse">
+                    {vocabExercise.arabicWord}
+                  </p>
+                  <span className="text-muted-foreground">=</span>
+                  <p className="text-lg font-semibold text-foreground">
+                    {vocabExercise.wordMeaning}
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2" dir="rtl">
+                  📖 {vocabExercise.surahAyah}
                 </p>
               </div>
             )}
-
-            {/* Arabic Input */}
-            <div>
-              <p className="text-sm font-semibold text-foreground mb-2">
-                {language === 'ar' ? 'إجابتك بالعربية:' : 'Your answer in Arabic:'}
-              </p>
-              <Textarea
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder={language === 'ar' ? 'أجب بالعربية...' : 'Type your answer in Arabic...'}
-                className="arabic-text text-lg min-h-[80px]"
-                dir="rtl"
-                lang="ar"
-                disabled={isAnswered}
-                data-testid="input-answer"
-              />
-            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3">
@@ -855,7 +871,7 @@ export default function Exercise() {
                 <Button
                   className="flex-1"
                   onClick={checkAnswer}
-                  disabled={!userAnswer.trim() || isValidating}
+                  disabled={!selectedOption || isValidating}
                   data-testid="button-check"
                 >
                   {isValidating ? (
@@ -1462,7 +1478,8 @@ export default function Exercise() {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Action Buttons (hidden for conversation/roleplay which have their own buttons) */}
+            {!(isConversationExercise || isRoleplayExercise) && (
             <div className="flex justify-between items-center mt-6">
               <Button
                 variant="outline"
@@ -1496,11 +1513,12 @@ export default function Exercise() {
                 )}
               </div>
             </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Context Information */}
-        <Card>
+        {/* Context Information (hidden for conversation/roleplay vocabulary quizzes) */}
+        {!(isConversationExercise || isRoleplayExercise) && <Card>
           <CardHeader>
             <CardTitle>
               {isThematicExercise ? t('aboutThisQuestion') : t('aboutThisPhrase')}
@@ -1689,7 +1707,7 @@ export default function Exercise() {
               </p>
             )}
           </CardContent>
-        </Card>
+        </Card>}
       </main>
     </div>
     </SubscriptionGate>
