@@ -23,14 +23,15 @@ export const exerciseTypes = [
     variant: 'secondary' as const,
     category: 'practical'
   },
-  {
-    id: 'transformation',
-    titleKey: 'transformation',
-    descriptionKey: 'transformationDesc',
-    icon: '💎',
-    variant: 'accent' as const,
-    category: 'wisdom'
-  },
+  // Transformation (المطابقة القرآنية) hidden per user request
+  // {
+  //   id: 'transformation',
+  //   titleKey: 'transformation',
+  //   descriptionKey: 'transformationDesc',
+  //   icon: '💎',
+  //   variant: 'accent' as const,
+  //   category: 'wisdom'
+  // },
   // Thematic exercise hidden per user request
   // {
   //   id: 'thematic',
