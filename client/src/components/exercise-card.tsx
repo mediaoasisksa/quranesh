@@ -16,12 +16,12 @@ interface ExerciseCardProps {
 }
 
 const SAMPLE_PREVIEWS = [
-  { targetWord: "أَبَابِيلَ", options: ["طَيْرًا أَبَابِيلَ", "بِحِجَارَةٍ مِّن سِجِّيلٍ", "كَعَصْفٍ مَّأْكُولٍ", "كَيْدَهُمْ فِي تَضْلِيلٍ"], surah: "الفيل" },
-  { targetWord: "الصِّرَاطَ", options: ["اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", "مَالِكِ يَوْمِ الدِّينِ", "رَبِّ الْعَالَمِينَ", "الرَّحْمَنِ الرَّحِيمِ"], surah: "الفاتحة" },
-  { targetWord: "الْكَوْثَرَ", options: ["أَعْطَيْنَاكَ الْكَوْثَرَ", "فَصَلِّ لِرَبِّكَ وَانْحَرْ", "شَانِئَكَ هُوَ الْأَبْتَرُ", "لِإِيلَافِ قُرَيْشٍ"], surah: "الكوثر" },
-  { targetWord: "الْفَلَقِ", options: ["أَعُوذُ بِرَبِّ الْفَلَقِ", "مِن شَرِّ مَا خَلَقَ", "غَاسِقٍ إِذَا وَقَبَ", "النَّفَّاثَاتِ فِي الْعُقَدِ"], surah: "الفلق" },
-  { targetWord: "أَحَدٌ", options: ["قُلْ هُوَ اللَّهُ أَحَدٌ", "اللَّهُ الصَّمَدُ", "لَمْ يَلِدْ وَلَمْ يُولَدْ", "كُفُوًا أَحَدٌ"], surah: "الإخلاص" },
-  { targetWord: "الضُّحَى", options: ["وَالضُّحَى", "وَاللَّيْلِ إِذَا سَجَى", "مَا وَدَّعَكَ رَبُّكَ", "وَلَلْآخِرَةُ خَيْرٌ لَّكَ"], surah: "الضحى" },
+  { meaning: "Flocks", targetWord: "أَبَابِيلَ", options: ["وَأَرْسَلَ", "طَيْرًا", "أَبَابِيلَ", "عَلَيْهِمْ"], surah: "الفيل" },
+  { meaning: "The Path", targetWord: "الصِّرَاطَ", options: ["اهْدِنَا", "الصِّرَاطَ", "الْمُسْتَقِيمَ", "رَبِّ"], surah: "الفاتحة" },
+  { meaning: "Abundance", targetWord: "الْكَوْثَرَ", options: ["إِنَّا", "أَعْطَيْنَاكَ", "الْكَوْثَرَ", "فَصَلِّ"], surah: "الكوثر" },
+  { meaning: "Daybreak", targetWord: "الْفَلَقِ", options: ["قُلْ", "أَعُوذُ", "بِرَبِّ", "الْفَلَقِ"], surah: "الفلق" },
+  { meaning: "One", targetWord: "أَحَدٌ", options: ["قُلْ", "هُوَ", "أَحَدٌ", "اللَّهُ"], surah: "الإخلاص" },
+  { meaning: "The Forenoon", targetWord: "الضُّحَى", options: ["الضُّحَى", "وَاللَّيْلِ", "سَجَى", "وَدَّعَكَ"], surah: "الضحى" },
 ];
 
 export default function ExerciseCard({
@@ -67,35 +67,35 @@ export default function ExerciseCard({
           <p className="text-xs font-medium text-muted-foreground mb-1">
             {t('chooseVerseContaining')}
           </p>
-          <p className="arabic-text text-xl font-bold text-primary" lang="ar" dir="rtl">
-            {preview.targetWord}
+          <p className="text-lg font-bold text-primary">
+            {preview.meaning}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             📖 {t('surahLabel')} {preview.surah}
           </p>
         </div>
-        <div className="space-y-1.5">
-          {preview.options.slice(0, 3).map((option, i) => (
-            <div
-              key={i}
-              className={`text-sm arabic-text rounded-md px-3 py-1.5 border text-right ${
-                i === 0
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
-                  : 'bg-muted/30 border-border text-muted-foreground'
-              }`}
-              lang="ar"
-              dir="rtl"
-            >
-              <span className="inline-flex items-center gap-2 w-full">
-                <span className="w-5 h-5 rounded-full bg-muted/50 flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {String.fromCharCode(65 + i)}
+        <div className="grid grid-cols-2 gap-1.5">
+          {preview.options.map((option, i) => {
+            const isCorrect = option === preview.targetWord;
+            return (
+              <div
+                key={i}
+                className={`text-sm arabic-text rounded-md px-2 py-1.5 border text-center ${
+                  isCorrect
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
+                    : 'bg-muted/30 border-border text-muted-foreground'
+                }`}
+                lang="ar"
+                dir="rtl"
+              >
+                <span className="flex flex-col items-center gap-0.5">
+                  <span className="text-[10px] font-bold text-muted-foreground">{String.fromCharCode(65 + i)}</span>
+                  <span className="font-semibold">{option}</span>
+                  {isCorrect && <span className="text-xs">✅</span>}
                 </span>
-                <span className="flex-1">{option}</span>
-                {i === 0 && <span className="shrink-0">✅</span>}
-              </span>
-            </div>
-          ))}
-          <div className="text-xs text-center text-muted-foreground">...</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );

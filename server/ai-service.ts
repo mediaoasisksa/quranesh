@@ -2185,10 +2185,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
     correctVerseMeaning: "Guide us to the straight path",
     options: [
-      { text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", isCorrect: false },
-      { text: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", isCorrect: true },
-      { text: "مَالِكِ يَوْمِ الدِّينِ", isCorrect: false },
-      { text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", isCorrect: false },
+      { text: "اهْدِنَا", isCorrect: false },
+      { text: "الصِّرَاطَ", isCorrect: true },
+      { text: "الْمُسْتَقِيمَ", isCorrect: false },
+      { text: "رَبِّ", isCorrect: false },
     ],
   },
   {
@@ -2222,10 +2222,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
     correctVerseMeaning: "You alone we worship, and You alone we ask for help",
     options: [
-      { text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", isCorrect: true },
-      { text: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", isCorrect: false },
-      { text: "الرَّحْمَنِ الرَّحِيمِ", isCorrect: false },
-      { text: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ", isCorrect: false },
+      { text: "إِيَّاكَ", isCorrect: false },
+      { text: "نَعْبُدُ", isCorrect: false },
+      { text: "نَسْتَعِينُ", isCorrect: true },
+      { text: "وَإِيَّاكَ", isCorrect: false },
     ],
   },
   {
@@ -2253,10 +2253,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "الرَّحْمَنِ الرَّحِيمِ",
     correctVerseMeaning: "The Most Gracious, the Most Merciful",
     options: [
-      { text: "مَالِكِ يَوْمِ الدِّينِ", isCorrect: false },
-      { text: "الرَّحْمَنِ الرَّحِيمِ", isCorrect: true },
-      { text: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", isCorrect: false },
-      { text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", isCorrect: false },
+      { text: "الرَّحْمَنِ", isCorrect: false },
+      { text: "الرَّحِيمِ", isCorrect: true },
+      { text: "مَالِكِ", isCorrect: false },
+      { text: "الدِّينِ", isCorrect: false },
     ],
   },
   {
@@ -2290,10 +2290,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
     correctVerseMeaning: "You alone we worship, and You alone we ask for help",
     options: [
-      { text: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ", isCorrect: false },
-      { text: "مَالِكِ يَوْمِ الدِّينِ", isCorrect: false },
-      { text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", isCorrect: true },
-      { text: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", isCorrect: false },
+      { text: "إِيَّاكَ", isCorrect: false },
+      { text: "نَعْبُدُ", isCorrect: true },
+      { text: "نَسْتَعِينُ", isCorrect: false },
+      { text: "الصِّرَاطَ", isCorrect: false },
     ],
   },
   {
@@ -2324,10 +2324,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "قُلْ هُوَ اللَّهُ أَحَدٌ",
     correctVerseMeaning: "Say: He is Allah, the One",
     options: [
-      { text: "اللَّهُ الصَّمَدُ", isCorrect: false },
-      { text: "قُلْ هُوَ اللَّهُ أَحَدٌ", isCorrect: true },
-      { text: "لَمْ يَلِدْ وَلَمْ يُولَدْ", isCorrect: false },
-      { text: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", isCorrect: false },
+      { text: "قُلْ", isCorrect: false },
+      { text: "هُوَ", isCorrect: false },
+      { text: "أَحَدٌ", isCorrect: true },
+      { text: "اللَّهُ", isCorrect: false },
     ],
   },
   {
@@ -2358,10 +2358,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "اللَّهُ الصَّمَدُ",
     correctVerseMeaning: "Allah, the Eternal Refuge",
     options: [
-      { text: "لَمْ يَلِدْ وَلَمْ يُولَدْ", isCorrect: false },
-      { text: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", isCorrect: false },
-      { text: "اللَّهُ الصَّمَدُ", isCorrect: true },
-      { text: "قُلْ هُوَ اللَّهُ أَحَدٌ", isCorrect: false },
+      { text: "اللَّهُ", isCorrect: false },
+      { text: "الصَّمَدُ", isCorrect: true },
+      { text: "يَلِدْ", isCorrect: false },
+      { text: "يُولَدْ", isCorrect: false },
     ],
   },
   {
@@ -2395,10 +2395,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
     correctVerseMeaning: "From the evil of the retreating whisperer",
     options: [
-      { text: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ", isCorrect: false },
-      { text: "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ", isCorrect: true },
-      { text: "مَلِكِ النَّاسِ", isCorrect: false },
-      { text: "إِلَهِ النَّاسِ", isCorrect: false },
+      { text: "مِن", isCorrect: false },
+      { text: "شَرِّ", isCorrect: false },
+      { text: "الْوَسْوَاسِ", isCorrect: true },
+      { text: "الْخَنَّاسِ", isCorrect: false },
     ],
   },
   {
@@ -2431,10 +2431,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
     correctVerseMeaning: "Say: I seek refuge in the Lord of daybreak",
     options: [
-      { text: "مِن شَرِّ مَا خَلَقَ", isCorrect: false },
-      { text: "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ", isCorrect: false },
-      { text: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", isCorrect: true },
-      { text: "وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ", isCorrect: false },
+      { text: "قُلْ", isCorrect: false },
+      { text: "أَعُوذُ", isCorrect: false },
+      { text: "بِرَبِّ", isCorrect: false },
+      { text: "الْفَلَقِ", isCorrect: true },
     ],
   },
   {
@@ -2467,10 +2467,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
     correctVerseMeaning: "Indeed, We have granted you Al-Kawthar",
     options: [
-      { text: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", isCorrect: true },
-      { text: "فَصَلِّ لِرَبِّكَ وَانْحَرْ", isCorrect: false },
-      { text: "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", isCorrect: false },
-      { text: "أَلْهَاكُمُ التَّكَاثُرُ", isCorrect: false },
+      { text: "إِنَّا", isCorrect: false },
+      { text: "أَعْطَيْنَاكَ", isCorrect: false },
+      { text: "الْكَوْثَرَ", isCorrect: true },
+      { text: "فَصَلِّ", isCorrect: false },
     ],
   },
   {
@@ -2504,10 +2504,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "فَصَلِّ لِرَبِّكَ وَانْحَرْ",
     correctVerseMeaning: "So pray to your Lord and sacrifice",
     options: [
-      { text: "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", isCorrect: false },
-      { text: "فَصَلِّ لِرَبِّكَ وَانْحَرْ", isCorrect: true },
-      { text: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", isCorrect: false },
-      { text: "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ", isCorrect: false },
+      { text: "فَصَلِّ", isCorrect: false },
+      { text: "لِرَبِّكَ", isCorrect: false },
+      { text: "انْحَرْ", isCorrect: true },
+      { text: "الْكَوْثَرَ", isCorrect: false },
     ],
   },
   {
@@ -2538,10 +2538,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
     correctVerseMeaning: "Indeed, mankind is in loss",
     options: [
-      { text: "وَالْعَصْرِ", isCorrect: false },
-      { text: "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ", isCorrect: false },
-      { text: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", isCorrect: true },
-      { text: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ", isCorrect: false },
+      { text: "إِنَّ", isCorrect: false },
+      { text: "الْإِنسَانَ", isCorrect: false },
+      { text: "لَفِي", isCorrect: false },
+      { text: "خُسْرٍ", isCorrect: true },
     ],
   },
   {
@@ -2571,10 +2571,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "وَالضُّحَى",
     correctVerseMeaning: "By the morning brightness",
     options: [
-      { text: "وَاللَّيْلِ إِذَا سَجَى", isCorrect: false },
-      { text: "وَالضُّحَى", isCorrect: true },
-      { text: "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَى", isCorrect: false },
-      { text: "وَلَلْآخِرَةُ خَيْرٌ لَّكَ مِنَ الْأُولَى", isCorrect: false },
+      { text: "الضُّحَى", isCorrect: true },
+      { text: "وَاللَّيْلِ", isCorrect: false },
+      { text: "سَجَى", isCorrect: false },
+      { text: "وَدَّعَكَ", isCorrect: false },
     ],
   },
   {
@@ -2607,10 +2607,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَى",
     correctVerseMeaning: "Did He not find you an orphan and gave you shelter?",
     options: [
-      { text: "وَوَجَدَكَ ضَالًّا فَهَدَى", isCorrect: false },
-      { text: "وَوَجَدَكَ عَائِلًا فَأَغْنَى", isCorrect: false },
-      { text: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَى", isCorrect: true },
-      { text: "وَالضُّحَى", isCorrect: false },
+      { text: "أَلَمْ", isCorrect: false },
+      { text: "يَجِدْكَ", isCorrect: false },
+      { text: "يَتِيمًا", isCorrect: true },
+      { text: "فَآوَى", isCorrect: false },
     ],
   },
   {
@@ -2643,10 +2643,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
     correctVerseMeaning: "Indeed, with hardship comes ease",
     options: [
-      { text: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ", isCorrect: false },
-      { text: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", isCorrect: true },
-      { text: "وَوَضَعْنَا عَنكَ وِزْرَكَ", isCorrect: false },
-      { text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", isCorrect: false },
+      { text: "إِنَّ", isCorrect: false },
+      { text: "مَعَ", isCorrect: false },
+      { text: "الْعُسْرِ", isCorrect: false },
+      { text: "يُسْرًا", isCorrect: true },
     ],
   },
   {
@@ -2680,10 +2680,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
     correctVerseMeaning: "Did We not expand for you your chest?",
     options: [
-      { text: "وَوَضَعْنَا عَنكَ وِزْرَكَ", isCorrect: false },
-      { text: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", isCorrect: false },
-      { text: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ", isCorrect: true },
-      { text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", isCorrect: false },
+      { text: "أَلَمْ", isCorrect: false },
+      { text: "شَرَحْنَا", isCorrect: true },
+      { text: "لَكَ", isCorrect: false },
+      { text: "صَدْرَكَ", isCorrect: false },
     ],
   },
   {
@@ -2717,10 +2717,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ",
     correctVerseMeaning: "We created man in the best form",
     options: [
-      { text: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ", isCorrect: true },
-      { text: "وَالتِّينِ وَالزَّيْتُونِ", isCorrect: false },
-      { text: "ثُمَّ رَدَدْنَاهُ أَسْفَلَ سَافِلِينَ", isCorrect: false },
-      { text: "خَلَقَ الْإِنسَانَ مِنْ عَلَقٍ", isCorrect: false },
+      { text: "خَلَقْنَا", isCorrect: false },
+      { text: "الْإِنسَانَ", isCorrect: false },
+      { text: "أَحْسَنِ", isCorrect: false },
+      { text: "تَقْوِيمٍ", isCorrect: true },
     ],
   },
   {
@@ -2753,10 +2753,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
     correctVerseMeaning: "Read in the name of your Lord who created",
     options: [
-      { text: "خَلَقَ الْإِنسَانَ مِنْ عَلَقٍ", isCorrect: false },
-      { text: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ", isCorrect: true },
-      { text: "اقْرَأْ وَرَبُّكَ الْأَكْرَمُ", isCorrect: false },
-      { text: "الَّذِي عَلَّمَ بِالْقَلَمِ", isCorrect: false },
+      { text: "اقْرَأْ", isCorrect: true },
+      { text: "بِاسْمِ", isCorrect: false },
+      { text: "رَبِّكَ", isCorrect: false },
+      { text: "خَلَقَ", isCorrect: false },
     ],
   },
   {
@@ -2786,10 +2786,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "الَّذِي عَلَّمَ بِالْقَلَمِ",
     correctVerseMeaning: "Who taught by the pen",
     options: [
-      { text: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ", isCorrect: false },
-      { text: "اقْرَأْ وَرَبُّكَ الْأَكْرَمُ", isCorrect: false },
-      { text: "الَّذِي عَلَّمَ بِالْقَلَمِ", isCorrect: true },
-      { text: "خَلَقَ الْإِنسَانَ مِنْ عَلَقٍ", isCorrect: false },
+      { text: "الَّذِي", isCorrect: false },
+      { text: "عَلَّمَ", isCorrect: false },
+      { text: "الْقَلَمِ", isCorrect: true },
+      { text: "الْإِنسَانَ", isCorrect: false },
     ],
   },
   {
@@ -2825,10 +2825,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ",
     correctVerseMeaning: "Indeed, We sent it down on the Night of Decree",
     options: [
-      { text: "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ", isCorrect: false },
-      { text: "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ", isCorrect: false },
-      { text: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ", isCorrect: true },
-      { text: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", isCorrect: false },
+      { text: "إِنَّا", isCorrect: false },
+      { text: "أَنزَلْنَاهُ", isCorrect: true },
+      { text: "لَيْلَةِ", isCorrect: false },
+      { text: "الْقَدْرِ", isCorrect: false },
     ],
   },
   {
@@ -2862,10 +2862,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "لَا أَعْبُدُ مَا تَعْبُدُونَ",
     correctVerseMeaning: "I do not worship what you worship",
     options: [
-      { text: "قُلْ يَا أَيُّهَا الْكَافِرُونَ", isCorrect: false },
-      { text: "لَا أَعْبُدُ مَا تَعْبُدُونَ", isCorrect: true },
-      { text: "لَكُمْ دِينُكُمْ وَلِيَ دِينِ", isCorrect: false },
-      { text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", isCorrect: false },
+      { text: "لَا", isCorrect: false },
+      { text: "أَعْبُدُ", isCorrect: true },
+      { text: "مَا", isCorrect: false },
+      { text: "تَعْبُدُونَ", isCorrect: false },
     ],
   },
   {
@@ -2898,10 +2898,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ",
     correctVerseMeaning: "When the victory of Allah comes and the conquest",
     options: [
-      { text: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ", isCorrect: true },
-      { text: "وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا", isCorrect: false },
-      { text: "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ", isCorrect: false },
-      { text: "لَكُمْ دِينُكُمْ وَلِيَ دِينِ", isCorrect: false },
+      { text: "جَاءَ", isCorrect: false },
+      { text: "نَصْرُ", isCorrect: false },
+      { text: "اللَّهِ", isCorrect: false },
+      { text: "الْفَتْحُ", isCorrect: true },
     ],
   },
   {
@@ -2935,10 +2935,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ",
     correctVerseMeaning: "May the hands of Abu Lahab perish, and he has perished",
     options: [
-      { text: "مَا أَغْنَى عَنْهُ مَالُهُ وَمَا كَسَبَ", isCorrect: false },
-      { text: "سَيَصْلَى نَارًا ذَاتَ لَهَبٍ", isCorrect: false },
-      { text: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ", isCorrect: true },
-      { text: "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ", isCorrect: false },
+      { text: "تَبَّتْ", isCorrect: true },
+      { text: "يَدَا", isCorrect: false },
+      { text: "أَبِي", isCorrect: false },
+      { text: "لَهَبٍ", isCorrect: false },
     ],
   },
   {
@@ -2972,10 +2972,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",
     correctVerseMeaning: "And He sent against them birds in flocks",
     options: [
-      { text: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ", isCorrect: true },
-      { text: "تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ", isCorrect: false },
-      { text: "فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ", isCorrect: false },
-      { text: "أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ", isCorrect: false },
+      { text: "وَأَرْسَلَ", isCorrect: false },
+      { text: "عَلَيْهِمْ", isCorrect: false },
+      { text: "طَيْرًا", isCorrect: false },
+      { text: "أَبَابِيلَ", isCorrect: true },
     ],
   },
   {
@@ -3009,10 +3009,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ",
     correctVerseMeaning: "Have you seen the one who denies the religion?",
     options: [
-      { text: "فَذَلِكَ الَّذِي يَدُعُّ الْيَتِيمَ", isCorrect: false },
-      { text: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ", isCorrect: true },
-      { text: "وَلَا يَحُضُّ عَلَى طَعَامِ الْمِسْكِينِ", isCorrect: false },
-      { text: "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ", isCorrect: false },
+      { text: "أَرَأَيْتَ", isCorrect: false },
+      { text: "الَّذِي", isCorrect: false },
+      { text: "يُكَذِّبُ", isCorrect: true },
+      { text: "بِالدِّينِ", isCorrect: false },
     ],
   },
   {
@@ -3046,10 +3046,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ",
     correctVerseMeaning: "Who collected wealth and counted it",
     options: [
-      { text: "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ", isCorrect: false },
-      { text: "كَلَّا لَيُنبَذَنَّ فِي الْحُطَمَةِ", isCorrect: false },
-      { text: "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ", isCorrect: true },
-      { text: "مَا أَغْنَى عَنْهُ مَالُهُ وَمَا كَسَبَ", isCorrect: false },
+      { text: "الَّذِي", isCorrect: false },
+      { text: "جَمَعَ", isCorrect: true },
+      { text: "مَالًا", isCorrect: false },
+      { text: "وَعَدَّدَهُ", isCorrect: false },
     ],
   },
   {
@@ -3083,10 +3083,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا",
     correctVerseMeaning: "When the earth is shaken with its earthquake",
     options: [
-      { text: "وَأَخْرَجَتِ الْأَرْضُ أَثْقَالَهَا", isCorrect: false },
-      { text: "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا", isCorrect: true },
-      { text: "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ", isCorrect: false },
-      { text: "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ", isCorrect: false },
+      { text: "إِذَا", isCorrect: false },
+      { text: "زُلْزِلَتِ", isCorrect: true },
+      { text: "الْأَرْضُ", isCorrect: false },
+      { text: "زِلْزَالَهَا", isCorrect: false },
     ],
   },
   {
@@ -3120,10 +3120,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ",
     correctVerseMeaning: "The Day when people will be like scattered moths",
     options: [
-      { text: "الْقَارِعَةُ", isCorrect: false },
-      { text: "مَا الْقَارِعَةُ", isCorrect: false },
-      { text: "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنفُوشِ", isCorrect: false },
-      { text: "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ", isCorrect: true },
+      { text: "النَّاسُ", isCorrect: false },
+      { text: "كَالْفَرَاشِ", isCorrect: false },
+      { text: "الْمَبْثُوثِ", isCorrect: true },
+      { text: "يَكُونُ", isCorrect: false },
     ],
   },
   {
@@ -3157,10 +3157,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "أَلْهَاكُمُ التَّكَاثُرُ",
     correctVerseMeaning: "Competition in worldly increase diverts you",
     options: [
-      { text: "حَتَّى زُرْتُمُ الْمَقَابِرَ", isCorrect: false },
-      { text: "أَلْهَاكُمُ التَّكَاثُرُ", isCorrect: true },
-      { text: "كَلَّا سَوْفَ تَعْلَمُونَ", isCorrect: false },
-      { text: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", isCorrect: false },
+      { text: "أَلْهَاكُمُ", isCorrect: false },
+      { text: "التَّكَاثُرُ", isCorrect: true },
+      { text: "الْمَقَابِرَ", isCorrect: false },
+      { text: "زُرْتُمُ", isCorrect: false },
     ],
   },
   {
@@ -3194,10 +3194,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ",
     correctVerseMeaning: "Until there came to them the clear evidence",
     options: [
-      { text: "رَسُولٌ مِّنَ اللَّهِ يَتْلُو صُحُفًا مُّطَهَّرَةً", isCorrect: false },
-      { text: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ", isCorrect: false },
-      { text: "حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ", isCorrect: true },
-      { text: "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ", isCorrect: false },
+      { text: "كَفَرُوا", isCorrect: false },
+      { text: "الْكِتَابِ", isCorrect: false },
+      { text: "مُنفَكِّينَ", isCorrect: false },
+      { text: "الْبَيِّنَةُ", isCorrect: true },
     ],
   },
   {
@@ -3233,10 +3233,10 @@ const VOCAB_BANK: VocabularyExercise[] = [
     correctVerse: "وَالْعَادِيَاتِ ضَبْحًا",
     correctVerseMeaning: "By the charging horses, panting",
     options: [
-      { text: "فَالْمُورِيَاتِ قَدْحًا", isCorrect: false },
-      { text: "فَالْمُغِيرَاتِ صُبْحًا", isCorrect: false },
-      { text: "وَالْعَادِيَاتِ ضَبْحًا", isCorrect: true },
-      { text: "وَالْعَصْرِ", isCorrect: false },
+      { text: "الْعَادِيَاتِ", isCorrect: true },
+      { text: "ضَبْحًا", isCorrect: false },
+      { text: "فَالْمُورِيَاتِ", isCorrect: false },
+      { text: "قَدْحًا", isCorrect: false },
     ],
   },
 ];

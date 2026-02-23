@@ -637,29 +637,33 @@ export default function Exercise() {
               </span>
             </div>
 
-            {/* Target Word Highlight */}
-            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-5 text-center border-2 border-primary/20">
-              <p className="text-sm font-semibold text-muted-foreground mb-3" dir={dir}>
-                {t('chooseVerseContaining')}
+            {/* Full Verse as Context */}
+            <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 text-center border border-border">
+              <p className="arabic-text text-2xl leading-loose text-foreground font-semibold" lang="ar" dir="rtl" data-testid="text-verse-context">
+                {vocabExercise?.correctVerse}
               </p>
-              {language === 'ar' ? (
-                <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
-                  {vocabExercise?.targetWord}
-                </p>
-              ) : (
-                <p className="text-3xl font-bold text-primary" data-testid="text-arabic-word">
-                  {vocabExercise?.translatedWordMeaning || vocabExercise?.targetWordMeaning}
-                </p>
-              )}
+              <p className="text-sm text-muted-foreground mt-2" dir={dir}>
+                {vocabExercise?.translatedVerseMeaning || vocabExercise?.correctVerseMeaning}
+              </p>
             </div>
 
-            {/* Multiple Choice Options - All Quranic verse fragments in Arabic */}
-            <div className="space-y-3" data-testid="options-container">
+            {/* Question: What word means X? */}
+            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 text-center border-2 border-primary/20">
+              <p className="text-sm font-semibold text-muted-foreground mb-2" dir={dir}>
+                {t('chooseVerseContaining')}
+              </p>
+              <p className="text-2xl font-bold text-primary" dir={dir} data-testid="text-arabic-word">
+                {vocabExercise?.translatedWordMeaning || vocabExercise?.targetWordMeaning}
+              </p>
+            </div>
+
+            {/* Multiple Choice Options - Individual Arabic Words */}
+            <div className="grid grid-cols-2 gap-3" data-testid="options-container">
               {vocabExercise?.options?.map((option, index) => {
                 const isSelected = selectedOption === option.text;
                 const showResult = isAnswered;
                 const optionIsCorrect = option.isCorrect;
-                let optionClass = "w-full text-right p-4 rounded-lg border-2 transition-all duration-200 text-base font-medium ";
+                let optionClass = "w-full text-center p-4 rounded-lg border-2 transition-all duration-200 ";
                 if (showResult && optionIsCorrect) {
                   optionClass += "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200";
                 } else if (showResult && isSelected && !optionIsCorrect) {
@@ -679,13 +683,13 @@ export default function Exercise() {
                     lang="ar"
                     data-testid={`option-${index}`}
                   >
-                    <span className="inline-flex items-center gap-3 w-full">
-                      <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold shrink-0">
+                    <span className="flex flex-col items-center gap-1">
+                      <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0">
                         {String.fromCharCode(65 + index)}
                       </span>
-                      <span className="arabic-text text-lg flex-1">{option.text}</span>
-                      {showResult && optionIsCorrect && <span className="shrink-0">✅</span>}
-                      {showResult && isSelected && !optionIsCorrect && <span className="shrink-0">❌</span>}
+                      <span className="arabic-text text-xl font-bold">{option.text}</span>
+                      {showResult && optionIsCorrect && <span>✅</span>}
+                      {showResult && isSelected && !optionIsCorrect && <span>❌</span>}
                     </span>
                   </button>
                 );

@@ -1,0 +1,34 @@
+Strict System Rule for Exercise Generation & UI:
+You are building an Arabic language learning tool based on Quranic vocabulary. We are shifting the logic from "matching a whole verse" to "extracting specific literal words".
+
+You must strictly follow these rules from now on:
+
+1. Process Order (Verse First):
+ALWAYS start by selecting a verse first. Then, formulate the question based on a specific target word or short phrase inside that verse.
+
+2. Strict Answer Constraint (Literal Linguistic Meaning Only):
+The correct answer MUST be an exact single Arabic word or a short text snippet extracted directly from the verse. It must NEVER be the entire verse.
+The meaning you teach must be the direct, literal linguistic translation (تعلم اللغة), NOT the Islamic exegesis (Tafsir) or intended religious meaning.
+Example: > Verse: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ"
+Question: Which word exactly means "The Dawn / Daybreak"?
+Correct Answer: "الْفَلَقِ" (NOT the whole verse, and no Tafsir explanations).
+
+3. UI / Frontend Redesign:
+Update the React UI components for the exercises to reflect this new concept.
+The UI should present the Question like: "What is the exact Arabic word for [Target Meaning in User's Language] in this verse?"
+Show the full Verse as context.
+The multiple-choice options (A, B, C, D) must now be individual Arabic words or short snippets, NOT full verses.
+
+Action Required:
+
+Update your exercise data generation logic to output specific words as answers, focusing strictly on literal meanings.
+
+Rewrite the UI component (e.g., Exercise.js or similar) so the options map to words, not full verses.
+Do not explain, just execute the data structure and UI changes and confirm when done.
+
+ماذا سيفعل هذا الأمر؟
+يعكس العملية (Reverse Engineering): سيجعل البرنامج يقرأ الآية أولاً، ثم يسأل المستخدم: "أين الكلمة التي تعني كذا؟".
+
+يمنع التفسير الديني: ركزنا له على مصطلح Literal Linguistic Meaning ليتوقف عن إعطاء شروحات شرعية ويركز على الترجمة الحرفية (مثلاً: الفلق = الصبح).
+
+يغير شكل الأزرار (الخيارات): بدلاً من أن تكون الخيارات (A, B, C, D) عبارة عن آيات كاملة طويلة، ستصبح الخيارات عبارة عن كلمات قصيرة (مثلاً: A: أعوذ، B: برب، C: الفلق)، وهذا يتماشى تماماً مع هدفك التعليمي.
