@@ -1,15 +1,6 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import AudioButton from "./audio-button";
 import type { Phrase } from "@shared/schema";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -21,8 +12,17 @@ interface ExerciseCardProps {
   phrase?: Phrase;
   onStart: (type: string, phraseId?: string) => void;
   variant?: "primary" | "secondary" | "accent";
-  useRandomFromServer?: boolean; // If true, don't pass phraseId - let server select non-repeated phrase
+  useRandomFromServer?: boolean;
 }
+
+const SAMPLE_PREVIEWS = [
+  { targetWord: "أَبَابِيلَ", options: ["طَيْرًا أَبَابِيلَ", "بِحِجَارَةٍ مِّن سِجِّيلٍ", "كَعَصْفٍ مَّأْكُولٍ", "كَيْدَهُمْ فِي تَضْلِيلٍ"], surah: "الفيل" },
+  { targetWord: "الصِّرَاطَ", options: ["اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", "مَالِكِ يَوْمِ الدِّينِ", "رَبِّ الْعَالَمِينَ", "الرَّحْمَنِ الرَّحِيمِ"], surah: "الفاتحة" },
+  { targetWord: "الْكَوْثَرَ", options: ["أَعْطَيْنَاكَ الْكَوْثَرَ", "فَصَلِّ لِرَبِّكَ وَانْحَرْ", "شَانِئَكَ هُوَ الْأَبْتَرُ", "لِإِيلَافِ قُرَيْشٍ"], surah: "الكوثر" },
+  { targetWord: "الْفَلَقِ", options: ["أَعُوذُ بِرَبِّ الْفَلَقِ", "مِن شَرِّ مَا خَلَقَ", "غَاسِقٍ إِذَا وَقَبَ", "النَّفَّاثَاتِ فِي الْعُقَدِ"], surah: "الفلق" },
+  { targetWord: "أَحَدٌ", options: ["قُلْ هُوَ اللَّهُ أَحَدٌ", "اللَّهُ الصَّمَدُ", "لَمْ يَلِدْ وَلَمْ يُولَدْ", "كُفُوًا أَحَدٌ"], surah: "الإخلاص" },
+  { targetWord: "الضُّحَى", options: ["وَالضُّحَى", "وَاللَّيْلِ إِذَا سَجَى", "مَا وَدَّعَكَ رَبُّكَ", "وَلَلْآخِرَةُ خَيْرٌ لَّكَ"], surah: "الضحى" },
+];
 
 export default function ExerciseCard({
   type,
@@ -34,8 +34,13 @@ export default function ExerciseCard({
   variant = "primary",
   useRandomFromServer = false,
 }: ExerciseCardProps) {
-  const [userInput, setUserInput] = useState("");
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  useEffect(() => {
+    const typeHash = type === 'daily_contextual' ? 0 : type === 'conversation' ? 2 : 4;
+    setPreviewIndex(typeHash % SAMPLE_PREVIEWS.length);
+  }, [type]);
 
   const variantStyles = {
     primary: "bg-primary/10 text-primary",
@@ -50,225 +55,50 @@ export default function ExerciseCard({
   };
 
   const handleStart = () => {
-    // If useRandomFromServer is true, don't pass phraseId
-    // This allows the server to select a non-repeated phrase for the user
     onStart(type, useRandomFromServer ? undefined : phrase?.id);
   };
 
-  const renderExerciseContent = () => {
-    switch (type) {
-      case "substitution":
-        return phrase ? (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <p
-                className="arabic-text text-lg text-foreground mb-2"
-                lang="ar"
-                data-testid="text-phrase-arabic"
-              >
-                {phrase.arabicText}
-              </p>
-              <p
-                className="text-sm text-muted-foreground"
-                data-testid="text-phrase-english"
-              >
-                {phrase.englishTranslation}
-              </p>
-            </div>
-            <p className="text-sm text-foreground mb-3">
-              {t('replaceWordInstruction')}
-            </p>
-            <Input
-              type="text"
-              className="arabic-text text-right"
-              placeholder={t('substitutionPlaceholder')}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              data-testid="input-substitution"
-            />
-          </div>
-        ) : null;
+  const preview = SAMPLE_PREVIEWS[previewIndex];
 
-      case "conversation":
-        return (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <p className="text-sm text-foreground font-medium mb-2">
-                {t('howDoYouSay')}
-              </p>
-              <p
-                className="text-foreground"
-                data-testid="text-conversation-prompt"
-              >
-                "{t('godIsWatchingExample')}"
-              </p>
-            </div>
-            <Textarea
-              className="arabic-text text-right"
-              rows={2}
-              placeholder={t('conversationPlaceholder')}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              data-testid="textarea-conversation"
-            />
-          </div>
-        );
-
-      case "completion":
-        const completionOptions = [
-          { arabic: "المحسنين", english: "the doers of good" },
-          { arabic: "المتوكلين", english: "those who put trust (in God)" },
-          { arabic: "الصابرين", english: "the patient ones" },
-          { arabic: "المقسطين", english: "those who are just" },
-        ];
-
-        return phrase ? (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <p
-                className="arabic-text text-lg text-foreground mb-2"
-                lang="ar"
-                data-testid="text-completion-prompt"
-              >
-                إِنَّ اللَّهَ يُحِبُّ ...
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Indeed, Allah loves...
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {completionOptions.map((option, index) => (
-                <TooltipProvider key={index}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="arabic-text text-sm hover:bg-muted transition-colors"
-                        onClick={() => setUserInput(option.arabic)}
-                        data-testid={`button-completion-${index}`}
-                      >
-                        {option.arabic}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-sm">{option.english}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ))}
-            </div>
-          </div>
-        ) : null;
-
-      case "comparison":
-        return (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3 space-y-3">
-              <div>
-                <p
-                  className="arabic-text text-sm text-foreground mb-1"
-                  lang="ar"
-                  data-testid="text-comparison-phrase1"
-                >
-                  إِنَّ مَعَ الْعُسْرِ يُسْرًا
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Indeed, with hardship comes ease
-                </p>
-              </div>
-              <hr className="border-border" />
-              <div>
-                <p
-                  className="arabic-text text-sm text-foreground mb-1"
-                  lang="ar"
-                  data-testid="text-comparison-phrase2"
-                >
-                  إِنَّ اللَّهَ مَعَ الصَّابِرِينَ
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Indeed, Allah is with the patient
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-foreground mb-2">
-              {t('explainDifferenceInstruction')}
-            </p>
-            <Textarea
-              className="arabic-text text-right"
-              rows={2}
-              placeholder={t('comparisonPlaceholder')}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              data-testid="textarea-comparison"
-            />
-          </div>
-        );
-
-      case "roleplay":
-        return (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <div className="flex items-start space-x-3">
-                <div className="mt-1">👥</div>
-                <div>
-                  <p className="text-sm text-foreground font-medium mb-1">
-                    {t('scenario')}:
-                  </p>
-                  <p
-                    className="text-sm text-muted-foreground"
-                    data-testid="text-roleplay-scenario"
-                  >
-                    {t('consoleFriendScenario')}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <Textarea
-              className="arabic-text text-right"
-              rows={2}
-              placeholder={t('roleplayPlaceholder')}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              data-testid="textarea-roleplay"
-            />
-          </div>
-        );
-
-      case "transformation":
-        return (
-          <div className="mb-4">
-            <div className="bg-muted/50 rounded-lg p-4 mb-3">
-              <p className="text-xs text-muted-foreground mb-2">
-                {t('philosophicalSentenceLabel')}
-              </p>
-              <p
-                className="arabic-text text-lg text-foreground mb-3"
-                lang="ar"
-                dir="rtl"
-                data-testid="text-transformation-philosophical"
-              >
-                💎 {phrase?.arabicText || "الحكمة ضالة المؤمن"}
-              </p>
-              <p className="text-xs text-muted-foreground font-medium">
-                {t('transformationInstruction')}
-              </p>
-            </div>
-            <Textarea
-              className="arabic-text text-right"
-              rows={3}
-              placeholder={t('transformationPlaceholder')}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              data-testid="textarea-transformation"
-              dir="rtl"
+  const renderVocabPreview = () => {
+    return (
+      <div className="mb-4">
+        <div className="bg-primary/5 dark:bg-primary/10 rounded-lg p-3 text-center border border-primary/20 mb-3">
+          <p className="text-xs font-medium text-muted-foreground mb-1">
+            {t('chooseVerseContaining')}
+          </p>
+          <p className="arabic-text text-xl font-bold text-primary" lang="ar" dir="rtl">
+            {preview.targetWord}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            📖 {t('surahLabel')} {preview.surah}
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          {preview.options.slice(0, 3).map((option, i) => (
+            <div
+              key={i}
+              className={`text-sm arabic-text rounded-md px-3 py-1.5 border text-right ${
+                i === 0
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
+                  : 'bg-muted/30 border-border text-muted-foreground'
+              }`}
               lang="ar"
-            />
-          </div>
-        );
-
-      default:
-        return null;
-    }
+              dir="rtl"
+            >
+              <span className="inline-flex items-center gap-2 w-full">
+                <span className="w-5 h-5 rounded-full bg-muted/50 flex items-center justify-center text-[10px] font-bold shrink-0">
+                  {String.fromCharCode(65 + i)}
+                </span>
+                <span className="flex-1">{option}</span>
+                {i === 0 && <span className="shrink-0">✅</span>}
+              </span>
+            </div>
+          ))}
+          <div className="text-xs text-center text-muted-foreground">...</div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -299,19 +129,9 @@ export default function ExerciseCard({
           </div>
         </div>
 
-        {renderExerciseContent()}
+        {renderVocabPreview()}
 
-        <div className="flex justify-between items-center">
-          {/* Only show audio button for exercise types that use the phrase */}
-          {phrase && type !== "conversation" && type !== "roleplay" && (
-            <AudioButton
-              text={phrase.arabicText}
-              lang="ar-SA"
-              className="text-primary hover:text-primary/80"
-              data-testid={`button-audio-exercise-${type}`}
-            />
-          )}
-          {(!phrase || type === "conversation" || type === "roleplay") && <div />}
+        <div className="flex justify-end">
           <Button
             className={`text-sm transition-colors ${buttonStyles[variant]}`}
             onClick={handleStart}
