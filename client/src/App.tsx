@@ -20,7 +20,6 @@ import TranslationManager from "@/pages/translation-manager";
 import Analytics from "@/pages/Analytics";
 import DiplomaPage from "@/pages/diploma";
 import AdminPage from "@/pages/admin";
-import ChatPage from "@/pages/chat";
 import ScholarshipStatus from "@/pages/ScholarshipStatus";
 
 function Router() {
@@ -34,7 +33,6 @@ function Router() {
       <Route path="/exercise/:type/:phraseId?" component={Exercise} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/diploma" component={DiplomaPage} />
-      <Route path="/chat" component={ChatPage} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
       <Route path="/profile" component={Profile} />
