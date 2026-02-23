@@ -46,7 +46,7 @@ import { philosophicalSentencesData } from "../client/src/lib/philosophical-sent
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer } from "./ai-service";
+import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer, getVocabBankSurahs } from "./ai-service";
 import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
 async function assignWaitingStudents() {
@@ -651,12 +651,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get available surahs from vocabulary bank
+  app.get("/api/vocabulary-surahs", (req, res) => {
+    try {
+      const surahs = getVocabBankSurahs();
+      res.json(surahs);
+    } catch (error) {
+      console.error("Error getting vocabulary surahs:", error);
+      res.status(500).json({ message: "Failed to get vocabulary surahs" });
+    }
+  });
+
   // Vocabulary Exercise routes (AI-generated, vocabulary-focused from allowed surahs only)
   app.get("/api/vocabulary-exercise", async (req, res) => {
     try {
-      const { language } = req.query;
+      const { language, surah } = req.query;
       const lang = typeof language === "string" ? language : "en";
-      const exercise = await generateVocabularyExercise(lang);
+      const surahFilter = typeof surah === "string" ? surah : undefined;
+      const exercise = await generateVocabularyExercise(lang, surahFilter);
       res.json(exercise);
     } catch (error) {
       console.error("Error generating vocabulary exercise:", error);

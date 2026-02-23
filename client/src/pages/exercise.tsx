@@ -29,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { surahList, type Surah } from "@/data/surah-list";
 import SubscriptionGate from "@/components/subscription-gate";
 
 
@@ -67,12 +66,12 @@ export default function Exercise() {
   const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
 
   // Surah selection and navigation
-  const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
+  const [selectedSurahName, setSelectedSurahName] = useState<string | null>(null);
   const [showSurahSelector, setShowSurahSelector] = useState(false);
 
-  // Fetch available surahs
-  const { data: availableSurahs = [] } = useQuery<{ number: number; nameArabic: string; nameEnglish: string; count: number }[]>({
-    queryKey: ["/api/surahs/available"],
+  // Fetch available surahs from vocabulary bank (only short surahs + Al-Fatiha)
+  const { data: vocabSurahs = [] } = useQuery<{ surahAr: string; surahEn: string; count: number }[]>({
+    queryKey: ["/api/vocabulary-surahs"],
   });
 
   // Fetch data based on exercise type
@@ -146,9 +145,11 @@ export default function Exercise() {
     translatedWordMeaning: string;
     translatedVerseMeaning: string;
   }>({
-    queryKey: ["/api/vocabulary-exercise", language, exerciseType],
+    queryKey: ["/api/vocabulary-exercise", language, exerciseType, selectedSurahName],
     queryFn: async () => {
-      const response = await fetch(`/api/vocabulary-exercise?language=${language}`);
+      const params = new URLSearchParams({ language });
+      if (selectedSurahName) params.set('surah', selectedSurahName);
+      const response = await fetch(`/api/vocabulary-exercise?${params}`);
       if (!response.ok) throw new Error("Failed to fetch vocabulary exercise");
       return response.json();
     },
@@ -463,75 +464,32 @@ export default function Exercise() {
     }
   };
 
-  // Navigate to previous surah
+  // Navigate to previous surah in vocabulary list
   const goToPreviousSurah = () => {
-    if (!selectedSurah || selectedSurah <= 1) return;
-    
-    const prevSurahNum = selectedSurah - 1;
-    const prevSurah = availableSurahs.find(s => s.number === prevSurahNum);
-    
-    if (prevSurah) {
-      setSelectedSurah(prevSurahNum);
+    if (!selectedSurahName || vocabSurahs.length === 0) return;
+    const currentIdx = vocabSurahs.findIndex(s => s.surahAr === selectedSurahName);
+    if (currentIdx > 0) {
+      const prev = vocabSurahs[currentIdx - 1];
+      setSelectedSurahName(prev.surahAr);
       resetExercise();
       setSelectedOption(null);
-      toast({
-        title: language === 'ar' ? `سورة ${prevSurah.nameArabic}` : prevSurah.nameEnglish,
-        description: language === 'ar' ? `${prevSurah.count} تمرين متاح` : `${prevSurah.count} exercises available`,
-      });
-    } else {
-      // Find the closest available surah before this one
-      const closestPrev = availableSurahs
-        .filter(s => s.number < selectedSurah)
-        .sort((a, b) => b.number - a.number)[0];
-      
-      if (closestPrev) {
-        setSelectedSurah(closestPrev.number);
-        resetExercise();
-        setSelectedOption(null);
-        toast({
-          title: language === 'ar' ? `سورة ${closestPrev.nameArabic}` : closestPrev.nameEnglish,
-          description: language === 'ar' ? `${closestPrev.count} تمرين متاح` : `${closestPrev.count} exercises available`,
-        });
-      }
     }
   };
 
-  // Navigate to next surah
+  // Navigate to next surah in vocabulary list
   const goToNextSurah = () => {
-    if (!selectedSurah || selectedSurah >= 114) return;
-    
-    const nextSurahNum = selectedSurah + 1;
-    const nextSurah = availableSurahs.find(s => s.number === nextSurahNum);
-    
-    if (nextSurah) {
-      setSelectedSurah(nextSurahNum);
+    if (!selectedSurahName || vocabSurahs.length === 0) return;
+    const currentIdx = vocabSurahs.findIndex(s => s.surahAr === selectedSurahName);
+    if (currentIdx < vocabSurahs.length - 1) {
+      const next = vocabSurahs[currentIdx + 1];
+      setSelectedSurahName(next.surahAr);
       resetExercise();
       setSelectedOption(null);
-      toast({
-        title: language === 'ar' ? `سورة ${nextSurah.nameArabic}` : nextSurah.nameEnglish,
-        description: language === 'ar' ? `${nextSurah.count} تمرين متاح` : `${nextSurah.count} exercises available`,
-      });
-    } else {
-      // Find the closest available surah after this one
-      const closestNext = availableSurahs
-        .filter(s => s.number > selectedSurah)
-        .sort((a, b) => a.number - b.number)[0];
-      
-      if (closestNext) {
-        setSelectedSurah(closestNext.number);
-        resetExercise();
-        setSelectedOption(null);
-        toast({
-          title: language === 'ar' ? `سورة ${closestNext.nameArabic}` : closestNext.nameEnglish,
-          description: language === 'ar' ? `${closestNext.count} تمرين متاح` : `${closestNext.count} exercises available`,
-        });
-      }
     }
   };
 
-  // Get current surah info
-  const currentSurahInfo = selectedSurah 
-    ? availableSurahs.find(s => s.number === selectedSurah) || surahList.find(s => s.number === selectedSurah)
+  const currentSurahInfo = selectedSurahName
+    ? vocabSurahs.find(s => s.surahAr === selectedSurahName)
     : null;
 
   const renderExerciseContent = () => {
@@ -1016,52 +974,42 @@ export default function Exercise() {
                 variant="outline"
                 size="icon"
                 onClick={goToPreviousSurah}
-                disabled={!selectedSurah || selectedSurah <= 1}
+                disabled={!selectedSurahName || vocabSurahs.findIndex(s => s.surahAr === selectedSurahName) <= 0}
                 data-testid="button-prev-surah"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
               
               <Select
-                value={selectedSurah?.toString() || ""}
+                value={selectedSurahName || "all"}
                 onValueChange={(value) => {
-                  const surahNum = parseInt(value);
-                  setSelectedSurah(surahNum);
+                  if (value === "all") {
+                    setSelectedSurahName(null);
+                  } else {
+                    setSelectedSurahName(value);
+                  }
                   resetExercise();
                   setSelectedOption(null);
-                  const surah = availableSurahs.find(s => s.number === surahNum);
-                  if (surah) {
-                    toast({
-                      title: language === 'ar' ? `سورة ${surah.nameArabic}` : surah.nameEnglish,
-                      description: language === 'ar' ? `${surah.count} تمرين متاح` : `${surah.count} exercises available`,
-                    });
-                  }
                 }}
               >
                 <SelectTrigger className="flex-1" data-testid="select-surah">
-                  <SelectValue placeholder={language === 'ar' ? 'اختر سورة...' : 'Choose a Surah...'} />
+                  <SelectValue placeholder={language === 'ar' ? 'جميع السور' : 'All Surahs'} />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
-                  {availableSurahs.length > 0 ? (
-                    availableSurahs.map((surah) => (
-                      <SelectItem key={surah.number} value={surah.number.toString()}>
-                        <span className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm">{surah.number}.</span>
-                          <span className="arabic-text">{surah.nameArabic}</span>
-                          <span className="text-muted-foreground text-sm">({surah.count})</span>
-                        </span>
-                      </SelectItem>
-                    ))
-                  ) : (
-                    surahList.map((surah) => (
-                      <SelectItem key={surah.number} value={surah.number.toString()}>
-                        <span className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm">{surah.number}.</span>
-                          <span className="arabic-text">{surah.nameArabic}</span>
-                        </span>
-                      </SelectItem>
-                    ))
-                  )}
+                  <SelectItem value="all">
+                    <span className="flex items-center gap-2">
+                      <span>{language === 'ar' ? 'جميع السور' : 'All Surahs'}</span>
+                    </span>
+                  </SelectItem>
+                  {vocabSurahs.map((surah) => (
+                    <SelectItem key={surah.surahAr} value={surah.surahAr}>
+                      <span className="flex items-center gap-2">
+                        <span className="arabic-text">{surah.surahAr}</span>
+                        <span className="text-muted-foreground text-sm">({language === 'ar' ? surah.surahEn : surah.surahEn})</span>
+                        <span className="text-muted-foreground text-xs">({surah.count})</span>
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               
@@ -1069,18 +1017,18 @@ export default function Exercise() {
                 variant="outline"
                 size="icon"
                 onClick={goToNextSurah}
-                disabled={!selectedSurah || selectedSurah >= 114}
+                disabled={!selectedSurahName || vocabSurahs.findIndex(s => s.surahAr === selectedSurahName) >= vocabSurahs.length - 1}
                 data-testid="button-next-surah"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             </div>
             
-            {selectedSurah && currentSurahInfo && (
+            {selectedSurahName && currentSurahInfo && (
               <div className="text-sm text-muted-foreground">
                 {language === 'ar' 
-                  ? `سورة ${(currentSurahInfo as any).nameArabic || ''}`
-                  : (currentSurahInfo as any).nameEnglish || (currentSurahInfo as Surah).nameEnglish}
+                  ? `${currentSurahInfo.count} تمرين`
+                  : `${currentSurahInfo.count} exercises`}
               </div>
             )}
           </div>

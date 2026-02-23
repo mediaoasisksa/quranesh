@@ -3250,8 +3250,24 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-export async function generateVocabularyExercise(userLanguage: string = 'en'): Promise<VocabularyExercise & { translatedWordMeaning: string; translatedVerseMeaning: string }> {
-  const exercise = VOCAB_BANK[Math.floor(Math.random() * VOCAB_BANK.length)];
+export function getVocabBankSurahs(): { surahAr: string; surahEn: string; count: number }[] {
+  const surahMap: Record<string, { surahAr: string; surahEn: string; count: number }> = {};
+  for (const ex of VOCAB_BANK) {
+    if (!surahMap[ex.surahAr]) {
+      surahMap[ex.surahAr] = { surahAr: ex.surahAr, surahEn: ex.surahEn, count: 0 };
+    }
+    surahMap[ex.surahAr].count++;
+  }
+  return Object.values(surahMap);
+}
+
+export async function generateVocabularyExercise(userLanguage: string = 'en', surahFilter?: string): Promise<VocabularyExercise & { translatedWordMeaning: string; translatedVerseMeaning: string }> {
+  let pool = VOCAB_BANK;
+  if (surahFilter) {
+    const filtered = VOCAB_BANK.filter(e => e.surahAr === surahFilter || e.surahEn === surahFilter);
+    if (filtered.length > 0) pool = filtered;
+  }
+  const exercise = pool[Math.floor(Math.random() * pool.length)];
   const shuffledOptions = shuffleArray(exercise.options);
   const translatedWordMeaning = exercise.targetWordTranslations[userLanguage] || exercise.targetWordTranslations['en'] || exercise.targetWordMeaning;
   const translatedVerseMeaning = exercise.correctVerseMeaningTranslations[userLanguage] || exercise.correctVerseMeaningTranslations['en'] || exercise.correctVerseMeaning;
