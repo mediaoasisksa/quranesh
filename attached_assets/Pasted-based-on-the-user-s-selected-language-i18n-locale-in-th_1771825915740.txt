@@ -1,0 +1,48 @@
+based on the user's selected language (i18n/locale) in the Exercise component. Stop hardcoding translations like (The Path).
+
+Step 1: Update the Data Source
+Find the data file containing the exercises (search for "أَنزَلْنَاهُ", "الْفَلَقِ", or "تَبَّتْ"). Update these specific objects to include a wordTranslations object and a surahTranslations object.
+Apply this exact data structure:
+
+JavaScript
+{
+  // Example for Al-Qadr
+  surahName: "Al-Qadr",
+  verseNumber: 1,
+  targetWord: "أَنزَلْنَاهُ",
+  wordTranslations: {
+    en: "We sent it down",
+    id: "Kami menurunkannya",
+    tr: "Biz onu indirdik",
+    ar: "أنزلناه"
+  },
+  surahTranslations: {
+    en: "Surah Al-Qadr — Verse",
+    id: "Surah Al-Qadr — Ayat",
+    tr: "Kadir Suresi — Ayet",
+    ar: "سورة القدر — الآية"
+  }
+  // ... do the exact same logic for Al-Falaq ("The Daybreak", "Waktu Subuh") and Al-Masad ("Perish", "Binasalah").
+}
+Step 2: Update the React Component
+Find the UI component rendering the exercise (Search for the JSX rendering {targetWord}).
+Modify the component logic to use the active language from your i18n setup (e.g., const currentLang = i18n.language || 'en';).
+
+Step 3: Replace the Hardcoded JSX
+Replace the current header and word display with this dynamic conditional rendering:
+
+JavaScript
+// 1. Dynamic Header
+<h4>
+  📖 {currentExercise.surahTranslations[currentLang] || currentExercise.surahTranslations['en']} {currentExercise.verseNumber}
+</h4>
+// 2. Dynamic Target Word Translation
+
+Execution Rule: Do not explain. Just find the files, apply the structural changes to the data array, and update the component JSX. Confirm when done.
+
+لماذا سيعمل هذا التوجيه بصرامة؟
+أجبرناه على تغيير هيكل البيانات (Data Structure): بدلاً من طلب "ترجمة الكلمة"، أعطيناه الكود الجاهز (wordTranslations) ليضعه داخل قاعدة البيانات الخاصة بالأسئلة.
+
+منعناه من التثبيت (Hardcoding): أشرنا بوضوح إلى أن وضع كلمة (The Path) بشكل ثابت هو خطأ، ويجب ربطها بمتغير اللغة الحالي (currentLang).
+
+شملنا ترويسة السورة: تمت إضافة كود مخصص ليترجم كلمة "Verse" و "Ayat" و "الآية" بناءً على اللغة المحددة في الصفحة.

@@ -229,8 +229,8 @@ export default function Exercise() {
       setIsAnswered(true);
       const correctVerseText = vocabExercise.correctVerse;
       setFeedback(answeredCorrectly 
-        ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
-        : (language === 'ar' ? `❌ الإجابة الصحيحة: ${correctVerseText}` : `❌ The correct answer: ${correctVerseText}`));
+        ? `✅ ${t('correctAnswer')}!` 
+        : `❌ ${t('incorrect')}: ${correctVerseText}`);
       setFeedbackGrade(answeredCorrectly ? 'exact_match' : 'incorrect');
       submitSessionMutation.mutate({
         userId,
@@ -727,8 +727,8 @@ export default function Exercise() {
               <div className={`rounded-lg p-4 border animate-in fade-in duration-300 ${isCorrect ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700' : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'}`}>
                 <p className={`text-sm font-bold mb-2 ${isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                   {isCorrect 
-                    ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
-                    : (language === 'ar' ? '❌ إجابة خاطئة' : '❌ Incorrect')}
+                    ? `✅ ${t('correctAnswer')}!` 
+                    : `❌ ${t('incorrect')}`}
                 </p>
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-3">
@@ -736,8 +736,8 @@ export default function Exercise() {
                       {vocabExercise.targetWord}
                     </p>
                     <span className="text-muted-foreground">=</span>
-                    <p className="text-lg font-semibold text-foreground">
-                      {vocabExercise.targetWordMeaning}
+                    <p className="text-lg font-semibold text-foreground" dir={dir}>
+                      {vocabExercise.translatedWordMeaning || vocabExercise.targetWordMeaning}
                     </p>
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 mt-2">
@@ -749,8 +749,10 @@ export default function Exercise() {
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2" dir="rtl">
-                  📖 {vocabExercise.surahAyah}
+                <p className="text-sm text-muted-foreground mt-2">
+                  📖 {language === 'ar' 
+                    ? `سورة ${vocabExercise.surahAr} — آية ${vocabExercise.ayahNumber}` 
+                    : `${t('surahLabel')} ${vocabExercise.surahEn} — ${t('verseLabel')} ${vocabExercise.ayahNumber}`}
                 </p>
               </div>
             )}
@@ -1353,7 +1355,9 @@ export default function Exercise() {
                       {t('source')}
                     </p>
                     <p className="text-foreground" data-testid="text-conversation-source">
-                      {vocabExercise.surahAyah}
+                      {language === 'ar' 
+                        ? `سورة ${vocabExercise.surahAr} — آية ${vocabExercise.ayahNumber}` 
+                        : `${t('surahLabel')} ${vocabExercise.surahEn} — ${t('verseLabel')} ${vocabExercise.ayahNumber}`}
                     </p>
                   </div>
                 </div>
@@ -1365,8 +1369,8 @@ export default function Exercise() {
                     <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse" lang="ar" dir="rtl">
                       {vocabExercise.correctVerse}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {vocabExercise.correctVerseMeaning}
+                    <p className="text-sm text-muted-foreground mt-1" dir={dir}>
+                      {vocabExercise.translatedVerseMeaning || vocabExercise.correctVerseMeaning}
                     </p>
                   </div>
                 )}
