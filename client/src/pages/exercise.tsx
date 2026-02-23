@@ -959,77 +959,17 @@ export default function Exercise() {
 
       {/* Exercise Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Surah Selector Bar */}
+        {/* Surah Al-Kahf Badge */}
         <div className="mb-6 bg-card rounded-lg border p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <span className="font-medium text-foreground">
-                {language === 'ar' ? 'اختر السورة:' : 'Select Surah:'}
+          <div className="flex items-center justify-center gap-3">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <span className="font-semibold text-lg text-foreground arabic-text">سورة الكهف</span>
+            <span className="text-muted-foreground">—</span>
+            <span className="text-muted-foreground">Surah Al-Kahf</span>
+            {vocabSurahs.length > 0 && (
+              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                {vocabSurahs[0]?.count} {language === 'ar' ? 'كلمة' : 'words'}
               </span>
-            </div>
-            
-            <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goToPreviousSurah}
-                disabled={!selectedSurahName || vocabSurahs.findIndex(s => s.surahAr === selectedSurahName) <= 0}
-                data-testid="button-prev-surah"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              
-              <Select
-                value={selectedSurahName || "all"}
-                onValueChange={(value) => {
-                  if (value === "all") {
-                    setSelectedSurahName(null);
-                  } else {
-                    setSelectedSurahName(value);
-                  }
-                  resetExercise();
-                  setSelectedOption(null);
-                }}
-              >
-                <SelectTrigger className="flex-1" data-testid="select-surah">
-                  <SelectValue placeholder={language === 'ar' ? 'جميع السور' : 'All Surahs'} />
-                </SelectTrigger>
-                <SelectContent className="max-h-80">
-                  <SelectItem value="all">
-                    <span className="flex items-center gap-2">
-                      <span>{language === 'ar' ? 'جميع السور' : 'All Surahs'}</span>
-                    </span>
-                  </SelectItem>
-                  {vocabSurahs.map((surah) => (
-                    <SelectItem key={surah.surahAr} value={surah.surahAr}>
-                      <span className="flex items-center gap-2">
-                        <span className="arabic-text">{surah.surahAr}</span>
-                        <span className="text-muted-foreground text-sm">({language === 'ar' ? surah.surahEn : surah.surahEn})</span>
-                        <span className="text-muted-foreground text-xs">({surah.count})</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goToNextSurah}
-                disabled={!selectedSurahName || vocabSurahs.findIndex(s => s.surahAr === selectedSurahName) >= vocabSurahs.length - 1}
-                data-testid="button-next-surah"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            {selectedSurahName && currentSurahInfo && (
-              <div className="text-sm text-muted-foreground">
-                {language === 'ar' 
-                  ? `${currentSurahInfo.count} تمرين`
-                  : `${currentSurahInfo.count} exercises`}
-              </div>
             )}
           </div>
         </div>
