@@ -21,7 +21,6 @@ import {
   LogOut,
   Settings,
   Languages,
-  BookOpen,
   Book,
   ExternalLink,
 } from "lucide-react";
@@ -328,36 +327,6 @@ export default function Dashboard() {
               );
             })}
             
-            {/* Quranic Expressions in Daily Life Card */}
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-primary/20 dark:border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20"
-              onClick={() => setLocation("/real-life-examples")}
-              data-testid="card-real-life-examples"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2 text-foreground">
-                      {t('realLifeExamplesTitle')}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {t('realLifeExamplesDesc')}
-                    </p>
-                  </div>
-                  <BookOpen className="h-10 w-10 text-primary shrink-0" />
-                </div>
-                <Button 
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLocation("/real-life-examples");
-                  }}
-                >
-                  {t('browseExamples')}
-                </Button>
-              </CardContent>
-            </Card>
-
             <Card 
               className="cursor-pointer hover:shadow-lg transition-shadow duration-200 border-2 border-emerald-200 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20"
               onClick={() => setLocation("/chat")}
