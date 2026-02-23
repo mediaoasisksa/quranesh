@@ -642,17 +642,13 @@ export default function Exercise() {
               <p className="text-sm font-semibold text-muted-foreground mb-3" dir={dir}>
                 {t('chooseVerseContaining')}
               </p>
-              <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
-                {vocabExercise?.targetWord}
-              </p>
-              {vocabExercise?.translatedWordMeaning && language !== 'ar' && (
-                <p className="text-base text-muted-foreground mt-2 font-medium" data-testid="text-word-translation">
-                  ({vocabExercise.translatedWordMeaning})
+              {language === 'ar' ? (
+                <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
+                  {vocabExercise?.targetWord}
                 </p>
-              )}
-              {vocabExercise?.translatedWordMeaning && language === 'ar' && (
-                <p className="text-base text-muted-foreground mt-2 font-medium arabic-text" dir="rtl" lang="ar" data-testid="text-word-translation">
-                  ({vocabExercise.translatedWordMeaning})
+              ) : (
+                <p className="text-3xl font-bold text-primary" data-testid="text-arabic-word">
+                  {vocabExercise?.translatedWordMeaning || vocabExercise?.targetWordMeaning}
                 </p>
               )}
             </div>
