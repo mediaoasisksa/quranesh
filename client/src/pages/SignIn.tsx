@@ -14,7 +14,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import LanguageToggle from "@/components/language-toggle";
+
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
 const SignIn = () => {
@@ -61,11 +61,6 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6" dir={dir}>
-      {/* Language Toggle - Top Right Corner */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageToggle />
-      </div>
-
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">

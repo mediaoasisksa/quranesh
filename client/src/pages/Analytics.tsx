@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/language-context";
-import LanguageToggle from "@/components/language-toggle";
+
 
 interface OverviewStats {
   totalUsers: number;
@@ -421,7 +421,6 @@ export default function Analytics() {
           <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
           <p className="text-muted-foreground">{t.subtitle}</p>
         </div>
-        <LanguageToggle />
       </div>
 
       <div className="space-y-6">

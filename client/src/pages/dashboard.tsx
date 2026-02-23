@@ -39,7 +39,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import ExerciseCard from "@/components/exercise-card";
 import PhraseCard from "@/components/phrase-card";
 import ProgressStats from "@/components/progress-stats";
-import LanguageToggle from "@/components/language-toggle";
+
 import { exerciseTypes, getRandomExerciseType } from "@/lib/exercises";
 import type { Phrase, DailyStats, UserProgress } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -156,11 +156,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background" dir={dir}>
-      {/* Language Toggle - Top Right Corner */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageToggle />
-      </div>
-
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

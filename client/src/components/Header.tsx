@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import LanguageToggle from "@/components/language-toggle";
+
 import { useLanguage } from "@/contexts/language-context";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 
@@ -83,7 +83,6 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <LanguageToggle />
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -195,7 +194,6 @@ const Header = () => {
                 )
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <LanguageToggle />
                 {isAuthenticated ? (
                   <>
                     <div className="flex items-center gap-2 p-2">

@@ -19,7 +19,7 @@ import {
 import type { Phrase, ExerciseSession, QuestionBank, PhilosophicalSentence } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import LanguageToggle from "@/components/language-toggle";
+
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import { isQuranicText, getQuranicLabel, QuranicVerseType } from "@shared/quran-protection";
 import {
@@ -944,11 +944,6 @@ export default function Exercise() {
   return (
     <SubscriptionGate>
     <div className="min-h-screen bg-background" dir={dir}>
-      {/* Language Toggle - Top Right Corner */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageToggle />
-      </div>
-
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

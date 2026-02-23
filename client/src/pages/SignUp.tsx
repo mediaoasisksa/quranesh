@@ -21,7 +21,7 @@ import { Eye, EyeOff, Heart, BookOpen, GraduationCap, ArrowLeft, Users, Clock } 
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import LanguageToggle from "@/components/language-toggle";
+
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import { countryCodes } from "@/data/country-codes";
 
@@ -207,10 +207,6 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-6" dir={dir}>
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageToggle />
-      </div>
-
       <div className="w-full max-w-3xl">
         <div className="flex items-center justify-center mb-8">
           <Link href="/" className="cursor-pointer">
