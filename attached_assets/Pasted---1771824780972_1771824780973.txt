@@ -1,0 +1,125 @@
+يجب تعديل الكود ليعرض ترجمة الكلمة المستهدفة بناءً على لغة المتصفح أو التطبيق المختارة، بالإضافة إلى تعريب/ترجمة ترويسة السورة.
+
+إليك الحل التقني واللغوي المباشر بصيغة "Replit" (منطق برمجي صارم) لتنفيذ هذا التغيير:
+
+1. هيكلة البيانات (Data Structure)
+لا يمكنك الاعتماد على الصور فقط. يجب أن يحتوي ملف البيانات (JSON أو قاعدة البيانات) على معنى الكلمة بكل اللغات المدعومة.
+
+التعديل المطلوب في ملف exercises.js أو قاعدة البيانات:
+
+JavaScript
+const exercises = [
+  {
+    surahName: "Al-Qadr",
+    verseNumber: 1,
+    targetWord: "أَنزَلْنَاهُ",
+    // هذا هو الجزء الجديد الضروري //
+    targetWordTranslation: {
+      en: "We sent it down",
+      id: "Kami menurunkannya",
+      tr: "Biz onu indirdik",
+      ar: "أنزلناه" // للمعنى المبسط
+    },
+    options: [ ... ]
+  },
+  {
+    surahName: "Al-Falaq",
+    verseNumber: 1,
+    targetWord: "الْفَلَقِ",
+    targetWordTranslation: {
+      en: "The Daybreak",
+      id: "Waktu Subuh",
+      tr: "Sabah aydınlığı",
+      ar: "الفلق (الصبح)"
+    },
+    options: [ ... ]
+  },
+  {
+    surahName: "Al-Masad",
+    verseNumber: 1,
+    targetWord: "تَبَّتْ",
+    targetWordTranslation: {
+      en: "Perish", // or "Ruined"
+      id: "Binasalah",
+      tr: "Kurusu",
+      ar: "خسرت/هلكت"
+    },
+    options: [ ... ]
+  }
+];
+2. واجهة المستخدم (The Component Logic)
+في واجهة العرض (Frontend)، يجب استبدال الصورة الثابتة أو النص العربي فقط بنص يجمع بين (الكلمة العربية + معناها بلغة المستخدم).
+
+منطق الكود المقترح (React/JSX):
+
+JavaScript
+// افتراض أن 'lang' هو متغير يحمل لغة الصفحة الحالية (en, id, tr, ar)
+const currentExercise = exercises[currentIndex];
+const translatedWord = currentExercise.targetWordTranslation[lang];
+
+// 1. ترجمة الترويسة (Header)
+const headerText = lang === 'ar' 
+  ? `سورة ${currentExercise.surahName} — الآية ${currentExercise.verseNumber}`
+  : lang === 'id'
+  ? `Surah ${currentExercise.surahName} — Ayat ${currentExercise.verseNumber}`
+  : `Surah ${currentExercise.surahName} — Verse ${currentExercise.verseNumber}`; // Default English
+
+// 2. عرض السؤال مع الترجمة
+return (
+  <div className="exercise-container">
+    <h4>{headerText}</h4> 
+    
+    <div className="question-box">
+      <p>
+        {/* نص التعليمات المترجم مسبقاً */}
+        {t('choose_verse_containing')}
+      </p>
+      
+      {/* الكلمة المستهدفة مع ترجمتها لتعزيز الفهم */}
+      <div className="target-word-display">
+        <h1 className="arabic-text">{currentExercise.targetWord}</h1>
+        <span className="translated-meaning">({translatedWord})</span>
+      </div>
+    </div>
+    
+    {/* الخيارات */}
+    <OptionsList ... />
+  </div>
+);
+3. الترجمات المعتمدة (للتطبيق الفوري)
+لتقوم بتحديث المحتوى فوراً، إليك الترجمات الدقيقة للكلمات التي طلبتها بناءً على سياق الآيات:
+
+أ) كلمة: "أَنزَلْنَاهُ" (سورة القدر)
+
+English: We sent it down / We revealed it
+
+Indonesian: Kami menurunkannya
+
+Context: تشير إلى إنزال القرآن.
+
+ب) كلمة: "الْفَلَقِ" (سورة الفلق)
+
+English: The Daybreak / The Dawn
+
+Indonesian: Waktu Subuh
+
+Context: الصبح الذي ينفلق منه الضوء.
+
+ج) كلمة: "تَبَّتْ" (سورة المسد)
+
+English: Perish / Ruined
+
+Indonesian: Binasalah / Celakalah
+
+Context: دعاء بالهلاك والخسران.
+
+د) ترويسة الآية (Header Format):
+
+English: 📖 Surah Al-Qadr — Verse 1
+
+Indonesian: 📖 Surah Al-Qadr — Ayat 1
+
+Arabic: 📖 سورة القدر — الآية 1
+
+الخلاصة "بصرامة":
+لن يتعلم المستخدم اللغة إذا كان يطابق أشكالاً (صوراً) فقط. يجب ربط المتغير targetWord بمصفوفة ترجمات translations واستدعاء الترجمة بناءً على locale الصفحة. هذا هو الفارق بين "لعبة مطابقة صور" وبين "تطبيق تعليم لغة".

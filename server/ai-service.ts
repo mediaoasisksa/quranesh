@@ -2151,6 +2151,8 @@ export interface VocabularyExercise {
   surahEn: string;
   targetWord: string;
   targetWordMeaning: string;
+  targetWordTranslations: Record<string, string>;
+  correctVerseMeaningTranslations: Record<string, string>;
   surahAyah: string;
   ayahNumber: number;
   hint: string;
@@ -2164,6 +2166,20 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v1", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
     targetWord: "الصِّرَاطَ",
     targetWordMeaning: "The Path",
+    targetWordTranslations: {
+      en: "The Path", ar: "الطريق", id: "Jalan", tr: "Yol", zh: "道路",
+      sw: "Njia", so: "Jidka", bs: "Put", sq: "Rruga", ru: "Путь",
+      ur: "راستہ", bn: "পথ", ms: "Jalan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Guide us to the straight path", ar: "اهدنا الطريق المستقيم",
+      id: "Tunjukilah kami jalan yang lurus", tr: "Bizi doğru yola ilet",
+      zh: "请引导我们走正道", sw: "Tuongoze njia iliyonyooka",
+      so: "Nagu hanuuni jidka toosan", bs: "Uputi nas na pravi put",
+      sq: "Udhëzona në rrugën e drejtë", ru: "Веди нас прямым путём",
+      ur: "ہمیں سیدھا راستہ دکھا", bn: "আমাদের সরল পথ দেখাও",
+      ms: "Tunjukilah kami jalan yang lurus"
+    },
     surahAyah: "الفاتحة:6", ayahNumber: 6,
     hint: "الكلمة تبدأ بحرف الـ ص...",
     correctVerse: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
@@ -2179,6 +2195,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v2", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
     targetWord: "نَسْتَعِينُ",
     targetWordMeaning: "We seek help",
+    targetWordTranslations: {
+      en: "We seek help", ar: "نطلب المساعدة", id: "Kami memohon pertolongan",
+      tr: "Yardım dileriz", zh: "我们求助", sw: "Tunaomba msaada",
+      so: "Waxaan ka kaalmaysanaa", bs: "Tražimo pomoć", sq: "Kërkojmë ndihmë",
+      ru: "Мы просим о помощи", ur: "ہم مدد چاہتے ہیں", bn: "আমরা সাহায্য চাই",
+      ms: "Kami memohon pertolongan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "You alone we worship, and You alone we ask for help",
+      ar: "إياك وحدك نعبد وإياك وحدك نستعين",
+      id: "Hanya kepada-Mu kami menyembah dan hanya kepada-Mu kami memohon pertolongan",
+      tr: "Yalnız Sana ibadet ederiz ve yalnız Senden yardım dileriz",
+      zh: "我们只崇拜你，我们只向你求助",
+      sw: "Wewe peke yako tunakuabudu, na Wewe peke yako tunaomba msaada",
+      so: "Adiga keliya ayaan caabudnaa, Adiga keliya ayaan kaalmada ka baryaa",
+      bs: "Samo Tebe obožavamo i samo od Tebe pomoć tražimo",
+      sq: "Vetëm Ty të adhurojmë dhe vetëm prej Teje ndihmë kërkojmë",
+      ru: "Тебе одному мы поклоняемся и Тебя одного молим о помощи",
+      ur: "ہم صرف تیری عبادت کرتے ہیں اور صرف تجھ سے مدد مانگتے ہیں",
+      bn: "আমরা কেবল তোমারই ইবাদত করি এবং কেবল তোমারই কাছে সাহায্য চাই",
+      ms: "Hanya Engkau yang kami sembah dan hanya Engkau yang kami mohon pertolongan"
+    },
     surahAyah: "الفاتحة:5", ayahNumber: 5,
     hint: "تعني نطلب المساعدة",
     correctVerse: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
@@ -2194,6 +2232,22 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v3", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
     targetWord: "الرَّحِيمِ",
     targetWordMeaning: "The Most Merciful",
+    targetWordTranslations: {
+      en: "The Most Merciful", ar: "الرحيم (كثير الرحمة)", id: "Maha Penyayang",
+      tr: "En Merhametli", zh: "至慈的", sw: "Mwenye huruma zaidi",
+      so: "Naxariista badan", bs: "Milostivi", sq: "Mëshiruesi",
+      ru: "Милосердный", ur: "نہایت رحم کرنے والا", bn: "পরম দয়ালু",
+      ms: "Maha Penyayang"
+    },
+    correctVerseMeaningTranslations: {
+      en: "The Most Gracious, the Most Merciful", ar: "الرحمن الرحيم",
+      id: "Maha Pengasih, Maha Penyayang", tr: "Rahman, Rahim",
+      zh: "至仁的，至慈的", sw: "Mwingi wa rehema, Mwenye kurehemu",
+      so: "Naxariista badan, Nebiga naxariista ah",
+      bs: "Milostivog, Samilosnog", sq: "I Gjithëmëshirshmi, Mëshiruesi",
+      ru: "Милостивого, Милосердного", ur: "بے حد رحم کرنے والا، نہایت مہربان",
+      bn: "পরম করুণাময়, অতি দয়ালু", ms: "Yang Maha Pemurah, Maha Penyayang"
+    },
     surahAyah: "الفاتحة:3", ayahNumber: 3,
     hint: "صفة من صفات الله تتعلق بالرحمة",
     correctVerse: "الرَّحْمَنِ الرَّحِيمِ",
@@ -2209,6 +2263,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v4", surahAr: "الفاتحة", surahEn: "Al-Fatiha",
     targetWord: "نَعْبُدُ",
     targetWordMeaning: "We worship",
+    targetWordTranslations: {
+      en: "We worship", ar: "نعبد (نُطيع ونُخلص)", id: "Kami menyembah",
+      tr: "İbadet ederiz", zh: "我们崇拜", sw: "Tunaabudu",
+      so: "Waan caabudnaa", bs: "Obožavamo", sq: "Adhurojmë",
+      ru: "Мы поклоняемся", ur: "ہم عبادت کرتے ہیں", bn: "আমরা ইবাদত করি",
+      ms: "Kami menyembah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "You alone we worship, and You alone we ask for help",
+      ar: "إياك وحدك نعبد وإياك وحدك نستعين",
+      id: "Hanya kepada-Mu kami menyembah dan hanya kepada-Mu kami memohon pertolongan",
+      tr: "Yalnız Sana ibadet ederiz ve yalnız Senden yardım dileriz",
+      zh: "我们只崇拜你，我们只向你求助",
+      sw: "Wewe peke yako tunakuabudu, na Wewe peke yako tunaomba msaada",
+      so: "Adiga keliya ayaan caabudnaa, Adiga keliya ayaan kaalmada ka baryaa",
+      bs: "Samo Tebe obožavamo i samo od Tebe pomoć tražimo",
+      sq: "Vetëm Ty të adhurojmë dhe vetëm prej Teje ndihmë kërkojmë",
+      ru: "Тебе одному мы поклоняемся и Тебя одного молим о помощи",
+      ur: "ہم صرف تیری عبادت کرتے ہیں اور صرف تجھ سے مدد مانگتے ہیں",
+      bn: "আমরা কেবল তোমারই ইবাদত করি এবং কেবল তোমারই কাছে সাহায্য চাই",
+      ms: "Hanya Engkau yang kami sembah dan hanya Engkau yang kami mohon pertolongan"
+    },
     surahAyah: "الفاتحة:5", ayahNumber: 5,
     hint: "تعني الطاعة والعبادة",
     correctVerse: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
@@ -2224,6 +2300,25 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v5", surahAr: "الإخلاص", surahEn: "Al-Ikhlas",
     targetWord: "أَحَدٌ",
     targetWordMeaning: "One / Unique",
+    targetWordTranslations: {
+      en: "One / Unique", ar: "واحد / أحد", id: "Satu / Yang Maha Esa",
+      tr: "Bir / Tek", zh: "独一的", sw: "Mmoja / Pekee",
+      so: "Hal / Gaar ah", bs: "Jedan / Jedini", sq: "Një / I vetëm",
+      ru: "Единый", ur: "ایک / یکتا", bn: "এক / অদ্বিতীয়",
+      ms: "Satu / Yang Maha Esa"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Say: He is Allah, the One", ar: "قل هو الله الواحد الأحد",
+      id: "Katakanlah: Dia-lah Allah, Yang Maha Esa",
+      tr: "De ki: O, Allah'tır, bir tektir",
+      zh: "你说：他是真主，是独一的",
+      sw: "Sema: Yeye ni Mwenyezi Mungu, Mmoja",
+      so: "Dheh: Isagu waa Allaah, Kii Keliya",
+      bs: "Reci: On je Allah, Jedan", sq: "Thuaj: Ai është Allahu, Një i vetëm",
+      ru: "Скажи: Он — Аллах, Единый",
+      ur: "کہو: وہ اللہ ہے، یکتا", bn: "বলো: তিনি আল্লাহ, এক",
+      ms: "Katakanlah: Dia-lah Allah, Yang Maha Esa"
+    },
     surahAyah: "الإخلاص:1", ayahNumber: 1,
     hint: "تعني الرقم 1 أو الوحيد",
     correctVerse: "قُلْ هُوَ اللَّهُ أَحَدٌ",
@@ -2239,6 +2334,25 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v6", surahAr: "الإخلاص", surahEn: "Al-Ikhlas",
     targetWord: "الصَّمَدُ",
     targetWordMeaning: "The Eternal Refuge / The Self-Sufficient",
+    targetWordTranslations: {
+      en: "The Eternal Refuge", ar: "الذي يُقصد في الحوائج", id: "Tempat bergantung",
+      tr: "Samed (Kendisine muhtaç olunan)", zh: "永恒的依靠",
+      sw: "Mkimbilio wa milele", so: "Kan loo baahdo",
+      bs: "Utočište vječno", sq: "Mbështetja e përjetshme",
+      ru: "Вечная опора", ur: "بے نیاز", bn: "চিরন্তন আশ্রয়",
+      ms: "Tempat bergantung"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Allah, the Eternal Refuge", ar: "الله الصمد الذي يحتاجه كل شيء",
+      id: "Allah, tempat bergantung",
+      tr: "Allah, Samed'dir (her şeyin kendisine muhtaç olduğu)",
+      zh: "真主是永恒的依靠",
+      sw: "Mwenyezi Mungu, Mkimbilio wa milele",
+      so: "Allaah, Kan loo baahdo",
+      bs: "Allah je utočište vječno", sq: "Allahu është Mbështetja e përjetshme",
+      ru: "Аллах — Вечная опора", ur: "اللہ بے نیاز ہے",
+      bn: "আল্লাহ, চিরন্তন আশ্রয়", ms: "Allah, tempat bergantung"
+    },
     surahAyah: "الإخلاص:2", ayahNumber: 2,
     hint: "الذي يحتاجه كل شيء ولا يحتاج أحداً",
     correctVerse: "اللَّهُ الصَّمَدُ",
@@ -2254,6 +2368,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v7", surahAr: "الناس", surahEn: "An-Nas",
     targetWord: "الْوَسْوَاسِ",
     targetWordMeaning: "The Whisperer",
+    targetWordTranslations: {
+      en: "The Whisperer", ar: "الموسوس (الشيطان)", id: "Pembisik",
+      tr: "Vesveseci", zh: "唆使者", sw: "Mnong'onezaji",
+      so: "Waswaasiga", bs: "Šaptač", sq: "Pëshpëritësi",
+      ru: "Наущающий", ur: "وسوسہ ڈالنے والا", bn: "কুমন্ত্রণাদাতা",
+      ms: "Pembisik"
+    },
+    correctVerseMeaningTranslations: {
+      en: "From the evil of the retreating whisperer",
+      ar: "من شر الوسواس الذي يختفي عند ذكر الله",
+      id: "Dari kejahatan bisikan setan yang bersembunyi",
+      tr: "Sinsi vesvesecinin şerrinden",
+      zh: "免遭暗中唆使者的伤害",
+      sw: "Kutokana na shari ya mnong'onezaji anayejificha",
+      so: "Sharriga waswaasiga dhuunta",
+      bs: "Od zla šaptača koji se povlači",
+      sq: "Nga e keqja e pëshpëritësit që tërhiqet",
+      ru: "От зла наущающего отступающего",
+      ur: "پیچھے ہٹ جانے والے وسوسہ ڈالنے والے کے شر سے",
+      bn: "আত্মগোপনকারী কুমন্ত্রণাদাতার অনিষ্ট থেকে",
+      ms: "Dari kejahatan pembisik yang bersembunyi"
+    },
     surahAyah: "الناس:4", ayahNumber: 4,
     hint: "الصوت الخفي الذي يدعو للشر",
     correctVerse: "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
@@ -2269,6 +2405,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v8", surahAr: "الفلق", surahEn: "Al-Falaq",
     targetWord: "الْفَلَقِ",
     targetWordMeaning: "The Daybreak / The Dawn",
+    targetWordTranslations: {
+      en: "The Daybreak", ar: "الفجر (انشقاق الصبح)", id: "Waktu subuh",
+      tr: "Tan yerinin ağarması", zh: "黎明", sw: "Alfajiri",
+      so: "Waaberi", bs: "Zora", sq: "Agimi", ru: "Рассвет",
+      ur: "صبح کا وقت", bn: "ভোর", ms: "Waktu subuh"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Say: I seek refuge in the Lord of daybreak",
+      ar: "قل أعوذ برب الفجر",
+      id: "Katakanlah: Aku berlindung kepada Tuhan waktu subuh",
+      tr: "De ki: Tan yerinin Rabbine sığınırım",
+      zh: "你说：我求庇于黎明的主",
+      sw: "Sema: Ninajikinga kwa Mola wa alfajiri",
+      so: "Dheh: Waxaan magangalyahay Rabbiga waaberi",
+      bs: "Reci: Utječem se Gospodaru zore",
+      sq: "Thuaj: Kërkoj mbrojtje te Zoti i agimit",
+      ru: "Скажи: Прибегаю к Господу рассвета",
+      ur: "کہو: میں صبح کے رب کی پناہ مانگتا ہوں",
+      bn: "বলো: আমি ভোরের প্রভুর আশ্রয় প্রার্থনা করি",
+      ms: "Katakanlah: Aku berlindung kepada Tuhan waktu subuh"
+    },
     surahAyah: "الفلق:1", ayahNumber: 1,
     hint: "تعني ضوء الفجر عندما ينشق",
     correctVerse: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
@@ -2284,6 +2441,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v9", surahAr: "الكوثر", surahEn: "Al-Kawthar",
     targetWord: "الْكَوْثَرَ",
     targetWordMeaning: "Abundance / A river in Paradise",
+    targetWordTranslations: {
+      en: "Abundance", ar: "الخير الكثير", id: "Nikmat yang berlimpah",
+      tr: "Bolluk / Kevser", zh: "丰裕", sw: "Wingi wa kheri",
+      so: "Badan", bs: "Obilje", sq: "Bollëk", ru: "Изобилие",
+      ur: "کوثر (بے شمار نعمتیں)", bn: "প্রাচুর্য", ms: "Nikmat yang melimpah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Indeed, We have granted you Al-Kawthar",
+      ar: "إنا أعطيناك الخير الكثير",
+      id: "Sesungguhnya Kami telah memberimu nikmat yang berlimpah",
+      tr: "Şüphesiz biz sana Kevser'i verdik",
+      zh: "我确已赐你丰裕",
+      sw: "Hakika tumekupa wingi wa kheri",
+      so: "Annaga waxaan ku siinay Al-Kawthar",
+      bs: "Mi smo ti uistinu obilje dali",
+      sq: "Ne, me të vërtetë, të kemi dhënë bollëk",
+      ru: "Мы даровали тебе изобилие",
+      ur: "بے شک ہم نے تمہیں کوثر عطا کیا",
+      bn: "নিশ্চয়ই আমি তোমাকে কাওসার দান করেছি",
+      ms: "Sesungguhnya Kami telah memberimu nikmat yang melimpah"
+    },
     surahAyah: "الكوثر:1", ayahNumber: 1,
     hint: "الكلمة تبدأ بحرف الـ ك...",
     correctVerse: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
@@ -2299,6 +2477,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v10", surahAr: "الكوثر", surahEn: "Al-Kawthar",
     targetWord: "انْحَرْ",
     targetWordMeaning: "Sacrifice",
+    targetWordTranslations: {
+      en: "Sacrifice", ar: "اذبح (قدّم الذبيحة)", id: "Berkorbanlah",
+      tr: "Kurban kes", zh: "献祭", sw: "Chinja",
+      so: "Gowrac", bs: "Žrtvuj", sq: "Therr kurban",
+      ru: "Принеси жертву", ur: "قربانی کرو", bn: "কোরবানি করো",
+      ms: "Berkorbanlah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "So pray to your Lord and sacrifice",
+      ar: "فصلِّ لربك واذبح",
+      id: "Maka shalatlah kepada Tuhanmu dan berkorbanlah",
+      tr: "Rabbin için namaz kıl ve kurban kes",
+      zh: "所以你当为你的主礼拜并献祭",
+      sw: "Basi mswalie Mola wako na uchinje",
+      so: "Ee tuko Rabbigaa oo gowrac",
+      bs: "Pa klanjaj se Gospodaru svome i žrtvuj",
+      sq: "Andaj falu për Zotin tënd dhe therr kurban",
+      ru: "Молись своему Господу и приноси жертву",
+      ur: "پس اپنے رب کے لیے نماز پڑھو اور قربانی کرو",
+      bn: "তাই তোমার প্রতিপালকের জন্য সালাত আদায় করো ও কোরবানি করো",
+      ms: "Maka solatlah kepada Tuhanmu dan berkorbanlah"
+    },
     surahAyah: "الكوثر:2", ayahNumber: 2,
     hint: "تعني تقديم الذبيحة لله",
     correctVerse: "فَصَلِّ لِرَبِّكَ وَانْحَرْ",
@@ -2314,6 +2514,25 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v11", surahAr: "العصر", surahEn: "Al-Asr",
     targetWord: "خُسْرٍ",
     targetWordMeaning: "Loss",
+    targetWordTranslations: {
+      en: "Loss", ar: "خسارة", id: "Kerugian", tr: "Ziyan / Kayıp",
+      zh: "亏损", sw: "Hasara", so: "Khasaare", bs: "Gubitak",
+      sq: "Humbje", ru: "Убыток", ur: "خسارہ", bn: "ক্ষতি", ms: "Kerugian"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Indeed, mankind is in loss", ar: "إن الإنسان لفي خسارة",
+      id: "Sesungguhnya manusia berada dalam kerugian",
+      tr: "Gerçekten insan ziyan içindedir",
+      zh: "人确是在亏损之中",
+      sw: "Hakika binadamu yuko katika hasara",
+      so: "Runtii bini'aadamku wuxuu ku jiraa khasaare",
+      bs: "Zaista je čovjek na gubitku",
+      sq: "Në të vërtetë, njeriu është në humbje",
+      ru: "Поистине, человек в убытке",
+      ur: "بے شک انسان خسارے میں ہے",
+      bn: "নিশ্চয়ই মানুষ ক্ষতির মধ্যে রয়েছে",
+      ms: "Sesungguhnya manusia berada dalam kerugian"
+    },
     surahAyah: "العصر:2", ayahNumber: 2,
     hint: "عكس الربح والفوز",
     correctVerse: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
@@ -2329,6 +2548,24 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v12", surahAr: "الضحى", surahEn: "Ad-Duha",
     targetWord: "الضُّحَى",
     targetWordMeaning: "The Morning Brightness",
+    targetWordTranslations: {
+      en: "The Morning Brightness", ar: "وقت الضحى (ضوء الصباح)",
+      id: "Waktu dhuha (cahaya pagi)", tr: "Kuşluk vakti",
+      zh: "上午的光亮", sw: "Mwanga wa asubuhi",
+      so: "Iftiinka subaxda", bs: "Jutarnje svjetlo",
+      sq: "Drita e mëngjesit", ru: "Утренний свет",
+      ur: "چاشت کی روشنی", bn: "পূর্বাহ্নের আলো", ms: "Waktu dhuha (cahaya pagi)"
+    },
+    correctVerseMeaningTranslations: {
+      en: "By the morning brightness", ar: "أقسم بوقت الضحى",
+      id: "Demi waktu dhuha", tr: "Kuşluk vaktine andolsun",
+      zh: "以上午的光亮起誓", sw: "Naapa kwa mwanga wa asubuhi",
+      so: "Waxaan ku dhaartay iftiinka subaxda",
+      bs: "Tako mi jutarnjeg svjetla",
+      sq: "Pasha dritën e mëngjesit", ru: "Клянусь утренним светом",
+      ur: "چاشت کی قسم", bn: "পূর্বাহ্নের শপথ",
+      ms: "Demi waktu dhuha"
+    },
     surahAyah: "الضحى:1", ayahNumber: 1,
     hint: "وقت من أوقات النهار في الصباح",
     correctVerse: "وَالضُّحَى",
@@ -2344,6 +2581,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v13", surahAr: "الضحى", surahEn: "Ad-Duha",
     targetWord: "يَتِيمًا",
     targetWordMeaning: "An orphan",
+    targetWordTranslations: {
+      en: "An orphan", ar: "يتيم (فقد أباه)", id: "Anak yatim",
+      tr: "Yetim", zh: "孤儿", sw: "Yatima",
+      so: "Agoonta", bs: "Siroče", sq: "Jetim",
+      ru: "Сирота", ur: "یتیم", bn: "এতিম", ms: "Anak yatim"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Did He not find you an orphan and gave you shelter?",
+      ar: "ألم يجدك يتيماً فآواك؟",
+      id: "Bukankah Dia mendapatimu sebagai seorang yatim lalu Dia melindungimu?",
+      tr: "O seni yetim bulup barındırmadı mı?",
+      zh: "难道他没有发现你是孤儿而收容你吗？",
+      sw: "Je, hakukuta yatima na akakupa makazi?",
+      so: "Miyuusan ku helin adigoo agoon ah oo kuu hoygaliyey?",
+      bs: "Zar te nije siročetom našao i utočište ti dao?",
+      sq: "A nuk të gjeti jetim dhe të dha strehim?",
+      ru: "Разве Он не нашёл тебя сиротой и не приютил?",
+      ur: "کیا اس نے تمہیں یتیم نہیں پایا اور ٹھکانا دیا؟",
+      bn: "তিনি কি তোমাকে এতিম পাননি এবং আশ্রয় দেননি?",
+      ms: "Bukankah Dia mendapatimu yatim lalu Dia melindungimu?"
+    },
     surahAyah: "الضحى:6", ayahNumber: 6,
     hint: "طفل فقد أباه",
     correctVerse: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَى",
@@ -2359,6 +2617,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v14", surahAr: "الشرح", surahEn: "Ash-Sharh",
     targetWord: "يُسْرًا",
     targetWordMeaning: "Ease / Relief",
+    targetWordTranslations: {
+      en: "Ease / Relief", ar: "يسر (سهولة)", id: "Kemudahan",
+      tr: "Kolaylık", zh: "容易", sw: "Wepesi",
+      so: "Fududayn", bs: "Olakšanje", sq: "Lehtësi",
+      ru: "Облегчение", ur: "آسانی", bn: "সহজতা", ms: "Kemudahan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Indeed, with hardship comes ease",
+      ar: "إن مع الصعوبة سهولة",
+      id: "Sesungguhnya bersama kesulitan ada kemudahan",
+      tr: "Şüphesiz zorluğun yanında kolaylık vardır",
+      zh: "困难之后必有容易",
+      sw: "Hakika pamoja na shida kuna wepesi",
+      so: "Runtii cilacsiga waxaa la jira fududayn",
+      bs: "Zaista, uz teškoću dolazi olakšanje",
+      sq: "Vërtet, me vështirësinë vjen lehtësia",
+      ru: "Поистине, за трудностью следует облегчение",
+      ur: "بے شک مشکل کے ساتھ آسانی ہے",
+      bn: "নিশ্চয়ই কষ্টের সাথে স্বস্তি আছে",
+      ms: "Sesungguhnya bersama kesukaran ada kemudahan"
+    },
     surahAyah: "الشرح:5", ayahNumber: 5,
     hint: "عكس الصعوبة",
     correctVerse: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
@@ -2374,6 +2653,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v15", surahAr: "الشرح", surahEn: "Ash-Sharh",
     targetWord: "شَرَحْنَا",
     targetWordMeaning: "We expanded / We opened",
+    targetWordTranslations: {
+      en: "We expanded", ar: "وسّعنا وفتحنا", id: "Kami lapangkan",
+      tr: "Genişlettik / Açtık", zh: "我们敞开了", sw: "Tulikupanua",
+      so: "Waanu kuu ballaadhinnay", bs: "Proširili smo", sq: "Ne zgjeruam",
+      ru: "Мы раскрыли", ur: "ہم نے کھول دیا", bn: "আমরা প্রশস্ত করেছি",
+      ms: "Kami lapangkan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Did We not expand for you your chest?",
+      ar: "ألم نوسّع لك صدرك؟",
+      id: "Bukankah Kami telah melapangkan dadamu?",
+      tr: "Senin göğsünü açmadık mı?",
+      zh: "难道我们没有为你敞开你的胸膛吗？",
+      sw: "Je, hatukukupanulia kifua chako?",
+      so: "Miyaanaan kuu ballaadhinin laabta?",
+      bs: "Zar ti nismo grudi tvoje proširili?",
+      sq: "A nuk ta zgjeruam gjoksin tënd?",
+      ru: "Разве Мы не раскрыли тебе грудь?",
+      ur: "کیا ہم نے تمہارا سینہ نہیں کھول دیا؟",
+      bn: "আমরা কি তোমার বক্ষ প্রশস্ত করিনি?",
+      ms: "Bukankah Kami telah melapangkan dadamu?"
+    },
     surahAyah: "الشرح:1", ayahNumber: 1,
     hint: "تعني فتحنا ووسّعنا",
     correctVerse: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
@@ -2389,6 +2690,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v16", surahAr: "التين", surahEn: "At-Tin",
     targetWord: "تَقْوِيمٍ",
     targetWordMeaning: "Form / Shape / Stature",
+    targetWordTranslations: {
+      en: "Form / Stature", ar: "هيئة وشكل", id: "Bentuk / Rupa",
+      tr: "Biçim / Şekil", zh: "形态", sw: "Umbo / Sura",
+      so: "Qaab / Muuqaal", bs: "Oblik / Stas", sq: "Formë / Figurë",
+      ru: "Облик / Стать", ur: "شکل / قامت", bn: "আকৃতি / গঠন",
+      ms: "Bentuk / Rupa"
+    },
+    correctVerseMeaningTranslations: {
+      en: "We created man in the best form",
+      ar: "لقد خلقنا الإنسان في أحسن شكل",
+      id: "Sungguh Kami telah menciptakan manusia dalam bentuk yang sebaik-baiknya",
+      tr: "Biz insanı en güzel biçimde yarattık",
+      zh: "我确已把人造成最优美的形态",
+      sw: "Hakika tumemuumba binadamu katika umbo bora zaidi",
+      so: "Waxaan aadanaha ku abuurnay qaabka ugu fiican",
+      bs: "Mi smo čovjeka u najljepšem obliku stvorili",
+      sq: "Ne e krijuam njeriun në formën më të bukur",
+      ru: "Мы сотворили человека в наилучшем облике",
+      ur: "ہم نے انسان کو بہترین شکل میں بنایا",
+      bn: "আমরা মানুষকে সুন্দরতম আকৃতিতে সৃষ্টি করেছি",
+      ms: "Sesungguhnya Kami telah mencipta manusia dalam bentuk yang sebaik-baiknya"
+    },
     surahAyah: "التين:4", ayahNumber: 4,
     hint: "تعني الشكل والصورة",
     correctVerse: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ",
@@ -2404,6 +2727,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v17", surahAr: "العلق", surahEn: "Al-Alaq",
     targetWord: "اقْرَأْ",
     targetWordMeaning: "Read / Recite",
+    targetWordTranslations: {
+      en: "Read / Recite", ar: "اقرأ (تلاوة)", id: "Bacalah",
+      tr: "Oku", zh: "读 / 诵读", sw: "Soma",
+      so: "Akhri", bs: "Čitaj / Uči", sq: "Lexo",
+      ru: "Читай", ur: "پڑھو", bn: "পড়ো", ms: "Bacalah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Read in the name of your Lord who created",
+      ar: "اقرأ باسم ربك الذي خلق",
+      id: "Bacalah dengan nama Tuhanmu yang menciptakan",
+      tr: "Yaratan Rabbinin adıyla oku",
+      zh: "你应当奉你的创造主的名义而宣读",
+      sw: "Soma kwa jina la Mola wako aliyeumba",
+      so: "Ku akhri magaca Rabbigaa ee abuuray",
+      bs: "Čitaj u ime Gospodara tvoga koji stvara",
+      sq: "Lexo me emrin e Zotit tënd, i Cili krijoi",
+      ru: "Читай во имя Господа твоего, который сотворил",
+      ur: "پڑھو اپنے رب کے نام سے جس نے پیدا کیا",
+      bn: "পড়ো তোমার প্রতিপালকের নামে যিনি সৃষ্টি করেছেন",
+      ms: "Bacalah dengan nama Tuhanmu yang menciptakan"
+    },
     surahAyah: "العلق:1", ayahNumber: 1,
     hint: "أول كلمة نزلت في القرآن",
     correctVerse: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
@@ -2419,6 +2763,24 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v18", surahAr: "العلق", surahEn: "Al-Alaq",
     targetWord: "الْقَلَمِ",
     targetWordMeaning: "The Pen",
+    targetWordTranslations: {
+      en: "The Pen", ar: "القلم (أداة الكتابة)", id: "Pena",
+      tr: "Kalem", zh: "笔", sw: "Kalamu",
+      so: "Qalinka", bs: "Pero", sq: "Pena / Lapsi",
+      ru: "Перо / Калам", ur: "قلم", bn: "কলম", ms: "Pena"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Who taught by the pen", ar: "الذي علّم بالقلم",
+      id: "Yang mengajar dengan pena",
+      tr: "Kalemle öğreten", zh: "他用笔教人",
+      sw: "Aliyefundisha kwa kalamu",
+      so: "Kan wax ku baray qalinka",
+      bs: "Koji perom poučava", sq: "I Cili mësoi me penë",
+      ru: "Который научил посредством пера",
+      ur: "جس نے قلم کے ذریعے سکھایا",
+      bn: "যিনি কলমের সাহায্যে শিক্ষা দিয়েছেন",
+      ms: "Yang mengajar dengan pena"
+    },
     surahAyah: "العلق:4", ayahNumber: 4,
     hint: "أداة الكتابة",
     correctVerse: "الَّذِي عَلَّمَ بِالْقَلَمِ",
@@ -2434,6 +2796,30 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v19", surahAr: "القدر", surahEn: "Al-Qadr",
     targetWord: "أَنزَلْنَاهُ",
     targetWordMeaning: "We sent it down / We revealed it",
+    targetWordTranslations: {
+      en: "We sent it down", ar: "أنزلناه (أرسلناه من السماء)",
+      id: "Kami turunkan", tr: "Biz indirdik",
+      zh: "我们降示了它", sw: "Tuliteremsha",
+      so: "Waanu soo dejinnay", bs: "Mi smo ga objavili",
+      sq: "Ne e zbritëm", ru: "Мы ниспослали его",
+      ur: "ہم نے اسے نازل کیا", bn: "আমরা এটি নাযিল করেছি",
+      ms: "Kami turunkan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Indeed, We sent it down on the Night of Decree",
+      ar: "إنا أنزلناه في ليلة القدر",
+      id: "Sesungguhnya Kami telah menurunkannya pada malam kemuliaan",
+      tr: "Şüphesiz biz onu Kadir gecesinde indirdik",
+      zh: "我在尊贵之夜降示了它",
+      sw: "Hakika tuliteremsha katika usiku wa heshima",
+      so: "Annaga waxaan soo dejinnay habeenka sharafta leh",
+      bs: "Mi smo ga objavili u Noći kadera",
+      sq: "Ne e zbritëm atë në Natën e Kadrit",
+      ru: "Мы ниспослали его в Ночь предопределения",
+      ur: "بے شک ہم نے اسے شب قدر میں نازل کیا",
+      bn: "নিশ্চয়ই আমরা এটি কদরের রাতে নাযিল করেছি",
+      ms: "Sesungguhnya Kami telah menurunkannya pada malam kemuliaan"
+    },
     surahAyah: "القدر:1", ayahNumber: 1,
     hint: "تعني أرسلناه من السماء",
     correctVerse: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ",
@@ -2449,6 +2835,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v20", surahAr: "الكافرون", surahEn: "Al-Kafirun",
     targetWord: "أَعْبُدُ",
     targetWordMeaning: "I worship",
+    targetWordTranslations: {
+      en: "I worship", ar: "أعبد (أُطيع وأُخلص)", id: "Aku menyembah",
+      tr: "İbadet ederim", zh: "我崇拜", sw: "Ninaabudu",
+      so: "Waan caabudaa", bs: "Obožavam", sq: "Unë adhuroj",
+      ru: "Я поклоняюсь", ur: "میں عبادت کرتا ہوں", bn: "আমি ইবাদত করি",
+      ms: "Aku menyembah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "I do not worship what you worship",
+      ar: "لا أعبد ما تعبدون",
+      id: "Aku tidak menyembah apa yang kamu sembah",
+      tr: "Ben sizin taptıklarınıza tapmam",
+      zh: "我不崇拜你们所崇拜的",
+      sw: "Mimi siabudu mnachokiabudu",
+      so: "Anigu ma caabudayo waxa aad caabuddaan",
+      bs: "Ja ne obožavam ono što vi obožavate",
+      sq: "Unë nuk adhuroj atë që ju adhuroni",
+      ru: "Я не поклоняюсь тому, чему вы поклоняетесь",
+      ur: "میں اس کی عبادت نہیں کرتا جس کی تم عبادت کرتے ہو",
+      bn: "তোমরা যার ইবাদত করো আমি তার ইবাদত করি না",
+      ms: "Aku tidak menyembah apa yang kamu sembah"
+    },
     surahAyah: "الكافرون:2", ayahNumber: 2,
     hint: "تعني أُطيع وأُخلص",
     correctVerse: "لَا أَعْبُدُ مَا تَعْبُدُونَ",
@@ -2464,6 +2872,27 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v21", surahAr: "النصر", surahEn: "An-Nasr",
     targetWord: "الْفَتْحُ",
     targetWordMeaning: "The Victory / The Conquest",
+    targetWordTranslations: {
+      en: "The Victory", ar: "النصر والفتح", id: "Kemenangan",
+      tr: "Fetih / Zafer", zh: "胜利", sw: "Ushindi",
+      so: "Guusha", bs: "Pobjeda", sq: "Fitorja",
+      ru: "Победа", ur: "فتح / کامیابی", bn: "বিজয়", ms: "Kemenangan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "When the victory of Allah comes and the conquest",
+      ar: "إذا جاء نصر الله والفتح",
+      id: "Apabila telah datang pertolongan Allah dan kemenangan",
+      tr: "Allah'ın yardımı ve fetih geldiğinde",
+      zh: "当真主的援助和胜利来临时",
+      sw: "Itakapokuja nusura ya Mwenyezi Mungu na ushindi",
+      so: "Markii ay timaado gargaarka Ilaahay iyo guusha",
+      bs: "Kada Allahova pomoć i pobjeda dođu",
+      sq: "Kur të vijë ndihma e Allahut dhe fitorja",
+      ru: "Когда придёт помощь Аллаха и победа",
+      ur: "جب اللہ کی مدد آئے اور فتح ہو",
+      bn: "যখন আল্লাহর সাহায্য ও বিজয় আসবে",
+      ms: "Apabila datang pertolongan Allah dan kemenangan"
+    },
     surahAyah: "النصر:1", ayahNumber: 1,
     hint: "تعني الانتصار",
     correctVerse: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ",
@@ -2479,6 +2908,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v22", surahAr: "المسد", surahEn: "Al-Masad",
     targetWord: "تَبَّتْ",
     targetWordMeaning: "May perish / Ruined",
+    targetWordTranslations: {
+      en: "May perish / Ruined", ar: "هلكت / خسرت", id: "Binasalah / Celakalah",
+      tr: "Kurusun / Mahvolsun", zh: "愿灭亡", sw: "Iangamie / Iharibiwe",
+      so: "Ha halaagsanto", bs: "Propale / Uništene", sq: "U shkatërroftë",
+      ru: "Да пропадут", ur: "ٹوٹ گئے / تباہ ہوئے", bn: "ধ্বংস হোক",
+      ms: "Binasalah / Celakalah"
+    },
+    correctVerseMeaningTranslations: {
+      en: "May the hands of Abu Lahab perish, and he has perished",
+      ar: "تبت يدا أبي لهب وخسر",
+      id: "Binasalah kedua tangan Abu Lahab dan sungguh dia telah binasa",
+      tr: "Ebu Leheb'in elleri kurusun, kurudu da",
+      zh: "愿阿布·拉海布的双手灭亡，他已灭亡",
+      sw: "Ziangamie mikono ya Abu Lahab, na ameangamia",
+      so: "Ha halaagsadeen gacmaha Abi Lahab, wuuna halaagsaday",
+      bs: "Propale ruke Ebu Lehebove i on je propao",
+      sq: "U shkatërroftë duart e Ebu Lehebit, e ai u shkatërrua",
+      ru: "Да пропадут руки Абу Ляхаба, и сам он пропал",
+      ur: "ابو لہب کے دونوں ہاتھ ٹوٹ جائیں اور وہ تباہ ہو",
+      bn: "আবু লাহাবের দুই হাত ধ্বংস হোক এবং সে ধ্বংস হয়েছে",
+      ms: "Binasalah kedua tangan Abu Lahab dan sesungguhnya dia telah binasa"
+    },
     surahAyah: "المسد:1", ayahNumber: 1,
     hint: "تعني الهلاك والخسارة",
     correctVerse: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ",
@@ -2494,6 +2945,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v23", surahAr: "الفيل", surahEn: "Al-Fil",
     targetWord: "أَبَابِيلَ",
     targetWordMeaning: "Flocks (of birds)",
+    targetWordTranslations: {
+      en: "Flocks (of birds)", ar: "جماعات (من الطيور)", id: "Berbondong-bondong",
+      tr: "Sürü sürü (kuşlar)", zh: "成群的（鸟）", sw: "Makundi (ya ndege)",
+      so: "Kooxo koox (shimbiraha)", bs: "Jata (ptica)", sq: "Tufa (zogjsh)",
+      ru: "Стаи (птиц)", ur: "جھنڈ در جھنڈ (پرندے)", bn: "ঝাঁকে ঝাঁকে (পাখি)",
+      ms: "Berbondong-bondong"
+    },
+    correctVerseMeaningTranslations: {
+      en: "And He sent against them birds in flocks",
+      ar: "وأرسل عليهم طيراً في جماعات",
+      id: "Dan Dia mengirimkan kepada mereka burung yang berbondong-bondong",
+      tr: "Üzerlerine sürü sürü kuşlar gönderdi",
+      zh: "他派遣成群的鸟去攻击他们",
+      sw: "Na akawapelekea ndege kwa makundi",
+      so: "Wuxuuna ku diray shimbiro kooxo koox ah",
+      bs: "I poslao je na njih ptice u jatima",
+      sq: "Dhe dërgoi kundër tyre tufa zogjsh",
+      ru: "И наслал на них стаи птиц",
+      ur: "اور ان پر جھنڈ در جھنڈ پرندے بھیجے",
+      bn: "এবং তিনি তাদের উপর ঝাঁকে ঝাঁকে পাখি পাঠিয়েছিলেন",
+      ms: "Dan Dia menghantar kepada mereka burung yang berbondong-bondong"
+    },
     surahAyah: "الفيل:3", ayahNumber: 3,
     hint: "طيور جاءت في جماعات",
     correctVerse: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",
@@ -2509,6 +2982,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v24", surahAr: "الماعون", surahEn: "Al-Ma'un",
     targetWord: "يُكَذِّبُ",
     targetWordMeaning: "Denies / Rejects",
+    targetWordTranslations: {
+      en: "Denies / Rejects", ar: "يُكذّب (ينكر)", id: "Mendustakan",
+      tr: "Yalanlayan / Reddeden", zh: "否认", sw: "Anakadhibisha",
+      so: "Beeniya", bs: "Poriče", sq: "Përgënjeshtron",
+      ru: "Отрицает", ur: "جھٹلاتا ہے", bn: "অস্বীকার করে",
+      ms: "Mendustakan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Have you seen the one who denies the religion?",
+      ar: "أرأيت الذي يُكذّب بالدين؟",
+      id: "Tahukah kamu orang yang mendustakan agama?",
+      tr: "Dini yalanlayanı gördün mü?",
+      zh: "你是否见过否认宗教的人？",
+      sw: "Je, umemwona yule anayekadhibisha dini?",
+      so: "Ma aragtay kii beeniya diinta?",
+      bs: "Znaš li ti onoga koji vjeru poriče?",
+      sq: "A e ke parë atë që e përgënjeshtron fenë?",
+      ru: "Видел ли ты того, кто отрицает религию?",
+      ur: "کیا تم نے اس شخص کو دیکھا جو دین کو جھٹلاتا ہے؟",
+      bn: "তুমি কি সেই ব্যক্তিকে দেখেছ যে দ্বীনকে অস্বীকার করে?",
+      ms: "Tahukah kamu orang yang mendustakan agama?"
+    },
     surahAyah: "الماعون:1", ayahNumber: 1,
     hint: "عكس التصديق",
     correctVerse: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ",
@@ -2524,6 +3019,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v25", surahAr: "الهمزة", surahEn: "Al-Humazah",
     targetWord: "جَمَعَ",
     targetWordMeaning: "Collected / Gathered",
+    targetWordTranslations: {
+      en: "Collected / Gathered", ar: "جمع (حصّل)", id: "Mengumpulkan",
+      tr: "Topladı / Biriktirdi", zh: "聚集", sw: "Alikusanya",
+      so: "Ururiyey", bs: "Skupio / Sakupio", sq: "Mblodhi / Grumbulloi",
+      ru: "Собрал / Накопил", ur: "جمع کیا", bn: "সংগ্রহ করেছে",
+      ms: "Mengumpulkan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Who collected wealth and counted it",
+      ar: "الذي جمع المال وعدّه",
+      id: "Yang mengumpulkan harta dan menghitung-hitungnya",
+      tr: "Mal toplayıp onu sayan",
+      zh: "积聚财富并反复计算的人",
+      sw: "Aliyekusanya mali na kuihesabu",
+      so: "Kii maalka ururiyey oo tiriyey",
+      bs: "Koji imetak gomila i prebrojava ga",
+      sq: "I cili mblodhi pasuri dhe e numëron",
+      ru: "Который копил богатство и подсчитывал его",
+      ur: "جس نے مال جمع کیا اور اسے گنتا رہا",
+      bn: "যে সম্পদ জমা করেছে ও তা গুনে রেখেছে",
+      ms: "Yang mengumpulkan harta dan menghitung-hitungnya"
+    },
     surahAyah: "الهمزة:2", ayahNumber: 2,
     hint: "عكس فرّق",
     correctVerse: "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ",
@@ -2539,6 +3056,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v26", surahAr: "الزلزلة", surahEn: "Az-Zalzalah",
     targetWord: "زُلْزِلَتِ",
     targetWordMeaning: "Is shaken / Quaked",
+    targetWordTranslations: {
+      en: "Is shaken", ar: "زُلزلت (تحركت بشدة)", id: "Diguncangkan",
+      tr: "Sarsıldı", zh: "被震动", sw: "Imetikiswa",
+      so: "La gariiriyey", bs: "Zatresena je", sq: "U tund / U dridh",
+      ru: "Сотрясена", ur: "ہلا دی گئی", bn: "কম্পিত হয়েছে",
+      ms: "Digoncangkan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "When the earth is shaken with its earthquake",
+      ar: "إذا زُلزلت الأرض زلزالها",
+      id: "Apabila bumi diguncangkan dengan guncangan yang dahsyat",
+      tr: "Yer büyük sarsıntıyla sarsıldığında",
+      zh: "当大地猛烈震动时",
+      sw: "Ardhi itakapotikiswa kwa mtikiso wake",
+      so: "Marka dhulku la gariiriyo gariirkiisa",
+      bs: "Kada se Zemlja zatrese žestokim potresom",
+      sq: "Kur toka të dridhet me tërmetin e saj",
+      ru: "Когда земля сотрясётся своим землетрясением",
+      ur: "جب زمین اپنے زلزلے سے ہلا دی جائے گی",
+      bn: "যখন পৃথিবী তার কম্পনে প্রকম্পিত হবে",
+      ms: "Apabila bumi digoncangkan dengan goncangan yang dahsyat"
+    },
     surahAyah: "الزلزلة:1", ayahNumber: 1,
     hint: "حركة الأرض بقوة",
     correctVerse: "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا",
@@ -2554,6 +3093,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v27", surahAr: "القارعة", surahEn: "Al-Qari'ah",
     targetWord: "الْمَبْثُوثِ",
     targetWordMeaning: "Scattered / Spread out",
+    targetWordTranslations: {
+      en: "Scattered", ar: "المنتشر في كل مكان", id: "Bertebaran",
+      tr: "Dağılmış / Saçılmış", zh: "散布的", sw: "Waliotawanyika",
+      so: "Kala firdhsan", bs: "Rasuti / Razbacani", sq: "Të shpërndarë",
+      ru: "Рассеянные", ur: "بکھری ہوئی", bn: "বিক্ষিপ্ত",
+      ms: "Bertebaran"
+    },
+    correctVerseMeaningTranslations: {
+      en: "The Day when people will be like scattered moths",
+      ar: "يوم يكون الناس كالفراش المنتشر",
+      id: "Hari ketika manusia seperti kupu-kupu yang bertebaran",
+      tr: "O gün insanlar yayılmış kelebekler gibi olacak",
+      zh: "那天人们将像散布的飞蛾",
+      sw: "Siku watu watakapokuwa kama nondo waliotawanyika",
+      so: "Maalinta dadku noqdaan sida balanbaallisaha kala firdhsan",
+      bs: "Dan kad će ljudi biti poput rasutih leptirova",
+      sq: "Ditën kur njerëzit do të jenë si flutura të shpërndara",
+      ru: "В тот День люди будут подобны рассеянным мотылькам",
+      ur: "جس دن لوگ بکھری ہوئی تتلیوں کی طرح ہوں گے",
+      bn: "যেদিন মানুষ হবে বিক্ষিপ্ত পতঙ্গের মতো",
+      ms: "Hari ketika manusia seperti kupu-kupu yang bertebaran"
+    },
     surahAyah: "القارعة:4", ayahNumber: 4,
     hint: "تعني المنتشر في كل مكان",
     correctVerse: "يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ",
@@ -2569,6 +3130,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v28", surahAr: "التكاثر", surahEn: "At-Takathur",
     targetWord: "التَّكَاثُرُ",
     targetWordMeaning: "Competition in increase / Rivalry in worldly gain",
+    targetWordTranslations: {
+      en: "Competition in increase", ar: "التفاخر بالكثرة", id: "Bermegah-megahan",
+      tr: "Çokluk yarışı", zh: "竞相增多", sw: "Kushindana kwa wingi",
+      so: "Tartanka badnaanta", bs: "Nadmetanje u gomilanju",
+      sq: "Garimi në shtim", ru: "Страсть к приумножению",
+      ur: "زیادتی کی دوڑ", bn: "প্রাচুর্যের প্রতিযোগিতা", ms: "Bermegah-megahan"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Competition in worldly increase diverts you",
+      ar: "ألهاكم التفاخر بكثرة الأموال والأولاد",
+      id: "Bermegah-megahan telah melalaikan kamu",
+      tr: "Çokluk yarışı sizi oyaladı",
+      zh: "竞相增多使你们疏忽了",
+      sw: "Kushindana kwa wingi kumekushughulisheni",
+      so: "Tartanka badnaantu wuu idin mashquuliyey",
+      bs: "Zaokuplja vas nadmetanje u gomilanju",
+      sq: "Garimi në grumbullim ju ka larguar",
+      ru: "Страсть к приумножению отвлекает вас",
+      ur: "زیادتی کی دوڑ نے تمہیں غافل کر دیا",
+      bn: "প্রাচুর্যের প্রতিযোগিতা তোমাদের ভুলিয়ে রেখেছে",
+      ms: "Bermegah-megahan telah melalaikan kamu"
+    },
     surahAyah: "التكاثر:1", ayahNumber: 1,
     hint: "التنافس في جمع الأشياء",
     correctVerse: "أَلْهَاكُمُ التَّكَاثُرُ",
@@ -2584,6 +3167,28 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v29", surahAr: "البينة", surahEn: "Al-Bayyinah",
     targetWord: "الْبَيِّنَةُ",
     targetWordMeaning: "The Clear Evidence / The Clear Proof",
+    targetWordTranslations: {
+      en: "The Clear Evidence", ar: "البرهان الواضح", id: "Bukti yang nyata",
+      tr: "Apaçık delil", zh: "明证", sw: "Ushahidi ulio wazi",
+      so: "Cadaynta cad", bs: "Jasni dokaz", sq: "Prova e qartë",
+      ru: "Ясное доказательство", ur: "واضح دلیل", bn: "সুস্পষ্ট প্রমাণ",
+      ms: "Bukti yang nyata"
+    },
+    correctVerseMeaningTranslations: {
+      en: "Until there came to them the clear evidence",
+      ar: "حتى تأتيهم البينة الواضحة",
+      id: "Sampai datang kepada mereka bukti yang nyata",
+      tr: "Kendilerine apaçık delil gelinceye kadar",
+      zh: "直到明证来到他们面前",
+      sw: "Mpaka ukawajia ushahidi ulio wazi",
+      so: "Ilaa ay u timaado cadaynta cad",
+      bs: "Dok im jasni dokaz ne dođe",
+      sq: "Derisa t'u vijë prova e qartë",
+      ru: "Пока не пришло к ним ясное доказательство",
+      ur: "یہاں تک کہ ان کے پاس واضح دلیل آئے",
+      bn: "যতক্ষণ না তাদের কাছে সুস্পষ্ট প্রমাণ আসে",
+      ms: "Sehingga datang kepada mereka bukti yang nyata"
+    },
     surahAyah: "البينة:1", ayahNumber: 1,
     hint: "تعني الدليل الواضح",
     correctVerse: "حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ",
@@ -2599,6 +3204,30 @@ const VOCAB_BANK: VocabularyExercise[] = [
     id: "v30", surahAr: "العاديات", surahEn: "Al-Adiyat",
     targetWord: "الْعَادِيَاتِ",
     targetWordMeaning: "The charging horses / The runners",
+    targetWordTranslations: {
+      en: "The charging horses", ar: "الخيول العادية (الراكضة بسرعة)",
+      id: "Kuda-kuda perang yang berlari kencang", tr: "Hızla koşan atlar",
+      zh: "奔驰的战马", sw: "Farasi wanaokimbia kwa kasi",
+      so: "Fardaha ordi u ordaya", bs: "Konji koji jure",
+      sq: "Kuajt që vrapojnë", ru: "Скачущие кони",
+      ur: "تیز دوڑنے والے گھوڑے", bn: "দ্রুতগামী ঘোড়া",
+      ms: "Kuda-kuda perang yang berlari laju"
+    },
+    correctVerseMeaningTranslations: {
+      en: "By the charging horses, panting",
+      ar: "أقسم بالخيول العاديات وهي تلهث",
+      id: "Demi kuda perang yang berlari kencang terengah-engah",
+      tr: "Soluk soluğa koşanlara andolsun",
+      zh: "以气喘吁吁奔驰的战马起誓",
+      sw: "Naapa kwa farasi wanaokimbia kwa kasi wakihema",
+      so: "Waxaan ku dhaartay fardaha ordaya oo neefta leh",
+      bs: "Tako mi konja koji jure dahtavo",
+      sq: "Pasha kuajt që vrapojnë duke gulçuar",
+      ru: "Клянусь скачущими, тяжело дышащими",
+      ur: "ہانپتے ہوئے تیز دوڑنے والے گھوڑوں کی قسم",
+      bn: "শপথ হাঁপাতে হাঁপাতে দ্রুত ধাবমান অশ্বগুলোর",
+      ms: "Demi kuda perang yang berlari laju sambil terengah-engah"
+    },
     surahAyah: "العاديات:1", ayahNumber: 1,
     hint: "الخيول التي تجري بسرعة",
     correctVerse: "وَالْعَادِيَاتِ ضَبْحًا",
@@ -2621,13 +3250,19 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-export async function generateVocabularyExercise(userLanguage: string = 'en'): Promise<VocabularyExercise> {
+export async function generateVocabularyExercise(userLanguage: string = 'en'): Promise<VocabularyExercise & { translatedWordMeaning: string; translatedVerseMeaning: string }> {
   const exercise = VOCAB_BANK[Math.floor(Math.random() * VOCAB_BANK.length)];
   const shuffledOptions = shuffleArray(exercise.options);
+  const translatedWordMeaning = exercise.targetWordTranslations[userLanguage] || exercise.targetWordTranslations['en'] || exercise.targetWordMeaning;
+  const translatedVerseMeaning = exercise.correctVerseMeaningTranslations[userLanguage] || exercise.correctVerseMeaningTranslations['en'] || exercise.correctVerseMeaning;
   return {
     ...exercise,
     id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     options: shuffledOptions,
+    targetWordMeaning: translatedWordMeaning,
+    correctVerseMeaning: translatedVerseMeaning,
+    translatedWordMeaning,
+    translatedVerseMeaning,
   };
 }
 

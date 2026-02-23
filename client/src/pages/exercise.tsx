@@ -139,6 +139,12 @@ export default function Exercise() {
     verseContextMeaning: string;
     options: { text: string; isCorrect: boolean }[];
     ayahNumber: number;
+    targetWord: string;
+    targetWordMeaning: string;
+    correctVerse: string;
+    correctVerseMeaning: string;
+    translatedWordMeaning: string;
+    translatedVerseMeaning: string;
   }>({
     queryKey: ["/api/vocabulary-exercise", language, exerciseType],
     queryFn: async () => {
@@ -625,7 +631,9 @@ export default function Exercise() {
             {/* Surah Badge + Ayah */}
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-base font-bold">
-                📖 {language === 'ar' ? `سورة ${vocabExercise?.surahAr} — آية ${vocabExercise?.ayahNumber}` : `Surah ${vocabExercise?.surahEn} — Verse ${vocabExercise?.ayahNumber}`}
+                📖 {language === 'ar' 
+                  ? `سورة ${vocabExercise?.surahAr} — آية ${vocabExercise?.ayahNumber}` 
+                  : `${t('surahLabel')} ${vocabExercise?.surahEn} — ${t('verseLabel')} ${vocabExercise?.ayahNumber}`}
               </span>
             </div>
 
@@ -637,6 +645,16 @@ export default function Exercise() {
               <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
                 {vocabExercise?.targetWord}
               </p>
+              {vocabExercise?.translatedWordMeaning && language !== 'ar' && (
+                <p className="text-base text-muted-foreground mt-2 font-medium" data-testid="text-word-translation">
+                  ({vocabExercise.translatedWordMeaning})
+                </p>
+              )}
+              {vocabExercise?.translatedWordMeaning && language === 'ar' && (
+                <p className="text-base text-muted-foreground mt-2 font-medium arabic-text" dir="rtl" lang="ar" data-testid="text-word-translation">
+                  ({vocabExercise.translatedWordMeaning})
+                </p>
+              )}
             </div>
 
             {/* Multiple Choice Options - All Quranic verse fragments in Arabic */}
@@ -727,7 +745,7 @@ export default function Exercise() {
                       {vocabExercise.correctVerse}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1" dir={dir}>
-                      {vocabExercise.correctVerseMeaning}
+                      {vocabExercise.translatedVerseMeaning || vocabExercise.correctVerseMeaning}
                     </p>
                   </div>
                 </div>
