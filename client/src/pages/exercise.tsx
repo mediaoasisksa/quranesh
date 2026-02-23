@@ -221,9 +221,10 @@ export default function Exercise() {
       const answeredCorrectly = selectedOption === correctOption?.text;
       setIsCorrect(answeredCorrectly);
       setIsAnswered(true);
+      const correctVerseText = vocabExercise.correctVerse;
       setFeedback(answeredCorrectly 
         ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
-        : (language === 'ar' ? `❌ الإجابة الصحيحة: ${vocabExercise.wordMeaning}` : `❌ The correct answer: ${vocabExercise.wordMeaning}`));
+        : (language === 'ar' ? `❌ الإجابة الصحيحة: ${correctVerseText}` : `❌ The correct answer: ${correctVerseText}`));
       setFeedbackGrade(answeredCorrectly ? 'exact_match' : 'incorrect');
       submitSessionMutation.mutate({
         userId,
@@ -313,7 +314,7 @@ export default function Exercise() {
 
       // Fetch meaning breakdown for conversation/roleplay when answer is correct
       if (result.isCorrect && isVocabQuizExercise) {
-        const verseText = vocabExercise?.answer;
+        const verseText = vocabExercise?.correctVerse;
         if (verseText) {
           setIsLoadingBreakdown(true);
           try {
@@ -628,35 +629,23 @@ export default function Exercise() {
               </span>
             </div>
 
-            {/* Verse Context - show the full verse so they can see the word in context */}
-            {vocabExercise?.verseContext && (
-              <div className="bg-muted/30 rounded-lg p-4 text-center border border-muted">
-                <p className="arabic-text text-xl leading-loose text-foreground" lang="ar" dir="rtl">
-                  {vocabExercise.verseContext}
-                </p>
-                <p className="text-sm text-muted-foreground mt-2" dir={dir}>
-                  {vocabExercise.verseContextMeaning}
-                </p>
-              </div>
-            )}
-
-            {/* Arabic Word Highlight */}
+            {/* Target Word Highlight */}
             <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-5 text-center border-2 border-primary/20">
               <p className="text-sm font-semibold text-muted-foreground mb-3" dir={dir}>
-                {language === 'ar' ? 'ما معنى هذه الكلمة؟' : 'What does this word mean?'}
+                {t('chooseVerseContaining')}
               </p>
               <p className="arabic-text text-3xl font-bold text-primary" lang="ar" dir="rtl" data-testid="text-arabic-word">
-                {vocabExercise?.arabicWord}
+                {vocabExercise?.targetWord}
               </p>
             </div>
 
-            {/* Multiple Choice Options */}
+            {/* Multiple Choice Options - All Quranic verse fragments in Arabic */}
             <div className="space-y-3" data-testid="options-container">
               {vocabExercise?.options?.map((option, index) => {
                 const isSelected = selectedOption === option.text;
                 const showResult = isAnswered;
                 const optionIsCorrect = option.isCorrect;
-                let optionClass = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 text-base font-medium ";
+                let optionClass = "w-full text-right p-4 rounded-lg border-2 transition-all duration-200 text-base font-medium ";
                 if (showResult && optionIsCorrect) {
                   optionClass += "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200";
                 } else if (showResult && isSelected && !optionIsCorrect) {
@@ -672,16 +661,17 @@ export default function Exercise() {
                     className={optionClass}
                     onClick={() => { if (!isAnswered) setSelectedOption(option.text); }}
                     disabled={isAnswered}
-                    dir={dir}
+                    dir="rtl"
+                    lang="ar"
                     data-testid={`option-${index}`}
                   >
-                    <span className="inline-flex items-center gap-3">
+                    <span className="inline-flex items-center gap-3 w-full">
                       <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold shrink-0">
                         {String.fromCharCode(65 + index)}
                       </span>
-                      <span>{option.text}</span>
-                      {showResult && optionIsCorrect && <span className="ml-auto">✅</span>}
-                      {showResult && isSelected && !optionIsCorrect && <span className="ml-auto">❌</span>}
+                      <span className="arabic-text text-lg flex-1">{option.text}</span>
+                      {showResult && optionIsCorrect && <span className="shrink-0">✅</span>}
+                      {showResult && isSelected && !optionIsCorrect && <span className="shrink-0">❌</span>}
                     </span>
                   </button>
                 );
@@ -698,7 +688,7 @@ export default function Exercise() {
                 data-testid="button-hint"
               >
                 <Lightbulb className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تلميح' : 'Hint'}
+                {t('hint')}
               </Button>
             )}
 
@@ -706,7 +696,7 @@ export default function Exercise() {
             {showHint && vocabExercise?.hint && !isAnswered && (
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">
-                  💡 {language === 'ar' ? 'تلميح:' : 'Hint:'}
+                  💡 {t('hintLabel')}
                 </p>
                 <p className="arabic-text text-lg text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
                   {vocabExercise.hint}
@@ -722,14 +712,24 @@ export default function Exercise() {
                     ? (language === 'ar' ? '✅ إجابة صحيحة! أحسنت!' : '✅ Correct! Well done!') 
                     : (language === 'ar' ? '❌ إجابة خاطئة' : '❌ Incorrect')}
                 </p>
-                <div className="flex items-center gap-3 mt-2">
-                  <p className="arabic-text text-xl font-bold text-foreground" lang="ar" dir="rtl" data-testid="text-conversation-verse">
-                    {vocabExercise.arabicWord}
-                  </p>
-                  <span className="text-muted-foreground">=</span>
-                  <p className="text-lg font-semibold text-foreground">
-                    {vocabExercise.wordMeaning}
-                  </p>
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-3">
+                    <p className="arabic-text text-xl font-bold text-foreground" lang="ar" dir="rtl" data-testid="text-conversation-verse">
+                      {vocabExercise.targetWord}
+                    </p>
+                    <span className="text-muted-foreground">=</span>
+                    <p className="text-lg font-semibold text-foreground">
+                      {vocabExercise.targetWordMeaning}
+                    </p>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-3 mt-2">
+                    <p className="arabic-text text-lg text-foreground" lang="ar" dir="rtl">
+                      {vocabExercise.correctVerse}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1" dir={dir}>
+                      {vocabExercise.correctVerseMeaning}
+                    </p>
+                  </div>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2" dir="rtl">
                   📖 {vocabExercise.surahAyah}
@@ -747,15 +747,15 @@ export default function Exercise() {
                   data-testid="button-check"
                 >
                   {isValidating ? (
-                    <>{language === 'ar' ? 'جاري التحقق...' : 'Checking...'}</>
+                    <>{t('checking')}</>
                   ) : (
-                    <>{language === 'ar' ? 'تحقق من الإجابة' : 'Check Answer'}</>
+                    <>{t('checkAnswer')}</>
                   )}
                 </Button>
               ) : (
                 <Button variant="outline" className="flex-1" onClick={goToNextExercise} data-testid="button-retry">
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  {language === 'ar' ? 'حاول مرة أخرى' : 'Try Again'}
+                  {t('nextExercise')}
                 </Button>
               )}
             </div>
@@ -1324,10 +1324,10 @@ export default function Exercise() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      {t('type')}
+                      {t('targetWord')}
                     </p>
-                    <p className="text-foreground" data-testid="text-conversation-type">
-                      {vocabExercise.exerciseType}
+                    <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-type" lang="ar" dir="rtl">
+                      {vocabExercise.targetWord}
                     </p>
                   </div>
                   <div>
@@ -1339,16 +1339,16 @@ export default function Exercise() {
                     </p>
                   </div>
                 </div>
-                {isAnswered && vocabExercise.answer && (
+                {isAnswered && vocabExercise.correctVerse && (
                   <div className="mt-4">
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                      {language === 'ar' ? 'الإجابة الصحيحة' : 'Correct Answer'}
+                      {t('correctAnswer')}
                     </p>
-                    <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse">
-                      {vocabExercise.answer}
+                    <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse" lang="ar" dir="rtl">
+                      {vocabExercise.correctVerse}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {vocabExercise.answerMeaning}
+                      {vocabExercise.correctVerseMeaning}
                     </p>
                   </div>
                 )}
