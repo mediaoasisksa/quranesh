@@ -44,6 +44,37 @@ import { exerciseTypes, getRandomExerciseType } from "@/lib/exercises";
 import type { Phrase, DailyStats, UserProgress } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
+const ALLOWED_SURAH_KEYWORDS = [
+  "الفاتحة", "Al-Fatiha", "Al-Fatihah", "Fatihah", "Fatiha",
+  "الضحى", "Ad-Duha", "Duha",
+  "الشرح", "Ash-Sharh", "Sharh",
+  "التين", "At-Tin", "Tin",
+  "العلق", "Al-Alaq", "Alaq",
+  "القدر", "Al-Qadr", "Qadr",
+  "البينة", "Al-Bayyinah", "Bayyinah",
+  "الزلزلة", "Az-Zalzalah", "Zalzalah",
+  "العاديات", "Al-Adiyat", "Adiyat",
+  "القارعة", "Al-Qari'ah", "Qariah", "Qari",
+  "التكاثر", "At-Takathur", "Takathur",
+  "العصر", "Al-Asr", "Asr",
+  "الهمزة", "Al-Humazah", "Humazah",
+  "الفيل", "Al-Fil", "Fil",
+  "قريش", "Quraysh", "Quraish",
+  "الماعون", "Al-Ma'un", "Maun",
+  "الكوثر", "Al-Kawthar", "Kawthar", "Kauthar",
+  "الكافرون", "Al-Kafirun", "Kafirun",
+  "النصر", "An-Nasr", "Nasr",
+  "المسد", "Al-Masad", "Masad", "Lahab",
+  "الإخلاص", "Al-Ikhlas", "Ikhlas",
+  "الفلق", "Al-Falaq", "Falaq",
+  "الناس", "An-Nas",
+];
+
+function isFromAllowedSurah(phrase: Phrase): boolean {
+  const surahRef = (phrase.surahAyah || "").toLowerCase();
+  return ALLOWED_SURAH_KEYWORDS.some(k => surahRef.toLowerCase().includes(k.toLowerCase()));
+}
+
 const DEMO_USER_ID = "demo-user";
 
 export default function Dashboard() {
@@ -97,10 +128,11 @@ export default function Dashboard() {
     }
   }, [isDark]);
 
+  const allowedPhrases = phrases.filter(isFromAllowedSurah);
   const filteredPhrases =
     selectedCategory === "all"
-      ? phrases
-      : phrases.filter((phrase) => phrase.category === selectedCategory);
+      ? allowedPhrases
+      : allowedPhrases.filter((phrase) => phrase.category === selectedCategory);
 
   const handleRandomExercise = () => {
     const randomType = getRandomExerciseType();
@@ -147,11 +179,12 @@ export default function Dashboard() {
     window.open("https://www.mojzy.com/", "_blank", "noopener,noreferrer");
   };
 
+  const allowedPhraseIds = new Set(allowedPhrases.map(p => p.id));
   const masteredPhrases = userProgress.filter(
-    (p) => (p.masteryLevel || 0) >= 80,
+    (p) => (p.masteryLevel || 0) >= 80 && allowedPhraseIds.has(p.phraseId),
   );
   const needReviewPhrases = userProgress.filter(
-    (p) => (p.masteryLevel || 0) < 80 && (p.masteryLevel || 0) > 0,
+    (p) => (p.masteryLevel || 0) < 80 && (p.masteryLevel || 0) > 0 && allowedPhraseIds.has(p.phraseId),
   );
 
   return (
@@ -216,7 +249,7 @@ export default function Dashboard() {
                     <DropdownMenuItem asChild>
                       <Link href="/translation-manager" className="cursor-pointer">
                         <Languages className="mr-2 h-4 w-4" />
-                        <span>إدارة الترجمات</span>
+                        <span>{t('translationManager')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -278,7 +311,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {exerciseTypes.map((exercise) => {
               const randomPhrase =
-                phrases[Math.floor(Math.random() * phrases.length)];
+                allowedPhrases.length > 0 ? allowedPhrases[Math.floor(Math.random() * allowedPhrases.length)] : undefined;
 
               return (
                 <ExerciseCard
@@ -334,10 +367,10 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold mb-2 text-foreground">
-                      Global Quranic Chat
+                      {t('globalQuranicChat')}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Join 11 language rooms with AI-powered Arabic translation
+                      {t('globalQuranicChatDesc')}
                     </p>
                   </div>
                   <Languages className="h-10 w-10 text-emerald-600 shrink-0" />
@@ -349,7 +382,7 @@ export default function Dashboard() {
                     setLocation("/chat");
                   }}
                 >
-                  Enter Chat Rooms
+                  {t('enterChatRooms')}
                 </Button>
               </CardContent>
             </Card>
@@ -532,7 +565,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="space-y-3">
-                  {phrases.slice(0, 2).map((phrase) => (
+                  {allowedPhrases.slice(0, 2).map((phrase) => (
                     <div
                       key={phrase.id}
                       className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-md"
@@ -561,7 +594,7 @@ export default function Dashboard() {
                     className="text-sm text-muted-foreground"
                     data-testid="text-suggestion-count"
                   >
-                    🌟 <strong>12</strong> {t('newPhrasesAvailable')}
+                    🌟 <strong>{allowedPhrases.length}</strong> {t('newPhrasesAvailable')}
                   </p>
                 </div>
               </CardContent>
