@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
+import { ALLOWED_SURAHS } from "./content-logic";
 import {
   insertPhraseSchema,
   insertExerciseSessionSchema,
@@ -1987,7 +1988,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/real-life-examples", async (_req, res) => {
     try {
       const examples = await storage.getAllRealLifeExamples();
-      res.json(examples);
+      const filtered = examples.filter(ex => {
+        const surahName = ex.surahReference?.split(':')?.[0];
+        return surahName && ALLOWED_SURAHS.includes(surahName);
+      });
+      res.json(filtered);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch real-life examples" });
     }
