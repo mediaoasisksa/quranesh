@@ -1500,13 +1500,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseUrl = `${protocol}://${host}`;
       const callbackUrl = `${baseUrl}/api/payment-callback?entityId=${entityId}&planId=${planId}&userId=${userId || ''}`;
 
+      if (!customerDetails) {
+        return res.status(400).json({ message: "Customer details are required" });
+      }
+
       const checkoutData = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
         currency: selectedPlan.currency,
         paymentType: "DB",
         merchantTransactionId,
-        integrity: "true", // Enable integrity hash for secure widget loading
         "customer.email": customerDetails.email,
         "customer.givenName": customerDetails.givenName,
         "customer.surname": customerDetails.surname,
@@ -1515,7 +1518,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.state": customerDetails.state,
         "billing.country": customerDetails.country,
         "billing.postcode": customerDetails.postcode,
-        "customParameters[3DS2_enrolled]": "true",
       };
 
       const formData = new URLSearchParams();
@@ -1556,9 +1558,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         plan: selectedPlan,
       });
     } catch (error: any) {
-      const hyperpayError = error?.response?.data || error?.message || error;
-      console.error("HyperPay checkout error:", JSON.stringify(hyperpayError, null, 2));
-      res.status(500).json({ message: "Failed to create checkout" });
+      const errData = error?.response?.data;
+      const errMsg = error?.message;
+      try {
+        console.error("===HYPERPAY_ERROR===", errData ? JSON.stringify(errData) : errMsg);
+      } catch {
+        console.error("===HYPERPAY_ERROR=== (non-serializable):", errMsg);
+      }
+      const debugMessage =
+        errData?.result?.description ||
+        errData?.resultDetails?.description ||
+        errMsg ||
+        "Unknown error";
+      res.status(500).json({ message: `Payment failed: ${debugMessage}` });
     }
   });
 

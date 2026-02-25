@@ -115,12 +115,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       const script = document.createElement('script');
       script.src = `${data.widgetUrl}/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
       
-      // Add security attributes as per HyperPay documentation
-      if (data.integrity) {
-        script.integrity = data.integrity;
-        script.crossOrigin = 'anonymous';
-      }
-      
       script.onload = () => {
         setIsLoading(false);
       };
