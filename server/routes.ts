@@ -1695,14 +1695,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { resourcePath, entityId, planId, userId } = req.query;
 
+      console.log("===PAYMENT_CALLBACK_RECEIVED===", { resourcePath, entityId, planId, userId });
+
       if (!resourcePath) {
+        console.error("Payment callback: missing resourcePath");
         return res.redirect("/pricing?error=missing_parameters");
       }
 
       const verificationEntityId = entityId as string || HYPERPAY_CONFIG.entityIdVisaMaster;
+      const verifyUrl = `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`;
+      console.log("===PAYMENT_VERIFY_URL===", verifyUrl, "entityId:", verificationEntityId?.substring(0, 8) + "...");
 
       const response = await axios.get(
-        `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`,
+        verifyUrl,
         {
           headers: {
             Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
@@ -1710,11 +1715,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           params: {
             entityId: verificationEntityId,
           },
+          // Don't throw on non-2xx — HyperPay returns 4xx for declined payments
+          validateStatus: () => true,
         },
       );
 
+      console.log("===PAYMENT_VERIFY_RESPONSE===", response.status, JSON.stringify(response.data));
+
       const paymentResult = response.data;
-      const isSuccessful = paymentResult.result.code.startsWith("000");
+
+      if (!paymentResult?.result?.code) {
+        console.error("Payment callback: no result code in response", JSON.stringify(paymentResult));
+        return res.redirect("/payment-success?success=false&error=verification_failed");
+      }
+
+      const code = paymentResult.result.code as string;
+      // HyperPay success codes: 000.000.xxx and 000.100.xxx
+      const isSuccessful = /^(000\.000\.|000\.100\.)/.test(code);
+
+      console.log("===PAYMENT_RESULT===", { code, description: paymentResult.result.description, isSuccessful });
 
       if (isSuccessful) {
         if (planId && userId) {
@@ -1756,12 +1775,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           `/payment-success?success=true&transactionId=${paymentResult.id}&amount=${paymentResult.amount}&currency=${paymentResult.currency}`,
         );
       } else {
-        res.redirect(
-          `/payment-success?success=false&error=${encodeURIComponent(paymentResult.result.description)}`,
-        );
+        const errorDesc = encodeURIComponent(paymentResult.result.description || "Payment declined");
+        res.redirect(`/payment-success?success=false&error=${errorDesc}`);
       }
     } catch (error: any) {
-      console.error("Payment callback error:", error.response?.data || error.message);
+      console.error("===PAYMENT_CALLBACK_ERROR===", error.message, error.response?.data);
       res.redirect("/payment-success?success=false&error=verification_failed");
     }
   });
