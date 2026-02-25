@@ -1453,15 +1453,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingPath = path.resolve(import.meta.dirname, "..", "pricing.json");
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
+  const isProduction = true;
   const HYPERPAY_CONFIG = {
-    serverUrl: "https://eu-prod.oppwa.com",
-    accessToken: process.env.HYPERPAY_ACCESS_TOKEN || "",
-    entityIdVisaMaster: process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID || "",
-    entityIdMada: process.env.HYPERPAY_ENTITY_ID_MADA || process.env.HYPERPAY_MADA_ENTITY_ID || "",
-    isProduction: true,
+    serverUrl: process.env.HYPERPAY_SERVER_URL || "https://eu-prod.oppwa.com",
+    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || process.env.HYPERPAY_ACCESS_TOKEN || "",
+    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID || "",
+    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || process.env.HYPERPAY_ENTITY_ID_MADA || process.env.HYPERPAY_MADA_ENTITY_ID || "",
+    isProduction,
   };
 
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
+  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityVisa=${!!HYPERPAY_CONFIG.entityIdVisaMaster}, entityMada=${!!HYPERPAY_CONFIG.entityIdMada}, serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
@@ -1553,8 +1555,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         merchantTransactionId,
         plan: selectedPlan,
       });
-    } catch (error) {
-      console.error("HyperPay checkout error:", error);
+    } catch (error: any) {
+      const hyperpayError = error?.response?.data || error?.message || error;
+      console.error("HyperPay checkout error:", JSON.stringify(hyperpayError, null, 2));
       res.status(500).json({ message: "Failed to create checkout" });
     }
   });
