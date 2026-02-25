@@ -1455,10 +1455,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const isProduction = true;
   const HYPERPAY_CONFIG = {
-    serverUrl: process.env.HYPERPAY_SERVER_URL || "https://eu-prod.oppwa.com",
-    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || process.env.HYPERPAY_ACCESS_TOKEN || "",
-    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID_VISA_MASTER || process.env.HYPERPAY_ENTITY_ID || "",
-    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || process.env.HYPERPAY_ENTITY_ID_MADA || process.env.HYPERPAY_MADA_ENTITY_ID || "",
+    serverUrl: "https://eu-prod.oppwa.com",
+    accessToken: process.env.HYPERPAY_ACCESS_TOKEN || "",
+    entityIdVisaMaster: process.env.HYPERPAY_ENTITY_ID || "",
+    entityIdMada: process.env.HYPERPAY_MADA_ENTITY_ID || "",
     isProduction,
   };
 
