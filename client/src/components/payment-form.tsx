@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
-import { Loader2, CreditCard, Shield } from 'lucide-react';
+import { Loader2, CreditCard } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -51,11 +51,10 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     street: '',
     city: '',
     state: '',
-    country: 'SA',
+    country: '',
     postcode: ''
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'MADA' | 'VISA_MASTER'>('VISA_MASTER');
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [integrity, setIntegrity] = useState<string | null>(null);
@@ -104,7 +103,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
         },
         body: JSON.stringify({
           planId: selectedPlan.id,
-          paymentMethod: paymentMethod,
           customerDetails,
           userId: user?.id || '',
         }),
@@ -182,56 +180,6 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Payment Method Selection */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium">{t('selectPaymentMethod')}</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant={paymentMethod === 'MADA' ? 'default' : 'outline'}
-                onClick={() => {
-                  setPaymentMethod('MADA');
-                  // Reset checkout if already created with different payment method
-                  if (checkoutId) {
-                    setCheckoutId(null);
-                    setIntegrity(null);
-                    setCallbackUrl(null);
-                    setError(null);
-                  }
-                }}
-                className="flex items-center justify-center gap-2 h-12"
-                disabled={isLoading}
-                data-testid="button-payment-mada"
-              >
-                <Shield className="h-5 w-5" />
-                <span className="font-semibold">{t('mada')}</span>
-              </Button>
-              <Button
-                type="button"
-                variant={paymentMethod === 'VISA_MASTER' ? 'default' : 'outline'}
-                onClick={() => {
-                  setPaymentMethod('VISA_MASTER');
-                  // Reset checkout if already created with different payment method
-                  if (checkoutId) {
-                    setCheckoutId(null);
-                    setIntegrity(null);
-                    setCallbackUrl(null);
-                    setError(null);
-                  }
-                }}
-                className="flex items-center justify-center gap-2 h-12"
-                disabled={isLoading}
-                data-testid="button-payment-visa-master"
-              >
-                <CreditCard className="h-5 w-5" />
-                <span className="font-semibold">{t('visaMaster')}</span>
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {t('selectCardType')}
-            </p>
           </div>
 
           {/* Customer Details Form */}
@@ -322,6 +270,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 required
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
+                <option value="" disabled>Select Country</option>
                 <option value="SA">Saudi Arabia</option>
                 <option value="AE">United Arab Emirates</option>
                 <option value="KW">Kuwait</option>
