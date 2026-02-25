@@ -62,13 +62,26 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Restore saved billing address and pre-fill registered email on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('quranesh_billing');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setCustomerDetails(prev => ({ ...prev, ...parsed, email: user?.email || '' }));
+      } else {
+        setCustomerDetails(prev => ({ ...prev, email: user?.email || '' }));
+      }
+    } catch {
+      setCustomerDetails(prev => ({ ...prev, email: user?.email || '' }));
+    }
+  }, [user]);
+
   // Configure HyperPay widget options
   useEffect(() => {
     window.wpwlOptions = {
       paymentTarget: "_top",
       brandOrder: ["MADA", "VISA", "MASTER"]
-      // Note: shopperResultUrl is set in the form's action attribute
-      // NOT in the backend checkout creation, as per HyperPay documentation
     };
   }, []);
 
@@ -107,6 +120,12 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       setCheckoutId(data.checkoutId);
       setIntegrity(data.integrity);
       setCallbackUrl(data.callbackUrl);
+
+      // Save billing details (not email) for next time
+      try {
+        const { email: _e, ...billingToSave } = customerDetails;
+        localStorage.setItem('quranesh_billing', JSON.stringify(billingToSave));
+      } catch { /* ignore storage errors */ }
 
       const script = document.createElement('script');
       script.src = `${data.widgetUrl}/v1/paymentWidgets.js?checkoutId=${data.checkoutId}`;
@@ -218,15 +237,15 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
           {/* Customer Details Form */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t('email')} *</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={customerDetails.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="your@email.com"
-                required
+                readOnly
+                className="bg-muted cursor-not-allowed opacity-80"
               />
+              <p className="text-xs text-muted-foreground">Using your registered email</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="givenName">{t('firstName')} *</Label>
