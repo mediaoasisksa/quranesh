@@ -296,14 +296,35 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">{t('country')} *</Label>
-              <Input
+              <select
                 id="country"
-                type="text"
                 value={customerDetails.country}
                 onChange={(e) => handleInputChange('country', e.target.value)}
-                placeholder="SA"
                 required
-              />
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="SA">Saudi Arabia</option>
+                <option value="AE">United Arab Emirates</option>
+                <option value="KW">Kuwait</option>
+                <option value="QA">Qatar</option>
+                <option value="BH">Bahrain</option>
+                <option value="OM">Oman</option>
+                <option value="EG">Egypt</option>
+                <option value="JO">Jordan</option>
+                <option value="LB">Lebanon</option>
+                <option value="IQ">Iraq</option>
+                <option value="TR">Turkey</option>
+                <option value="PK">Pakistan</option>
+                <option value="IN">India</option>
+                <option value="ID">Indonesia</option>
+                <option value="MY">Malaysia</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+              </select>
             </div>
           </div>
 

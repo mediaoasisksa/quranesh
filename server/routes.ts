@@ -1504,6 +1504,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Customer details are required" });
       }
 
+      const normalizeCountry = (c: string): string => {
+        const map: Record<string, string> = {
+          'saudi arabia': 'SA', 'uae': 'AE', 'united arab emirates': 'AE',
+          'kuwait': 'KW', 'qatar': 'QA', 'bahrain': 'BH', 'oman': 'OM',
+          'egypt': 'EG', 'jordan': 'JO', 'lebanon': 'LB', 'iraq': 'IQ',
+          'united states': 'US', 'usa': 'US', 'united kingdom': 'GB', 'uk': 'GB',
+          'turkey': 'TR', 'pakistan': 'PK', 'india': 'IN', 'indonesia': 'ID',
+          'malaysia': 'MY', 'germany': 'DE', 'france': 'FR', 'canada': 'CA', 'australia': 'AU',
+        };
+        const val = (c || 'SA').trim();
+        if (val.length === 2) return val.toUpperCase();
+        return map[val.toLowerCase()] || val.toUpperCase().substring(0, 2);
+      };
+      const normalizedCountry = normalizeCountry(customerDetails.country);
+      console.log(`HyperPay checkout: country="${customerDetails.country}" → normalized="${normalizedCountry}", amount=${selectedPlan.price}, entityId=${entityId ? entityId.substring(0,8)+'...' : 'MISSING'}`);
+
       const checkoutData = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
@@ -1516,7 +1532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "billing.street1": customerDetails.street,
         "billing.city": customerDetails.city,
         "billing.state": customerDetails.state,
-        "billing.country": customerDetails.country,
+        "billing.country": normalizedCountry,
         "billing.postcode": customerDetails.postcode,
       };
 
