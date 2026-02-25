@@ -1542,6 +1542,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
+      console.log("===HYPERPAY_RESPONSE===", JSON.stringify(response.data));
+
       // HyperPay returns integrity as an object { value: string, algorithm: string }
       let integrityHash = null;
       if (response.data.integrity && response.data.integrity.value) {

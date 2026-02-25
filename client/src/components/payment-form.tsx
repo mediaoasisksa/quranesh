@@ -100,11 +100,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
       const data = await response.json();
 
       if (!response.ok) {
-        // Provide more helpful error messages
-        let errorMessage = data.message || 'Failed to create checkout';
-        if (response.status === 500) {
-          errorMessage = 'Payment service temporarily unavailable. Please try again later.';
-        }
+        const errorMessage = data.message || 'Failed to create checkout';
         throw new Error(errorMessage);
       }
 
