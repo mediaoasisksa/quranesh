@@ -213,14 +213,3 @@ export async function runDailyQuranicElementsJob(): Promise<{ success: boolean; 
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runDailyQuranicElementsJob()
-    .then(result => {
-      console.log("Job result:", result);
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error("Job failed:", error);
-      process.exit(1);
-    });
-}
