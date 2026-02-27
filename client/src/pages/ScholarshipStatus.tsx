@@ -40,6 +40,13 @@ const ScholarshipStatus = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      if (res.status === 401) {
+        // Expired or invalid token — clear localStorage and send to sign in
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        window.location.href = "/signin?redirect=/scholarship-status";
+        return;
+      }
       if (!res.ok) throw new Error(data.message || "Failed to claim scholarship");
       setClaimed(true);
     } catch (err: any) {
