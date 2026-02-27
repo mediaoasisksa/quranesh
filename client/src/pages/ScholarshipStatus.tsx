@@ -74,7 +74,7 @@ const ScholarshipStatus = () => {
                     ? "تهانينا! تم فتح اشتراكك السنوي مجانًا. يمكنك الآن الدخول إلى جميع التمارين."
                     : "Congratulations! Your free annual subscription has been activated. You can now access all exercises."}
                 </p>
-                <Link href="/exercise">
+                <Link href="/dashboard">
                   <Button size="lg" className="w-full">
                     {isArabic ? "ابدأ التعلم الآن" : "Start Learning Now"}
                   </Button>
