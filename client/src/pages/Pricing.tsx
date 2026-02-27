@@ -316,6 +316,19 @@ const Pricing = () => {
                         <ShoppingCart className="w-4 h-4" />
                         {isArabic ? "اشترك الآن" : "Subscribe"} - {plan.price} {plan.currency}
                       </Button>
+
+                      {plan.id === "learner" && (
+                        <div className="text-center mt-3">
+                          <a
+                            href="/scholarship-status"
+                            className="text-sm text-primary hover:underline font-medium"
+                          >
+                            {isArabic
+                              ? "🎓 للحصول على منحة من المنصة والدخول مجانًا"
+                              : "🎓 Apply for a scholarship to access for free"}
+                          </a>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
