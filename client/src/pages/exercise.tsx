@@ -965,10 +965,10 @@ export default function Exercise() {
             <BookOpen className="h-5 w-5 text-primary" />
             <span className="font-semibold text-lg text-foreground arabic-text">سورة الكهف</span>
             <span className="text-muted-foreground">—</span>
-            <span className="text-muted-foreground">Surah Al-Kahf</span>
+            <span className="text-muted-foreground">{t('surahAlKahfName')}</span>
             {vocabSurahs.length > 0 && (
               <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                {vocabSurahs[0]?.count} {language === 'ar' ? 'كلمة' : 'words'}
+                {vocabSurahs[0]?.count} {t('wordsUnit')}
               </span>
             )}
           </div>
