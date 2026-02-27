@@ -23,8 +23,8 @@
     },
     {
       "id": "sponsor-5",
-      "name": "راعي 5 متعلمين",
-      "nameEn": "Sponsor 5 Learners",
+      "name": "راعي فضي",
+      "nameEn": "Silver Sponsor",
       "price": 50,
       "currency": "SAR",
       "duration": "year",
@@ -43,8 +43,8 @@
     },
     {
       "id": "sponsor-10",
-      "name": "راعي 10 متعلمين",
-      "nameEn": "Sponsor 10 Learners",
+      "name": "متعلم ذهبي",
+      "nameEn": "Golden Learner",
       "price": 100,
       "currency": "SAR",
       "duration": "year",
