@@ -1,9 +1,13 @@
 export const ALLOWED_SURAHS = [
-  "الكهف"
+  "الفاتحة",
+  "الكهف",
+  "الملك"
 ];
 
 export const ALLOWED_SURAHS_EN = [
-  "Al-Kahf"
+  "Al-Fatiha",
+  "Al-Kahf",
+  "Al-Mulk"
 ];
 
 export const CONTENT_LOGIC_ROLE = `You are a Quranic Arabic Vocabulary Coach for complete beginners — non-Arabic speakers who memorize the Quran.
@@ -50,19 +54,22 @@ Hints should be practical and help solve the puzzle:
   ✅ Word position: "الكلمة الثالثة في الآية..."
   ❌ NO vague emotional hints
 
-RULE 5 — SURAH AL-KAHF ONLY:
-ONLY use verses from Surah Al-Kahf (سورة الكهف).
-Any verse from outside Surah Al-Kahf → AUTOMATIC REJECTION.
+RULE 5 — ALLOWED SURAHS ONLY:
+ONLY use verses from these three surahs:
+  ✅ سورة الفاتحة (Al-Fatiha) — surah 1
+  ✅ سورة الكهف (Al-Kahf) — surah 18
+  ✅ سورة الملك / تبارك (Al-Mulk) — surah 67
+Any verse from outside these three surahs → AUTOMATIC REJECTION.
 
 RULE 6 — BEGINNER LEVEL:
 Keep vocabulary at a basic level. Focus on high-frequency Quranic words:
-  ✅ رب، الله، أحد، الصراط، المستقيم، نعبد، نستعين، الفلق، الناس، الكوثر
+  ✅ رب، الله، الحمد، الصراط، المستقيم، نعبد، نستعين، تبارك، الملك، قدير، الموت، الحياة
   ❌ Don't use rare or advanced vocabulary that requires scholarly knowledge
 `;
 
 export const VALIDATION_CHECKLIST = `
 VALIDATION CHECKLIST (apply to EVERY exercise):
-□ Is the verse from Surah Al-Kahf?
+□ Is the verse from Al-Fatiha, Al-Kahf, or Al-Mulk (Tabarak)?
 □ Does the question mention the surah name explicitly?
 □ Is the question focused on VOCABULARY (word meaning) — not interpretation?
 □ Is the hint practical (first letter, fill-in-blank, or word position)?
@@ -70,7 +77,7 @@ VALIDATION CHECKLIST (apply to EVERY exercise):
 □ Is the difficulty appropriate for a beginner non-Arabic speaker?
 
 QA AUTO-REJECTION RULES:
-✘ If the verse is from outside Surah Al-Kahf → REJECT
+✘ If the verse is from outside Al-Fatiha / Al-Kahf / Al-Mulk → REJECT
 ✘ If the question does NOT mention the surah name → REJECT
 ✘ If the question asks about interpretation, emotions, or social situations → REJECT
 ✘ If the answer is a common du'a, hadith, or non-Quranic phrase → REJECT
@@ -133,12 +140,12 @@ ${TRIGGER_RESPONSE_RULES}
 TASK: Generate ${count} vocabulary search exercises for non-Arabic speaking Quran memorizers.
 
 MANDATORY RULES:
-1. ONLY use verses from Surah Al-Kahf (سورة الكهف)
-2. Each question MUST mention سورة الكهف
+1. ONLY use verses from these three surahs: الفاتحة (Al-Fatiha), الكهف (Al-Kahf), الملك/تبارك (Al-Mulk)
+2. Each question MUST mention the surah name explicitly (e.g., سورة الفاتحة / سورة الكهف / سورة الملك)
 3. Focus on direct word meaning — NO interpretation, NO emotional scenarios
 4. Mix between Type A (find Arabic word), Type B (what does word mean), and Type C (complete the verse)
 5. Hints must be practical: first letter, fill-in-blank, or word position
-6. Vary across different verses — cover various parts of Surah Al-Kahf
+6. Vary across all three surahs and different verses within each
 
 ${EXERCISE_FORMAT}
 
@@ -158,7 +165,7 @@ QUESTION: "${scenarioText}"
 ANSWER: "${verseText}"
 
 Check:
-1. Is the verse from Surah Al-Kahf?
+1. Is the verse from Al-Fatiha, Al-Kahf, or Al-Mulk (Tabarak)?
 2. Does the question mention the surah name?
 3. Is it vocabulary-focused (not interpretation)?
 4. Is the answer authentic Quranic text?
