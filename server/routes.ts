@@ -1850,6 +1850,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/scholarship/claim", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const userId = decoded.userId;
+
+      const { eq, lt, and, sql: sqlTag } = await import("drizzle-orm");
+
+      const userRecord = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (userRecord.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const user = userRecord[0];
+
+      if (user.scholarshipStatus === "active") {
+        return res.status(400).json({ message: "You already have an active scholarship" });
+      }
+
+      const existingMatch = await db.select().from(scholarshipMatches).where(eq(scholarshipMatches.studentId, userId)).limit(1);
+      if (existingMatch.length > 0) {
+        return res.status(400).json({ message: "Scholarship already claimed" });
+      }
+
+      const updated = await db.execute(
+        sqlTag`UPDATE sponsorships SET used_seats = used_seats + 1, is_fully_used = (used_seats + 1 >= total_seats) WHERE used_seats < total_seats RETURNING id`
+      );
+      const rows = (updated as any).rows || (updated as any);
+      if (!rows || rows.length === 0) {
+        return res.status(400).json({ message: "No available scholarship seats" });
+      }
+      const spId = rows[0].id;
+
+      await db.insert(scholarshipMatches).values({ studentId: userId, sponsorshipId: spId });
+
+      await db.update(users).set({ scholarshipStatus: "active" }).where(eq(users.id, userId));
+
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 365);
+      await db.insert(subscriptions).values({
+        userId,
+        planType: "learner",
+        amount: 0,
+        currency: "SAR",
+        endDate,
+        status: "active",
+        transactionId: `scholarship-${spId}-${Date.now()}`,
+        sponsoredUsers: 0,
+      });
+
+      console.log(`Scholarship claimed: userId=${userId}, sponsorshipId=${spId}`);
+      res.json({ success: true, message: "Scholarship activated successfully" });
+    } catch (error: any) {
+      console.error("Scholarship claim error:", error);
+      res.status(500).json({ message: "Failed to claim scholarship" });
+    }
+  });
+
   app.get("/api/scholarship/status", async (req, res) => {
     try {
       const { userId } = req.query;
