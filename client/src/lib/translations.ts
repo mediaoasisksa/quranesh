@@ -291,6 +291,18 @@ export const translations = {
     termsOfService: "Terms of Service",
     footerDescription: "Empowering Huffaz worldwide to transform their Quranic knowledge into practical Arabic communication skills through AI-powered learning.",
     footerCopyright: "© 2024 Quranic. All rights reserved. Developed with respect for Islamic values.",
+    // Scholarship
+    scholarshipAvailableTitle: "Free Seats Available!",
+    scholarshipActivatedTitle: "Scholarship Activated! 🎉",
+    scholarshipActivatedDesc: "Congratulations! Your free annual subscription has been activated. You can now access all exercises.",
+    scholarshipSeatNotice: "You will use 1 seat out of {count} available seats",
+    scholarshipRegisteredUnder: "Subscription will be registered under:",
+    claimFreeScholarship: "🎓 Claim Your Free Scholarship",
+    signInToClaimScholarship: "You need to sign in first to claim your scholarship",
+    waitingListTitle: "You're on the Waiting List",
+    waitingListDesc: "You've been registered successfully! There are no sponsored seats available right now. Your account will be activated automatically when a new sponsor is available.",
+    getFreeScholarshipTitle: "Get a Free Seat Scholarship from the Platform",
+    getFreeScholarshipDesc: "You will be notified as soon as a sponsored seat becomes available and your subscription will be activated automatically",
   },
   ar: {
     // Navigation
@@ -584,6 +596,18 @@ export const translations = {
     termsOfService: "شروط الخدمة",
     footerDescription: "تمكين الحفاظ في جميع أنحاء العالم لتحويل معرفتهم القرآنية إلى مهارات التواصل العربية العملية من خلال التعلم المدعوم بالذكاء الاصطناعي.",
     footerCopyright: "© 2024 قرآني. جميع الحقوق محفوظة. تم التطوير باحترام القيم الإسلامية.",
+    // Scholarship
+    scholarshipAvailableTitle: "مقاعد مجانية متاحة!",
+    scholarshipActivatedTitle: "تم تفعيل منحتك بنجاح! 🎉",
+    scholarshipActivatedDesc: "تهانينا! تم فتح اشتراكك السنوي مجانًا. يمكنك الآن الدخول إلى جميع التمارين.",
+    scholarshipSeatNotice: "ستستهلك مقعدًا واحدًا من {count} مقعدًا متاحًا",
+    scholarshipRegisteredUnder: "سيتم تسجيل الاشتراك باسم:",
+    claimFreeScholarship: "🎓 احصل على منحتك مجانًا",
+    signInToClaimScholarship: "يجب تسجيل الدخول أولاً للحصول على المنحة",
+    waitingListTitle: "أنت في قائمة الانتظار",
+    waitingListDesc: "تم تسجيلك بنجاح! لا توجد مقاعد مدعومة متاحة حالياً. سيتم تفعيل حسابك تلقائياً عند توفر كافل جديد.",
+    getFreeScholarshipTitle: "احصل على منحة مقعد مجاني من المنصة",
+    getFreeScholarshipDesc: "سيتم إشعارك فور توفر مقعد مدعوم وتفعيل اشتراكك تلقائيًا",
   },
   id: {
     // Navigation
@@ -877,6 +901,18 @@ export const translations = {
     termsOfService: "Ketentuan Layanan",
     footerDescription: "Memberdayakan Huffaz di seluruh dunia untuk mengubah pengetahuan Quran mereka menjadi keterampilan komunikasi Arab praktis melalui pembelajaran bertenaga AI.",
     footerCopyright: "© 2024 Quranic. Semua hak dilindungi. Dikembangkan dengan menghormati nilai-nilai Islam.",
+    // Scholarship
+    scholarshipAvailableTitle: "Kursi Gratis Tersedia!",
+    scholarshipActivatedTitle: "Beasiswa Diaktifkan! 🎉",
+    scholarshipActivatedDesc: "Selamat! Langganan tahunan gratis Anda telah diaktifkan. Anda sekarang dapat mengakses semua latihan.",
+    scholarshipSeatNotice: "Anda akan menggunakan 1 kursi dari {count} kursi yang tersedia",
+    scholarshipRegisteredUnder: "Langganan akan didaftarkan atas nama:",
+    claimFreeScholarship: "🎓 Klaim Beasiswa Gratis Anda",
+    signInToClaimScholarship: "Anda perlu masuk terlebih dahulu untuk mengklaim beasiswa",
+    waitingListTitle: "Anda Ada di Daftar Tunggu",
+    waitingListDesc: "Anda telah terdaftar dengan sukses! Tidak ada kursi yang tersedia saat ini. Akun Anda akan diaktifkan secara otomatis ketika sponsor baru tersedia.",
+    getFreeScholarshipTitle: "Dapatkan Beasiswa Kursi Gratis dari Platform",
+    getFreeScholarshipDesc: "Anda akan diberitahu segera setelah kursi yang disponsori tersedia dan langganan Anda akan diaktifkan secara otomatis",
   },
   tr: {
     // Navigation
@@ -1170,6 +1206,18 @@ export const translations = {
     termsOfService: "Hizmet Şartları",
     footerDescription: "Dünya çapındaki Huffaz'ı, yapay zeka destekli öğrenme yoluyla Kuran bilgilerini pratik Arapça iletişim becerilerine dönüştürmeye güçlendiriyoruz.",
     footerCopyright: "© 2024 Quranic. Tüm hakları saklıdır. İslami değerlere saygıyla geliştirilmiştir.",
+    // Scholarship
+    scholarshipAvailableTitle: "Ücretsiz Kontenjan Mevcut!",
+    scholarshipActivatedTitle: "Burs Aktifleştirildi! 🎉",
+    scholarshipActivatedDesc: "Tebrikler! Ücretsiz yıllık aboneliğiniz aktifleştirildi. Artık tüm alıştırmalara erişebilirsiniz.",
+    scholarshipSeatNotice: "{count} mevcut kontenjandan 1 kontenjan kullanacaksınız",
+    scholarshipRegisteredUnder: "Abonelik şu isim altında kaydedilecek:",
+    claimFreeScholarship: "🎓 Ücretsiz Bursu Talep Et",
+    signInToClaimScholarship: "Bursu talep etmek için önce giriş yapmanız gerekiyor",
+    waitingListTitle: "Bekleme Listesindeysiniz",
+    waitingListDesc: "Başarıyla kaydedildiniz! Şu anda desteklenen kontenjan bulunmamaktadır. Yeni bir sponsor mevcut olduğunda hesabınız otomatik olarak aktifleştirilecektir.",
+    getFreeScholarshipTitle: "Platformdan Ücretsiz Kontenjan Bursu Alın",
+    getFreeScholarshipDesc: "Desteklenen bir kontenjan müsait olur olmaz bilgilendirilecek ve aboneliğiniz otomatik olarak aktifleştirilecektir",
   },
   zh: {
     // Navigation
@@ -1463,6 +1511,18 @@ export const translations = {
     termsOfService: "服务条款",
     footerDescription: "通过人工智能驱动的学习，赋能全球哈菲兹将他们的古兰经知识转化为实际的阿拉伯语交流技能。",
     footerCopyright: "© 2024 古兰经。保留所有权利。以尊重伊斯兰价值观开发。",
+    // Scholarship
+    scholarshipAvailableTitle: "有免费名额！",
+    scholarshipActivatedTitle: "奖学金已激活！🎉",
+    scholarshipActivatedDesc: "恭喜！您的免费年度订阅已激活。您现在可以访问所有练习。",
+    scholarshipSeatNotice: "您将使用 {count} 个可用名额中的 1 个",
+    scholarshipRegisteredUnder: "订阅将以以下名义注册：",
+    claimFreeScholarship: "🎓 领取免费奖学金",
+    signInToClaimScholarship: "您需要先登录才能领取奖学金",
+    waitingListTitle: "您在等待名单中",
+    waitingListDesc: "您已成功注册！目前没有可用的赞助名额。当有新赞助商时，您的账户将自动激活。",
+    getFreeScholarshipTitle: "从平台获取免费名额奖学金",
+    getFreeScholarshipDesc: "一旦有赞助名额可用，您将收到通知，订阅将自动激活",
   },
   sw: {
     // Navigation
@@ -1756,6 +1816,18 @@ export const translations = {
     termsOfService: "Masharti ya Huduma",
     footerDescription: "Kuwapa nguvu Huffaz ulimwenguni kote kubadilisha maarifa yao ya Quran kuwa ujuzi wa mawasiliano ya Kiarabu kwa njia ya kujifunza kinachoendeshwa na AI.",
     footerCopyright: "© 2024 Quranic. Haki zote zimehifadhiwa. Imetengenezwa kwa kuheshimu maadili ya Kiislamu.",
+    // Scholarship
+    scholarshipAvailableTitle: "Viti vya Bure Vinapatikana!",
+    scholarshipActivatedTitle: "Ufadhili Umewezeshwa! 🎉",
+    scholarshipActivatedDesc: "Hongera! Usajili wako wa kila mwaka bila malipo umewezeshwa. Sasa unaweza kufikia mazoezi yote.",
+    scholarshipSeatNotice: "Utatumia kiti 1 kati ya viti {count} vinapatikana",
+    scholarshipRegisteredUnder: "Usajili utasajiliwa kwa jina la:",
+    claimFreeScholarship: "🎓 Dai Ufadhili Wako wa Bure",
+    signInToClaimScholarship: "Unahitaji kuingia kwanza kudai ufadhili",
+    waitingListTitle: "Uko Kwenye Orodha ya Kusubiri",
+    waitingListDesc: "Umesajiliwa kwa mafanikio! Hakuna viti vya kuungwa mkono kwa sasa. Akaunti yako itawezeshwa kiotomatiki mhisani mpya atakapopatikana.",
+    getFreeScholarshipTitle: "Pata Ufadhili wa Kiti cha Bure kutoka kwa Jukwaa",
+    getFreeScholarshipDesc: "Utaarifiwa mara kiti kinachoungwa mkono kitakapopatikana na usajili wako utawezeshwa kiotomatiki",
   },
   so: {
     // Navigation
@@ -2049,6 +2121,18 @@ export const translations = {
     termsOfService: "Shuruudaha Adeegga",
     footerDescription: "Xoog siinta Xaafidhiinta dunida oo dhan inay u beddelaan aqoontooda Quraanka xirfadaha isgaarsiinta Carabiga iyada oo la adeegsanayo barashada AI ku dhaqaaqsan.",
     footerCopyright: "© 2024 Quranic. Dhammaan xuquuqaha way xifdhan yihiin. Lagu sameeyey ixtiraam qiyamka Islaamka.",
+    // Scholarship
+    scholarshipAvailableTitle: "Kursiyo Bilaash Ah Ayaa Jira!",
+    scholarshipActivatedTitle: "Deeqda Waxaa La Firfircooniyay! 🎉",
+    scholarshipActivatedDesc: "Hambalyo! Rukhsaddaada sanadlaha bilaashka ah waxaa la firfircooniyay. Hadda waxaad geli kartaa dhammaan jimicsiyada.",
+    scholarshipSeatNotice: "Waxaad isticmaali doontaa 1 kursi oo ka mid ah {count} kursiyo la heli karo",
+    scholarshipRegisteredUnder: "Rukhsaddadu waxay ku diiwaan gashan doontaa magaca:",
+    claimFreeScholarship: "🎓 Qaado Deeqdaada Bilaashka ah",
+    signInToClaimScholarship: "Waa inaad marka hore gasho si aad deeqda u qaadato",
+    waitingListTitle: "Waxaad Ku Jirtaa Liiska Sugitaanka",
+    waitingListDesc: "Waad si guul leh u diiwaan gashatay! Ma jirto kursiyo la taageero ah hadda. Akoonkaaga si toos ah ayaa loo firfircooni doonaa marka deeq bixiye cusub la helo.",
+    getFreeScholarshipTitle: "Hel Deeq Kursi Bilaash ah oo Ka Timid Platform-ka",
+    getFreeScholarshipDesc: "Waxaa lagugu wargeliyaa isla markaaba marka kursi la taageero ah la helo iyo rukhsaddaada si toos ah ayaa loo firfircooni doonaa",
   },
   bs: {
     // Navigation
@@ -2342,6 +2426,18 @@ export const translations = {
     termsOfService: "Uslovi korištenja",
     footerDescription: "Osnažujemo hafize širom svijeta da transformišu svoje Kur'ansko znanje u praktične vještine arapske komunikacije kroz AI-podržano učenje.",
     footerCopyright: "© 2024 Quranic. Sva prava zadržana. Razvijeno uz poštovanje islamskih vrijednosti.",
+    // Scholarship
+    scholarshipAvailableTitle: "Slobodna mjesta dostupna!",
+    scholarshipActivatedTitle: "Stipendija aktivirana! 🎉",
+    scholarshipActivatedDesc: "Čestitamo! Vaša besplatna godišnja pretplata je aktivirana. Sada možete pristupiti svim vježbama.",
+    scholarshipSeatNotice: "Koristit ćete 1 mjesto od {count} dostupnih mjesta",
+    scholarshipRegisteredUnder: "Pretplata će biti registrovana pod imenom:",
+    claimFreeScholarship: "🎓 Uzmi besplatnu stipendiju",
+    signInToClaimScholarship: "Morate se prvo prijaviti da biste uzeli stipendiju",
+    waitingListTitle: "Na listi čekanja ste",
+    waitingListDesc: "Uspješno ste registrovani! Trenutno nema dostupnih sponzorisanih mjesta. Vaš nalog će biti automatski aktiviran kada novi sponzor postane dostupan.",
+    getFreeScholarshipTitle: "Dobijte besplatnu stipendiju mjesta od platforme",
+    getFreeScholarshipDesc: "Bit ćete obaviješteni čim sponzorisano mjesto postane dostupno i vaša pretplata će biti automatski aktivirana",
   },
   sq: {
     // Navigation
@@ -2634,6 +2730,18 @@ export const translations = {
     termsOfService: "Kushtet e Shërbimit",
     footerDescription: "Fuqizimi i Huffaz në mbarë botën për të transformuar njohuritë e tyre Kuranore në aftësi praktike të komunikimit në arabisht përmes të mësuarit të mundësuar nga AI.",
     footerCopyright: "© 2024 Quranic. Të gjitha të drejtat e rezervuara. Zhvilluar me respekt për vlerat Islame.",
+    // Scholarship
+    scholarshipAvailableTitle: "Vende të lira disponohen!",
+    scholarshipActivatedTitle: "Bursa u aktivizua! 🎉",
+    scholarshipActivatedDesc: "Urime! Abonimi juaj vjetor falas është aktivizuar. Tani mund të aksesoni të gjitha ushtrimet.",
+    scholarshipSeatNotice: "Do të përdorni 1 vend nga {count} vende të disponueshme",
+    scholarshipRegisteredUnder: "Abonimi do të regjistrohet nën emrin:",
+    claimFreeScholarship: "🎓 Merr bursën tënde falas",
+    signInToClaimScholarship: "Duhet të identifikoheni fillimisht për të marrë bursën",
+    waitingListTitle: "Jeni në listën e pritjes",
+    waitingListDesc: "Jeni regjistruar me sukses! Nuk ka vende të sponsorizuara disponueshme aktualisht. Llogaria juaj do të aktivizohet automatikisht kur të jetë i disponueshëm një sponsor i ri.",
+    getFreeScholarshipTitle: "Merrni bursë vendesh falas nga platforma",
+    getFreeScholarshipDesc: "Do të njoftohen sapo një vend i sponsorizuar të bëhet i disponueshëm dhe abonimi juaj do të aktivizohet automatikisht",
   },
   ru: {
     // Navigation
@@ -2949,6 +3057,18 @@ export const translations = {
     termsOfService: "Условия обслуживания",
     footerDescription: "Расширение возможностей Хуффаз по всему миру для преобразования их знаний Корана в практические навыки общения на арабском языке через обучение с использованием ИИ.",
     footerCopyright: "© 2024 Quranic. Все права защищены. Разработано с уважением к исламским ценностям.",
+    // Scholarship
+    scholarshipAvailableTitle: "Бесплатные места доступны!",
+    scholarshipActivatedTitle: "Стипендия активирована! 🎉",
+    scholarshipActivatedDesc: "Поздравляем! Ваша бесплатная годовая подписка активирована. Теперь вы можете получить доступ ко всем упражнениям.",
+    scholarshipSeatNotice: "Вы займёте 1 место из {count} доступных мест",
+    scholarshipRegisteredUnder: "Подписка будет зарегистрирована на имя:",
+    claimFreeScholarship: "🎓 Получить бесплатную стипендию",
+    signInToClaimScholarship: "Необходимо войти в систему, чтобы получить стипендию",
+    waitingListTitle: "Вы в списке ожидания",
+    waitingListDesc: "Вы успешно зарегистрированы! На данный момент нет доступных спонсируемых мест. Ваш аккаунт будет автоматически активирован, когда появится новый спонсор.",
+    getFreeScholarshipTitle: "Получите бесплатное место от платформы",
+    getFreeScholarshipDesc: "Вы получите уведомление, как только появится спонсируемое место, и ваша подписка будет автоматически активирована",
   },
   ur: {
     // Navigation
@@ -3241,6 +3361,18 @@ export const translations = {
     termsOfService: "خدمت کی شرائط",
     footerDescription: "دنیا بھر کے حافظوں کو ایآئی سے چلایا جانے والے تعلیم کے ذریعے ان کے قرآنی علم کو عملی عربی مواصلاتی مہارت میں تبدیل کرنے کے لیے بااختیار بنانا۔",
     footerCopyright: "© 2024 Quranic. تمام حقوق محفوظ ہیں۔ اسلامی اقدار کے لیے احترام کے ساتھ تیار کیا گیا۔",
+    // Scholarship
+    scholarshipAvailableTitle: "مفت سیٹیں دستیاب ہیں!",
+    scholarshipActivatedTitle: "وظیفہ فعال ہو گیا! 🎉",
+    scholarshipActivatedDesc: "مبارک ہو! آپ کی مفت سالانہ رکنیت فعال ہو گئی ہے۔ اب آپ تمام مشقوں تک رسائی حاصل کر سکتے ہیں۔",
+    scholarshipSeatNotice: "آپ {count} دستیاب سیٹوں میں سے 1 سیٹ استعمال کریں گے",
+    scholarshipRegisteredUnder: "رکنیت اس نام سے درج ہوگی:",
+    claimFreeScholarship: "🎓 اپنا مفت وظیفہ حاصل کریں",
+    signInToClaimScholarship: "وظیفہ حاصل کرنے کے لیے پہلے سائن ان کریں",
+    waitingListTitle: "آپ انتظار کی فہرست میں ہیں",
+    waitingListDesc: "آپ کی کامیابی سے رجسٹریشن ہو گئی! ابھی کوئی اسپانسر شدہ سیٹ دستیاب نہیں ہے۔ جب کوئی نیا اسپانسر دستیاب ہوگا تو آپ کا اکاؤنٹ خودکار طور پر فعال ہو جائے گا۔",
+    getFreeScholarshipTitle: "پلیٹ فارم سے مفت سیٹ وظیفہ حاصل کریں",
+    getFreeScholarshipDesc: "جیسے ہی کوئی اسپانسر شدہ سیٹ دستیاب ہوگی آپ کو اطلاع دی جائے گی اور آپ کی رکنیت خودکار طور پر فعال ہو جائے گی",
   },
   bn: {
     // Navigation
@@ -3533,6 +3665,18 @@ export const translations = {
     termsOfService: "সেবার শর্তাবলী",
     footerDescription: "এআই-চালিত শিক্ষার মাধ্যমে বিশ্বব্যাপী হাফেজদের তাদের কুরআনের জ্ঞানকে ব্যবহারিক আরবি যোগাযোগ দক্ষতায় রূপান্তর করতে সক্ষম করা।",
     footerCopyright: "© ২০২৪ কুরআনিক। সমস্ত অধিকার সংরক্ষিত। ইসলামী মূল্যবোধের প্রতি শ্রদ্ধার সাথে তৈরি।",
+    // Scholarship
+    scholarshipAvailableTitle: "বিনামূল্যে আসন উপলব্ধ!",
+    scholarshipActivatedTitle: "বৃত্তি সক্রিয় হয়েছে! 🎉",
+    scholarshipActivatedDesc: "অভিনন্দন! আপনার বিনামূল্যে বার্ষিক সদস্যপদ সক্রিয় হয়েছে। আপনি এখন সমস্ত অনুশীলনে প্রবেশ করতে পারবেন।",
+    scholarshipSeatNotice: "আপনি {count}টি উপলব্ধ আসনের মধ্যে ১টি আসন ব্যবহার করবেন",
+    scholarshipRegisteredUnder: "সদস্যপদ এই নামে নিবন্ধিত হবে:",
+    claimFreeScholarship: "🎓 আপনার বিনামূল্যে বৃত্তি নিন",
+    signInToClaimScholarship: "বৃত্তি পেতে প্রথমে সাইন ইন করুন",
+    waitingListTitle: "আপনি অপেক্ষা তালিকায় আছেন",
+    waitingListDesc: "আপনি সফলভাবে নিবন্ধিত হয়েছেন! এখন কোনো স্পনসর করা আসন নেই। নতুন স্পনসর পাওয়া গেলে আপনার অ্যাকাউন্ট স্বয়ংক্রিয়ভাবে সক্রিয় হবে।",
+    getFreeScholarshipTitle: "প্ল্যাটফর্ম থেকে বিনামূল্যে আসনের বৃত্তি পান",
+    getFreeScholarshipDesc: "একটি স্পনসর করা আসন পাওয়া মাত্রই আপনাকে জানানো হবে এবং আপনার সদস্যপদ স্বয়ংক্রিয়ভাবে সক্রিয় হবে",
 
     // Diploma
     diplomaTitle: "আরবি ভাষা ডিপ্লোমা",
@@ -3711,6 +3855,18 @@ export const translations = {
     termsOfService: "Terma Perkhidmatan",
     footerDescription: "Memberdayakan hafiz di seluruh dunia untuk mengubah pengetahuan Quran menjadi kemahiran komunikasi Arab praktikal melalui pendidikan bertenaga AI.",
     footerCopyright: "© 2024 Quranic. Hak cipta terpelihara. Dibuat dengan penghormatan terhadap nilai-nilai Islam.",
+    // Scholarship
+    scholarshipAvailableTitle: "Tempat Percuma Tersedia!",
+    scholarshipActivatedTitle: "Biasiswa Diaktifkan! 🎉",
+    scholarshipActivatedDesc: "Tahniah! Langganan tahunan percuma anda telah diaktifkan. Anda kini boleh mengakses semua latihan.",
+    scholarshipSeatNotice: "Anda akan menggunakan 1 tempat daripada {count} tempat yang tersedia",
+    scholarshipRegisteredUnder: "Langganan akan didaftarkan atas nama:",
+    claimFreeScholarship: "🎓 Tuntut Biasiswa Percuma Anda",
+    signInToClaimScholarship: "Anda perlu log masuk dahulu untuk menuntut biasiswa",
+    waitingListTitle: "Anda Berada dalam Senarai Tunggu",
+    waitingListDesc: "Anda telah berjaya didaftarkan! Tiada tempat yang ditaja tersedia buat masa ini. Akaun anda akan diaktifkan secara automatik apabila penaja baru tersedia.",
+    getFreeScholarshipTitle: "Dapatkan Biasiswa Tempat Percuma daripada Platform",
+    getFreeScholarshipDesc: "Anda akan dimaklumkan sebaik sahaja tempat yang ditaja tersedia dan langganan anda akan diaktifkan secara automatik",
   },
 };
 export type Language = keyof typeof translations;
