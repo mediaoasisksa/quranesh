@@ -1609,7 +1609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             Authorization: `Bearer ${HYPERPAY_CONFIG.accessToken}`,
           },
           params: {
-            entityId: entityId || HYPERPAY_CONFIG.entityIdVisaMaster,
+            entityId: entityId || HYPERPAY_CONFIG.entityIdMada,
           },
         },
       );
@@ -1700,7 +1700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect("/pricing?error=missing_parameters");
       }
 
-      const verificationEntityId = entityId as string || HYPERPAY_CONFIG.entityIdVisaMaster;
+      const verificationEntityId = entityId as string || HYPERPAY_CONFIG.entityIdMada;
       const verifyUrl = `${HYPERPAY_CONFIG.serverUrl}${resourcePath}`;
       console.log("===PAYMENT_VERIFY_URL===", verifyUrl, "entityId:", verificationEntityId?.substring(0, 8) + "...");
 
