@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { Phrase } from "@shared/schema";
 import { isNonQuranicPhrase } from "./quran-validator";
+import { JUZ_AMMA_BANK } from "./juz-amma-vocab";
 
 // قوائم الكلمات المفتاحية للحماية السياقية
 // منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
@@ -4390,6 +4391,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
   },
 ];
 
+VOCAB_BANK.push(...(JUZ_AMMA_BANK as unknown as VocabularyExercise[]));
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -4411,12 +4414,29 @@ export function getVocabBankSurahs(): { surahAr: string; surahEn: string; count:
 }
 
 export async function generateVocabularyExercise(userLanguage: string = 'en', surahFilter?: string): Promise<VocabularyExercise & { translatedWordMeaning: string; translatedVerseMeaning: string }> {
-  let pool = VOCAB_BANK;
+  let exercise: VocabularyExercise;
+
   if (surahFilter) {
     const filtered = VOCAB_BANK.filter(e => e.surahAr === surahFilter || e.surahEn === surahFilter);
-    if (filtered.length > 0) pool = filtered;
+    const pool = filtered.length > 0 ? filtered : VOCAB_BANK;
+    exercise = pool[Math.floor(Math.random() * pool.length)];
+  } else {
+    const allSurahs = [...new Set(VOCAB_BANK.map(e => e.surahAr))];
+    const fatihaEntries = VOCAB_BANK.filter(e => e.surahAr === 'الفاتحة');
+    let targetSurah: string;
+
+    if (fatihaEntries.length > 0 && Math.random() < 0.30) {
+      targetSurah = 'الفاتحة';
+    } else {
+      const otherSurahs = allSurahs.filter(s => s !== 'الفاتحة');
+      targetSurah = otherSurahs.length > 0
+        ? otherSurahs[Math.floor(Math.random() * otherSurahs.length)]
+        : allSurahs[Math.floor(Math.random() * allSurahs.length)];
+    }
+
+    const surahPool = VOCAB_BANK.filter(e => e.surahAr === targetSurah);
+    exercise = surahPool[Math.floor(Math.random() * surahPool.length)];
   }
-  const exercise = pool[Math.floor(Math.random() * pool.length)];
   const shuffledOptions = shuffleArray(exercise.options);
   const translatedWordMeaning = exercise.targetWordTranslations[userLanguage] || exercise.targetWordTranslations['en'] || exercise.targetWordMeaning;
   const translatedVerseMeaning = exercise.correctVerseMeaningTranslations[userLanguage] || exercise.correctVerseMeaningTranslations['en'] || exercise.correctVerseMeaning;

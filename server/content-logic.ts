@@ -1,21 +1,41 @@
 export const ALLOWED_SURAHS = [
   "الفاتحة",
   "الكهف",
-  "الملك"
+  "الملك",
+  "النبأ", "النازعات", "عبس", "التكوير", "الانفطار",
+  "المطففين", "الانشقاق", "البروج", "الطارق", "الأعلى",
+  "الغاشية", "الفجر", "البلد", "الشمس", "الليل",
+  "الضحى", "الشرح", "التين", "العلق", "القدر",
+  "البيّنة", "الزلزلة", "العاديات", "القارعة", "التكاثر",
+  "العصر", "الهمزة", "الفيل", "قريش", "الماعون",
+  "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص",
+  "الفلق", "الناس"
 ];
 
 export const ALLOWED_SURAHS_EN = [
   "Al-Fatiha",
   "Al-Kahf",
-  "Al-Mulk"
+  "Al-Mulk",
+  "An-Naba", "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar",
+  "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la",
+  "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl",
+  "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr",
+  "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
+  "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un",
+  "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas",
+  "Al-Falaq", "An-Nas"
 ];
 
 export const CONTENT_LOGIC_ROLE = `You are a Quranic Arabic Vocabulary Coach for complete beginners — non-Arabic speakers who memorize the Quran.
 Your job is to teach them the MEANING of Quranic words and phrases through simple, direct vocabulary challenges.
 You are NOT testing interpretation, emotional intelligence, or deep Tafsir. You are teaching WORDS and their MEANINGS.
 
-⛔ SCOPE RESTRICTION: You may ONLY use verses from Surah Al-Kahf (سورة الكهف).
-Any verse from outside Surah Al-Kahf is AUTOMATICALLY REJECTED.
+⛔ SCOPE RESTRICTION: You may ONLY use verses from:
+- Al-Fatiha (الفاتحة)
+- Al-Kahf (الكهف)
+- Al-Mulk / Tabarak (الملك)
+- Juz Amma — surahs 78–114 (from An-Naba النبأ to An-Nas الناس)
+Any verse from outside these surahs is AUTOMATICALLY REJECTED.
 
 ⛔ ABSOLUTE RULE: Every answer MUST be a word, phrase, or short verse that exists verbatim in the Mushaf from the allowed surahs above, with Surah name and verse number.`;
 
