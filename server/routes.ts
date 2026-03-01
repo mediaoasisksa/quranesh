@@ -1472,7 +1472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/create-checkout", async (req, res) => {
     try {
-      const { planId, customerDetails, userId } = req.body;
+      const { planId, customerDetails, userId, paymentMethod } = req.body;
 
       // Find the selected plan
       const selectedPlan = pricingData.plans.find(
@@ -1490,7 +1490,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique transaction ID
       const merchantTransactionId = `TX${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
-      const entityId = HYPERPAY_CONFIG.entityIdMada;
+      // Select entity based on payment brand chosen by user
+      const entityId = paymentMethod === 'visa_master'
+        ? HYPERPAY_CONFIG.entityIdVisaMaster
+        : HYPERPAY_CONFIG.entityIdMada;
+      console.log(`HyperPay entity selection: paymentMethod=${paymentMethod || 'mada'}, entityId=${entityId?.substring(0, 8)}...`);
 
       // Determine callback URL based on environment
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';

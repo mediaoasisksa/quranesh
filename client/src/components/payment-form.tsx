@@ -44,6 +44,8 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
   const { t } = useLanguage();
   const { user } = useAuth();
   
+  const [paymentMethod, setPaymentMethod] = useState<'mada' | 'visa_master'>('mada');
+
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     email: '',
     givenName: '',
@@ -76,13 +78,13 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
     }
   }, [user]);
 
-  // Configure HyperPay widget options
+  // Configure HyperPay widget options based on selected payment method
   useEffect(() => {
     window.wpwlOptions = {
       paymentTarget: "_top",
-      brandOrder: ["MADA", "VISA", "MASTER"]
+      brandOrder: paymentMethod === 'mada' ? ["MADA"] : ["VISA", "MASTER"]
     };
-  }, []);
+  }, [paymentMethod]);
 
   const handleInputChange = (field: keyof CustomerDetails, value: string) => {
     setCustomerDetails(prev => ({
@@ -105,6 +107,7 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
           planId: selectedPlan.id,
           customerDetails,
           userId: user?.id || '',
+          paymentMethod,
         }),
       });
 
@@ -180,6 +183,42 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="space-y-2">
+            <Label>Payment Method</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                disabled={!!checkoutId}
+                onClick={() => setPaymentMethod('mada')}
+                className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 text-sm font-medium transition-all
+                  ${paymentMethod === 'mada'
+                    ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary ring-offset-1'
+                    : 'border-input bg-background text-muted-foreground hover:border-primary/50'}
+                  ${checkoutId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span className="text-lg font-bold">مدى</span>
+                <span className="text-xs">MADA</span>
+              </button>
+              <button
+                type="button"
+                disabled={!!checkoutId}
+                onClick={() => setPaymentMethod('visa_master')}
+                className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 text-sm font-medium transition-all
+                  ${paymentMethod === 'visa_master'
+                    ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary ring-offset-1'
+                    : 'border-input bg-background text-muted-foreground hover:border-primary/50'}
+                  ${checkoutId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <CreditCard className="h-5 w-5" />
+                <span className="text-xs">Visa / Mastercard</span>
+              </button>
+            </div>
+            {checkoutId && (
+              <p className="text-xs text-muted-foreground">Payment method locked for this session.</p>
+            )}
           </div>
 
           {/* Customer Details Form */}
@@ -346,12 +385,10 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 <p className="text-sm text-gray-600">Secure payment powered by HyperPay</p>
               </div>
 
-              {/* HyperPay Payment Form - Single form for all payment methods */}
-              {/* The form action is the shopperResultUrl - HyperPay redirects here after payment */}
               <form 
                 action={callbackUrl || '/api/payment-callback'}
                 className="paymentWidgets" 
-                data-brands="MADA VISA MASTER"
+                data-brands={paymentMethod === 'mada' ? 'MADA' : 'VISA MASTER'}
               />
             </div>
           )}
