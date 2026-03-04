@@ -47,6 +47,7 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer, getVocabBankSurahs } from "./ai-service";
+import { getRandomPrepositionExercise, PREPOSITION_OPTIONS } from "./preposition-bank";
 import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
 async function assignWaitingStudents() {
@@ -658,7 +659,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const excludeIds = exclude
         ? String(exclude).split(",").map(Number).filter(Boolean)
         : [];
-      const { getRandomPrepositionExercise, PREPOSITION_OPTIONS } = require("./preposition-bank");
       const exercise = getRandomPrepositionExercise(excludeIds);
       res.json({ ...exercise, options: PREPOSITION_OPTIONS });
     } catch (error) {
