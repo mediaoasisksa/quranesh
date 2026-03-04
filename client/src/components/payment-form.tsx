@@ -186,36 +186,50 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
           </div>
 
           {/* Payment Method Selection */}
-          <div className="space-y-2">
-            <Label>Payment Method</Label>
+          <div className="space-y-3">
+            <Label>طريقة الدفع / Payment Method</Label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 disabled={!!checkoutId}
                 onClick={() => setPaymentMethod('mada')}
-                className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 text-sm font-medium transition-all
+                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-lg border-2 transition-all
                   ${paymentMethod === 'mada'
                     ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary ring-offset-1'
                     : 'border-input bg-background text-muted-foreground hover:border-primary/50'}
                   ${checkoutId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
-                <span className="text-lg font-bold">مدى</span>
-                <span className="text-xs">MADA</span>
+                <span className="text-xl font-bold" style={{ fontFamily: 'Amiri, serif' }}>مدى</span>
+                <span className="text-xs font-semibold mt-0.5">بطاقات البنوك السعودية</span>
+                <span className="text-xs text-muted-foreground">Saudi Bank Cards (MADA)</span>
               </button>
               <button
                 type="button"
                 disabled={!!checkoutId}
                 onClick={() => setPaymentMethod('visa_master')}
-                className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 text-sm font-medium transition-all
+                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-lg border-2 transition-all
                   ${paymentMethod === 'visa_master'
                     ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary ring-offset-1'
                     : 'border-input bg-background text-muted-foreground hover:border-primary/50'}
                   ${checkoutId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
-                <CreditCard className="h-5 w-5" />
-                <span className="text-xs">Visa / Mastercard</span>
+                <CreditCard className="h-6 w-6" />
+                <span className="text-xs font-semibold mt-0.5">بطاقات دولية</span>
+                <span className="text-xs text-muted-foreground">International (Visa / Mastercard)</span>
               </button>
             </div>
+
+            {/* Guidance callout */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-1">
+              <p className="font-semibold text-amber-800">⚠️ كيف أعرف نوع بطاقتي؟</p>
+              <p className="text-amber-700">
+                معظم بطاقات البنوك السعودية (الراجحي، الأهلي، الرياض، SNB...) هي بطاقات <strong>مدى</strong> — حتى لو كان عليها شعار فيزا. ابحث عن شعار <strong>مدى</strong> على ظهر البطاقة.
+              </p>
+              <p className="text-amber-600 mt-1">
+                Most Saudi bank cards are <strong>MADA</strong> cards — even if they show a Visa logo. Look for the <strong>مدى</strong> logo on your card. Only select Visa/Mastercard for non-Saudi international cards.
+              </p>
+            </div>
+
             {checkoutId && (
               <p className="text-xs text-muted-foreground">Payment method locked for this session.</p>
             )}
