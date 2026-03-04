@@ -80,7 +80,8 @@ export default function Exercise() {
   const isConversationExercise = exerciseType === "conversation";
   const isRoleplayExercise = exerciseType === "roleplay";
   const isDailyContextualExercise = exerciseType === "daily_contextual";
-  const isVocabQuizExercise = isConversationExercise || isRoleplayExercise || isDailyContextualExercise;
+  const isVocabQuizExercise = isConversationExercise || isDailyContextualExercise;
+  const isPrepositionExercise = isRoleplayExercise;
 
   // For transformation exercises, fetch philosophical sentences
   const { data: philosophicalSentence, isLoading: philosophicalLoading } = useQuery<PhilosophicalSentence>({
@@ -158,10 +159,44 @@ export default function Exercise() {
     gcTime: 0,
   });
 
-  // daily_contextual now uses the same VOCAB_BANK as conversation/roleplay (via isVocabQuizExercise)
+  // Preposition fill-in-the-blank exercise data
+  const [seenPrepositionIds, setSeenPrepositionIds] = useState<number[]>([]);
+  const { data: prepositionExercise, isLoading: prepositionLoading, refetch: refetchPreposition } = useQuery<{
+    id: number;
+    surahEn: string;
+    surahAr: string;
+    ayah: number;
+    verseWithBlank: string;
+    fullVerse: string;
+    correctPreposition: string;
+    meaningEn: string;
+    explanation: string;
+    explanationAr: string;
+    options: string[];
+  }>({
+    queryKey: ["/api/preposition-exercise", seenPrepositionIds.length],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (seenPrepositionIds.length > 0) params.set('exclude', seenPrepositionIds.join(','));
+      const response = await fetch(`/api/preposition-exercise?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch preposition exercise");
+      return response.json();
+    },
+    enabled: !!exerciseType && isPrepositionExercise,
+    staleTime: 0,
+    gcTime: 0,
+  });
 
-  const isLoading = isTransformationExercise ? philosophicalLoading : (isThematicExercise ? questionBankLoading : (isVocabQuizExercise ? vocabLoading : phraseLoading));
-  const exerciseData = isTransformationExercise ? philosophicalSentence : (isThematicExercise ? questionBank : (isVocabQuizExercise ? vocabExercise : phrase));
+  const isLoading = isTransformationExercise ? philosophicalLoading
+    : isThematicExercise ? questionBankLoading
+    : isVocabQuizExercise ? vocabLoading
+    : isPrepositionExercise ? prepositionLoading
+    : phraseLoading;
+  const exerciseData = isTransformationExercise ? philosophicalSentence
+    : isThematicExercise ? questionBank
+    : isVocabQuizExercise ? vocabExercise
+    : isPrepositionExercise ? prepositionExercise
+    : phrase;
 
   // Submit exercise session mutation
   const submitSessionMutation = useMutation({
@@ -220,6 +255,28 @@ export default function Exercise() {
   const checkAnswer = async () => {
     // Handle all vocabulary quiz exercises (conversation, roleplay, daily_contextual)
     // They all use the same VOCAB_BANK MCQ format
+
+    if (isPrepositionExercise) {
+      if (!prepositionExercise || !selectedOption) return;
+      setIsValidating(true);
+      const answeredCorrectly = selectedOption === prepositionExercise.correctPreposition;
+      setIsCorrect(answeredCorrectly);
+      setIsAnswered(true);
+      setFeedback(answeredCorrectly
+        ? `✅ ${t('correctAnswer')}! — ${language === 'ar' ? prepositionExercise.explanationAr : prepositionExercise.explanation}`
+        : `❌ ${t('incorrect')} — ${t('correctAnswer')}: ${prepositionExercise.correctPreposition}\n${language === 'ar' ? prepositionExercise.explanationAr : prepositionExercise.explanation}`);
+      setFeedbackGrade(answeredCorrectly ? 'exact_match' : 'incorrect');
+      submitSessionMutation.mutate({
+        userId,
+        exerciseType: 'roleplay',
+        phraseId: String(prepositionExercise.id),
+        userAnswer: selectedOption,
+        correctAnswer: prepositionExercise.correctPreposition,
+        isCorrect: answeredCorrectly ? "true" : "false",
+      });
+      setIsValidating(false);
+      return;
+    }
 
     if (isVocabQuizExercise) {
       if (!vocabExercise || !selectedOption) return;
@@ -444,7 +501,13 @@ export default function Exercise() {
         queryClient.removeQueries({
           queryKey: ["/api/philosophical-sentences/random", userId, language],
         });
-      } else if (currentExerciseType === "conversation" || currentExerciseType === "roleplay" || currentExerciseType === "daily_contextual") {
+      } else if (currentExerciseType === "roleplay") {
+        // Track seen preposition exercise IDs to avoid repeats
+        if (prepositionExercise?.id) {
+          setSeenPrepositionIds(prev => [...prev, prepositionExercise.id]);
+        }
+        queryClient.removeQueries({ queryKey: ["/api/preposition-exercise"] });
+      } else if (currentExerciseType === "conversation" || currentExerciseType === "daily_contextual") {
         queryClient.removeQueries({
           queryKey: ["/api/vocabulary-exercise"],
         });
@@ -581,8 +644,77 @@ export default function Exercise() {
           </div>
         );
 
-      case "conversation":
       case "roleplay":
+        return (
+          <div className="space-y-5" dir="rtl">
+            {/* Surah + Ayah badge */}
+            <div className="flex items-center justify-center gap-2">
+              <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-base font-bold arabic-text">
+                📖 سورة {prepositionExercise?.surahAr} — آية {prepositionExercise?.ayah}
+              </span>
+            </div>
+
+            {/* Verse with blank */}
+            <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 text-center border-2 border-primary/30">
+              <p className="text-sm font-semibold text-muted-foreground mb-3 text-center" dir="ltr">
+                {language === 'ar' ? 'أكمل الآية باختيار حرف الجر الصحيح:' : 'Complete the verse — choose the correct preposition:'}
+              </p>
+              <p className="arabic-text text-2xl leading-loose text-foreground font-bold" lang="ar" dir="rtl">
+                {prepositionExercise?.verseWithBlank.replace('___', '[ ___ ]')}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2 text-center" dir="ltr">
+                {prepositionExercise?.meaningEn}
+              </p>
+            </div>
+
+            {/* 7 preposition option buttons */}
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4" data-testid="options-container">
+              {prepositionExercise?.options?.map((option, index) => {
+                const isSelected = selectedOption === option;
+                const showResult = isAnswered;
+                const optionIsCorrect = option === prepositionExercise.correctPreposition;
+                let cls = "w-full text-center p-3 rounded-xl border-2 transition-all duration-200 arabic-text text-2xl font-bold ";
+                if (showResult && optionIsCorrect) {
+                  cls += "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200";
+                } else if (showResult && isSelected && !optionIsCorrect) {
+                  cls += "bg-red-50 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-200";
+                } else if (isSelected && !showResult) {
+                  cls += "bg-primary/10 border-primary text-primary";
+                } else {
+                  cls += "bg-card border-border hover:border-primary/50 hover:bg-primary/5 text-foreground";
+                }
+                return (
+                  <button
+                    key={index}
+                    className={cls}
+                    onClick={() => { if (!isAnswered) setSelectedOption(option); }}
+                    disabled={isAnswered}
+                    lang="ar"
+                    data-testid={`option-${index}`}
+                  >
+                    {option}
+                    {showResult && optionIsCorrect && <span className="text-base ml-1">✅</span>}
+                    {showResult && isSelected && !optionIsCorrect && <span className="text-base ml-1">❌</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Correct verse revealed after answering */}
+            {isAnswered && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-300 rounded-xl p-4 text-center">
+                <p className="text-xs font-semibold text-green-700 dark:text-green-300 mb-1">
+                  {language === 'ar' ? 'الآية الكاملة:' : 'Full Verse:'}
+                </p>
+                <p className="arabic-text text-xl font-bold text-green-800 dark:text-green-200 leading-loose" lang="ar" dir="rtl">
+                  {prepositionExercise?.fullVerse}
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case "conversation":
       case "daily_contextual":
         return (
           <div className="space-y-5">

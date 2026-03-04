@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
-import { Loader2, CreditCard } from 'lucide-react';
+import { Loader2, CreditCard, Info } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -215,18 +215,21 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
               >
                 <CreditCard className="h-6 w-6" />
                 <span className="text-xs font-semibold mt-0.5">بطاقات دولية</span>
-                <span className="text-xs text-muted-foreground">International (Visa / Mastercard)</span>
+                <span className="text-xs text-muted-foreground">International Cards (Visa / Mastercard)</span>
               </button>
             </div>
 
             {/* Guidance callout */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-1">
-              <p className="font-semibold text-amber-800">⚠️ كيف أعرف نوع بطاقتي؟</p>
-              <p className="text-amber-700">
-                معظم بطاقات البنوك السعودية (الراجحي، الأهلي، الرياض، SNB...) هي بطاقات <strong>مدى</strong> — حتى لو كان عليها شعار فيزا. ابحث عن شعار <strong>مدى</strong> على ظهر البطاقة.
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-1.5">
+              <div className="flex items-center gap-1.5 font-semibold text-amber-800">
+                <Info className="h-3.5 w-3.5 shrink-0" />
+                <span>كيف أعرف نوع بطاقتي؟</span>
+              </div>
+              <p className="text-amber-800 leading-relaxed" dir="rtl">
+                معظم بطاقات البنوك السعودية (الراجحي، الأهلي، الرياض...) هي بطاقات <strong>مدى</strong> — حتى لو كانت عليها شعار فيزا. ابحث عن شعار <strong>مدى</strong> على بطاقتك.
               </p>
-              <p className="text-amber-600 mt-1">
-                Most Saudi bank cards are <strong>MADA</strong> cards — even if they show a Visa logo. Look for the <strong>مدى</strong> logo on your card. Only select Visa/Mastercard for non-Saudi international cards.
+              <p className="text-amber-700 leading-relaxed">
+                Most Saudi bank cards (Al Rajhi, NCB, Riyad, SNB...) are <strong>MADA</strong> cards — even if they display a Visa logo. Look for the <strong>مدى</strong> logo on your card.
               </p>
             </div>
 

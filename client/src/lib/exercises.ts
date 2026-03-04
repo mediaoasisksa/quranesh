@@ -19,7 +19,7 @@ export const exerciseTypes = [
     id: 'roleplay',
     titleKey: 'roleplay',
     descriptionKey: 'roleplayDesc',
-    icon: '🎭',
+    icon: '📝',
     variant: 'secondary' as const,
     category: 'practical'
   },

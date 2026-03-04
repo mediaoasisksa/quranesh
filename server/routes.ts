@@ -651,6 +651,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Preposition fill-in-the-blank exercise
+  app.get("/api/preposition-exercise", (req, res) => {
+    try {
+      const { exclude } = req.query;
+      const excludeIds = exclude
+        ? String(exclude).split(",").map(Number).filter(Boolean)
+        : [];
+      const { getRandomPrepositionExercise, PREPOSITION_OPTIONS } = require("./preposition-bank");
+      const exercise = getRandomPrepositionExercise(excludeIds);
+      res.json({ ...exercise, options: PREPOSITION_OPTIONS });
+    } catch (error) {
+      console.error("Error getting preposition exercise:", error);
+      res.status(500).json({ message: "Failed to get preposition exercise" });
+    }
+  });
+
   // Get available surahs from vocabulary bank
   app.get("/api/vocabulary-surahs", (req, res) => {
     try {
