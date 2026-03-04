@@ -959,11 +959,11 @@ export default function Exercise() {
 
       {/* Exercise Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Surah Al-Kahf Badge */}
+        {/* Quranic Badge */}
         <div className="mb-6 bg-card rounded-lg border p-4 shadow-sm">
           <div className="flex items-center justify-center gap-3">
             <BookOpen className="h-5 w-5 text-primary" />
-            <span className="font-semibold text-lg text-foreground arabic-text">سورة الكهف</span>
+            <span className="font-semibold text-lg text-foreground arabic-text">قرآني</span>
             <span className="text-muted-foreground">—</span>
             <span className="text-muted-foreground">{t('surahAlKahfName')}</span>
             {vocabSurahs.length > 0 && (
