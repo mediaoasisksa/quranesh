@@ -27,6 +27,8 @@ interface SessionDuration {
   totalSessions: number;
 }
 
+const ACTIVE_EXERCISE_TYPES = ['roleplay', 'conversation', 'daily_contextual'];
+
 export default function Analytics() {
   const { dir, language } = useLanguage();
   const isArabic = language === 'ar';
@@ -43,131 +45,64 @@ export default function Analytics() {
     queryKey: ["/api/analytics/session-duration"],
   });
 
+  const filteredEngagement = exerciseEngagement?.filter(e =>
+    ACTIVE_EXERCISE_TYPES.includes(e.exerciseType)
+  );
+
+  const filteredDuration = sessionDuration?.filter(s =>
+    ACTIVE_EXERCISE_TYPES.includes(s.exerciseType)
+  );
+
   const getExerciseTypeLabel = (type: string) => {
     const exerciseTranslations: Record<string, Record<string, string>> = {
-      conversation: {
-        ar: "تمارين المحادثة",
-        en: "Conversation Practice",
-        id: "Latihan Percakapan",
-        tr: "Konuşma Pratiği",
-        zh: "对话练习",
-        sw: "Mazoezi ya Mazungumzo",
-        so: "Tababarka Wadahadalka",
-        bs: "Vježbe konverzacije",
-        sq: "Praktikë bisede",
-        ru: "Практика разговора",
-      },
-      transformation: {
-        ar: "المطابقة القرآنية",
-        en: "Quranic Match",
-        id: "Pencocokan Qurani",
-        tr: "Kuran Eşleştirme",
-        zh: "古兰经匹配",
-        sw: "Uoanishaji wa Qurani",
-        so: "Isku xidhka Quraanka",
-        bs: "Kur'ansko povezivanje",
-        sq: "Përputhja Kuranore",
-        ru: "Кораническое соответствие",
-      },
       roleplay: {
-        ar: "سيناريوهات تمثيل الأدوار",
-        en: "Role-play Scenarios",
-        id: "Skenario Bermain Peran",
-        tr: "Rol Yapma Senaryoları",
-        zh: "角色扮演情景",
-        sw: "Hali za Kucheza Majukumu",
-        so: "Xaaladaha Jilayaasha Doorka",
-        bs: "Scenariji uloga",
-        sq: "Skenarë loje rolit",
-        ru: "Ролевые сценарии",
+        ar: "ملء الفراغ بحرف الجر",
+        en: "Fill in the Preposition",
+        id: "Isi Huruf Jar",
+        tr: "Harf-i Cer Doldurma",
+        zh: "填写介词",
+        sw: "Jaza Kihusishi",
+        so: "Buuxi Xarafta Xiriirka",
+        bs: "Popuni prijedlog",
+        sq: "Plotëso parafjalën",
+        ru: "Вставь предлог",
+        ur: "حرف جر بھریں",
+        bn: "অব্যয় পূরণ করুন",
+        ms: "Isi Huruf Jar",
       },
-      dailyContextual: {
-        ar: "مطابقة التعبيرات اليومية",
-        en: "Daily Expression Match",
-        id: "Kecocokan Ekspresi Harian",
-        tr: "Günlük İfade Eşleştirme",
-        zh: "日常表达匹配",
-        sw: "Kufananisha Maneno ya Kila Siku",
-        so: "Is-waafajinta Odhaahda Maalinlaha",
-        bs: "Dnevno podudaranje izraza",
-        sq: "Përputhje shprehjesh ditore",
-        ru: "Сопоставление ежедневных выражений",
-      },
-      phonetic_practice: {
-        ar: "تمارين النطق",
-        en: "Phonetic Practice",
-        id: "Latihan Fonetik",
-        tr: "Fonetik Pratik",
-        zh: "语音练习",
-        sw: "Mazoezi ya Sauti",
-        so: "Tababarka Dhawaaqa",
-        bs: "Fonetska vježba",
-        sq: "Praktikë fonetike",
-        ru: "Фонетическая практика",
-      },
-      completion: {
-        ar: "إكمال الجملة",
-        en: "Sentence Completion",
-        id: "Penyelesaian Kalimat",
-        tr: "Cümle Tamamlama",
-        zh: "完成句子",
-        sw: "Kukamilisha Sentensi",
-        so: "Dhamaystirka Weedhaha",
-        bs: "Dovršavanje rečenice",
-        sq: "Plotësim fjalie",
-        ru: "Завершение предложения",
-      },
-      substitution: {
-        ar: "الاستبدال",
-        en: "Substitution",
-        id: "Substitusi",
-        tr: "Değiştirme",
-        zh: "替换",
-        sw: "Kubadilisha",
-        so: "Beddelka",
-        bs: "Zamjena",
-        sq: "Zëvendësim",
-        ru: "Замена",
-      },
-      thematic: {
-        ar: "الموضوعات",
-        en: "Thematic",
-        id: "Tematik",
-        tr: "Tematik",
-        zh: "主题",
-        sw: "Mada",
-        so: "Mawduuc",
-        bs: "Tematski",
-        sq: "Tematik",
-        ru: "Тематический",
-      },
-      comparison: {
-        ar: "المقارنة",
-        en: "Comparison",
-        id: "Perbandingan",
-        tr: "Karşılaştırma",
-        zh: "比较",
-        sw: "Ulinganisho",
-        so: "Isbarbardhig",
-        bs: "Poređenje",
-        sq: "Krahasim",
-        ru: "Сравнение",
+      conversation: {
+        ar: "البحث عن الكلمة",
+        en: "Word Search Challenge",
+        id: "Tantangan Cari Kata",
+        tr: "Kelime Arama Yarışması",
+        zh: "词汇搜索挑战",
+        sw: "Changamoto ya Kutafuta Maneno",
+        so: "Tartanka Raadinta Ereyga",
+        bs: "Izazov traženja riječi",
+        sq: "Sfida e kërkimit të fjalëve",
+        ru: "Поиск слова",
+        ur: "لفظ تلاش چیلنج",
+        bn: "শব্দ অনুসন্ধান চ্যালেঞ্জ",
+        ms: "Cabaran Cari Perkataan",
       },
       daily_contextual: {
-        ar: "السياق اليومي",
-        en: "Daily Contextual",
-        id: "Kontekstual Harian",
-        tr: "Günlük Bağlamsal",
-        zh: "日常语境",
-        sw: "Muktadha wa Kila Siku",
-        so: "Macnaha Maalinlaha",
-        bs: "Dnevni kontekstualni",
-        sq: "Kontekstual ditor",
-        ru: "Ежедневный контекстуальный",
+        ar: "اختبار مفردات سورة الكهف",
+        en: "Surah Al-Kahf Vocabulary Quiz",
+        id: "Kuis Kosakata Surah Al-Kahfi",
+        tr: "Kehf Suresi Kelime Sınavı",
+        zh: "洞穴章词汇测验",
+        sw: "Maswali ya Msamiati wa Surat Al-Kahf",
+        so: "Imtixaanka Erayada Suurat Al-Kahf",
+        bs: "Kviz rječnika sure Al-Kehf",
+        sq: "Kuiz i fjalorit të sures Al-Kahf",
+        ru: "Словарный тест суры Аль-Кахф",
+        ur: "سورہ الکہف الفاظ کوئز",
+        bn: "সূরা আল-কাহফ শব্দভাণ্ডার কুইজ",
+        ms: "Kuiz Perbendaharaan Surah Al-Kahf",
       },
     };
 
-    return exerciseTranslations[type]?.[language] || type;
+    return exerciseTranslations[type]?.[language] || exerciseTranslations[type]?.['en'] || type;
   };
 
   const formatDuration = (seconds: number) => {
@@ -474,7 +409,7 @@ export default function Analytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {exerciseEngagement?.map((exercise) => (
+                  {filteredEngagement?.map((exercise) => (
                     <tr key={exercise.exerciseType} className="border-b">
                       <td className={`py-3 ${isArabic ? 'text-right' : ''}`}>{getExerciseTypeLabel(exercise.exerciseType)}</td>
                       <td className="text-right py-3 font-semibold">{exercise.totalSessions}</td>
@@ -506,7 +441,7 @@ export default function Analytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sessionDuration?.map((session) => (
+                  {filteredDuration?.map((session) => (
                     <tr key={session.exerciseType} className="border-b">
                       <td className={`py-3 ${isArabic ? 'text-right' : ''}`}>{getExerciseTypeLabel(session.exerciseType)}</td>
                       <td className="text-right py-3 font-semibold">{session.totalSessions}</td>
