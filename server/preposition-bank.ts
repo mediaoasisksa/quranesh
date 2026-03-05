@@ -313,13 +313,13 @@ export const PREPOSITION_BANK: PrepositionExercise[] = [
     id: 24,
     surahEn: "Ad-Duha",
     surahAr: "الضحى",
-    ayah: 8,
-    verseWithBlank: "وَوَجَدَكَ عَائِلًا فَأَغْنَى ___ ك",
-    fullVerse: "وَوَجَدَكَ عَائِلًا فَأَغْنَاكَ",
+    ayah: 4,
+    verseWithBlank: "وَلَلْآخِرَةُ خَيْرٌ لَكَ ___ الْأُولَى",
+    fullVerse: "وَلَلْآخِرَةُ خَيْرٌ لَكَ مِنَ الْأُولَى",
     correctPreposition: "من",
-    meaningEn: "And He found you poor and made you self-sufficient",
-    explanation: "من is used with أغنى في سياقات أخرى — Here: فأغنى (no preposition in this verse)",
-    explanationAr: "لا حرف جر في هذه الآية — أغناك: جعلك غنياً مباشرةً"
+    meaningEn: "And the Hereafter is better for you than the first life",
+    explanation: "من (than/from) — خير من = better than. من here marks comparison",
+    explanationAr: "من — خير لك من الأولى: حرف الجر 'من' يدل على المفاضلة والمقارنة"
   },
   // Al-Mulk (67) extra
   {
@@ -339,13 +339,13 @@ export const PREPOSITION_BANK: PrepositionExercise[] = [
     id: 26,
     surahEn: "An-Naba",
     surahAr: "النبأ",
-    ayah: 6,
-    verseWithBlank: "أَلَمْ نَجْعَلِ الْأَرْضَ مِهَادًا ___ ك",
-    fullVerse: "أَلَمْ نَجْعَلِ الْأَرْضَ مِهَادًا",
-    correctPreposition: "لِ",
-    meaningEn: "Have We not made the earth a resting place?",
-    explanation: "لِ (for) — مهاداً لكم = a resting place for you",
-    explanationAr: "لِ — مهاداً لكم: الأرض جُعلت فراشاً لصالح البشر"
+    ayah: 35,
+    verseWithBlank: "لَا يَسْمَعُونَ ___ هَا لَغْوًا وَلَا كِذَّابًا",
+    fullVerse: "لَا يَسْمَعُونَ فِيهَا لَغْوًا وَلَا كِذَّابًا",
+    correctPreposition: "في",
+    meaningEn: "They will not hear therein any ill speech or falsehood",
+    explanation: "في (in/therein) — فيها = in it (referring to paradise)",
+    explanationAr: "في — لا يسمعون فيها: ما يجري داخل الجنة من كلام، حرف الجر يدل على الظرفية"
   },
   // Al-Kahf extra
   {
@@ -379,7 +379,7 @@ export const PREPOSITION_BANK: PrepositionExercise[] = [
     surahEn: "Al-Inshiqaq",
     surahAr: "الانشقاق",
     ayah: 9,
-    verseWithBlank: "فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا — وَيَنقَلِبُ ___ أَهْلِهِ مَسْرُورًا",
+    verseWithBlank: "وَيَنقَلِبُ ___ أَهْلِهِ مَسْرُورًا",
     fullVerse: "وَيَنقَلِبُ إِلَى أَهْلِهِ مَسْرُورًا",
     correctPreposition: "إلى",
     meaningEn: "And he will return to his people in happiness",
