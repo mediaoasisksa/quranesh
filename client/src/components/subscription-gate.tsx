@@ -4,19 +4,24 @@ import { useLanguage } from "@/contexts/language-context";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart } from "lucide-react";
+import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SubscriptionGateProps {
   children: ReactNode;
 }
 
 export default function SubscriptionGate({ children }: SubscriptionGateProps) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, token } = useAuth();
   const { hasActiveSubscription, isAdmin, isLoading: subLoading } = useSubscription();
   const { dir, language } = useLanguage();
+  const queryClient = useQueryClient();
   const [plans, setPlans] = useState<any[]>([]);
+  const [availability, setAvailability] = useState<{ availableSeats: number; hasSeats: boolean } | null>(null);
+  const [claiming, setClaiming] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
 
   const isArabic = language === "ar";
 
@@ -26,8 +31,35 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
         .then(r => r.json())
         .then(data => setPlans(data.plans || []))
         .catch(() => {});
+
+      fetch("/api/scholarship/availability")
+        .then(r => r.json())
+        .then(setAvailability)
+        .catch(() => {});
     }
   }, [hasActiveSubscription, isAdmin, isAuthenticated]);
+
+  const handleClaimScholarship = async () => {
+    if (!token) return;
+    setClaiming(true);
+    setClaimError(null);
+    try {
+      const res = await fetch("/api/scholarship/claim", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setClaimError(data.message || (isArabic ? "حدث خطأ، حاول مرة أخرى" : "An error occurred, please try again"));
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/subscription-status"] });
+      }
+    } catch {
+      setClaimError(isArabic ? "حدث خطأ في الشبكة" : "Network error, please try again");
+    } finally {
+      setClaiming(false);
+    }
+  };
 
   if (authLoading || subLoading) {
     return (
@@ -69,6 +101,9 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
     certificate: Award,
   };
 
+  const seatsLeft = availability?.availableSeats ?? null;
+  const hasSeats = availability?.hasSeats ?? true;
+
   return (
     <div className="flex items-center justify-center min-h-[60vh] p-4" dir={dir}>
       <div className="max-w-2xl w-full space-y-6">
@@ -85,6 +120,75 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
                 ? "اشترك لفتح جميع التمارين والمحتوى التعليمي"
                 : "Subscribe to unlock all exercises and learning content"}
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Platform Scholarship Card */}
+        <Card className="border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-950/30">
+          <CardHeader className="text-center pb-2">
+            <GraduationCap className="w-10 h-10 mx-auto text-green-600 dark:text-green-400 mb-2" />
+            <CardTitle className="text-base text-green-800 dark:text-green-300">
+              {isArabic ? "منحة مجانية من المنصة" : "Free Platform Scholarship"}
+            </CardTitle>
+            <p className="text-2xl font-bold text-green-700 dark:text-green-400">
+              {isArabic ? "مجانًا" : "Free"}
+              <span className="text-sm font-normal text-green-600 dark:text-green-500 ms-1">
+                {isArabic ? "/ سنة كاملة" : "/ full year"}
+              </span>
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-1.5">
+              {[
+                isArabic ? "وصول كامل لجميع التمارين" : "Full access to all exercises",
+                isArabic ? "ممول من منصة قرآنيش" : "Funded by Quranesh platform",
+                isArabic ? "اشتراك لمدة سنة كاملة" : "One full year subscription",
+              ].map((f, i) => (
+                <div key={i} className="flex items-start gap-1.5 text-xs">
+                  <Check className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-green-800 dark:text-green-300">{f}</span>
+                </div>
+              ))}
+            </div>
+
+            {seatsLeft !== null && (
+              <p className="text-xs text-center text-green-700 dark:text-green-400 font-medium">
+                {isArabic
+                  ? `${seatsLeft} مقعد متاح من أصل 200`
+                  : `${seatsLeft} seats available out of 200`}
+              </p>
+            )}
+
+            {claimError && (
+              <p className="text-xs text-center text-red-600 font-medium">{claimError}</p>
+            )}
+
+            {hasSeats ? (
+              <Button
+                className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                onClick={handleClaimScholarship}
+                disabled={claiming}
+              >
+                {claiming ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" />{isArabic ? "جاري التفعيل..." : "Activating..."}</>
+                ) : (
+                  <><GraduationCap className="w-4 h-4" />{isArabic ? "احصل على وصول مجاني" : "Get Free Access"}</>
+                )}
+              </Button>
+            ) : (
+              <Button
+                className="w-full gap-2"
+                variant="outline"
+                onClick={handleClaimScholarship}
+                disabled={claiming}
+              >
+                {claiming ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" />{isArabic ? "جاري التسجيل..." : "Registering..."}</>
+                ) : (
+                  isArabic ? "انضم لقائمة الانتظار" : "Join Waiting List"
+                )}
+              </Button>
+            )}
           </CardContent>
         </Card>
 
