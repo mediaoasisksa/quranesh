@@ -1,0 +1,43 @@
+Important: make sure ALL new signup texts for this feature are translated in every language already supported by the program.
+
+DO NOT hardcode English text in the component.
+
+Please do the following:
+
+1. Add all new strings to the i18n/translation files for every supported locale in the project.
+2. Replace any inline text on the signup page with translation keys.
+3. Make sure the right card (“Free Registration”) and all related success/error messages use the translation system.
+4. If a language is missing a key, fail safely by falling back to the app default language.
+5. Review the full free-registration flow so the same translated texts appear in:
+   - signup card title
+   - signup card description
+   - badge showing free seats
+   - note under the card
+   - no-seats-available message
+   - wallet deduction success message
+   - registration confirmation / access granted message
+   - admin labels if admin panel is multilingual
+
+Add translation keys similar to these:
+
+signup.freeRegistration.title
+signup.freeRegistration.description
+signup.freeRegistration.badge
+signup.freeRegistration.note
+signup.freeRegistration.unavailable
+signup.freeRegistration.success
+signup.freeRegistration.walletDeducted
+signup.freeRegistration.activeAccess
+
+Suggested English source text:
+- title: Free Registration
+- description: Register for free and start learning Quranic Arabic through available sponsored seats.
+- badge: {count} free seats currently available
+- note: No payment required for eligible free registration.
+- unavailable: Free sponsored seats are currently unavailable.
+- success: Your free registration has been completed successfully.
+- walletDeducted: Your seat has been funded through the sponsorship wallet.
+- activeAccess: Your learning access is now active.
+
+Please apply the translations to ALL supported languages in the program, not only English.
+Also scan the codebase to ensure there are no hardcoded copies of these messages outside the translation files.

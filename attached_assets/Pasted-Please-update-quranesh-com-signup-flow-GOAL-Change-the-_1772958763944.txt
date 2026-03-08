@@ -1,0 +1,120 @@
+Please update quranesh.com signup flow.
+
+GOAL
+Change the 3rd card on the signup page (currently the right-side card: “Sponsored Student”) so it becomes a FREE REGISTRATION option for users from the site.
+
+EXPECTED BUSINESS LOGIC
+- The user who clicks the right-side card should register for free.
+- The system must NOT ask this user for payment.
+- The seat/value of this free registration must be deducted automatically from the wallet balance.
+- If wallet balance is not enough, show a clear message that free seats are currently unavailable.
+- If wallet balance is enough, complete registration normally and mark the user as a free-sponsored student.
+
+UI CHANGES
+On /signup:
+- Replace the right card title from:
+  “Sponsored Student”
+  to:
+  “Free Registration”
+- Replace the description with:
+  “Register for free and start learning Quranic Arabic through available sponsored seats.”
+- Keep the available seats indicator, but make it dynamic from wallet/seats balance.
+- Example badge:
+  “319 free seats currently available”
+- Add a short note:
+  “No payment required for eligible free registration.”
+
+SIGNUP FLOW
+When user selects the right card:
+1. Create account normally.
+2. Skip checkout/payment page completely.
+3. Check available wallet balance or sponsored seats.
+4. Deduct 1 seat cost from wallet automatically.
+5. Create enrollment/subscription for the student.
+6. Mark source as: `free_site_registration`
+7. Mark plan/payment status clearly, for example:
+   - plan_type = sponsored_free
+   - payment_status = paid_by_wallet
+   - sponsor_source = site_wallet
+
+BACKEND REQUIREMENTS
+Implement the logic atomically in one transaction:
+- Check wallet balance
+- Deduct amount
+- Reserve seat
+- Create user subscription/enrollment
+- Save wallet transaction log
+
+If anything fails, rollback everything.
+
+DATABASE / MODEL CHANGES
+Please add or use these fields cleanly:
+- wallets
+  - id
+  - owner_type
+  - owner_id
+  - balance
+  - currency
+- wallet_transactions
+  - id
+  - wallet_id
+  - type (debit/credit)
+  - amount
+  - reference_type
+  - reference_id
+  - note
+  - created_at
+- users
+  - registration_source
+- subscriptions or enrollments
+  - plan_type
+  - payment_status
+  - sponsored_by_wallet_id
+  - seat_cost
+
+If there is already a wallet table, reuse it and only add missing fields.
+
+SEAT CALCULATION
+- Define the cost of one free registration seat in one place only, such as:
+  `SPONSORED_SEAT_COST`
+- Available free seats =
+  floor(wallet.balance / SPONSORED_SEAT_COST)
+
+DISPLAY this value on the right signup card dynamically.
+
+ADMIN / REPORTING
+In admin dashboard, add:
+- wallet current balance
+- total free seats remaining
+- total free students registered
+- transaction history for deducted seats
+
+ERROR HANDLING
+If wallet balance < seat cost:
+- disable the right card or allow click then show:
+  “Free sponsored seats are currently unavailable.”
+- do not create enrollment
+- do not deduct anything
+
+SECURITY
+- Do not let users manually set payment_status from frontend.
+- Backend must be the only place that marks wallet-paid registrations.
+- Prevent double submission / duplicate deductions.
+
+ACCEPTANCE CRITERIA
+1. User clicks “Free Registration”.
+2. User signs up without paying.
+3. System deducts seat cost from wallet automatically.
+4. User receives active access immediately.
+5. Admin can see wallet deduction in transaction history.
+6. If wallet is empty, signup shows no free seats available.
+
+PLEASE IMPLEMENT
+- frontend card text and behavior
+- backend endpoint/service
+- wallet deduction transaction
+- dynamic seat counter
+- admin reporting
+- any required migration files
+
+Also review all existing signup code so the old “Sponsored Student” payment path does not conflict with this new free-registration flow.
