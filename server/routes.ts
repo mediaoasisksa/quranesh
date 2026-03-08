@@ -100,11 +100,15 @@ async function assignWaitingStudents() {
 
 // Fixed cutoff: all users registered before this date receive legacy free access
 const LEGACY_CUTOFF_DATE = new Date("2026-03-08T00:00:00.000Z");
+const LEGACY_CUTOFF_GROUP = "before_payment_update_2026_03_08";
 const LEGACY_FREE_END_DATE = new Date("2099-12-31T00:00:00.000Z");
+
+// Track last backfill run time (in-process, shown in admin stats)
+let lastBackfillRun: Date | null = null;
 
 async function runLegacyBackfill() {
   try {
-    const { lt, eq, and, inArray } = await import("drizzle-orm");
+    const { lt, eq, and, inArray, isNull, or } = await import("drizzle-orm");
 
     // Find all users created before the cutoff
     const legacyUsers = await db
@@ -112,20 +116,24 @@ async function runLegacyBackfill() {
       .from(users)
       .where(lt(users.createdAt, LEGACY_CUTOFF_DATE));
 
-    if (legacyUsers.length === 0) return;
+    if (legacyUsers.length === 0) {
+      lastBackfillRun = new Date();
+      return;
+    }
 
     const legacyIds = legacyUsers.map(u => u.id);
 
-    // Mark them as legacy free in the users table (idempotent)
+    // Mark all legacy users with full metadata (idempotent — only updates those not yet fully marked)
     await db
       .update(users)
-      .set({ isLegacyFree: true })
-      .where(and(
-        lt(users.createdAt, LEGACY_CUTOFF_DATE),
-        eq(users.isLegacyFree, false),
-      ));
+      .set({
+        isLegacyFree: true,
+        legacyCutoffGroup: LEGACY_CUTOFF_GROUP,
+        registrationSource: "legacy_before_payment_update",
+      })
+      .where(lt(users.createdAt, LEGACY_CUTOFF_DATE));
 
-    // For each legacy user, create a legacy_free subscription only if they don't already have one
+    // Find users who already have a legacy_free subscription
     const existingLegacySubs = await db
       .select({ userId: subscriptions.userId })
       .from(subscriptions)
@@ -137,6 +145,7 @@ async function runLegacyBackfill() {
     const alreadyGranted = new Set(existingLegacySubs.map(s => s.userId));
     const toGrant = legacyIds.filter(id => !alreadyGranted.has(id));
 
+    // Insert missing legacy_free subscriptions
     if (toGrant.length > 0) {
       const insertValues = toGrant.map(userId => ({
         userId,
@@ -148,12 +157,37 @@ async function runLegacyBackfill() {
         transactionId: `legacy-free-backfill-${userId}`,
         sponsoredUsers: 0,
         grantedReason: "Registered before payment system update",
+        paymentStatus: "waived",
+        accessStatus: "active",
+        billingRequired: false,
+        expiresAt: null,
       }));
       await db.insert(subscriptions).values(insertValues);
-      console.log(`✅ Legacy backfill: granted free access to ${toGrant.length} users`);
-    } else {
-      console.log(`✅ Legacy backfill: all ${legacyIds.length} legacy users already have access`);
+      console.log(`✅ Legacy backfill: granted free access to ${toGrant.length} new users`);
     }
+
+    // Patch existing legacy_free subscriptions that are missing the new semantic fields
+    await db
+      .update(subscriptions)
+      .set({
+        paymentStatus: "waived",
+        accessStatus: "active",
+        billingRequired: false,
+        expiresAt: null,
+        grantedReason: "Registered before payment system update",
+      })
+      .where(and(
+        inArray(subscriptions.userId, legacyIds),
+        eq(subscriptions.planType, "legacy_free"),
+        or(
+          isNull(subscriptions.paymentStatus),
+          isNull(subscriptions.accessStatus),
+        ),
+      ));
+
+    const totalLegacy = legacyIds.length;
+    console.log(`✅ Legacy backfill: ${totalLegacy} users covered (${toGrant.length} new grants, ${alreadyGranted.size} already had access)`);
+    lastBackfillRun = new Date();
   } catch (err) {
     console.error("Legacy backfill error:", err);
   }
@@ -1929,12 +1963,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const [sponsoredCount] = await db.select({ count: countFn() }).from(users).where(eqFn(users.scholarshipStatus, "active"));
       const [totalUsers] = await db.select({ count: countFn() }).from(users);
 
+      const [selfFundedCount] = await db.select({ count: countFn() }).from(users).where(eqFn(users.userType, "self_funded"));
+
       res.json({
         cutoffDate: LEGACY_CUTOFF_DATE.toISOString(),
         legacyFreeCount: Number(legacyCount.count),
         paidCount: Number(paidCount.count),
         sponsoredCount: Number(sponsoredCount.count),
+        selfFundedCount: Number(selfFundedCount.count),
         totalUsers: Number(totalUsers.count),
+        lastBackfillRun: lastBackfillRun ? lastBackfillRun.toISOString() : null,
       });
     } catch (error) {
       console.error("Legacy stats error:", error);

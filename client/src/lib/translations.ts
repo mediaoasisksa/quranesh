@@ -311,6 +311,9 @@ export const translations = {
     getFreeScholarshipDesc: "You will be notified as soon as a sponsored seat becomes available and your subscription will be activated automatically",
     legacyFreeTitle: "Free Access Activated",
     legacyFreeMessage: "Your free open access has been activated because you registered before the payment system update.",
+    legacyAccessActivated: "Your free open access has been activated because you registered before the payment system update.",
+    legacyAccessSubtitle: "You can continue learning without payment.",
+    legacyAccessBadge: "Legacy Free Access",
   },
   ar: {
     // Navigation
@@ -624,6 +627,9 @@ export const translations = {
     getFreeScholarshipDesc: "سيتم إشعارك فور توفر مقعد مدعوم وتفعيل اشتراكك تلقائيًا",
     legacyFreeTitle: "تم تفعيل وصولك المجاني المفتوح",
     legacyFreeMessage: "تم تفعيل اشتراكك المجاني المفتوح لأنك سجلت قبل تحديث نظام الدفع.",
+    legacyAccessActivated: "تم تفعيل اشتراكك المجاني المفتوح لأنك سجلت قبل تحديث نظام الدفع.",
+    legacyAccessSubtitle: "يمكنك متابعة التعلم بدون دفع.",
+    legacyAccessBadge: "دخول مجاني للمستخدمين السابقين",
   },
   id: {
     // Navigation
@@ -937,6 +943,9 @@ export const translations = {
     getFreeScholarshipDesc: "Anda akan diberitahu segera setelah kursi yang disponsori tersedia dan langganan Anda akan diaktifkan secara otomatis",
     legacyFreeTitle: "Akses Gratis Diaktifkan",
     legacyFreeMessage: "Akses gratis terbuka Anda telah diaktifkan karena Anda mendaftar sebelum pembaruan sistem pembayaran.",
+    legacyAccessActivated: "Akses gratis terbuka Anda telah diaktifkan karena Anda mendaftar sebelum pembaruan sistem pembayaran.",
+    legacyAccessSubtitle: "Anda dapat terus belajar tanpa pembayaran.",
+    legacyAccessBadge: "Akses Gratis Warisan",
   },
   tr: {
     // Navigation
@@ -1250,6 +1259,9 @@ export const translations = {
     getFreeScholarshipDesc: "Desteklenen bir kontenjan müsait olur olmaz bilgilendirilecek ve aboneliğiniz otomatik olarak aktifleştirilecektir",
     legacyFreeTitle: "Ücretsiz Erişim Aktifleştirildi",
     legacyFreeMessage: "Ödeme sistemi güncellemesinden önce kaydolduğunuz için ücretsiz açık erişiminiz aktifleştirildi.",
+    legacyAccessActivated: "Ödeme sistemi güncellemesinden önce kaydolduğunuz için ücretsiz açık erişiminiz aktifleştirildi.",
+    legacyAccessSubtitle: "Ödeme yapmadan öğrenmeye devam edebilirsiniz.",
+    legacyAccessBadge: "Eski Ücretsiz Erişim",
   },
   zh: {
     // Navigation
@@ -1563,6 +1575,9 @@ export const translations = {
     getFreeScholarshipDesc: "一旦有赞助名额可用，您将收到通知，订阅将自动激活",
     legacyFreeTitle: "免费访问已激活",
     legacyFreeMessage: "您的免费开放访问权限已激活，因为您在支付系统更新之前注册。",
+    legacyAccessActivated: "您的免费开放访问权限已激活，因为您在支付系统更新之前注册。",
+    legacyAccessSubtitle: "您可以继续免费学习。",
+    legacyAccessBadge: "旧用户免费访问",
   },
   sw: {
     // Navigation
@@ -1876,6 +1891,9 @@ export const translations = {
     getFreeScholarshipDesc: "Utaarifiwa mara kiti kinachoungwa mkono kitakapopatikana na usajili wako utawezeshwa kiotomatiki",
     legacyFreeTitle: "Ufikiaji wa Bure Umewezeshwa",
     legacyFreeMessage: "Ufikiaji wako wa wazi bila malipo umewezeshwa kwa sababu ulijisajili kabla ya sasisho la mfumo wa malipo.",
+    legacyAccessActivated: "Ufikiaji wako wa wazi bila malipo umewezeshwa kwa sababu ulijisajili kabla ya sasisho la mfumo wa malipo.",
+    legacyAccessSubtitle: "Unaweza kuendelea kujifunza bila malipo.",
+    legacyAccessBadge: "Ufikiaji wa Bure wa Zamani",
   },
   so: {
     // Navigation
@@ -2189,6 +2207,9 @@ export const translations = {
     getFreeScholarshipDesc: "Waxaa lagugu wargeliyaa isla markaaba marka kursi la taageero ah la helo iyo rukhsaddaada si toos ah ayaa loo firfircooni doonaa",
     legacyFreeTitle: "Gelitaanka Bilaashka ah Waa La Shaqeeyay",
     legacyFreeMessage: "Gelitaankaaga bilaashka ah ee furan waa la shaqeeyay maxaa yeelay waxaad is-diiwaan-gelisay ka hor cusbooneysiinta nidaamka lacag-bixinta.",
+    legacyAccessActivated: "Gelitaankaaga bilaashka ah ee furan waa la shaqeeyay maxaa yeelay waxaad is-diiwaan-gelisay ka hor cusbooneysiinta nidaamka lacag-bixinta.",
+    legacyAccessSubtitle: "Waxaad sii wadan kartaa barasho la'aanta lacag-bixin.",
+    legacyAccessBadge: "Gelitaanka Bilaashka Hore",
   },
   bs: {
     // Navigation
@@ -2502,6 +2523,9 @@ export const translations = {
     getFreeScholarshipDesc: "Bit ćete obaviješteni čim sponzorisano mjesto postane dostupno i vaša pretplata će biti automatski aktivirana",
     legacyFreeTitle: "Besplatan pristup aktiviran",
     legacyFreeMessage: "Vaš besplatan otvoreni pristup je aktiviran jer ste se registrirali prije ažuriranja sistema plaćanja.",
+    legacyAccessActivated: "Vaš besplatan otvoreni pristup je aktiviran jer ste se registrirali prije ažuriranja sistema plaćanja.",
+    legacyAccessSubtitle: "Možete nastaviti učiti bez plaćanja.",
+    legacyAccessBadge: "Nasljedni Besplatni Pristup",
   },
   sq: {
     // Navigation
@@ -2814,6 +2838,9 @@ export const translations = {
     getFreeScholarshipDesc: "Do të njoftohen sapo një vend i sponsorizuar të bëhet i disponueshëm dhe abonimi juaj do të aktivizohet automatikisht",
     legacyFreeTitle: "Aksesi i Lirë u Aktivizua",
     legacyFreeMessage: "Aksesi juaj i hapur falas është aktivizuar sepse u regjistruat para përditësimit të sistemit të pagesave.",
+    legacyAccessActivated: "Aksesi juaj i hapur falas është aktivizuar sepse u regjistruat para përditësimit të sistemit të pagesave.",
+    legacyAccessSubtitle: "Mund të vazhdoni të mësoni pa pagesë.",
+    legacyAccessBadge: "Aksesi i Lirë i Trashëgimisë",
   },
   ru: {
     // Navigation
@@ -3149,6 +3176,9 @@ export const translations = {
     getFreeScholarshipDesc: "Вы получите уведомление, как только появится спонсируемое место, и ваша подписка будет автоматически активирована",
     legacyFreeTitle: "Бесплатный доступ активирован",
     legacyFreeMessage: "Ваш бесплатный открытый доступ был активирован, поскольку вы зарегистрировались до обновления платёжной системы.",
+    legacyAccessActivated: "Ваш бесплатный открытый доступ был активирован, поскольку вы зарегистрировались до обновления платёжной системы.",
+    legacyAccessSubtitle: "Вы можете продолжать обучение без оплаты.",
+    legacyAccessBadge: "Унаследованный бесплатный доступ",
   },
   ur: {
     // Navigation
@@ -3461,6 +3491,9 @@ export const translations = {
     getFreeScholarshipDesc: "جیسے ہی کوئی اسپانسر شدہ سیٹ دستیاب ہوگی آپ کو اطلاع دی جائے گی اور آپ کی رکنیت خودکار طور پر فعال ہو جائے گی",
     legacyFreeTitle: "مفت رسائی فعال ہو گئی",
     legacyFreeMessage: "آپ کی مفت کھلی رسائی فعال کر دی گئی ہے کیونکہ آپ نے ادائیگی سسٹم کی اپ ڈیٹ سے پہلے رجسٹریشن کی تھی۔",
+    legacyAccessActivated: "آپ کی مفت کھلی رسائی فعال کر دی گئی ہے کیونکہ آپ نے ادائیگی سسٹم کی اپ ڈیٹ سے پہلے رجسٹریشن کی تھی۔",
+    legacyAccessSubtitle: "آپ ادائیگی کے بغیر سیکھنا جاری رکھ سکتے ہیں۔",
+    legacyAccessBadge: "پرانے صارفین کی مفت رسائی",
   },
   bn: {
     // Navigation
@@ -3773,6 +3806,9 @@ export const translations = {
     getFreeScholarshipDesc: "একটি স্পনসর করা আসন পাওয়া মাত্রই আপনাকে জানানো হবে এবং আপনার সদস্যপদ স্বয়ংক্রিয়ভাবে সক্রিয় হবে",
     legacyFreeTitle: "বিনামূল্যে অ্যাক্সেস সক্রিয় হয়েছে",
     legacyFreeMessage: "পেমেন্ট সিস্টেম আপডেটের আগে নিবন্ধন করায় আপনার বিনামূল্যে খোলা অ্যাক্সেস সক্রিয় করা হয়েছে।",
+    legacyAccessActivated: "পেমেন্ট সিস্টেম আপডেটের আগে নিবন্ধন করায় আপনার বিনামূল্যে খোলা অ্যাক্সেস সক্রিয় করা হয়েছে।",
+    legacyAccessSubtitle: "আপনি বিনামূল্যে শেখা চালিয়ে যেতে পারেন।",
+    legacyAccessBadge: "পুরনো ব্যবহারকারীর বিনামূল্যে অ্যাক্সেস",
 
     // Diploma
     diplomaTitle: "আরবি ভাষা ডিপ্লোমা",
@@ -3971,6 +4007,9 @@ export const translations = {
     getFreeScholarshipDesc: "Anda akan dimaklumkan sebaik sahaja tempat yang ditaja tersedia dan langganan anda akan diaktifkan secara automatik",
     legacyFreeTitle: "Akses Percuma Diaktifkan",
     legacyFreeMessage: "Akses terbuka percuma anda telah diaktifkan kerana anda mendaftar sebelum kemaskini sistem pembayaran.",
+    legacyAccessActivated: "Akses terbuka percuma anda telah diaktifkan kerana anda mendaftar sebelum kemaskini sistem pembayaran.",
+    legacyAccessSubtitle: "Anda boleh terus belajar tanpa bayaran.",
+    legacyAccessBadge: "Akses Percuma Warisan",
   },
 };
 export type Language = keyof typeof translations;

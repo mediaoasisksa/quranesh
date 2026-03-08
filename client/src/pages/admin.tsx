@@ -117,7 +117,7 @@ export default function AdminPage() {
   const { data: scenarios, isLoading: scenariosLoading } = useQuery<RoleplayScenario[]>({ queryKey: ["/api/admin/roleplay-scenarios"], enabled: isAdmin });
   const { data: phrasesList, isLoading: phrasesLoading } = useQuery<PhraseItem[]>({ queryKey: ["/api/admin/phrases"], enabled: isAdmin });
   const { data: legacyStats, refetch: refetchLegacyStats } = useQuery<{
-    cutoffDate: string; legacyFreeCount: number; paidCount: number; sponsoredCount: number; totalUsers: number;
+    cutoffDate: string; legacyFreeCount: number; paidCount: number; sponsoredCount: number; selfFundedCount: number; totalUsers: number; lastBackfillRun: string | null;
   }>({ queryKey: ["/api/admin/legacy-stats"], enabled: isAdmin });
 
   const backfillLegacyMutation = useMutation({
@@ -746,7 +746,7 @@ export default function AdminPage() {
                         <span className="text-amber-700 dark:text-amber-400 font-mono">{new Date(legacyStats.cutoffDate).toLocaleString("ar-SA")}</span>
                         <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">كل المستخدمين المسجلين قبل هذا التاريخ يحصلون على وصول مجاني دائم</p>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <Card className="border-amber-200 dark:border-amber-700">
                           <CardContent className="pt-4 text-center">
                             <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">{legacyStats.legacyFreeCount}</div>
@@ -765,6 +765,12 @@ export default function AdminPage() {
                             <p className="text-xs text-muted-foreground mt-1">اشتراكات مدفوعة (Paid)</p>
                           </CardContent>
                         </Card>
+                        <Card className="border-purple-200 dark:border-purple-700">
+                          <CardContent className="pt-4 text-center">
+                            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{legacyStats.selfFundedCount ?? 0}</div>
+                            <p className="text-xs text-muted-foreground mt-1">طلاب مستقلون (Self-funded)</p>
+                          </CardContent>
+                        </Card>
                         <Card>
                           <CardContent className="pt-4 text-center">
                             <div className="text-3xl font-bold">{legacyStats.totalUsers}</div>
@@ -772,6 +778,11 @@ export default function AdminPage() {
                           </CardContent>
                         </Card>
                       </div>
+                      {legacyStats.lastBackfillRun && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          آخر تشغيل للمنح: {new Date(legacyStats.lastBackfillRun).toLocaleString("ar-SA")}
+                        </p>
+                      )}
                     </>
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>

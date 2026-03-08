@@ -1,0 +1,121 @@
+Please implement a safe bulk upgrade for quranesh.com so that all users who registered BEFORE the new payment-system deployment receive permanent free open access automatically.
+
+OBJECTIVE
+Grant all existing users before a fixed cutoff timestamp a permanent legacy subscription with full access and no checkout requirement.
+
+IMPORTANT
+- Use BACKEND as source of truth.
+- Do NOT manually edit users one by one.
+- Implement as migration + idempotent backfill script + access-control update + UI handling.
+- All new users AFTER cutoff must still follow the new payment flow.
+
+FIXED CUTOFF
+Create a single server-side constant:
+PAYMENT_SYSTEM_CUTOFF = "<PUT_THE_DEPLOYMENT_TIMESTAMP_HERE_IN_UTC>"
+
+Example:
+PAYMENT_SYSTEM_CUTOFF = "2026-03-08T00:00:00.000Z"
+
+TARGET GROUP
+All users with:
+users.created_at < PAYMENT_SYSTEM_CUTOFF
+
+REQUIRED RESULT
+For each qualifying user:
+- full access enabled
+- no payment required
+- no paywall shown
+- no expiration
+- marked clearly as legacy free
+
+DATA MODEL CHANGES
+Please add these fields if they do not exist:
+
+users
+- is_legacy_free boolean not null default false
+- legacy_cutoff_group varchar/null
+- registration_source varchar/null
+
+subscriptions (or memberships / enrollments depending on schema)
+- plan_type varchar/null
+- payment_status varchar/null
+- access_status varchar/null
+- billing_required boolean default true
+- granted_reason text/null
+- expires_at timestamptz/null
+
+RECOMMENDED VALUES
+For legacy users:
+- users.is_legacy_free = true
+- users.legacy_cutoff_group = "before_payment_update_2026_03_08"
+- users.registration_source = "legacy_before_payment_update"
+
+Subscription values:
+- plan_type = "legacy_free"
+- payment_status = "waived"
+- access_status = "active"
+- billing_required = false
+- expires_at = null
+- granted_reason = "Registered before payment system update"
+
+BACKFILL BEHAVIOR
+Create an idempotent script that:
+1. finds all users before cutoff
+2. marks them is_legacy_free = true
+3. creates a legacy subscription if missing
+4. upgrades expired/inactive subscriptions to active legacy free
+5. does NOT duplicate subscriptions if rerun
+6. preserves paid history if a paid subscription already exists, but still grants effective access
+
+ACCESS CONTROL CHANGES
+Update all access checks so that:
+- if user.is_legacy_free === true => allow full access
+- if subscription.plan_type === legacy_free and access_status === active => allow full access
+- checkout must be skipped for these users
+- paywall must never block them
+
+LOGIN / APP FLOW
+When a legacy user logs in:
+- send them directly to app/dashboard/content
+- do not redirect to checkout
+- show a translated success banner:
+  Arabic: تم تفعيل اشتراكك المجاني المفتوح لأنك سجلت قبل تحديث نظام الدفع.
+  English: Your free open access has been activated because you registered before the payment system update.
+
+UI / I18N
+Add translation keys in all supported languages:
+legacyAccess.activated
+legacyAccess.subtitle
+legacyAccess.badge
+
+Suggested source text:
+- legacyAccess.activated = Your free open access has been activated because you registered before the payment system update.
+- legacyAccess.subtitle = You can continue learning without payment.
+- legacyAccess.badge = Legacy Free Access
+
+ADMIN
+Add admin report/cards:
+- total legacy free users
+- total active paid users
+- total sponsored users
+- total self-funded users
+- last backfill run timestamp
+
+Also add a filter for users by:
+- legacy_free
+- paid
+- sponsored
+- self_funded
+
+SAFETY
+- Use a DB transaction where appropriate
+- Make the backfill idempotent
+- Add logs for number of users updated
+- Prevent future users from receiving this accidentally by relying only on the fixed cutoff
+
+ACCEPTANCE TESTS
+1. User created before cutoff logs in and gets full access without checkout.
+2. User created after cutoff still follows new payment flow.
+3. Running backfill twice does not duplicate subscriptions.
+4. Existing paid records remain intact.
+5. Legacy users do not hit paywall anywhere in app.

@@ -99,11 +99,14 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
             <div className="max-w-4xl mx-auto flex items-start gap-3">
               <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
+                <span className="inline-block text-xs font-semibold bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 px-2 py-0.5 rounded-full mb-1">
+                  {t('legacyAccessBadge')}
+                </span>
                 <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-                  {t('legacyFreeTitle')}
+                  {t('legacyAccessActivated')}
                 </p>
                 <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-                  {t('legacyFreeMessage')}
+                  {t('legacyAccessSubtitle')}
                 </p>
               </div>
               <button

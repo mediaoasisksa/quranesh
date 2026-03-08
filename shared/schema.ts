@@ -87,6 +87,8 @@ export const users = pgTable("users", {
   scholarshipStatus: text("scholarship_status").default("none").notNull(), // none, waiting, active
   isAdmin: boolean("is_admin").default(false).notNull(),
   isLegacyFree: boolean("is_legacy_free").default(false).notNull(),
+  legacyCutoffGroup: text("legacy_cutoff_group"),
+  registrationSource: text("registration_source"),
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`now()`).notNull(),
 });
@@ -109,6 +111,10 @@ export const subscriptions = pgTable("subscriptions", {
   transactionId: text("transaction_id"),
   sponsoredUsers: integer("sponsored_users").default(0),
   grantedReason: text("granted_reason"),
+  paymentStatus: text("payment_status"),   // "paid", "waived", "pending"
+  accessStatus: text("access_status"),     // "active", "inactive"
+  billingRequired: boolean("billing_required").default(true),
+  expiresAt: timestamp("expires_at"),      // null = no expiry (legacy_free / open)
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
 });
 
