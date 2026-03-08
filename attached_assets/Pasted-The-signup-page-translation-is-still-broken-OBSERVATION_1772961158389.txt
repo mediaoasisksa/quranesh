@@ -1,0 +1,104 @@
+The signup page translation is still broken.
+
+OBSERVATION FROM LIVE PAGE
+- Language switch works.
+- “Already have an account? Sign in” is translated.
+- But the 3 signup cards still show English text.
+This means i18n is working globally, but the card titles/descriptions/badge are still hardcoded or rendered outside the translation layer.
+
+PLEASE FIX THIS EXACTLY
+
+1) Remove all hardcoded English text from the 3 signup squares/cards:
+- Sponsor
+- Self-Funded Student
+- Sponsored Student / Free Registration
+- all descriptions
+- all helper text
+- the seats badge text
+
+2) Replace them with translation keys from the i18n files.
+
+Required keys:
+
+signup.cards.sponsor.title
+signup.cards.sponsor.description
+signup.cards.sponsor.note
+
+signup.cards.selfFunded.title
+signup.cards.selfFunded.description
+signup.cards.selfFunded.note
+
+signup.cards.freeRegistration.title
+signup.cards.freeRegistration.description
+signup.cards.freeRegistration.note
+signup.cards.freeRegistration.badge
+
+signup.title
+signup.subtitle
+signup.haveAccount
+signup.signIn
+
+3) Use translation interpolation for the badge:
+Example:
+t("signup.cards.freeRegistration.badge", { count: availableSeats })
+
+Do NOT build the badge string manually in English.
+
+4) Check the signup card component itself.
+Most likely issue:
+- card data is defined as hardcoded strings in an array/config
+- or labels are stored in constants outside translation hook
+- or translations are loaded in parent page but not used in the card objects
+
+Refactor so the card config uses translation keys, not fixed English values.
+
+BAD:
+[
+  { title: "Sponsor", description: "I want to support..." }
+]
+
+GOOD:
+[
+  {
+    title: t("signup.cards.sponsor.title"),
+    description: t("signup.cards.sponsor.description"),
+    note: t("signup.cards.sponsor.note")
+  }
+]
+
+OR better:
+Store keys only, then resolve with t() during render.
+
+5) Make sure ALL visible text inside the squares is translated:
+- card title
+- main description
+- bottom note
+- seats badge
+- any button/CTA inside card
+
+6) Check hydration / SSR issue:
+If translations exist but cards still stay English after language switch,
+make sure:
+- current locale is passed into the signup card component
+- component rerenders on locale change
+- no memoization freezes English text
+- no static constants are created outside component render
+
+7) Translation files
+Please add the new keys to ALL supported locales, including Turkish.
+At minimum confirm:
+- en
+- ar
+- tr
+and every other supported locale in the app
+
+8) Add fallback safety:
+If a key is missing, fallback to default locale, not raw English hardcoded in component.
+
+9) After fix, verify manually on live signup page:
+- switch to Turkish → all 3 cards become Turkish
+- switch to Arabic → all 3 cards become Arabic
+- switch back to English → all 3 cards become English
+
+10) Important:
+The feature is NOT complete unless the text inside the signup squares changes when the language changes.

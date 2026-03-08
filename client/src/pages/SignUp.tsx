@@ -77,13 +77,13 @@ const SignUp = () => {
     setSuccess("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError(isArabic ? "كلمتا المرور غير متطابقتين" : t('passwordsDoNotMatch'));
+      setError(t('passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 8) {
-      setError(isArabic ? "يجب أن تكون كلمة المرور 8 أحرف على الأقل" : t('passwordTooShort'));
+      setError(t('passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -116,28 +116,20 @@ const SignUp = () => {
           signIn(data.user, data.token);
         }
 
-        let successMsg = isArabic ? "تم إنشاء الحساب بنجاح!" : t('accountCreatedSuccess');
+        let successMsg = t('accountCreatedSuccess');
         let redirectPath = "/pricing";
 
         if (data.scholarshipStatus === "waiting") {
-          successMsg = isArabic
-            ? "تم تسجيلك بنجاح! أنت الآن في قائمة الانتظار."
-            : "Registered successfully! You're on the waiting list.";
+          successMsg = t('signupWaitingListSuccess');
           redirectPath = "/scholarship-status";
         } else if (data.scholarshipStatus === "active") {
-          successMsg = isArabic
-            ? "تم تسجيلك وتفعيل المنحة بنجاح!"
-            : "Registered and scholarship activated successfully!";
+          successMsg = t('signupScholarshipSuccess');
           redirectPath = "/exercises";
         } else if (userType === "sponsor") {
-          successMsg = isArabic
-            ? "تم إنشاء حسابك! اختر باقة الكفالة"
-            : "Account created! Choose your sponsorship plan";
+          successMsg = t('signupSponsorCreated');
           redirectPath = "/pricing?role=sponsor";
         } else {
-          successMsg = isArabic
-            ? "تم إنشاء حسابك! اختر باقة الاشتراك"
-            : "Account created! Choose your subscription plan";
+          successMsg = t('signupStudentCreated');
           redirectPath = "/pricing";
         }
 
@@ -147,10 +139,10 @@ const SignUp = () => {
           setLocation(redirectPath);
         }, 1500);
       } else {
-        setError(data.message || (isArabic ? "فشل إنشاء الحساب" : t('accountCreationFailed')));
+        setError(data.message || (t('accountCreationFailed')));
       }
     } catch (err) {
-      setError(isArabic ? "خطأ في الشبكة" : t('networkError'));
+      setError(t('networkError'));
     } finally {
       setLoading(false);
     }
@@ -160,13 +152,9 @@ const SignUp = () => {
     {
       type: "sponsor" as UserType,
       icon: Heart,
-      title: isArabic ? "الكافل / الداعم" : "Sponsor",
-      description: isArabic
-        ? "أريد دعم غير الناطقين بالعربية لفهم القرآن"
-        : "I want to support non-Arabic speakers to understand the Quran",
-      detail: isArabic
-        ? "ستشتري باقة تُضاف كمقعد دراسي مجاني لمن لا يستطيع الدفع"
-        : "Your purchase adds free learning seats for those who can't afford it",
+      title: t('signupSponsorTitle'),
+      description: t('signupSponsorDesc'),
+      detail: t('signupSponsorNote'),
       color: "border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950",
       iconColor: "text-amber-600",
       bgGradient: "from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20",
@@ -174,13 +162,9 @@ const SignUp = () => {
     {
       type: "self_funded" as UserType,
       icon: BookOpen,
-      title: isArabic ? "الطالب المستقل" : "Self-Funded Student",
-      description: isArabic
-        ? "أريد شراء باقة لنفسي لتعلم العربية القرآنية"
-        : "I want to buy a plan for myself to learn Quranic Arabic",
-      detail: isArabic
-        ? "اشترِ باقتك وابدأ رحلة التعلم فوراً"
-        : "Purchase your plan and start your learning journey immediately",
+      title: t('signupSelfFundedTitle'),
+      description: t('signupSelfFundedDesc'),
+      detail: t('signupSelfFundedNote'),
       color: "border-primary hover:bg-primary/5",
       iconColor: "text-primary",
       bgGradient: "from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5",
@@ -188,17 +172,11 @@ const SignUp = () => {
     {
       type: "sponsored_student" as UserType,
       icon: GraduationCap,
-      title: isArabic ? "طالب المنحة المدعوم" : "Sponsored Student",
-      description: isArabic
-        ? "أريد تعلم العربية القرآنية عن طريق المنح المجانية المدعومة"
-        : "I want to learn Quranic Arabic through free sponsored scholarships",
+      title: t('signupSponsoredStudentTitle'),
+      description: t('signupSponsoredStudentDesc'),
       detail: scholarshipInfo && scholarshipInfo.availableSeats > 0
-        ? (isArabic
-          ? `${scholarshipInfo.availableSeats} مقعد متاح حالياً`
-          : `${scholarshipInfo.availableSeats} seats currently available`)
-        : (isArabic
-          ? "سيتم وضعك في قائمة الانتظار حتى يتوفر كافل"
-          : "You'll be placed on a waiting list until a sponsor is available"),
+        ? `${scholarshipInfo.availableSeats} ${t('signupSeatsAvailable')}`
+        : t('signupWaitingListNote'),
       color: "border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950",
       iconColor: "text-emerald-600",
       bgGradient: "from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20",
@@ -222,10 +200,10 @@ const SignUp = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                {isArabic ? "إنشاء حساب جديد" : "Create Your Account"}
+                {t('signupCreateAccount')}
               </h1>
               <p className="text-muted-foreground text-lg">
-                {isArabic ? "اختر المسار الذي يناسبك" : "Choose the path that suits you"}
+                {t('signupChoosePath')}
               </p>
             </div>
 
@@ -270,9 +248,9 @@ const SignUp = () => {
             </div>
 
             <div className="text-center text-sm text-muted-foreground mt-6">
-              {isArabic ? "لديك حساب بالفعل؟" : t('alreadyHaveAccount')}{" "}
+              {t('alreadyHaveAccount')}{" "}
               <Link href="/signin" className="text-primary hover:underline font-medium">
-                {isArabic ? "تسجيل الدخول" : t('signIn')}
+                {t('signIn')}
               </Link>
             </div>
           </div>
@@ -289,35 +267,35 @@ const SignUp = () => {
                   className="gap-1"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  {isArabic ? "رجوع" : "Back"}
+                  {t('signupBack')}
                 </Button>
                 <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                   {userTypeCards.find(c => c.type === userType)?.title}
                 </span>
               </div>
-              <CardTitle className="text-2xl font-bold">{isArabic ? "إنشاء حساب" : t('signUp')}</CardTitle>
+              <CardTitle className="text-2xl font-bold">{t('signUp')}</CardTitle>
               <CardDescription>
-                {isArabic ? "أكمل بياناتك للتسجيل" : t('createNewAccount')}
+                {t('signupCompleteData')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">{isArabic ? "الاسم الأول" : t('firstName')}</Label>
+                    <Label htmlFor="firstName">{t('firstName')}</Label>
                     <Input
                       id="firstName"
-                      placeholder={isArabic ? "الاسم الأول" : t('firstName')}
+                      placeholder={t('firstName')}
                       value={formData.firstName}
                       onChange={(e) => handleInputChange("firstName", e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">{isArabic ? "الاسم الأخير" : t('lastName')}</Label>
+                    <Label htmlFor="lastName">{t('lastName')}</Label>
                     <Input
                       id="lastName"
-                      placeholder={isArabic ? "الاسم الأخير" : t('lastName')}
+                      placeholder={t('lastName')}
                       value={formData.lastName}
                       onChange={(e) => handleInputChange("lastName", e.target.value)}
                       required
@@ -326,11 +304,11 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">{isArabic ? "البريد الإلكتروني" : t('email')}</Label>
+                  <Label htmlFor="email">{t('email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder={isArabic ? "البريد الإلكتروني" : t('email')}
+                    placeholder={t('email')}
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     required
@@ -338,7 +316,7 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">{isArabic ? "رقم الهاتف" : t('phoneNumber')}</Label>
+                  <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
                   <div className="flex gap-2" dir="ltr">
                     <Select
                       value={formData.countryCode}
@@ -372,12 +350,12 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">{isArabic ? "كلمة المرور" : t('password')}</Label>
+                  <Label htmlFor="password">{t('password')}</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder={isArabic ? "أنشئ كلمة مرور" : t('createPassword')}
+                      placeholder={t('createPassword')}
                       value={formData.password}
                       onChange={(e) => handleInputChange("password", e.target.value)}
                       required
@@ -394,12 +372,12 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">{isArabic ? "تأكيد كلمة المرور" : t('confirmPassword')}</Label>
+                  <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder={isArabic ? "أعد كتابة كلمة المرور" : t('confirmPasswordPlaceholder')}
+                      placeholder={t('confirmPasswordPlaceholder')}
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                       required
@@ -418,13 +396,13 @@ const SignUp = () => {
                 {userType !== "sponsor" && (
                   <>
                     <div className="space-y-2">
-                      <Label>{isArabic ? "مستوى الحفظ" : t('memorizationLevel')}</Label>
+                      <Label>{t('memorizationLevel')}</Label>
                       <Select
                         value={formData.memorizationLevel}
                         onValueChange={(value) => handleInputChange("memorizationLevel", value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder={isArabic ? "اختر مستوى الحفظ" : t('selectMemorizationLevel')} />
+                          <SelectValue placeholder={t('selectMemorizationLevel')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="para-1-3">{t('para1to3')}</SelectItem>
@@ -437,13 +415,13 @@ const SignUp = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>{isArabic ? "اللغة الأم" : t('nativeLanguage')}</Label>
+                      <Label>{t('nativeLanguage')}</Label>
                       <Select
                         value={formData.nativeLanguage}
                         onValueChange={(value) => handleInputChange("nativeLanguage", value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder={isArabic ? "اختر لغتك الأم" : t('selectNativeLanguage')} />
+                          <SelectValue placeholder={t('selectNativeLanguage')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="english">{t('english')}</SelectItem>
@@ -460,13 +438,13 @@ const SignUp = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>{isArabic ? "هدف التعلم" : t('learningGoal')}</Label>
+                      <Label>{t('learningGoal')}</Label>
                       <Select
                         value={formData.learningGoal}
                         onValueChange={(value) => handleInputChange("learningGoal", value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder={isArabic ? "اختر هدف التعلم" : t('selectLearningGoal')} />
+                          <SelectValue placeholder={t('selectLearningGoal')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="daily-conversation">{t('dailyConversation')}</SelectItem>
@@ -503,16 +481,14 @@ const SignUp = () => {
                 </div>
 
                 <Button type="submit" variant="default" className="w-full" disabled={loading}>
-                  {loading
-                    ? (isArabic ? "جارٍ إنشاء الحساب..." : `${t('createAccount')}...`)
-                    : (isArabic ? "إنشاء الحساب" : t('createAccount'))}
+                  {loading ? `${t('createAccount')}...` : t('createAccount')}
                 </Button>
               </form>
 
               <div className="mt-6 text-center text-sm text-muted-foreground">
-                {isArabic ? "لديك حساب بالفعل؟" : t('alreadyHaveAccount')}{" "}
+                {t('alreadyHaveAccount')}{" "}
                 <Link href="/signin" className="text-primary hover:underline font-medium">
-                  {isArabic ? "تسجيل الدخول" : t('signIn')}
+                  {t('signIn')}
                 </Link>
               </div>
             </CardContent>
