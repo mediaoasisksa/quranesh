@@ -116,6 +116,14 @@ export default function AdminPage() {
   const { data: prompts, isLoading: promptsLoading } = useQuery<ConversationPrompt[]>({ queryKey: ["/api/admin/conversation-prompts"], enabled: isAdmin });
   const { data: scenarios, isLoading: scenariosLoading } = useQuery<RoleplayScenario[]>({ queryKey: ["/api/admin/roleplay-scenarios"], enabled: isAdmin });
   const { data: phrasesList, isLoading: phrasesLoading } = useQuery<PhraseItem[]>({ queryKey: ["/api/admin/phrases"], enabled: isAdmin });
+  const { data: legacyStats, refetch: refetchLegacyStats } = useQuery<{
+    cutoffDate: string; legacyFreeCount: number; paidCount: number; sponsoredCount: number; totalUsers: number;
+  }>({ queryKey: ["/api/admin/legacy-stats"], enabled: isAdmin });
+
+  const backfillLegacyMutation = useMutation({
+    mutationFn: async () => apiRequest("POST", "/api/admin/backfill-legacy", {}),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/admin/legacy-stats"] }); toast({ title: "اكتمل تطبيق المنح المجانية القديمة" }); },
+  });
 
   const toggleAdminMutation = useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => apiRequest("POST", `/api/admin/users/${userId}/toggle-admin`, { isAdmin }),
@@ -253,6 +261,7 @@ export default function AdminPage() {
             <TabsTrigger value="phrases" className="gap-1 text-xs sm:text-sm"><BookText className="h-4 w-4" />العبارات القرآنية</TabsTrigger>
             <TabsTrigger value="questions" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />بنك الأسئلة</TabsTrigger>
             <TabsTrigger value="situations" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />المواقف</TabsTrigger>
+            <TabsTrigger value="legacy" className="gap-1 text-xs sm:text-sm"><Shield className="h-4 w-4" />الوصول المجاني القديم</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1 text-xs sm:text-sm"><Settings className="h-4 w-4" />الإعدادات</TabsTrigger>
           </TabsList>
 
@@ -714,6 +723,119 @@ export default function AdminPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Legacy Free Access */}
+          <TabsContent value="legacy">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-amber-500" />
+                    إحصائيات الوصول المجاني القديم
+                  </CardTitle>
+                  <CardDescription>
+                    المستخدمون الذين سجلوا قبل تاريخ الإغلاق ويحظون بوصول مجاني مفتوح دون انتهاء
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {legacyStats ? (
+                    <>
+                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-700 rounded-lg text-sm">
+                        <span className="font-medium text-amber-800 dark:text-amber-300">تاريخ الإغلاق الثابت: </span>
+                        <span className="text-amber-700 dark:text-amber-400 font-mono">{new Date(legacyStats.cutoffDate).toLocaleString("ar-SA")}</span>
+                        <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">كل المستخدمين المسجلين قبل هذا التاريخ يحصلون على وصول مجاني دائم</p>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Card className="border-amber-200 dark:border-amber-700">
+                          <CardContent className="pt-4 text-center">
+                            <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">{legacyStats.legacyFreeCount}</div>
+                            <p className="text-xs text-muted-foreground mt-1">وصول مجاني قديم (Legacy)</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="border-green-200 dark:border-green-700">
+                          <CardContent className="pt-4 text-center">
+                            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{legacyStats.sponsoredCount}</div>
+                            <p className="text-xs text-muted-foreground mt-1">منح مدعومة (Sponsored)</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="border-blue-200 dark:border-blue-700">
+                          <CardContent className="pt-4 text-center">
+                            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{legacyStats.paidCount}</div>
+                            <p className="text-xs text-muted-foreground mt-1">اشتراكات مدفوعة (Paid)</p>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardContent className="pt-4 text-center">
+                            <div className="text-3xl font-bold">{legacyStats.totalUsers}</div>
+                            <p className="text-xs text-muted-foreground mt-1">إجمالي المستخدمين</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
+                  )}
+                  <div className="flex items-center gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => backfillLegacyMutation.mutate()}
+                      disabled={backfillLegacyMutation.isPending}
+                      className="gap-2"
+                    >
+                      <Shield className="h-4 w-4" />
+                      {backfillLegacyMutation.isPending ? "جارٍ التطبيق..." : "إعادة تطبيق المنح القديمة (Idempotent)"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">آمن للتشغيل أكثر من مرة — لن يُكرر المنح الموجودة</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Filter users by type */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>تصفية المستخدمين حسب نوع الوصول</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {usersLoading ? <div className="text-center py-8">جاري التحميل...</div> : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>الاسم</TableHead>
+                          <TableHead>البريد الإلكتروني</TableHead>
+                          <TableHead>نوع الوصول</TableHead>
+                          <TableHead>تاريخ التسجيل</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users?.map((u) => {
+                          const cutoff = new Date("2026-03-08T00:00:00.000Z");
+                          const isLegacy = new Date(u.createdAt) < cutoff;
+                          return (
+                            <TableRow key={u.id}>
+                              <TableCell>{u.firstName} {u.lastName}</TableCell>
+                              <TableCell className="text-muted-foreground text-sm">{u.email}</TableCell>
+                              <TableCell>
+                                {u.isAdmin ? (
+                                  <Badge variant="destructive">مشرف</Badge>
+                                ) : isLegacy ? (
+                                  <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 hover:bg-amber-100">Legacy Free</Badge>
+                                ) : (
+                                  <Badge variant="outline">جديد</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                {new Date(u.createdAt).toLocaleDateString("ar-SA")}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Settings */}

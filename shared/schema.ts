@@ -86,6 +86,7 @@ export const users = pgTable("users", {
   userType: text("user_type").default("self_funded").notNull(), // sponsor, self_funded, sponsored_student
   scholarshipStatus: text("scholarship_status").default("none").notNull(), // none, waiting, active
   isAdmin: boolean("is_admin").default(false).notNull(),
+  isLegacyFree: boolean("is_legacy_free").default(false).notNull(),
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`now()`).notNull(),
 });
@@ -107,6 +108,7 @@ export const subscriptions = pgTable("subscriptions", {
   status: text("status").default("active").notNull(),
   transactionId: text("transaction_id"),
   sponsoredUsers: integer("sponsored_users").default(0),
+  grantedReason: text("granted_reason"),
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
 });
 

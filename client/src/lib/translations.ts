@@ -309,6 +309,8 @@ export const translations = {
     waitingListDesc: "You've been registered successfully! There are no sponsored seats available right now. Your account will be activated automatically when a new sponsor is available.",
     getFreeScholarshipTitle: "Get a Free Seat Scholarship from the Platform",
     getFreeScholarshipDesc: "You will be notified as soon as a sponsored seat becomes available and your subscription will be activated automatically",
+    legacyFreeTitle: "Free Access Activated",
+    legacyFreeMessage: "Your free open access has been activated because you registered before the payment system update.",
   },
   ar: {
     // Navigation
@@ -620,6 +622,8 @@ export const translations = {
     waitingListDesc: "تم تسجيلك بنجاح! لا توجد مقاعد مدعومة متاحة حالياً. سيتم تفعيل حسابك تلقائياً عند توفر كافل جديد.",
     getFreeScholarshipTitle: "احصل على منحة مقعد مجاني من المنصة",
     getFreeScholarshipDesc: "سيتم إشعارك فور توفر مقعد مدعوم وتفعيل اشتراكك تلقائيًا",
+    legacyFreeTitle: "تم تفعيل وصولك المجاني المفتوح",
+    legacyFreeMessage: "تم تفعيل اشتراكك المجاني المفتوح لأنك سجلت قبل تحديث نظام الدفع.",
   },
   id: {
     // Navigation
@@ -931,6 +935,8 @@ export const translations = {
     waitingListDesc: "Anda telah terdaftar dengan sukses! Tidak ada kursi yang tersedia saat ini. Akun Anda akan diaktifkan secara otomatis ketika sponsor baru tersedia.",
     getFreeScholarshipTitle: "Dapatkan Beasiswa Kursi Gratis dari Platform",
     getFreeScholarshipDesc: "Anda akan diberitahu segera setelah kursi yang disponsori tersedia dan langganan Anda akan diaktifkan secara otomatis",
+    legacyFreeTitle: "Akses Gratis Diaktifkan",
+    legacyFreeMessage: "Akses gratis terbuka Anda telah diaktifkan karena Anda mendaftar sebelum pembaruan sistem pembayaran.",
   },
   tr: {
     // Navigation
@@ -1242,6 +1248,8 @@ export const translations = {
     waitingListDesc: "Başarıyla kaydedildiniz! Şu anda desteklenen kontenjan bulunmamaktadır. Yeni bir sponsor mevcut olduğunda hesabınız otomatik olarak aktifleştirilecektir.",
     getFreeScholarshipTitle: "Platformdan Ücretsiz Kontenjan Bursu Alın",
     getFreeScholarshipDesc: "Desteklenen bir kontenjan müsait olur olmaz bilgilendirilecek ve aboneliğiniz otomatik olarak aktifleştirilecektir",
+    legacyFreeTitle: "Ücretsiz Erişim Aktifleştirildi",
+    legacyFreeMessage: "Ödeme sistemi güncellemesinden önce kaydolduğunuz için ücretsiz açık erişiminiz aktifleştirildi.",
   },
   zh: {
     // Navigation
@@ -1553,6 +1561,8 @@ export const translations = {
     waitingListDesc: "您已成功注册！目前没有可用的赞助名额。当有新赞助商时，您的账户将自动激活。",
     getFreeScholarshipTitle: "从平台获取免费名额奖学金",
     getFreeScholarshipDesc: "一旦有赞助名额可用，您将收到通知，订阅将自动激活",
+    legacyFreeTitle: "免费访问已激活",
+    legacyFreeMessage: "您的免费开放访问权限已激活，因为您在支付系统更新之前注册。",
   },
   sw: {
     // Navigation
@@ -1864,6 +1874,8 @@ export const translations = {
     waitingListDesc: "Umesajiliwa kwa mafanikio! Hakuna viti vya kuungwa mkono kwa sasa. Akaunti yako itawezeshwa kiotomatiki mhisani mpya atakapopatikana.",
     getFreeScholarshipTitle: "Pata Ufadhili wa Kiti cha Bure kutoka kwa Jukwaa",
     getFreeScholarshipDesc: "Utaarifiwa mara kiti kinachoungwa mkono kitakapopatikana na usajili wako utawezeshwa kiotomatiki",
+    legacyFreeTitle: "Ufikiaji wa Bure Umewezeshwa",
+    legacyFreeMessage: "Ufikiaji wako wa wazi bila malipo umewezeshwa kwa sababu ulijisajili kabla ya sasisho la mfumo wa malipo.",
   },
   so: {
     // Navigation
@@ -2175,6 +2187,8 @@ export const translations = {
     waitingListDesc: "Waad si guul leh u diiwaan gashatay! Ma jirto kursiyo la taageero ah hadda. Akoonkaaga si toos ah ayaa loo firfircooni doonaa marka deeq bixiye cusub la helo.",
     getFreeScholarshipTitle: "Hel Deeq Kursi Bilaash ah oo Ka Timid Platform-ka",
     getFreeScholarshipDesc: "Waxaa lagugu wargeliyaa isla markaaba marka kursi la taageero ah la helo iyo rukhsaddaada si toos ah ayaa loo firfircooni doonaa",
+    legacyFreeTitle: "Gelitaanka Bilaashka ah Waa La Shaqeeyay",
+    legacyFreeMessage: "Gelitaankaaga bilaashka ah ee furan waa la shaqeeyay maxaa yeelay waxaad is-diiwaan-gelisay ka hor cusbooneysiinta nidaamka lacag-bixinta.",
   },
   bs: {
     // Navigation
@@ -2486,6 +2500,8 @@ export const translations = {
     waitingListDesc: "Uspješno ste registrovani! Trenutno nema dostupnih sponzorisanih mjesta. Vaš nalog će biti automatski aktiviran kada novi sponzor postane dostupan.",
     getFreeScholarshipTitle: "Dobijte besplatnu stipendiju mjesta od platforme",
     getFreeScholarshipDesc: "Bit ćete obaviješteni čim sponzorisano mjesto postane dostupno i vaša pretplata će biti automatski aktivirana",
+    legacyFreeTitle: "Besplatan pristup aktiviran",
+    legacyFreeMessage: "Vaš besplatan otvoreni pristup je aktiviran jer ste se registrirali prije ažuriranja sistema plaćanja.",
   },
   sq: {
     // Navigation
@@ -2796,6 +2812,8 @@ export const translations = {
     waitingListDesc: "Jeni regjistruar me sukses! Nuk ka vende të sponsorizuara disponueshme aktualisht. Llogaria juaj do të aktivizohet automatikisht kur të jetë i disponueshëm një sponsor i ri.",
     getFreeScholarshipTitle: "Merrni bursë vendesh falas nga platforma",
     getFreeScholarshipDesc: "Do të njoftohen sapo një vend i sponsorizuar të bëhet i disponueshëm dhe abonimi juaj do të aktivizohet automatikisht",
+    legacyFreeTitle: "Aksesi i Lirë u Aktivizua",
+    legacyFreeMessage: "Aksesi juaj i hapur falas është aktivizuar sepse u regjistruat para përditësimit të sistemit të pagesave.",
   },
   ru: {
     // Navigation
@@ -3129,6 +3147,8 @@ export const translations = {
     waitingListDesc: "Вы успешно зарегистрированы! На данный момент нет доступных спонсируемых мест. Ваш аккаунт будет автоматически активирован, когда появится новый спонсор.",
     getFreeScholarshipTitle: "Получите бесплатное место от платформы",
     getFreeScholarshipDesc: "Вы получите уведомление, как только появится спонсируемое место, и ваша подписка будет автоматически активирована",
+    legacyFreeTitle: "Бесплатный доступ активирован",
+    legacyFreeMessage: "Ваш бесплатный открытый доступ был активирован, поскольку вы зарегистрировались до обновления платёжной системы.",
   },
   ur: {
     // Navigation
@@ -3439,6 +3459,8 @@ export const translations = {
     waitingListDesc: "آپ کی کامیابی سے رجسٹریشن ہو گئی! ابھی کوئی اسپانسر شدہ سیٹ دستیاب نہیں ہے۔ جب کوئی نیا اسپانسر دستیاب ہوگا تو آپ کا اکاؤنٹ خودکار طور پر فعال ہو جائے گا۔",
     getFreeScholarshipTitle: "پلیٹ فارم سے مفت سیٹ وظیفہ حاصل کریں",
     getFreeScholarshipDesc: "جیسے ہی کوئی اسپانسر شدہ سیٹ دستیاب ہوگی آپ کو اطلاع دی جائے گی اور آپ کی رکنیت خودکار طور پر فعال ہو جائے گی",
+    legacyFreeTitle: "مفت رسائی فعال ہو گئی",
+    legacyFreeMessage: "آپ کی مفت کھلی رسائی فعال کر دی گئی ہے کیونکہ آپ نے ادائیگی سسٹم کی اپ ڈیٹ سے پہلے رجسٹریشن کی تھی۔",
   },
   bn: {
     // Navigation
@@ -3749,6 +3771,8 @@ export const translations = {
     waitingListDesc: "আপনি সফলভাবে নিবন্ধিত হয়েছেন! এখন কোনো স্পনসর করা আসন নেই। নতুন স্পনসর পাওয়া গেলে আপনার অ্যাকাউন্ট স্বয়ংক্রিয়ভাবে সক্রিয় হবে।",
     getFreeScholarshipTitle: "প্ল্যাটফর্ম থেকে বিনামূল্যে আসনের বৃত্তি পান",
     getFreeScholarshipDesc: "একটি স্পনসর করা আসন পাওয়া মাত্রই আপনাকে জানানো হবে এবং আপনার সদস্যপদ স্বয়ংক্রিয়ভাবে সক্রিয় হবে",
+    legacyFreeTitle: "বিনামূল্যে অ্যাক্সেস সক্রিয় হয়েছে",
+    legacyFreeMessage: "পেমেন্ট সিস্টেম আপডেটের আগে নিবন্ধন করায় আপনার বিনামূল্যে খোলা অ্যাক্সেস সক্রিয় করা হয়েছে।",
 
     // Diploma
     diplomaTitle: "আরবি ভাষা ডিপ্লোমা",
@@ -3945,6 +3969,8 @@ export const translations = {
     waitingListDesc: "Anda telah berjaya didaftarkan! Tiada tempat yang ditaja tersedia buat masa ini. Akaun anda akan diaktifkan secara automatik apabila penaja baru tersedia.",
     getFreeScholarshipTitle: "Dapatkan Biasiswa Tempat Percuma daripada Platform",
     getFreeScholarshipDesc: "Anda akan dimaklumkan sebaik sahaja tempat yang ditaja tersedia dan langganan anda akan diaktifkan secara automatik",
+    legacyFreeTitle: "Akses Percuma Diaktifkan",
+    legacyFreeMessage: "Akses terbuka percuma anda telah diaktifkan kerana anda mendaftar sebelum kemaskini sistem pembayaran.",
   },
 };
 export type Language = keyof typeof translations;

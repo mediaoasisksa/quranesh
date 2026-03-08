@@ -98,6 +98,67 @@ async function assignWaitingStudents() {
   }
 }
 
+// Fixed cutoff: all users registered before this date receive legacy free access
+const LEGACY_CUTOFF_DATE = new Date("2026-03-08T00:00:00.000Z");
+const LEGACY_FREE_END_DATE = new Date("2099-12-31T00:00:00.000Z");
+
+async function runLegacyBackfill() {
+  try {
+    const { lt, eq, and, inArray } = await import("drizzle-orm");
+
+    // Find all users created before the cutoff
+    const legacyUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(lt(users.createdAt, LEGACY_CUTOFF_DATE));
+
+    if (legacyUsers.length === 0) return;
+
+    const legacyIds = legacyUsers.map(u => u.id);
+
+    // Mark them as legacy free in the users table (idempotent)
+    await db
+      .update(users)
+      .set({ isLegacyFree: true })
+      .where(and(
+        lt(users.createdAt, LEGACY_CUTOFF_DATE),
+        eq(users.isLegacyFree, false),
+      ));
+
+    // For each legacy user, create a legacy_free subscription only if they don't already have one
+    const existingLegacySubs = await db
+      .select({ userId: subscriptions.userId })
+      .from(subscriptions)
+      .where(and(
+        inArray(subscriptions.userId, legacyIds),
+        eq(subscriptions.planType, "legacy_free"),
+      ));
+
+    const alreadyGranted = new Set(existingLegacySubs.map(s => s.userId));
+    const toGrant = legacyIds.filter(id => !alreadyGranted.has(id));
+
+    if (toGrant.length > 0) {
+      const insertValues = toGrant.map(userId => ({
+        userId,
+        planType: "legacy_free",
+        amount: 0,
+        currency: "SAR",
+        endDate: LEGACY_FREE_END_DATE,
+        status: "active",
+        transactionId: `legacy-free-backfill-${userId}`,
+        sponsoredUsers: 0,
+        grantedReason: "Registered before payment system update",
+      }));
+      await db.insert(subscriptions).values(insertValues);
+      console.log(`✅ Legacy backfill: granted free access to ${toGrant.length} users`);
+    } else {
+      console.log(`✅ Legacy backfill: all ${legacyIds.length} legacy users already have access`);
+    }
+  } catch (err) {
+    console.error("Legacy backfill error:", err);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Validate JWT secret on startup
   const JWT_SECRET = process.env.JWT_SECRET;
@@ -198,6 +259,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Add new wisdom data with Quranic verses
     const { addWisdomData } = await import("./add-wisdom-data");
     await addWisdomData();
+
+    // Grant legacy free access to all users registered before payment system launch
+    await runLegacyBackfill();
   })();
 
   // Authentication routes
@@ -1815,6 +1879,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ hasActiveSubscription: true, isAdmin: true, plan: null });
       }
 
+      // Legacy free users get full access with no expiry check
+      if (user.length > 0 && user[0].isLegacyFree) {
+        return res.json({
+          hasActiveSubscription: true,
+          isLegacyFree: true,
+          plan: "legacy_free",
+          expiresAt: null,
+        });
+      }
+
       const now = new Date();
       const activeSubs = await db.select().from(subscriptions)
         .where(and(
@@ -1837,6 +1911,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Subscription status error:", error);
       res.status(500).json({ message: "Failed to check subscription" });
+    }
+  });
+
+  app.get("/api/admin/legacy-stats", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+      if (!token) return res.status(401).json({ message: "Unauthorized" });
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const { eq: eqFn, count: countFn } = await import("drizzle-orm");
+      const adminUser = await db.select().from(users).where(eqFn(users.id, decoded.userId)).limit(1);
+      if (!adminUser[0]?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+
+      const [legacyCount] = await db.select({ count: countFn() }).from(users).where(eqFn(users.isLegacyFree, true));
+      const [paidCount] = await db.select({ count: countFn() }).from(subscriptions).where(eqFn(subscriptions.planType, "learner"));
+      const [sponsoredCount] = await db.select({ count: countFn() }).from(users).where(eqFn(users.scholarshipStatus, "active"));
+      const [totalUsers] = await db.select({ count: countFn() }).from(users);
+
+      res.json({
+        cutoffDate: LEGACY_CUTOFF_DATE.toISOString(),
+        legacyFreeCount: Number(legacyCount.count),
+        paidCount: Number(paidCount.count),
+        sponsoredCount: Number(sponsoredCount.count),
+        totalUsers: Number(totalUsers.count),
+      });
+    } catch (error) {
+      console.error("Legacy stats error:", error);
+      res.status(500).json({ message: "Failed to fetch legacy stats" });
+    }
+  });
+
+  app.post("/api/admin/backfill-legacy", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+      if (!token) return res.status(401).json({ message: "Unauthorized" });
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const { eq: eqFn } = await import("drizzle-orm");
+      const adminUser = await db.select().from(users).where(eqFn(users.id, decoded.userId)).limit(1);
+      if (!adminUser[0]?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+
+      await runLegacyBackfill();
+      res.json({ message: "Legacy backfill completed successfully" });
+    } catch (error) {
+      console.error("Backfill error:", error);
+      res.status(500).json({ message: "Backfill failed" });
     }
   });
 

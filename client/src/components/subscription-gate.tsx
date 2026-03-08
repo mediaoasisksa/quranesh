@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2 } from "lucide-react";
+import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,13 +15,14 @@ interface SubscriptionGateProps {
 
 export default function SubscriptionGate({ children }: SubscriptionGateProps) {
   const { isAuthenticated, isLoading: authLoading, token } = useAuth();
-  const { hasActiveSubscription, isAdmin, isLoading: subLoading } = useSubscription();
-  const { dir, language } = useLanguage();
+  const { hasActiveSubscription, isAdmin, isLegacyFree, isLoading: subLoading } = useSubscription();
+  const { dir, language, t } = useLanguage();
   const queryClient = useQueryClient();
   const [plans, setPlans] = useState<any[]>([]);
   const [availability, setAvailability] = useState<{ availableSeats: number; hasSeats: boolean } | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [legacyBannerDismissed, setLegacyBannerDismissed] = useState(false);
 
   const isArabic = language === "ar";
 
@@ -91,6 +92,33 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
   }
 
   if (isAdmin || hasActiveSubscription) {
+    if (isLegacyFree && !isAdmin && !legacyBannerDismissed) {
+      return (
+        <div dir={dir}>
+          <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-700 px-4 py-3">
+            <div className="max-w-4xl mx-auto flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                  {t('legacyFreeTitle')}
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                  {t('legacyFreeMessage')}
+                </p>
+              </div>
+              <button
+                onClick={() => setLegacyBannerDismissed(true)}
+                className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-lg leading-none shrink-0"
+                aria-label="Dismiss"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          {children}
+        </div>
+      );
+    }
     return <>{children}</>;
   }
 

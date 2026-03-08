@@ -4,8 +4,9 @@ import { useAuth } from "./use-auth";
 interface SubscriptionStatus {
   hasActiveSubscription: boolean;
   isAdmin?: boolean;
+  isLegacyFree?: boolean;
   plan?: string | null;
-  expiresAt?: string;
+  expiresAt?: string | null;
 }
 
 export function useSubscription() {
@@ -25,6 +26,7 @@ export function useSubscription() {
   return {
     hasActiveSubscription: data?.hasActiveSubscription ?? false,
     isAdmin: data?.isAdmin ?? user?.isAdmin ?? false,
+    isLegacyFree: data?.isLegacyFree ?? false,
     plan: data?.plan ?? null,
     expiresAt: data?.expiresAt ?? null,
     isLoading,
