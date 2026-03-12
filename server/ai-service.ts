@@ -763,6 +763,12 @@ Think like an Arabic language professor teaching vocabulary through meanings and
     so: "Somali",
     bs: "Bosnian",
     sq: "Albanian",
+    ru: "Russian",
+    ur: "Urdu",
+    bn: "Bengali",
+    ms: "Malay",
+    fr: "French",
+    sus: "Soso",
   };
   
   const targetLanguageName = languageNameMap[userLanguage] || "English";
@@ -1811,6 +1817,12 @@ const languageNames: Record<string, string> = {
   so: "Somali (Soomaali)",
   bs: "Bosnian (Bosanski)",
   sq: "Albanian (Shqip)",
+  ru: "Russian (Русский)",
+  ur: "Urdu (اردو)",
+  bn: "Bengali (বাংলা)",
+  ms: "Malay (Bahasa Melayu)",
+  fr: "French (Français)",
+  sus: "Soso (Sosokui)",
 };
 
 /**
@@ -2170,7 +2182,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Cave", ar: "المغارة", id: "Gua", tr: "Mağara", zh: "洞穴",
       sw: "Pango", so: "Godka", bs: "Pećina", sq: "Shpella", ru: "Пещера",
-      ur: "غار", bn: "গুহা", ms: "Gua"
+      ur: "غار", bn: "গুহা", ms: "Gua",
+      fr: "La Grotte", sus: "Bɔlɔn"
     },
     correctVerseMeaningTranslations: {
       en: "When the youths retreated to the cave", ar: "حين لجأ الفتية إلى الكهف",
@@ -2179,7 +2192,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       so: "Markii dhalinyaradu u carareen godka", bs: "Kada se mladići skloniše u pećinu",
       sq: "Kur të rinjtë u strehuan në shpellë", ru: "Когда юноши укрылись в пещере",
       ur: "جب نوجوان غار کی طرف گئے", bn: "যখন যুবকরা গুহায় আশ্রয় নিল",
-      ms: "Ketika para pemuda pergi ke gua"
+      ms: "Ketika para pemuda pergi ke gua",
+      fr: "Quand les jeunes se retirèrent dans la grotte", sus: "Waati denyɛmɔɔe taa bɔlɔn na"
     },
     surahAyah: "الكهف:10", ayahNumber: 10,
     hint: "مكان في الجبل يختبئ فيه الناس",
@@ -2199,7 +2213,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Youths", ar: "الشباب", id: "Para pemuda", tr: "Gençler", zh: "青年们",
       sw: "Vijana", so: "Dhalinyarada", bs: "Mladići", sq: "Të rinjtë", ru: "Юноши",
-      ur: "نوجوان", bn: "যুবকরা", ms: "Para pemuda"
+      ur: "نوجوان", bn: "যুবকরা", ms: "Para pemuda",
+      fr: "Les Jeunes", sus: "Denyɛmɔɔe"
     },
     correctVerseMeaningTranslations: {
       en: "When the youths retreated to the cave", ar: "حين لجأ الفتية إلى الكهف",
@@ -2208,7 +2223,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       so: "Markii dhalinyaradu u carareen godka", bs: "Kada se mladići skloniše u pećinu",
       sq: "Kur të rinjtë u strehuan në shpellë", ru: "Когда юноши укрылись в пещере",
       ur: "جب نوجوان غار کی طرف گئے", bn: "যখন যুবকরা গুহায় আশ্রয় নিল",
-      ms: "Ketika para pemuda pergi ke gua"
+      ms: "Ketika para pemuda pergi ke gua",
+      fr: "Quand les jeunes se retirèrent dans la grotte", sus: "Waati denyɛmɔɔe taa bɔlɔn na"
     },
     surahAyah: "الكهف:10", ayahNumber: 10,
     hint: "مجموعة من الشباب",
@@ -2228,7 +2244,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Mercy", ar: "رحمة", id: "Rahmat", tr: "Rahmet", zh: "慈悯",
       sw: "Rehema", so: "Naxariis", bs: "Milost", sq: "Mëshirë", ru: "Милость",
-      ur: "رحمت", bn: "রহমত", ms: "Rahmat"
+      ur: "رحمت", bn: "রহমত", ms: "Rahmat",
+      fr: "Miséricorde", sus: "Naxari"
     },
     correctVerseMeaningTranslations: {
       en: "Our Lord, grant us from Yourself mercy", ar: "ربنا آتنا من عندك رحمة",
@@ -2242,7 +2259,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Господи наш, даруй нам от Себя милость",
       ur: "ہمارے رب، ہمیں اپنی طرف سے رحمت عطا فرما",
       bn: "হে আমাদের প্রভু, আমাদের তোমার পক্ষ থেকে রহমত দাও",
-      ms: "Wahai Tuhan kami, berikanlah rahmat kepada kami dari sisi-Mu"
+      ms: "Wahai Tuhan kami, berikanlah rahmat kepada kami dari sisi-Mu",
+      fr: "Notre Seigneur, accorde-nous Ta miséricorde", sus: "Anh Kɔlɔnyi, naxari di anh ma i bɔ"
     },
     surahAyah: "الكهف:10", ayahNumber: 10,
     hint: "تعني اللطف والعطف من الله",
@@ -2263,7 +2281,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       en: "Right guidance", ar: "الرشد والهداية", id: "Petunjuk yang lurus",
       tr: "Doğru yol", zh: "正道", sw: "Uongofu",
       so: "Hanuunin toosan", bs: "Ispravnost", sq: "Udhëzim", ru: "Правильный путь",
-      ur: "ہدایت", bn: "সঠিক পথ", ms: "Petunjuk yang betul"
+      ur: "ہدایت", bn: "সঠিক পথ", ms: "Petunjuk yang betul",
+      fr: "Juste guidance", sus: "Nɛrɛ Tilinɲɛ"
     },
     correctVerseMeaningTranslations: {
       en: "And prepare for us from our affair right guidance",
@@ -2274,7 +2293,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       so: "Oo noo diyaari hanuunin amarkayaga", bs: "I pripremi nam ispravnost u poslu našem",
       sq: "Dhe na përgatit udhëzim në punën tonë", ru: "И подготовь нам в нашем деле правильный путь",
       ur: "اور ہمارے معاملے میں ہدایت مہیا فرما", bn: "এবং আমাদের কাজে সঠিক পথ প্রস্তুত করো",
-      ms: "Dan sediakanlah petunjuk yang betul dalam urusan kami"
+      ms: "Dan sediakanlah petunjuk yang betul dalam urusan kami",
+      fr: "Et prépare-nous la bonne voie dans nos affaires", sus: "Wa anh xa nɛrɛ tilinɲɛ diyaari anh kɛlɛ ra"
     },
     surahAyah: "الكهف:10", ayahNumber: 10,
     hint: "عكس الضلال",
@@ -2294,7 +2314,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Years", ar: "سنوات", id: "Tahun-tahun", tr: "Yıllar", zh: "年",
       sw: "Miaka", so: "Sano", bs: "Godina", sq: "Vite", ru: "Годы",
-      ur: "سال", bn: "বছর", ms: "Tahun-tahun"
+      ur: "سال", bn: "বছর", ms: "Tahun-tahun",
+      fr: "Années", sus: "Sanɛe"
     },
     correctVerseMeaningTranslations: {
       en: "So We cast over their ears in the cave for a number of years",
@@ -2309,7 +2330,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И Мы запечатали их уши в пещере на долгие годы",
       ur: "پس ہم نے غار میں ان کے کانوں پر کئی سال تک پردہ ڈال دیا",
       bn: "তখন আমি গুহায় তাদের কানের উপর কয়েক বছর পর্দা ফেলে দিলাম",
-      ms: "Maka Kami tutup telinga mereka dalam gua selama beberapa tahun"
+      ms: "Maka Kami tutup telinga mereka dalam gua selama beberapa tahun",
+      fr: "So We cast over their ears in the cave for a number of years", sus: "So We cast over their ears in the cave for a number of years"
     },
     surahAyah: "الكهف:11", ayahNumber: 11,
     hint: "وحدة قياس الزمن الطويلة",
@@ -2329,7 +2351,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Knowledge", ar: "علم ومعرفة", id: "Ilmu", tr: "İlim", zh: "知识",
       sw: "Elimu", so: "Cilmi", bs: "Znanje", sq: "Dituri", ru: "Знание",
-      ur: "علم", bn: "জ্ঞান", ms: "Ilmu"
+      ur: "علم", bn: "জ্ঞান", ms: "Ilmu",
+      fr: "Connaissance", sus: "Kolon"
     },
     correctVerseMeaningTranslations: {
       en: "And We taught him knowledge from Us",
@@ -2344,7 +2367,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И Мы научили его знанию от Нас",
       ur: "اور ہم نے اسے اپنی طرف سے علم سکھایا",
       bn: "এবং আমরা তাকে আমাদের পক্ষ থেকে জ্ঞান শিক্ষা দিয়েছিলাম",
-      ms: "Dan Kami ajarkan kepadanya ilmu dari sisi Kami"
+      ms: "Dan Kami ajarkan kepadanya ilmu dari sisi Kami",
+      fr: "And We taught him knowledge from Us", sus: "And We taught him knowledge from Us"
     },
     surahAyah: "الكهف:65", ayahNumber: 65,
     hint: "تعني المعرفة والفهم",
@@ -2364,7 +2388,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Patience", ar: "صبر وتحمّل", id: "Kesabaran", tr: "Sabır", zh: "耐心",
       sw: "Subira", so: "Samir", bs: "Strpljenje", sq: "Durim", ru: "Терпение",
-      ur: "صبر", bn: "ধৈর্য", ms: "Kesabaran"
+      ur: "صبر", bn: "ধৈর্য", ms: "Kesabaran",
+      fr: "Patience", sus: "Murutare"
     },
     correctVerseMeaningTranslations: {
       en: "Indeed, you will never be able to have patience with me",
@@ -2379,7 +2404,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Поистине, ты не сможешь проявить терпение со мной",
       ur: "بے شک تم میرے ساتھ صبر نہیں کر سکو گے",
       bn: "নিশ্চয়ই তুমি আমার সাথে ধৈর্য ধরতে পারবে না",
-      ms: "Sesungguhnya kamu tidak akan sanggup bersabar bersamaku"
+      ms: "Sesungguhnya kamu tidak akan sanggup bersabar bersamaku",
+      fr: "En vérité, tu ne pourras jamais avoir de patience avec moi", sus: "Tilinɲɛ, i mu bɛ murutare sɔtɔ n fɛ"
     },
     surahAyah: "الكهف:67", ayahNumber: 67,
     hint: "عكس العجلة والاستعجال",
@@ -2399,7 +2425,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Ship", ar: "السفينة (المركب)", id: "Kapal", tr: "Gemi", zh: "船",
       sw: "Meli", so: "Markabka", bs: "Brod", sq: "Anija", ru: "Корабль",
-      ur: "کشتی", bn: "জাহাজ", ms: "Kapal"
+      ur: "کشتی", bn: "জাহাজ", ms: "Kapal",
+      fr: "Le Bateau", sus: "Bɔti"
     },
     correctVerseMeaningTranslations: {
       en: "As for the ship, it belonged to poor people working at sea",
@@ -2414,7 +2441,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Что касается корабля, он принадлежал беднякам, работавшим на море",
       ur: "جہاں تک کشتی کا تعلق ہے وہ مسکینوں کی تھی جو سمندر میں کام کرتے تھے",
       bn: "জাহাজটির কথা, তা ছিল দরিদ্র লোকদের যারা সমুদ্রে কাজ করতো",
-      ms: "Adapun kapal itu adalah milik orang-orang miskin yang bekerja di laut"
+      ms: "Adapun kapal itu adalah milik orang-orang miskin yang bekerja di laut",
+      fr: "Quant au bateau, il appartenait à des pauvres qui travaillaient en mer", sus: "Bɔti nan na, a ye xun mu bɛ mɔɔe ra bɛrɛ ma"
     },
     surahAyah: "الكهف:79", ayahNumber: 79,
     hint: "مركب يسير على الماء",
@@ -2434,7 +2462,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Sea", ar: "البحر", id: "Laut", tr: "Deniz", zh: "海洋",
       sw: "Bahari", so: "Badda", bs: "More", sq: "Deti", ru: "Море",
-      ur: "سمندر", bn: "সমুদ্র", ms: "Laut"
+      ur: "سمندر", bn: "সমুদ্র", ms: "Laut",
+      fr: "La Mer", sus: "Bɛrɛ"
     },
     correctVerseMeaningTranslations: {
       en: "As for the ship, it belonged to poor people working at sea",
@@ -2449,7 +2478,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Что касается корабля, он принадлежал беднякам, работавшим на море",
       ur: "جہاں تک کشتی کا تعلق ہے وہ مسکینوں کی تھی جو سمندر میں کام کرتے تھے",
       bn: "জাহাজটির কথা, তা ছিল দরিদ্র লোকদের যারা সমুদ্রে কাজ করতো",
-      ms: "Adapun kapal itu adalah milik orang-orang miskin yang bekerja di laut"
+      ms: "Adapun kapal itu adalah milik orang-orang miskin yang bekerja di laut",
+      fr: "Quant au bateau, il appartenait à des pauvres qui travaillaient en mer", sus: "Bɔti nan na, a ye xun mu bɛ mɔɔe ra bɛrɛ ma"
     },
     surahAyah: "الكهف:79", ayahNumber: 79,
     hint: "المسطح المائي الكبير",
@@ -2469,7 +2499,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Two Gardens", ar: "البستانين", id: "Dua kebun", tr: "İki bahçe", zh: "两座花园",
       sw: "Bustani mbili", so: "Labada beero", bs: "Dva vrta", sq: "Dy kopshte", ru: "Два сада",
-      ur: "دو باغ", bn: "দুটি বাগান", ms: "Dua kebun"
+      ur: "دو باغ", bn: "দুটি বাগান", ms: "Dua kebun",
+      fr: "Les Deux Jardins", sus: "Taan Sɛndɛ"
     },
     correctVerseMeaningTranslations: {
       en: "We granted him two gardens of grapevines",
@@ -2484,7 +2515,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Мы дали ему два виноградных сада",
       ur: "ہم نے اسے انگور کے دو باغ دیے",
       bn: "আমরা তাকে আঙুরের দুটি বাগান দিয়েছিলাম",
-      ms: "Kami berikan kepadanya dua kebun anggur"
+      ms: "Kami berikan kepadanya dua kebun anggur",
+      fr: "We granted him two gardens of grapevines", sus: "We granted him two gardens of grapevines"
     },
     surahAyah: "الكهف:32", ayahNumber: 32,
     hint: "مكانان مليئان بالأشجار والثمار",
@@ -2504,7 +2536,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Wealth", ar: "المال والثروة", id: "Harta", tr: "Mal / Servet", zh: "财富",
       sw: "Mali", so: "Maalka", bs: "Imetak", sq: "Pasuria", ru: "Богатство",
-      ur: "مال و دولت", bn: "সম্পদ", ms: "Harta"
+      ur: "مال و دولت", bn: "সম্পদ", ms: "Harta",
+      fr: "Richesse / Argent", sus: "Lɛndɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Wealth and children are the adornment of the life of this world",
@@ -2519,7 +2552,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Богатство и сыновья — украшение мирской жизни",
       ur: "مال اور اولاد دنیا کی زندگی کی زینت ہیں",
       bn: "সম্পদ ও সন্তানেরা দুনিয়ার জীবনের শোভা",
-      ms: "Harta dan anak-anak adalah perhiasan kehidupan dunia"
+      ms: "Harta dan anak-anak adalah perhiasan kehidupan dunia",
+      fr: "Wealth and children are the adornment of the life of this world", sus: "Wealth and children are the adornment of the life of this world"
     },
     surahAyah: "الكهف:46", ayahNumber: 46,
     hint: "ما يملكه الإنسان من ثروة",
@@ -2539,7 +2573,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Adornment", ar: "الزينة والجمال", id: "Perhiasan", tr: "Süs", zh: "装饰",
       sw: "Pambo", so: "Qurux", bs: "Ukras", sq: "Stoli", ru: "Украшение",
-      ur: "زینت", bn: "শোভা", ms: "Perhiasan"
+      ur: "زینت", bn: "শোভা", ms: "Perhiasan",
+      fr: "Parure / Beauté", sus: "Nɔrɔnɔrɔ"
     },
     correctVerseMeaningTranslations: {
       en: "Wealth and children are the adornment of the life of this world",
@@ -2554,7 +2589,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Богатство и сыновья — украшение мирской жизни",
       ur: "مال اور اولاد دنیا کی زندگی کی زینت ہیں",
       bn: "সম্পদ ও সন্তানেরা দুনিয়ার জীবনের শোভা",
-      ms: "Harta dan anak-anak adalah perhiasan kehidupan dunia"
+      ms: "Harta dan anak-anak adalah perhiasan kehidupan dunia",
+      fr: "Wealth and children are the adornment of the life of this world", sus: "Wealth and children are the adornment of the life of this world"
     },
     surahAyah: "الكهف:46", ayahNumber: 46,
     hint: "ما يُجمّل ويُزيّن",
@@ -2574,7 +2610,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Book", ar: "الكتاب (القرآن)", id: "Kitab", tr: "Kitap", zh: "经典",
       sw: "Kitabu", so: "Kitaabka", bs: "Knjiga", sq: "Libri", ru: "Книга",
-      ur: "کتاب", bn: "কিতাব", ms: "Kitab"
+      ur: "کتاب", bn: "কিতাব", ms: "Kitab",
+      fr: "Le Livre", sus: "Sɛbɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Praise be to Allah who revealed the Book to His servant",
@@ -2589,7 +2626,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Хвала Аллаху, Который ниспослал Своему рабу Книгу",
       ur: "تعریف اللہ کی جس نے اپنے بندے پر کتاب نازل کی",
       bn: "সমস্ত প্রশংসা আল্লাহর যিনি তাঁর বান্দার প্রতি কিতাব নাযিল করেছেন",
-      ms: "Segala puji bagi Allah yang menurunkan Kitab kepada hamba-Nya"
+      ms: "Segala puji bagi Allah yang menurunkan Kitab kepada hamba-Nya",
+      fr: "Praise be to Allah who revealed the Book to His servant", sus: "Praise be to Allah who revealed the Book to His servant"
     },
     surahAyah: "الكهف:1", ayahNumber: 1,
     hint: "القرآن الكريم",
@@ -2609,7 +2647,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Any crookedness", ar: "اعوجاج أو انحراف", id: "Kebengkokan", tr: "Eğrilik", zh: "弯曲",
       sw: "Upotovu", so: "Qalooc", bs: "Iskrivljenost", sq: "Shtrembërim", ru: "Искривление",
-      ur: "کجی", bn: "বক্রতা", ms: "Kebengkokan"
+      ur: "کجی", bn: "বক্রতা", ms: "Kebengkokan",
+      fr: "Toute déviation", sus: "Nalama"
     },
     correctVerseMeaningTranslations: {
       en: "And has not made therein any crookedness",
@@ -2624,7 +2663,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И не допустил в нём никакого искривления",
       ur: "اور اس میں کوئی کجی نہیں رکھی",
       bn: "এবং তাতে কোনো বক্রতা রাখেননি",
-      ms: "Dan tidak menjadikan padanya sebarang kebengkokan"
+      ms: "Dan tidak menjadikan padanya sebarang kebengkokan",
+      fr: "And has not made therein any crookedness", sus: "And has not made therein any crookedness"
     },
     surahAyah: "الكهف:1", ayahNumber: 1,
     hint: "عكس الاستقامة",
@@ -2644,7 +2684,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Good deeds", ar: "الأعمال الصالحة", id: "Amal saleh", tr: "Salih ameller", zh: "善行",
       sw: "Matendo mema", so: "Camalka wanaagsan", bs: "Dobra djela", sq: "Vepra të mira", ru: "Праведные дела",
-      ur: "نیک اعمال", bn: "সৎকর্ম", ms: "Amal soleh"
+      ur: "نیک اعمال", bn: "সৎকর্ম", ms: "Amal soleh",
+      fr: "Bonnes œuvres", sus: "Kɛlɛ Kore"
     },
     correctVerseMeaningTranslations: {
       en: "And gives good tidings to the believers who do righteous deeds",
@@ -2659,7 +2700,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И радует верующих, совершающих праведные дела",
       ur: "اور ایمان والوں کو جو نیک اعمال کرتے ہیں خوشخبری دیتا ہے",
       bn: "এবং সুসংবাদ দেয় মুমিনদের যারা সৎকর্ম করে",
-      ms: "Dan memberi khabar gembira kepada orang-orang beriman yang beramal soleh"
+      ms: "Dan memberi khabar gembira kepada orang-orang beriman yang beramal soleh",
+      fr: "And gives good tidings to the believers who do righteous deeds", sus: "And gives good tidings to the believers who do righteous deeds"
     },
     surahAyah: "الكهف:2", ayahNumber: 2,
     hint: "الأعمال الحسنة التي يثاب عليها",
@@ -2679,7 +2721,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Remembrance", ar: "ذكر وتذكّر", id: "Peringatan", tr: "Zikir / Hatırlama", zh: "记忆",
       sw: "Ukumbusho", so: "Xusuus", bs: "Sjećanje", sq: "Përkujtim", ru: "Поминание",
-      ur: "ذکر", bn: "স্মরণ", ms: "Peringatan"
+      ur: "ذکر", bn: "স্মরণ", ms: "Peringatan",
+      fr: "Rappel / Souvenir", sus: "Xabu"
     },
     correctVerseMeaningTranslations: {
       en: "And do not say of anything: I shall do that tomorrow, except [when adding] if Allah wills. And remember your Lord when you forget",
@@ -2694,7 +2737,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И поминай Господа своего, когда забудешь",
       ur: "اور اپنے رب کو یاد کرو جب بھول جاؤ",
       bn: "এবং তোমার প্রভুকে স্মরণ করো যখন তুমি ভুলে যাও",
-      ms: "Dan ingatlah Tuhanmu apabila kamu lupa"
+      ms: "Dan ingatlah Tuhanmu apabila kamu lupa",
+      fr: "And do not say of anything: I shall do that tomorrow, except [when adding] if Allah wills. And remember your Lord when you forget", sus: "And do not say of anything: I shall do that tomorrow, except [when adding] if Allah wills. And remember your Lord when you forget"
     },
     surahAyah: "الكهف:24", ayahNumber: 24,
     hint: "تعني التذكّر والاستحضار",
@@ -2714,7 +2758,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Injustice", ar: "ظلم وجور", id: "Kezaliman", tr: "Zulüm", zh: "不义",
       sw: "Dhulma", so: "Dulmi", bs: "Nepravda", sq: "Padrejtësi", ru: "Несправедливость",
-      ur: "ظلم", bn: "অন্যায়", ms: "Kezaliman"
+      ur: "ظلم", bn: "অন্যায়", ms: "Kezaliman",
+      fr: "Injustice / Méfait", sus: "Nalama Kɛlɛ"
     },
     correctVerseMeaningTranslations: {
       en: "And your Lord does injustice to no one",
@@ -2729,7 +2774,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И Господь твой не поступает несправедливо ни с кем",
       ur: "اور تمہارا رب کسی پر ظلم نہیں کرتا",
       bn: "এবং তোমার প্রভু কারো প্রতি অন্যায় করেন না",
-      ms: "Dan Tuhanmu tidak berlaku zalim kepada sesiapa"
+      ms: "Dan Tuhanmu tidak berlaku zalim kepada sesiapa",
+      fr: "And your Lord does injustice to no one", sus: "And your Lord does injustice to no one"
     },
     surahAyah: "الكهف:49", ayahNumber: 49,
     hint: "عكس العدل",
@@ -2749,7 +2795,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Sun", ar: "الشمس", id: "Matahari", tr: "Güneş", zh: "太阳",
       sw: "Jua", so: "Qorraxda", bs: "Sunce", sq: "Dielli", ru: "Солнце",
-      ur: "سورج", bn: "সূর্য", ms: "Matahari"
+      ur: "سورج", bn: "সূর্য", ms: "Matahari",
+      fr: "Le Soleil", sus: "Tɛlɛnde"
     },
     correctVerseMeaningTranslations: {
       en: "And you would see the sun when it rose",
@@ -2764,7 +2811,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Ты видишь, как солнце при восходе",
       ur: "اور تم دیکھتے کہ سورج جب طلوع ہوتا",
       bn: "এবং তুমি দেখতে সূর্য যখন উদিত হত",
-      ms: "Dan kamu melihat matahari ketika terbit"
+      ms: "Dan kamu melihat matahari ketika terbit",
+      fr: "And you would see the sun when it rose", sus: "And you would see the sun when it rose"
     },
     surahAyah: "الكهف:17", ayahNumber: 17,
     hint: "النجم الذي يضيء النهار",
@@ -2784,7 +2832,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Their Dog", ar: "كلبهم", id: "Anjing mereka", tr: "Köpekleri", zh: "他们的狗",
       sw: "Mbwa wao", so: "Eygooda", bs: "Njihov pas", sq: "Qeni i tyre", ru: "Их собака",
-      ur: "ان کا کتا", bn: "তাদের কুকুর", ms: "Anjing mereka"
+      ur: "ان کا کتا", bn: "তাদের কুকুর", ms: "Anjing mereka",
+      fr: "Leur Chien", sus: "E Xɔnxɔn"
     },
     correctVerseMeaningTranslations: {
       en: "And their dog stretching his forelegs at the entrance",
@@ -2799,7 +2848,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "А их собака вытянула лапы у входа",
       ur: "اور ان کا کتا اپنی اگلی ٹانگیں دہلیز پر پھیلائے ہوئے",
       bn: "এবং তাদের কুকুর তার সামনের পা দরজায় প্রসারিত করে",
-      ms: "Sedang anjing mereka menghulurkan kedua-dua kaki depannya di muka pintu"
+      ms: "Sedang anjing mereka menghulurkan kedua-dua kaki depannya di muka pintu",
+      fr: "And their dog stretching his forelegs at the entrance", sus: "And their dog stretching his forelegs at the entrance"
     },
     surahAyah: "الكهف:18", ayahNumber: 18,
     hint: "حيوان أليف كان مع أصحاب الكهف",
@@ -2819,7 +2869,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Water", ar: "الماء", id: "Air", tr: "Su", zh: "水",
       sw: "Maji", so: "Biyo", bs: "Voda", sq: "Ujë", ru: "Вода",
-      ur: "پانی", bn: "পানি", ms: "Air"
+      ur: "پانی", bn: "পানি", ms: "Air",
+      fr: "Eau", sus: "Ji"
     },
     correctVerseMeaningTranslations: {
       en: "Send one of you with this silver coin to the city to find the purest food",
@@ -2834,7 +2885,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Пошлите одного из вас с этими серебряными монетами в город",
       ur: "اپنے میں سے کسی کو اپنے سکے لے کر شہر بھیجو",
       bn: "তোমাদের কাউকে তোমাদের এই রূপার মুদ্রা দিয়ে শহরে পাঠাও",
-      ms: "Maka hantarlah seorang di antara kamu dengan wang perak kamu ini ke bandar"
+      ms: "Maka hantarlah seorang di antara kamu dengan wang perak kamu ini ke bandar",
+      fr: "Send one of you with this silver coin to the city to find the purest food", sus: "Send one of you with this silver coin to the city to find the purest food"
     },
     surahAyah: "الكهف:29", ayahNumber: 29,
     hint: "سائل شفاف نشربه",
@@ -2854,7 +2906,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Truth", ar: "الحقيقة والصواب", id: "Kebenaran", tr: "Hakikat / Gerçek", zh: "真理",
       sw: "Ukweli", so: "Xaqiiqda", bs: "Istina", sq: "E vërteta", ru: "Истина",
-      ur: "حق", bn: "সত্য", ms: "Kebenaran"
+      ur: "حق", bn: "সত্য", ms: "Kebenaran",
+      fr: "La Vérité", sus: "Tilinɲɛ"
     },
     correctVerseMeaningTranslations: {
       en: "And say: The truth is from your Lord",
@@ -2869,7 +2922,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И скажи: Истина — от вашего Господа",
       ur: "اور کہو: حق تمہارے رب کی طرف سے ہے",
       bn: "এবং বলো: সত্য তোমাদের প্রভুর পক্ষ থেকে",
-      ms: "Dan katakanlah: Kebenaran itu datangnya dari Tuhan kamu"
+      ms: "Dan katakanlah: Kebenaran itu datangnya dari Tuhan kamu",
+      fr: "And say: The truth is from your Lord", sus: "And say: The truth is from your Lord"
     },
     surahAyah: "الكهف:29", ayahNumber: 29,
     hint: "عكس الباطل والكذب",
@@ -2889,7 +2943,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "A Boy", ar: "صبي / فتى", id: "Seorang anak muda", tr: "Bir oğlan", zh: "一个男孩",
       sw: "Kijana", so: "Wiil", bs: "Dječak", sq: "Një djalë", ru: "Мальчик",
-      ur: "لڑکا", bn: "এক বালক", ms: "Seorang budak lelaki"
+      ur: "لڑکا", bn: "এক বালক", ms: "Seorang budak lelaki",
+      fr: "Un Garçon / Jeune Homme", sus: "Denyɛ"
     },
     correctVerseMeaningTranslations: {
       en: "And as for the boy, his parents were believers",
@@ -2904,7 +2959,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Что касается мальчика, его родители были верующими",
       ur: "اور جہاں تک لڑکے کا تعلق ہے اس کے والدین مومن تھے",
       bn: "আর ছেলেটির বিষয়, তার পিতামাতা ছিল মুমিন",
-      ms: "Adapun anak muda itu, kedua ibu bapanya adalah orang beriman"
+      ms: "Adapun anak muda itu, kedua ibu bapanya adalah orang beriman",
+      fr: "And as for the boy, his parents were believers", sus: "And as for the boy, his parents were believers"
     },
     surahAyah: "الكهف:80", ayahNumber: 80,
     hint: "ذكر صغير السن",
@@ -2924,7 +2980,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Wall", ar: "الحائط / السور", id: "Dinding", tr: "Duvar", zh: "墙壁",
       sw: "Ukuta", so: "Derbiga", bs: "Zid", sq: "Muri", ru: "Стена",
-      ur: "دیوار", bn: "দেয়াল", ms: "Dinding"
+      ur: "دیوار", bn: "দেয়াল", ms: "Dinding",
+      fr: "Le Mur", sus: "Mamboli"
     },
     correctVerseMeaningTranslations: {
       en: "And as for the wall, it belonged to two orphan boys in the city",
@@ -2939,7 +2996,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Что касается стены, она принадлежала двум мальчикам-сиротам в городе",
       ur: "اور جہاں تک دیوار کا تعلق ہے وہ شہر کے دو یتیم لڑکوں کی تھی",
       bn: "আর দেয়ালটি ছিল শহরের দুই এতিম ছেলের",
-      ms: "Adapun dinding itu adalah kepunyaan dua anak yatim di bandar itu"
+      ms: "Adapun dinding itu adalah kepunyaan dua anak yatim di bandar itu",
+      fr: "And as for the wall, it belonged to two orphan boys in the city", sus: "And as for the wall, it belonged to two orphan boys in the city"
     },
     surahAyah: "الكهف:82", ayahNumber: 82,
     hint: "بناء عمودي يحمي أو يفصل",
@@ -2959,7 +3017,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "East / Sunrise", ar: "مكان شروق الشمس", id: "Timur / Terbit", tr: "Doğu", zh: "东方",
       sw: "Mashariki", so: "Bari", bs: "Istok", sq: "Lindje", ru: "Восток",
-      ur: "مشرق", bn: "পূর্ব দিক", ms: "Timur"
+      ur: "مشرق", bn: "পূর্ব দিক", ms: "Timur",
+      fr: "Est / Lever du soleil", sus: "Tɛlɛnde Tima"
     },
     correctVerseMeaningTranslations: {
       en: "Until when he reached the rising of the sun",
@@ -2974,7 +3033,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Пока не достиг места восхода солнца",
       ur: "یہاں تک کہ جب وہ سورج کے طلوع ہونے کی جگہ پہنچا",
       bn: "অবশেষে যখন সে সূর্যোদয়ের স্থানে পৌঁছলো",
-      ms: "Sehingga apabila dia sampai ke tempat terbit matahari"
+      ms: "Sehingga apabila dia sampai ke tempat terbit matahari",
+      fr: "Until when he reached the rising of the sun", sus: "Until when he reached the rising of the sun"
     },
     surahAyah: "الكهف:90", ayahNumber: 90,
     hint: "الاتجاه الذي تطلع منه الشمس",
@@ -2994,7 +3054,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "A Barrier", ar: "حاجز / سد", id: "Penghalang", tr: "Set / Engel", zh: "屏障",
       sw: "Kizuizi", so: "Xaajis", bs: "Brana / Pregrada", sq: "Pengesë", ru: "Преграда",
-      ur: "بند / رکاوٹ", bn: "বাঁধ / প্রতিবন্ধক", ms: "Penghalang"
+      ur: "بند / رکاوٹ", bn: "বাঁধ / প্রতিবন্ধক", ms: "Penghalang",
+      fr: "Une Barrière / Barrage", sus: "Xali"
     },
     correctVerseMeaningTranslations: {
       en: "Shall we pay you tribute so that you build a barrier between us and them?",
@@ -3009,7 +3070,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Не установить ли тебе вознаграждение за то, что ты воздвигнешь преграду между нами и ними?",
       ur: "کیا ہم آپ کو خراج دیں تاکہ آپ ہمارے اور ان کے درمیان ایک بند بنا دیں؟",
       bn: "আমরা কি আপনাকে কর দেব যাতে আপনি আমাদের ও তাদের মধ্যে এক প্রতিবন্ধক তৈরি করেন?",
-      ms: "Bolehkah kami memberikan bayaran kepadamu supaya engkau membina penghalang antara kami dengan mereka?"
+      ms: "Bolehkah kami memberikan bayaran kepadamu supaya engkau membina penghalang antara kami dengan mereka?",
+      fr: "Shall we pay you tribute so that you build a barrier between us and them?", sus: "Shall we pay you tribute so that you build a barrier between us and them?"
     },
     surahAyah: "الكهف:94", ayahNumber: 94,
     hint: "بناء يمنع المرور",
@@ -3029,7 +3091,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Iron", ar: "الحديد (المعدن)", id: "Besi", tr: "Demir", zh: "铁",
       sw: "Chuma", so: "Birta", bs: "Željezo", sq: "Hekuri", ru: "Железо",
-      ur: "لوہا", bn: "লোহা", ms: "Besi"
+      ur: "لوہا", bn: "লোহা", ms: "Besi",
+      fr: "Fer", sus: "Tɔrɔnfɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Bring me blocks of iron",
@@ -3044,7 +3107,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Принесите мне куски железа",
       ur: "مجھے لوہے کے ٹکڑے لا کر دو",
       bn: "আমাকে লোহার টুকরো এনে দাও",
-      ms: "Berikanlah kepadaku ketulan-ketulan besi"
+      ms: "Berikanlah kepadaku ketulan-ketulan besi",
+      fr: "Bring me blocks of iron", sus: "Bring me blocks of iron"
     },
     surahAyah: "الكهف:96", ayahNumber: 96,
     hint: "معدن قوي يُستخدم في البناء",
@@ -3064,7 +3128,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Molten Copper", ar: "النحاس المذاب", id: "Tembaga cair", tr: "Erimiş bakır", zh: "熔化的铜",
       sw: "Shaba iliyoyeyuka", so: "Naxaas dhalaalay", bs: "Rastopljeni bakar", sq: "Bakër i shkrirë", ru: "Расплавленная медь",
-      ur: "پگھلا ہوا تانبا", bn: "গলিত তামা", ms: "Tembaga cair"
+      ur: "پگھلا ہوا تانبا", bn: "গলিত তামা", ms: "Tembaga cair",
+      fr: "Cuivre fondu", sus: "Kɔpɛrɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Bring me molten copper to pour over it",
@@ -3079,7 +3144,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Принесите мне расплавленную медь, чтобы я залил ею",
       ur: "مجھے پگھلا ہوا تانبا لا دو تاکہ میں اس پر ڈالوں",
       bn: "আমাকে গলিত তামা এনে দাও যেন আমি তার উপর ঢালি",
-      ms: "Bawalah kepadaku tembaga cair supaya aku tuangkan ke atasnya"
+      ms: "Bawalah kepadaku tembaga cair supaya aku tuangkan ke atasnya",
+      fr: "Apportez-moi du cuivre fondu pour le verser dessus", sus: "Kɔpɛrɛ sɔtɔ wa yi a xun"
     },
     surahAyah: "الكهف:96", ayahNumber: 96,
     hint: "معدن مذاب يُسكب",
@@ -3099,7 +3165,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Ink / Supply", ar: "حبر / مداد", id: "Tinta", tr: "Mürekkep", zh: "墨水",
       sw: "Wino", so: "Khad", bs: "Tinta", sq: "Bojë", ru: "Чернила",
-      ur: "روشنائی", bn: "কালি", ms: "Dakwat"
+      ur: "روشنائی", bn: "কালি", ms: "Dakwat",
+      fr: "Encre / Provision", sus: "Sɛbɛ Kolon"
     },
     correctVerseMeaningTranslations: {
       en: "Say: If the sea were ink for the words of my Lord",
@@ -3114,7 +3181,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Скажи: Если бы море стало чернилами для слов Господа моего",
       ur: "کہو: اگر سمندر میرے رب کے کلمات کے لیے روشنائی ہو",
       bn: "বলো: আমার প্রভুর কথা লেখার জন্য যদি সমুদ্র কালি হয়",
-      ms: "Katakanlah: Sekiranya lautan menjadi dakwat untuk menulis kalimah-kalimah Tuhanku"
+      ms: "Katakanlah: Sekiranya lautan menjadi dakwat untuk menulis kalimah-kalimah Tuhanku",
+      fr: "Say: If the sea were ink for the words of my Lord", sus: "Say: If the sea were ink for the words of my Lord"
     },
     surahAyah: "الكهف:109", ayahNumber: 109,
     hint: "سائل يُكتب به",
@@ -3134,7 +3202,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Associate partners", ar: "يُشرك (يعبد غير الله)", id: "Menyekutukan", tr: "Ortak koşmak", zh: "举伴",
       sw: "Kushirikisha", so: "La wadaajin", bs: "Pridruživati", sq: "Shoqërojë", ru: "Придавать сотоварища",
-      ur: "شریک ٹھہرانا", bn: "শরীক করা", ms: "Menyekutukan"
+      ur: "شریک ٹھہرانا", bn: "শরীক করা", ms: "Menyekutukan",
+      fr: "Associer des partenaires (à Allah)", sus: "Ala Ra Dunbu"
     },
     correctVerseMeaningTranslations: {
       en: "And let him not associate in the worship of his Lord anyone",
@@ -3149,7 +3218,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И пусть не придаёт в поклонении Господу своему никого",
       ur: "اور اپنے رب کی عبادت میں کسی کو شریک نہ ٹھہرائے",
       bn: "এবং তার প্রভুর ইবাদতে কাউকে শরীক না করুক",
-      ms: "Dan janganlah dia mempersekutukan sesiapa pun dalam ibadat kepada Tuhannya"
+      ms: "Dan janganlah dia mempersekutukan sesiapa pun dalam ibadat kepada Tuhannya",
+      fr: "And let him not associate in the worship of his Lord anyone", sus: "And let him not associate in the worship of his Lord anyone"
     },
     surahAyah: "الكهف:110", ayahNumber: 110,
     hint: "عبادة غير الله مع الله",
@@ -3169,7 +3239,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Meeting", ar: "الملاقاة واللقاء", id: "Pertemuan", tr: "Buluşma / Kavuşma", zh: "相遇",
       sw: "Kukutana", so: "Kulanka", bs: "Susret", sq: "Takimi", ru: "Встреча",
-      ur: "ملاقات", bn: "সাক্ষাৎ", ms: "Pertemuan"
+      ur: "ملاقات", bn: "সাক্ষাৎ", ms: "Pertemuan",
+      fr: "Rencontre / Rendez-vous", sus: "Ɲaxɛlɛ"
     },
     correctVerseMeaningTranslations: {
       en: "So whoever hopes for the meeting with his Lord",
@@ -3184,7 +3255,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Кто надеется на встречу со своим Господом",
       ur: "پس جو اپنے رب سے ملاقات کی امید رکھتا ہے",
       bn: "অতএব যে তার প্রভুর সাক্ষাতের আশা করে",
-      ms: "Maka sesiapa yang mengharapkan pertemuan dengan Tuhannya"
+      ms: "Maka sesiapa yang mengharapkan pertemuan dengan Tuhannya",
+      fr: "So whoever hopes for the meeting with his Lord", sus: "So whoever hopes for the meeting with his Lord"
     },
     surahAyah: "الكهف:110", ayahNumber: 110,
     hint: "تعني المقابلة والوصول",
@@ -3205,7 +3277,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "In the name", ar: "باسم", id: "Dengan nama", tr: "Adıyla", zh: "以…之名",
       sw: "Kwa jina", so: "Magaca", bs: "U ime", sq: "Me emrin", ru: "Во имя",
-      ur: "نام سے", bn: "নামে", ms: "Dengan nama"
+      ur: "نام سے", bn: "নামে", ms: "Dengan nama",
+      fr: "Au nom de", sus: "Xi Ra"
     },
     correctVerseMeaningTranslations: {
       en: "In the name of Allah, the Most Gracious, the Most Merciful",
@@ -3220,7 +3293,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Во имя Аллаха Милостивого Милосердного",
       ur: "اللہ کے نام سے جو بڑا مہربان اور رحم کرنے والا ہے",
       bn: "পরম করুণাময় ও অসীম দয়ালু আল্লাহর নামে",
-      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani"
+      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani",
+      fr: "Au nom d'Allah, le Très Miséricordieux, le Miséricordieux", sus: "Ala xi ra, Naxari Belebele, Naxariden"
     },
     surahAyah: "الفاتحة:1", ayahNumber: 1,
     hint: "الكلمة الأولى في الفاتحة والقرآن كله",
@@ -3240,7 +3314,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Most Gracious", ar: "الرحمن (واسع الرحمة)", id: "Yang Maha Pengasih", tr: "Rahman (çok merhametli)", zh: "至仁的",
       sw: "Mwingi wa rehema", so: "Naxariis badan", bs: "Samilosni", sq: "Gjithëmëshirshmi", ru: "Милостивый",
-      ur: "بہت رحم کرنے والا", bn: "পরম করুণাময়", ms: "Yang Maha Pemurah"
+      ur: "بہت رحم کرنے والا", bn: "পরম করুণাময়", ms: "Yang Maha Pemurah",
+      fr: "Le Très Miséricordieux", sus: "Naxari Belebele"
     },
     correctVerseMeaningTranslations: {
       en: "In the name of Allah, the Most Gracious, the Most Merciful",
@@ -3255,7 +3330,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Во имя Аллаха Милостивого Милосердного",
       ur: "اللہ کے نام سے جو بڑا مہربان اور رحم کرنے والا ہے",
       bn: "পরম করুণাময় ও অসীম দয়ালু আল্লাহর নামে",
-      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani"
+      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani",
+      fr: "Au nom d'Allah, le Très Miséricordieux, le Miséricordieux", sus: "Ala xi ra, Naxari Belebele, Naxariden"
     },
     surahAyah: "الفاتحة:1", ayahNumber: 1,
     hint: "صفة الله الأولى، تعني رحمته الواسعة لجميع الخلق",
@@ -3275,7 +3351,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The Most Merciful", ar: "الرحيم (دائم الرحمة)", id: "Yang Maha Penyayang", tr: "Rahim (daima merhametli)", zh: "至慈的",
       sw: "Mwenye kurehemu", so: "Naxariis leh", bs: "Milostivi", sq: "Mëshirëploti", ru: "Милосердный",
-      ur: "بار بار رحم کرنے والا", bn: "অসীম দয়ালু", ms: "Yang Maha Mengasihani"
+      ur: "بار بار رحم کرنے والا", bn: "অসীম দয়ালু", ms: "Yang Maha Mengasihani",
+      fr: "Le Miséricordieux", sus: "Naxariden"
     },
     correctVerseMeaningTranslations: {
       en: "In the name of Allah, the Most Gracious, the Most Merciful",
@@ -3290,7 +3367,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Во имя Аллаха Милостивого Милосердного",
       ur: "اللہ کے نام سے جو بڑا مہربان اور رحم کرنے والا ہے",
       bn: "পরম করুণাময় ও অসীম দয়ালু আল্লাহর নামে",
-      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani"
+      ms: "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani",
+      fr: "Au nom d'Allah, le Très Miséricordieux, le Miséricordieux", sus: "Ala xi ra, Naxari Belebele, Naxariden"
     },
     surahAyah: "الفاتحة:1", ayahNumber: 1,
     hint: "صفة الله الثانية، رحمة خاصة بالمؤمنين",
@@ -3310,7 +3388,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "All praise", ar: "الحمد والثناء", id: "Segala puji", tr: "Hamd / Övgü", zh: "一切赞美",
       sw: "Sifa zote", so: "Mahad dhan", bs: "Sva hvala", sq: "Gjithë lavdërimet", ru: "Вся хвала",
-      ur: "تمام تعریف", bn: "সমস্ত প্রশংসা", ms: "Segala puji"
+      ur: "تمام تعریف", bn: "সমস্ত প্রশংসা", ms: "Segala puji",
+      fr: "Toute louange", sus: "Tanbi Birin"
     },
     correctVerseMeaningTranslations: {
       en: "All praise is due to Allah, Lord of all the worlds",
@@ -3325,7 +3404,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Хвала Аллаху, Господу миров",
       ur: "تمام تعریف اللہ کے لیے ہے جو سارے جہانوں کا رب ہے",
       bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি সমস্ত জগতের প্রতিপালক",
-      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam"
+      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam",
+      fr: "All praise is due to Allah, Lord of all the worlds", sus: "All praise is due to Allah, Lord of all the worlds"
     },
     surahAyah: "الفاتحة:2", ayahNumber: 2,
     hint: "أول كلمة في الآية الثانية، عكسها الذم",
@@ -3345,7 +3425,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Lord / Master", ar: "الرب والسيد", id: "Tuhan / Pemilik", tr: "Rab / Sahip", zh: "主宰",
       sw: "Mola / Bwana", so: "Rabbiga", bs: "Gospodar", sq: "Zot / Krijues", ru: "Господь",
-      ur: "رب / پروردگار", bn: "প্রতিপালক / প্রভু", ms: "Tuhan / Pemilik"
+      ur: "رب / پروردگار", bn: "প্রতিপালক / প্রভু", ms: "Tuhan / Pemilik",
+      fr: "Seigneur / Maître", sus: "Kɔlɔnyi"
     },
     correctVerseMeaningTranslations: {
       en: "All praise is due to Allah, Lord of all the worlds",
@@ -3360,7 +3441,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Хвала Аллаху, Господу миров",
       ur: "تمام تعریف اللہ کے لیے ہے جو سارے جہانوں کا رب ہے",
       bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি সমস্ত জগতের প্রতিপালক",
-      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam"
+      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam",
+      fr: "All praise is due to Allah, Lord of all the worlds", sus: "All praise is due to Allah, Lord of all the worlds"
     },
     surahAyah: "الفاتحة:2", ayahNumber: 2,
     hint: "يعني المالك والمربي، الكلمة تبدأ بحرف الـ ر...",
@@ -3380,7 +3462,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The worlds / All of creation", ar: "العوالم كلها", id: "Semesta alam", tr: "Âlemler / Tüm varlıklar", zh: "众世界",
       sw: "Walimwengu wote", so: "Caalamka oo dhan", bs: "Svi svjetovi", sq: "Gjithë botët", ru: "Миры / Все творения",
-      ur: "تمام جہان", bn: "সমস্ত জগৎ", ms: "Sekalian alam"
+      ur: "تمام جہان", bn: "সমস্ত জগৎ", ms: "Sekalian alam",
+      fr: "Les mondes / Toute la création", sus: "Dunia Birin"
     },
     correctVerseMeaningTranslations: {
       en: "All praise is due to Allah, Lord of all the worlds",
@@ -3395,7 +3478,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Хвала Аллаху, Господу миров",
       ur: "تمام تعریف اللہ کے لیے ہے جو سارے جہانوں کا رب ہے",
       bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি সমস্ত জগতের প্রতিপালক",
-      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam"
+      ms: "Segala puji tertentu bagi Allah, Tuhan yang memelihara sekalian alam",
+      fr: "All praise is due to Allah, Lord of all the worlds", sus: "All praise is due to Allah, Lord of all the worlds"
     },
     surahAyah: "الفاتحة:2", ayahNumber: 2,
     hint: "آخر كلمة في الآية الثانية، تشمل البشر والجن والملائكة والكون",
@@ -3415,7 +3499,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "King / Master", ar: "المالك والملك", id: "Raja / Pemilik", tr: "Malik / Sahip", zh: "主宰 / 王",
       sw: "Mfalme / Mmiliki", so: "Boqorka", bs: "Vladar / Vlasnik", sq: "Sundimtar / Zotërues", ru: "Владыка / Царь",
-      ur: "مالک / بادشاہ", bn: "মালিক / রাজা", ms: "Raja / Pemilik"
+      ur: "مالک / بادشاہ", bn: "মালিক / রাজা", ms: "Raja / Pemilik",
+      fr: "Roi / Maître / Propriétaire", sus: "Mansa"
     },
     correctVerseMeaningTranslations: {
       en: "Master of the Day of Judgment",
@@ -3430,7 +3515,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Властелин Дня воздаяния",
       ur: "روز جزا کے مالک",
       bn: "বিচার দিনের মালিক",
-      ms: "Yang menguasai hari pembalasan"
+      ms: "Yang menguasai hari pembalasan",
+      fr: "Maître du Jour du Jugement", sus: "Hɔrɔ Lɔxɔ Mansa"
     },
     surahAyah: "الفاتحة:4", ayahNumber: 4,
     hint: "الكلمة تبدأ بحرف الـ م، وتعني صاحب الملك والسلطة",
@@ -3450,7 +3536,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Day", ar: "اليوم", id: "Hari", tr: "Gün", zh: "日 / 天",
       sw: "Siku", so: "Maalinta", bs: "Dan", sq: "Ditë", ru: "День",
-      ur: "دن", bn: "দিন", ms: "Hari"
+      ur: "دن", bn: "দিন", ms: "Hari",
+      fr: "Jour", sus: "Lɔxɔ"
     },
     correctVerseMeaningTranslations: {
       en: "Master of the Day of Judgment",
@@ -3465,7 +3552,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Властелин Дня воздаяния",
       ur: "روز جزا کے مالک",
       bn: "বিচার দিনের মালিক",
-      ms: "Yang menguasai hari pembalasan"
+      ms: "Yang menguasai hari pembalasan",
+      fr: "Maître du Jour du Jugement", sus: "Hɔrɔ Lɔxɔ Mansa"
     },
     surahAyah: "الفاتحة:4", ayahNumber: 4,
     hint: "الكلمة الثانية في الآية الرابعة، ضد الليل",
@@ -3485,7 +3573,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Judgment / Religion", ar: "الجزاء والدين", id: "Pembalasan / Agama", tr: "Hesap / Din", zh: "报应 / 宗教",
       sw: "Hukumu / Dini", so: "Xisaabta / Diinta", bs: "Sud / Vjera", sq: "Gjykimi / Feja", ru: "Суд / Воздаяние",
-      ur: "جزا / دین", bn: "বিচার / ধর্ম", ms: "Pembalasan / Agama"
+      ur: "جزا / دین", bn: "বিচার / ধর্ম", ms: "Pembalasan / Agama",
+      fr: "Jugement / Religion", sus: "Hɔrɔ Lɔxɔ"
     },
     correctVerseMeaningTranslations: {
       en: "Master of the Day of Judgment",
@@ -3500,7 +3589,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Властелин Дня воздаяния",
       ur: "روز جزا کے مالک",
       bn: "বিচার দিনের মালিক",
-      ms: "Yang menguasai hari pembalasan"
+      ms: "Yang menguasai hari pembalasan",
+      fr: "Maître du Jour du Jugement", sus: "Hɔrɔ Lɔxɔ Mansa"
     },
     surahAyah: "الفاتحة:4", ayahNumber: 4,
     hint: "آخر كلمة في الآية الرابعة، تعني يوم الحساب والجزاء",
@@ -3520,7 +3610,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "You alone / Only You", ar: "إياك وحدك (للتخصيص)", id: "Hanya Engkau", tr: "Yalnızca Seni", zh: "唯有你",
       sw: "Wewe peke yako", so: "Adiga keliya", bs: "Samo Tebe", sq: "Vetëm Ty", ru: "Тебя одного",
-      ur: "صرف تجھی کو", bn: "শুধু তোমাকেই", ms: "Hanya Engkau"
+      ur: "صرف تجھی کو", bn: "শুধু তোমাকেই", ms: "Hanya Engkau",
+      fr: "Toi seul / Toi uniquement", sus: "I Kelen"
     },
     correctVerseMeaningTranslations: {
       en: "You alone we worship and You alone we ask for help",
@@ -3535,7 +3626,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Тебе одному мы поклоняемся и у Тебя одного просим помощи",
       ur: "ہم صرف تیری ہی عبادت کرتے ہیں اور صرف تجھ سے ہی مدد مانگتے ہیں",
       bn: "আমরা শুধু তোমারই ইবাদত করি এবং শুধু তোমারই সাহায্য চাই",
-      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan"
+      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan",
+      fr: "You alone we worship and You alone we ask for help", sus: "You alone we worship and You alone we ask for help"
     },
     surahAyah: "الفاتحة:5", ayahNumber: 5,
     hint: "تعني التخصيص — أي أنت وحدك، الكلمة تبدأ بالهمزة",
@@ -3555,7 +3647,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "We worship", ar: "نعبد ونطيع", id: "Kami menyembah", tr: "İbadet ederiz", zh: "我们崇拜",
       sw: "Tunaabudu", so: "Baanu caabudi", bs: "Obožavamo", sq: "Ne adhurojmë", ru: "Мы поклоняемся",
-      ur: "ہم عبادت کرتے ہیں", bn: "আমরা ইবাদত করি", ms: "Kami menyembah"
+      ur: "ہم عبادت کرتے ہیں", bn: "আমরা ইবাদত করি", ms: "Kami menyembah",
+      fr: "Nous adorons", sus: "Anh Bɛ Tɛɛbɔ"
     },
     correctVerseMeaningTranslations: {
       en: "You alone we worship and You alone we ask for help",
@@ -3570,7 +3663,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Тебе одному мы поклоняемся и у Тебя одного просим помощи",
       ur: "ہم صرف تیری ہی عبادت کرتے ہیں اور صرف تجھ سے ہی مدد مانگتے ہیں",
       bn: "আমরা শুধু তোমারই ইবাদত করি এবং শুধু তোমারই সাহায্য চাই",
-      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan"
+      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan",
+      fr: "You alone we worship and You alone we ask for help", sus: "You alone we worship and You alone we ask for help"
     },
     surahAyah: "الفاتحة:5", ayahNumber: 5,
     hint: "أكمل الآية: إِيَّاكَ ___ وَإِيَّاكَ نَسْتَعِينُ",
@@ -3590,7 +3684,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "We seek help", ar: "نطلب المساعدة", id: "Kami memohon pertolongan", tr: "Yardım dileriz", zh: "我们求助",
       sw: "Tunaomba msaada", so: "Baanu u codsanaa", bs: "Tražimo pomoć", sq: "Kërkojmë ndihmë", ru: "Просим помощи",
-      ur: "ہم مدد مانگتے ہیں", bn: "আমরা সাহায্য চাই", ms: "Kami memohon pertolongan"
+      ur: "ہم مدد مانگتے ہیں", bn: "আমরা সাহায্য চাই", ms: "Kami memohon pertolongan",
+      fr: "Nous implorons l'aide", sus: "Anh Bɛ Dɛnbɛ Ɲaxɛ"
     },
     correctVerseMeaningTranslations: {
       en: "You alone we worship and You alone we ask for help",
@@ -3605,7 +3700,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Тебе одному мы поклоняемся и у Тебя одного просим помощи",
       ur: "ہم صرف تیری ہی عبادت کرتے ہیں اور صرف تجھ سے ہی مدد مانگتے ہیں",
       bn: "আমরা শুধু তোমারই ইবাদত করি এবং শুধু তোমারই সাহায্য চাই",
-      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan"
+      ms: "Hanya Engkau yang kami sembah, dan hanya kepada Engkau kami mohon pertolongan",
+      fr: "You alone we worship and You alone we ask for help", sus: "You alone we worship and You alone we ask for help"
     },
     surahAyah: "الفاتحة:5", ayahNumber: 5,
     hint: "أكمل الآية: إِيَّاكَ نَعْبُدُ وَإِيَّاكَ ___",
@@ -3625,7 +3721,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Guide us", ar: "أرشدنا وأرنا الطريق", id: "Tunjukilah kami", tr: "Bizi hidayete erdir", zh: "引导我们",
       sw: "Tuongoze", so: "Nagu hida", bs: "Uputi nas", sq: "Na udhëzo", ru: "Веди нас",
-      ur: "ہمیں ہدایت دے", bn: "আমাদের পথ দেখাও", ms: "Tunjukilah kami"
+      ur: "ہمیں ہدایت دے", bn: "আমাদের পথ দেখাও", ms: "Tunjukilah kami",
+      fr: "Guide-nous", sus: "Anh Sɛgɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Guide us to the straight path",
@@ -3640,7 +3737,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Веди нас прямым путём",
       ur: "ہمیں سیدھے راستے کی ہدایت دے",
       bn: "আমাদের সরল পথ দেখাও",
-      ms: "Tunjukilah kami jalan yang lurus"
+      ms: "Tunjukilah kami jalan yang lurus",
+      fr: "Guide-nous sur le droit chemin", sus: "Anh sɛgɛ nɛrɛ tilinɲɛ ma"
     },
     surahAyah: "الفاتحة:6", ayahNumber: 6,
     hint: "أول كلمة في دعاء الفاتحة، فعل أمر للهداية",
@@ -3660,7 +3758,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The path / The way", ar: "الطريق والمسلك", id: "Jalan", tr: "Yol / Sırat", zh: "道路 / 正路",
       sw: "Njia", so: "Jidka", bs: "Put / Staza", sq: "Rruga / Udha", ru: "Путь / Дорога",
-      ur: "راستہ / صراط", bn: "পথ / রাস্তা", ms: "Jalan / Laluan"
+      ur: "راستہ / صراط", bn: "পথ / রাস্তা", ms: "Jalan / Laluan",
+      fr: "Le chemin / La voie", sus: "Nɛrɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Guide us to the straight path",
@@ -3675,7 +3774,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Веди нас прямым путём",
       ur: "ہمیں سیدھے راستے کی ہدایت دے",
       bn: "আমাদের সরল পথ দেখাও",
-      ms: "Tunjukilah kami jalan yang lurus"
+      ms: "Tunjukilah kami jalan yang lurus",
+      fr: "Guide-nous sur le droit chemin", sus: "Anh sɛgɛ nɛrɛ tilinɲɛ ma"
     },
     surahAyah: "الفاتحة:6", ayahNumber: 6,
     hint: "تعني الطريق أو المسلك، الكلمة تبدأ بحرف الـ ص...",
@@ -3695,7 +3795,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The straight / The upright", ar: "المستقيم والمباشر", id: "Yang lurus", tr: "Doğru olan", zh: "笔直的",
       sw: "Iliyonyooka", so: "Toosan", bs: "Pravi / Ispravan", sq: "I drejtë", ru: "Прямой",
-      ur: "سیدھا / مستقیم", bn: "সরল / সঠিক", ms: "Yang lurus"
+      ur: "سیدھا / مستقیم", bn: "সরল / সঠিক", ms: "Yang lurus",
+      fr: "Le droit / Le rectiligne", sus: "Nɛrɛ Tilinɲɛ"
     },
     correctVerseMeaningTranslations: {
       en: "Guide us to the straight path",
@@ -3710,7 +3811,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Веди нас прямым путём",
       ur: "ہمیں سیدھے راستے کی ہدایت دے",
       bn: "আমাদের সরল পথ দেখাও",
-      ms: "Tunjukilah kami jalan yang lurus"
+      ms: "Tunjukilah kami jalan yang lurus",
+      fr: "Guide-nous sur le droit chemin", sus: "Anh sɛgɛ nɛrɛ tilinɲɛ ma"
     },
     surahAyah: "الفاتحة:6", ayahNumber: 6,
     hint: "أكمل الآية: اهْدِنَا الصِّرَاطَ ___",
@@ -3730,7 +3832,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "You have bestowed favour upon", ar: "أعطيت النعمة لـ", id: "Engkau telah memberi nikmat", tr: "Nimetlendirdiklerinin", zh: "你所赐恩的",
       sw: "Uliowaneemesha", so: "Ee aad u naxariisatay", bs: "Koje si blagodatima obasuo", sq: "Të cilëve u dhurove të mira", ru: "Которым Ты оказал милость",
-      ur: "جن پر تو نے انعام کیا", bn: "যাদের উপর তুমি অনুগ্রহ করেছ", ms: "Yang Engkau telah menganugerahkan nikmat"
+      ur: "جن پر تو نے انعام کیا", bn: "যাদের উপর তুমি অনুগ্রহ করেছ", ms: "Yang Engkau telah menganugerahkan nikmat",
+      fr: "Tu as comblé de bienfaits", sus: "Hɔnɔyi Masaxu"
     },
     correctVerseMeaningTranslations: {
       en: "The path of those upon whom You have bestowed favour",
@@ -3745,7 +3848,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Путь тех, которым Ты оказал милость",
       ur: "ان لوگوں کا راستہ جن پر تو نے انعام کیا",
       bn: "তাদের পথ যাদের উপর তুমি অনুগ্রহ করেছ",
-      ms: "Jalan orang-orang yang telah Engkau kurniakan nikmat"
+      ms: "Jalan orang-orang yang telah Engkau kurniakan nikmat",
+      fr: "The path of those upon whom You have bestowed favour", sus: "The path of those upon whom You have bestowed favour"
     },
     surahAyah: "الفاتحة:7", ayahNumber: 7,
     hint: "تعني منح النعمة والعطاء، الكلمة تبدأ بالهمزة",
@@ -3765,7 +3869,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Those who earned wrath", ar: "الذين غضب الله عليهم", id: "Yang dimurkai", tr: "Gazaba uğrayanların", zh: "被愤怒的人",
       sw: "Waliokasirikwa", so: "Kuwa cadhoobay", bs: "Onih nad kojima je srdžba", sq: "Atyre mbi të cilët ka rëndë zemërimi", ru: "Тех на кого пал гнев",
-      ur: "جن پر غضب ہوا", bn: "যাদের উপর ক্রোধ পড়েছে", ms: "Yang dimurkai"
+      ur: "جن پر غضب ہوا", bn: "যাদের উপর ক্রোধ পড়েছে", ms: "Yang dimurkai",
+      fr: "Ceux qui ont mérité la colère", sus: "Suukuye Sɔtɔxie"
     },
     correctVerseMeaningTranslations: {
       en: "Not of those who earned wrath, nor of those who go astray",
@@ -3780,7 +3885,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Не тех на кого пал гнев и не заблудших",
       ur: "نہ ان کا جن پر غضب ہوا اور نہ گمراہوں کا",
       bn: "তাদের নয় যাদের উপর ক্রোধ নেমেছে এবং পথভ্রষ্টদেরও নয়",
-      ms: "Bukan jalan mereka yang dimurkai dan bukan pula mereka yang sesat"
+      ms: "Bukan jalan mereka yang dimurkai dan bukan pula mereka yang sesat",
+      fr: "Not of those who earned wrath, nor of those who go astray", sus: "Not of those who earned wrath, nor of those who go astray"
     },
     surahAyah: "الفاتحة:7", ayahNumber: 7,
     hint: "الكلمة تبدأ بالميم، وتعني الذين نالوا غضب الله",
@@ -3800,7 +3906,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Those who go astray", ar: "الذين ضلوا عن الحق", id: "Yang tersesat", tr: "Sapıkların / Yolunu şaşıranların", zh: "迷误者",
       sw: "Waliopotea", so: "Kuwa dhumay", bs: "Onih koji su zalutali", sq: "Atyre që kanë humbur rrugën", ru: "Заблудших",
-      ur: "گمراہوں کا", bn: "পথভ্রষ্টদের", ms: "Mereka yang sesat"
+      ur: "گمراہوں کا", bn: "পথভ্রষ্টদের", ms: "Mereka yang sesat",
+      fr: "Ceux qui s'égarent", sus: "Nalama Nɛrɛ ra"
     },
     correctVerseMeaningTranslations: {
       en: "Not of those who earned wrath, nor of those who go astray",
@@ -3815,7 +3922,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Не тех на кого пал гнев и не заблудших",
       ur: "نہ ان کا جن پر غضب ہوا اور نہ گمراہوں کا",
       bn: "তাদের নয় যাদের উপর ক্রোধ নেমেছে এবং পথভ্রষ্টদেরও নয়",
-      ms: "Bukan jalan mereka yang dimurkai dan bukan pula mereka yang sesat"
+      ms: "Bukan jalan mereka yang dimurkai dan bukan pula mereka yang sesat",
+      fr: "Not of those who earned wrath, nor of those who go astray", sus: "Not of those who earned wrath, nor of those who go astray"
     },
     surahAyah: "الفاتحة:7", ayahNumber: 7,
     hint: "أكمل الآية: غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا ___",
@@ -3836,7 +3944,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Blessed / Most Exalted", ar: "تعالى وتعظّم وكثر خيره", id: "Maha Suci / Maha Agung", tr: "Ne yücedir / Mübarektir", zh: "祝福的 / 至高无上的",
       sw: "Amebarikiwa / Mtukufu", so: "Wayn buu yahay", bs: "Neka je uzvišen", sq: "I lartësuari / I bekuari", ru: "Благословен / Превыше всего",
-      ur: "بابرکت / عظیم", bn: "মহিমান্বিত / বরকতময়", ms: "Maha Berkat / Maha Agung"
+      ur: "بابرکت / عظیم", bn: "মহিমান্বিত / বরকতময়", ms: "Maha Berkat / Maha Agung",
+      fr: "Béni / Très Élevé", sus: "Tabaraki"
     },
     correctVerseMeaningTranslations: {
       en: "Blessed is He in whose hand is dominion",
@@ -3851,7 +3960,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Благословен Тот в чьей руке власть",
       ur: "بابرکت ہے وہ جس کے ہاتھ میں بادشاہت ہے",
       bn: "বরকতময় তিনি যার হাতে রাজত্ব",
-      ms: "Maha Suci Dia yang di tangan-Nya pemerintahan"
+      ms: "Maha Suci Dia yang di tangan-Nya pemerintahan",
+      fr: "Blessed is He in whose hand is dominion", sus: "Blessed is He in whose hand is dominion"
     },
     surahAyah: "الملك:1", ayahNumber: 1,
     hint: "الكلمة الأولى في السورة، تعني عظمة الله وكثرة خيره",
@@ -3871,7 +3981,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The dominion / The kingdom", ar: "السلطة والملك والسيادة", id: "Kerajaan / Kekuasaan", tr: "Mülk / Hükümranlık", zh: "王权 / 统治权",
       sw: "Utawala / Ufalme", so: "Mulkiga / Boqortoyada", bs: "Vlast / Carstvo", sq: "Sundimi / Mbretëria", ru: "Власть / Царство",
-      ur: "بادشاہت / ملک", bn: "রাজত্ব / কর্তৃত্ব", ms: "Kerajaan / Kekuasaan"
+      ur: "بادشاہت / ملک", bn: "রাজত্ব / কর্তৃত্ব", ms: "Kerajaan / Kekuasaan",
+      fr: "La souveraineté / Le royaume", sus: "Mansaya"
     },
     correctVerseMeaningTranslations: {
       en: "Blessed is He in whose hand is dominion",
@@ -3886,7 +3997,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Благословен Тот в чьей руке власть",
       ur: "بابرکت ہے وہ جس کے ہاتھ میں بادشاہت ہے",
       bn: "বরকতময় তিনি যার হাতে রাজত্ব",
-      ms: "Maha Suci Dia yang di tangan-Nya pemerintahan"
+      ms: "Maha Suci Dia yang di tangan-Nya pemerintahan",
+      fr: "Blessed is He in whose hand is dominion", sus: "Blessed is He in whose hand is dominion"
     },
     surahAyah: "الملك:1", ayahNumber: 1,
     hint: "تعني السلطة والحكم المطلق، وهي اسم السورة",
@@ -3906,7 +4018,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "All-Powerful", ar: "القادر على كل شيء", id: "Maha Kuasa", tr: "Her şeye kadir", zh: "全能的",
       sw: "Mwenye nguvu zote", so: "Xoogga leh", bs: "Svemoćan", sq: "I gjithëfuqishëm", ru: "Всемогущий",
-      ur: "ہر چیز پر قادر", bn: "সর্বশক্তিমান", ms: "Maha Berkuasa"
+      ur: "ہر چیز پر قادر", bn: "সর্বশক্তিমান", ms: "Maha Berkuasa",
+      fr: "Tout-Puissant", sus: "Sɛnyi Birin na"
     },
     correctVerseMeaningTranslations: {
       en: "And He is over all things competent",
@@ -3921,7 +4034,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И Он над всякой вещью мощен",
       ur: "اور وہ ہر چیز پر قادر ہے",
       bn: "এবং তিনি সব কিছুর উপর সর্বশক্তিমান",
-      ms: "Dan Dia Maha Kuasa atas tiap-tiap sesuatu"
+      ms: "Dan Dia Maha Kuasa atas tiap-tiap sesuatu",
+      fr: "And He is over all things competent", sus: "And He is over all things competent"
     },
     surahAyah: "الملك:1", ayahNumber: 1,
     hint: "آخر كلمة في الآية الأولى، صفة الله في القدرة المطلقة",
@@ -3941,7 +4055,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Death", ar: "الموت وانتهاء الحياة", id: "Kematian", tr: "Ölüm", zh: "死亡",
       sw: "Kifo", so: "Dhimashada", bs: "Smrt", sq: "Vdekja", ru: "Смерть",
-      ur: "موت", bn: "মৃত্যু", ms: "Kematian"
+      ur: "موت", bn: "মৃত্যু", ms: "Kematian",
+      fr: "Mort", sus: "Faa"
     },
     correctVerseMeaningTranslations: {
       en: "Who created death and life to test you which of you is best in deed",
@@ -3956,7 +4071,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Который сотворил смерть и жизнь чтобы испытать вас кто лучше поступками",
       ur: "جس نے موت اور زندگی بنائی تاکہ تمہیں آزمائے کہ تم میں کون عمل میں بہتر ہے",
       bn: "যিনি মৃত্যু ও জীবন সৃষ্টি করেছেন তোমাদের পরীক্ষার জন্য কে তোমাদের মধ্যে আমলে উত্তম",
-      ms: "Yang menciptakan mati dan hidup untuk menguji kamu siapakah yang terbaik amalannya"
+      ms: "Yang menciptakan mati dan hidup untuk menguji kamu siapakah yang terbaik amalannya",
+      fr: "Who created death and life to test you which of you is best in deed", sus: "Who created death and life to test you which of you is best in deed"
     },
     surahAyah: "الملك:2", ayahNumber: 2,
     hint: "ضد الحياة، أول شيء ذكر في الآية الثانية",
@@ -3976,7 +4092,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Life", ar: "الحياة والوجود", id: "Kehidupan", tr: "Hayat", zh: "生命",
       sw: "Uhai / Maisha", so: "Noloshada", bs: "Život", sq: "Jeta", ru: "Жизнь",
-      ur: "زندگی", bn: "জীবন", ms: "Kehidupan"
+      ur: "زندگی", bn: "জীবন", ms: "Kehidupan",
+      fr: "Vie", sus: "Yinyi"
     },
     correctVerseMeaningTranslations: {
       en: "Who created death and life to test you which of you is best in deed",
@@ -3991,7 +4108,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Который сотворил смерть и жизнь чтобы испытать вас кто лучше поступками",
       ur: "جس نے موت اور زندگی بنائی تاکہ تمہیں آزمائے کہ تم میں کون عمل میں بہتر ہے",
       bn: "যিনি মৃত্যু ও জীবন সৃষ্টি করেছেন তোমাদের পরীক্ষার জন্য কে তোমাদের মধ্যে আমলে উত্তম",
-      ms: "Yang menciptakan mati dan hidup untuk menguji kamu siapakah yang terbaik amalannya"
+      ms: "Yang menciptakan mati dan hidup untuk menguji kamu siapakah yang terbaik amalannya",
+      fr: "Who created death and life to test you which of you is best in deed", sus: "Who created death and life to test you which of you is best in deed"
     },
     surahAyah: "الملك:2", ayahNumber: 2,
     hint: "أكمل الآية: الَّذِي خَلَقَ الْمَوْتَ وَ___",
@@ -4011,7 +4129,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Best in deed", ar: "أفضل في العمل والفعل", id: "Terbaik amalnya", tr: "En güzel ameli yapan", zh: "行为最好的",
       sw: "Bora zaidi katika vitendo", so: "Ugu fiican ee ficilada", bs: "Bolja u djelima", sq: "Më i miri në vepra", ru: "Лучший в делах",
-      ur: "عمل میں بہترین", bn: "আমলে সর্বোত্তম", ms: "Terbaik amalannya"
+      ur: "عمل میں بہترین", bn: "আমলে সর্বোত্তম", ms: "Terbaik amalannya",
+      fr: "Meilleur en œuvre", sus: "Kɛlɛ Kore"
     },
     correctVerseMeaningTranslations: {
       en: "To test you which of you is best in deed",
@@ -4026,7 +4145,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Чтобы испытать вас кто из вас лучший в деяниях",
       ur: "تاکہ آزمائے تم میں سے کون عمل میں بہتر ہے",
       bn: "তোমাদের পরীক্ষা করতে কে তোমাদের মধ্যে আমলে উত্তম",
-      ms: "Untuk menguji kamu siapakah yang terbaik amalannya"
+      ms: "Untuk menguji kamu siapakah yang terbaik amalannya",
+      fr: "To test you which of you is best in deed", sus: "To test you which of you is best in deed"
     },
     surahAyah: "الملك:2", ayahNumber: 2,
     hint: "مركب من كلمتين، تعني الأفضل في الأعمال والسلوك",
@@ -4046,7 +4166,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Layer upon layer / In tiers", ar: "طبقات فوق بعضها", id: "Berlapis-lapis", tr: "Kat kat / Tabaka tabaka", zh: "层叠的",
       sw: "Safu juu ya safu", so: "Lakab laakabnaan", bs: "Jedan iznad drugog", sq: "Shtresë mbi shtresë", ru: "Ярус за ярусом",
-      ur: "ایک کے اوپر ایک", bn: "স্তরে স্তরে", ms: "Berlapis-lapis"
+      ur: "ایک کے اوپر ایک", bn: "স্তরে স্তরে", ms: "Berlapis-lapis",
+      fr: "Couche par couche / En niveaux", sus: "Nɔrɔ Xun ma"
     },
     correctVerseMeaningTranslations: {
       en: "Who created seven heavens in layers",
@@ -4061,7 +4182,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Который сотворил семь небес ярус за ярусом",
       ur: "جس نے سات آسمان ایک کے اوپر ایک بنائے",
       bn: "যিনি সাত আকাশ স্তরে স্তরে সৃষ্টি করেছেন",
-      ms: "Yang menciptakan tujuh langit berlapis-lapis"
+      ms: "Yang menciptakan tujuh langit berlapis-lapis",
+      fr: "Who created seven heavens in layers", sus: "Who created seven heavens in layers"
     },
     surahAyah: "الملك:3", ayahNumber: 3,
     hint: "تصف السماوات السبع، تعني الطبقات المتراكمة",
@@ -4081,7 +4203,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Defect / Imperfection", ar: "الخلل والتباين والاضطراب", id: "Ketidakseimbangan / Cacat", tr: "Çelişki / Kusur", zh: "缺陷 / 不协调",
       sw: "Kasoro / Tofauti", so: "Cilad / Khalad", bs: "Nesklad / Mana", sq: "Papërsosuri / Mospajtim", ru: "Несоответствие / Изъян",
-      ur: "خامی / عدم توازن", bn: "ত্রুটি / অসামঞ্জস্য", ms: "Ketidakseimbangan / Cacat"
+      ur: "خامی / عدم توازن", bn: "ত্রুটি / অসামঞ্জস্য", ms: "Ketidakseimbangan / Cacat",
+      fr: "Défaut / Imperfection", sus: "Kuya"
     },
     correctVerseMeaningTranslations: {
       en: "You will not see in the creation of the Most Merciful any defect",
@@ -4096,7 +4219,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Ты не увидишь в творении Милосердного никакого изъяна",
       ur: "تم رحمان کی تخلیق میں کوئی خامی نہیں دیکھو گے",
       bn: "তুমি রহমানের সৃষ্টিতে কোনো ত্রুটি দেখবে না",
-      ms: "Kamu tidak akan melihat pada ciptaan Allah yang Maha Pemurah sebarang cacat"
+      ms: "Kamu tidak akan melihat pada ciptaan Allah yang Maha Pemurah sebarang cacat",
+      fr: "You will not see in the creation of the Most Merciful any defect", sus: "You will not see in the creation of the Most Merciful any defect"
     },
     surahAyah: "الملك:3", ayahNumber: 3,
     hint: "تعني الاختلاف والخلل، والقرآن يقول لن ترى في الخلق من ___",
@@ -4116,7 +4240,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Blazing fire", ar: "النار المشتعلة الحارقة", id: "Api yang menyala-nyala", tr: "Alevli ateş", zh: "熊熊烈火",
       sw: "Moto mkali unaowaka", so: "Dab guban", bs: "Buktinja / Razbuktali oganj", sq: "Zjarr i ndezur fort", ru: "Пламя / Пылающий огонь",
-      ur: "بھڑکتی آگ", bn: "প্রজ্বলিত আগুন", ms: "Api yang menyala-nyala"
+      ur: "بھڑکتی آگ", bn: "প্রজ্বলিত আগুন", ms: "Api yang menyala-nyala",
+      fr: "Feu ardent", sus: "Tasuma Kankan"
     },
     correctVerseMeaningTranslations: {
       en: "And We have adorned the nearest heaven with lamps and made them pelted at the devils",
@@ -4131,7 +4256,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Мы украсили ближайшее небо светильниками и сделали их метательными снарядами для дьяволов",
       ur: "اور ہم نے قریب کے آسمان کو چراغوں سے آراستہ کیا اور انہیں شیطانوں کو مارنے کا ذریعہ بنایا",
       bn: "আমরা নিকটবর্তী আকাশকে প্রদীপমালা দিয়ে সুসজ্জিত করেছি এবং সেগুলোকে শয়তানদের প্রতি নিক্ষেপের উপকরণ করেছি",
-      ms: "Dan sesungguhnya Kami telah menghiasi langit yang hampir dengan pelita-pelita dan Kami jadikannya sebagai pelempar syaitan"
+      ms: "Dan sesungguhnya Kami telah menghiasi langit yang hampir dengan pelita-pelita dan Kami jadikannya sebagai pelempar syaitan",
+      fr: "And We have adorned the nearest heaven with lamps and made them pelted at the devils", sus: "And We have adorned the nearest heaven with lamps and made them pelted at the devils"
     },
     surahAyah: "الملك:5", ayahNumber: 5,
     hint: "تعني النار الحارقة الشديدة، الكلمة تبدأ بحرف الـ س...",
@@ -4151,7 +4277,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Warner / One who warns", ar: "المحذِّر والمنبه", id: "Pemberi peringatan", tr: "Uyarıcı", zh: "警告者",
       sw: "Mwonya / Mtahadharisha", so: "Digniiye", bs: "Opominjač / Onaj koji opominje", sq: "Paralajmëruesi", ru: "Предостерегающий / Увещеватель",
-      ur: "ڈرانے والا", bn: "সতর্ককারী", ms: "Pemberi amaran"
+      ur: "ڈرانے والا", bn: "সতর্ককারী", ms: "Pemberi amaran",
+      fr: "Avertisseur / Celui qui avertit", sus: "Bɔndɛyi"
     },
     correctVerseMeaningTranslations: {
       en: "Indeed we are warners",
@@ -4166,7 +4293,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Воистину Мы являемся предостерегающими",
       ur: "بے شک ہم خبردار کرنے والے ہیں",
       bn: "নিশ্চয়ই আমরা সতর্ককারী",
-      ms: "Sesungguhnya kami adalah pemberi amaran"
+      ms: "Sesungguhnya kami adalah pemberi amaran",
+      fr: "Indeed we are warners", sus: "Indeed we are warners"
     },
     surahAyah: "الملك:8", ayahNumber: 8,
     hint: "تعني الشخص الذي يحذّر ويخبر بالخطر، الكلمة تبدأ بحرف الـ ن...",
@@ -4186,7 +4314,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Raging roar / Moaning", ar: "صوت الغليان والزفير الشديد", id: "Suara gemuruh / Raungan", tr: "Uğultu / İnilti", zh: "咆哮声",
       sw: "Ngurumo / Mlio mkali", so: "Codka daran", bs: "Tutnjava / Jecanje", sq: "Ulurimë / Zë i furishëm", ru: "Рёв / Стон",
-      ur: "چنگھاڑ / غرغرانے کی آواز", bn: "গর্জন / হাহাকার", ms: "Bunyi gemuruh / Raungan"
+      ur: "چنگھاڑ / غرغرانے کی آواز", bn: "গর্জন / হাহাকার", ms: "Bunyi gemuruh / Raungan",
+      fr: "Rugissement / Gémissement", sus: "Xɔ Belebele"
     },
     correctVerseMeaningTranslations: {
       en: "They heard its raging roar as it boiled over",
@@ -4201,7 +4330,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Они услышали её рёв когда она бурлила",
       ur: "انہوں نے اس کی چنگھاڑ سنی جب وہ جوش کھا رہی تھی",
       bn: "তারা তার গর্জন শুনল যখন তা উথলে উঠছিল",
-      ms: "Mereka mendengar bunyi gemuruhnya ketika mendidih"
+      ms: "Mereka mendengar bunyi gemuruhnya ketika mendidih",
+      fr: "They heard its raging roar as it boiled over", sus: "They heard its raging roar as it boiled over"
     },
     surahAyah: "الملك:7", ayahNumber: 7,
     hint: "تعني الصوت الشديد من الغضب أو الاحتراق، الكلمة تبدأ بحرف الـ ز...",
@@ -4221,7 +4351,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Do you feel secure", ar: "هل تأمنون وتطمئنون", id: "Apakah kamu merasa aman", tr: "Emin misiniz / Güvende misiniz", zh: "你们感到安全吗",
       sw: "Je, mnahisi usalama", so: "Ma ammaan tahay", bs: "Jeste li sigurni", sq: "A ndiheni të sigurt", ru: "Разве вы чувствуете себя в безопасности",
-      ur: "کیا تم بے خوف ہو", bn: "তোমরা কি নিরাপদ মনে করছ", ms: "Adakah kamu berasa aman"
+      ur: "کیا تم بے خوف ہو", bn: "তোমরা কি নিরাপদ মনে করছ", ms: "Adakah kamu berasa aman",
+      fr: "Êtes-vous en sécurité / Sûr", sus: "I Yaabixi"
     },
     correctVerseMeaningTranslations: {
       en: "Do you feel secure that He who is above the sky will not cause the earth to swallow you",
@@ -4236,7 +4367,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Разве вы уверены что Тот кто на небе не повелит земле поглотить вас",
       ur: "کیا تم بے خوف ہو کہ جو آسمان میں ہے وہ تمہیں زمین میں دھنسا دے",
       bn: "তোমরা কি নিরাপদ মনে করছ যে আকাশে যিনি আছেন তিনি তোমাদের ভূমিতে ধ্বসিয়ে দেবেন না",
-      ms: "Apakah kamu merasa aman bahawa Dia yang di langit tidak akan menenggelamkan kamu ke dalam bumi"
+      ms: "Apakah kamu merasa aman bahawa Dia yang di langit tidak akan menenggelamkan kamu ke dalam bumi",
+      fr: "Do you feel secure that He who is above the sky will not cause the earth to swallow you", sus: "Do you feel secure that He who is above the sky will not cause the earth to swallow you"
     },
     surahAyah: "الملك:16", ayahNumber: 16,
     hint: "استفهام تحذيري، تعني هل تشعر بالأمان؟",
@@ -4256,7 +4388,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "The birds", ar: "الطيور", id: "Burung-burung", tr: "Kuşlar", zh: "鸟儿",
       sw: "Ndege", so: "Shimbiraha", bs: "Ptice", sq: "Zogjtë", ru: "Птицы",
-      ur: "پرندے", bn: "পাখিরা", ms: "Burung-burung"
+      ur: "پرندے", bn: "পাখিরা", ms: "Burung-burung",
+      fr: "Les oiseaux", sus: "Sunɛe"
     },
     correctVerseMeaningTranslations: {
       en: "Do they not see the birds above them spreading and folding their wings",
@@ -4271,7 +4404,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Разве они не видят птиц над ними раскрывающих и складывающих крылья",
       ur: "کیا انہوں نے اپنے اوپر پرندوں کو نہیں دیکھا جو پر پھیلاتے اور سمیٹتے ہیں",
       bn: "তারা কি তাদের উপরের পাখিগুলোকে দেখেনি যারা ডানা প্রসারিত করে ও গুটিয়ে নেয়",
-      ms: "Tidakkah mereka melihat burung-burung di atas mereka mengembang dan mengepak sayap"
+      ms: "Tidakkah mereka melihat burung-burung di atas mereka mengembang dan mengepak sayap",
+      fr: "Do they not see the birds above them spreading and folding their wings", sus: "Do they not see the birds above them spreading and folding their wings"
     },
     surahAyah: "الملك:19", ayahNumber: 19,
     hint: "الكائنات التي تطير في السماء، الكلمة تبدأ بحرف الـ ط...",
@@ -4291,7 +4425,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Who holds them / Keeps them up", ar: "من يمسك بهن ويبقيهن", id: "Yang menahan mereka", tr: "Onları tutan", zh: "谁托住它们",
       sw: "Anayezishikilia", so: "Kan haysta", bs: "Onaj koji ih drži", sq: "Ai që i mban", ru: "Удерживающий их",
-      ur: "انہیں تھامنے والا", bn: "যিনি তাদের ধরে রাখেন", ms: "Yang menahannya"
+      ur: "انہیں تھامنے والا", bn: "যিনি তাদের ধরে রাখেন", ms: "Yang menahannya",
+      fr: "Qui les retient / Soutient", sus: "E Mara Mɔɔ"
     },
     correctVerseMeaningTranslations: {
       en: "None holds them up except the Most Merciful",
@@ -4306,7 +4441,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Никто их не удерживает кроме Милосердного",
       ur: "انہیں رحمان کے سوا کوئی نہیں تھامتا",
       bn: "রহমান ছাড়া কেউ তাদের ধরে রাখে না",
-      ms: "Tidak ada yang menahannya melainkan Ar-Rahman"
+      ms: "Tidak ada yang menahannya melainkan Ar-Rahman",
+      fr: "None holds them up except the Most Merciful", sus: "None holds them up except the Most Merciful"
     },
     surahAyah: "الملك:19", ayahNumber: 19,
     hint: "أكمل الآية: مَا ___ إِلَّا الرَّحْمَٰنُ",
@@ -4326,7 +4462,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Tame / Subservient", ar: "مذللة وسهلة", id: "Jinak / Tunduk", tr: "Boyun eğmiş / Yumuşak", zh: "驯服的",
       sw: "Nyoofu / Laini", so: "Hooseysa / Xoogan", bs: "Krotak / Podređen", sq: "I butë / I nënshtruar", ru: "Покорная / Смирная",
-      ur: "مسخر / نرم", bn: "বশীভূত / নম্র", ms: "Patuh / Jinak"
+      ur: "مسخر / نرم", bn: "বশীভূত / নম্র", ms: "Patuh / Jinak",
+      fr: "Soumis / Docile", sus: "Yekeyeke"
     },
     correctVerseMeaningTranslations: {
       en: "It is He who made the earth subservient to you, so walk upon its slopes",
@@ -4341,7 +4478,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "Он сделал для вас землю покорной поэтому ходите по её просторам",
       ur: "وہی ہے جس نے تمہارے لیے زمین کو مسخر کیا پس اس کے کناروں پر چلو",
       bn: "তিনিই তোমাদের জন্য পৃথিবীকে বশীভূত করেছেন তাই এর পথে চলাফেরা কর",
-      ms: "Dialah yang menjadikan bumi tunduk untuk kamu maka berjalanlah di merata-rata"
+      ms: "Dialah yang menjadikan bumi tunduk untuk kamu maka berjalanlah di merata-rata",
+      fr: "It is He who made the earth subservient to you, so walk upon its slopes", sus: "It is He who made the earth subservient to you, so walk upon its slopes"
     },
     surahAyah: "الملك:15", ayahNumber: 15,
     hint: "تعني الأرض المطيعة السهلة المشي، الكلمة تبدأ بحرف الـ ذ...",
@@ -4361,7 +4499,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
     targetWordTranslations: {
       en: "Sustenance / Provision", ar: "الرزق والقوت", id: "Rezeki / Karunia", tr: "Rızık / Geçimlik", zh: "给养 / 食粮",
       sw: "Riziki / Chakula", so: "Rizqiga", bs: "Opskrba / Nafaka", sq: "Furnizimi / Ushqimi", ru: "Пропитание / Удел",
-      ur: "رزق / روزی", bn: "রিজিক / জীবিকা", ms: "Rezeki / Pemberian"
+      ur: "رزق / روزی", bn: "রিজিক / জীবিকা", ms: "Rezeki / Pemberian",
+      fr: "Subsistance / Provision", sus: "Risiki"
     },
     correctVerseMeaningTranslations: {
       en: "And seek His provision",
@@ -4376,7 +4515,8 @@ const VOCAB_BANK: VocabularyExercise[] = [
       ru: "И ищите Его удел",
       ur: "اور اس کا رزق تلاش کرو",
       bn: "এবং তাঁর রিজিক তালাশ কর",
-      ms: "Dan carilah rezeki dari kurnia-Nya"
+      ms: "Dan carilah rezeki dari kurnia-Nya",
+      fr: "And seek His provision", sus: "And seek His provision"
     },
     surahAyah: "الملك:15", ayahNumber: 15,
     hint: "تعني القوت والطعام والمال من الله، الكلمة تبدأ بحرف الـ ر...",
