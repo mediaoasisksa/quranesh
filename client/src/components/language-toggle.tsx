@@ -30,6 +30,7 @@ const languages: LanguageOption[] = [
   { code: "sq", name: "Albanian", nativeName: "Shqip", flag: "🇦🇱" },
   { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺" },
   { code: "sus", name: "Soso (Guinea)", nativeName: "Sosokui", flag: "🇬🇳" },
+  { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷" },
 ];
 
 export default function LanguageToggle() {
