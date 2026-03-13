@@ -1849,7 +1849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // HyperPay success codes: 000.000.xxx and 000.100.xxx
       const isSuccessful = /^(000\.000\.|000\.100\.)/.test(code);
 
-      console.log("===PAYMENT_RESULT===", { code, description: paymentResult.result.description, isSuccessful });
+      console.log("===PAYMENT_RESULT===", { code, description: paymentResult.result.description, isSuccessful, brand: paymentResult.paymentBrand, currency: paymentResult.currency, amount: paymentResult.amount });
 
       if (isSuccessful) {
         if (planId && userId) {
