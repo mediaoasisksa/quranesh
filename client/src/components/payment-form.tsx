@@ -273,83 +273,97 @@ export function PaymentForm({ selectedPlan, onPaymentSuccess, onPaymentError }: 
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="street">{t('streetAddress')} *</Label>
-              <Input
-                id="street"
-                type="text"
-                value={customerDetails.street}
-                onChange={(e) => handleInputChange('street', e.target.value)}
-                placeholder={t('streetAddress')}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="city">{t('city')} *</Label>
-              <Input
-                id="city"
-                type="text"
-                value={customerDetails.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                placeholder={t('city')}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">{t('state')} *</Label>
-              <Input
-                id="state"
-                type="text"
-                value={customerDetails.state}
-                onChange={(e) => handleInputChange('state', e.target.value)}
-                placeholder={t('state')}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="postcode">{t('postalCode')} *</Label>
-              <Input
-                id="postcode"
-                type="text"
-                value={customerDetails.postcode}
-                onChange={(e) => handleInputChange('postcode', e.target.value)}
-                placeholder={t('postalCode')}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country">{t('country')} *</Label>
-              <select
-                id="country"
-                value={customerDetails.country}
-                onChange={(e) => handleInputChange('country', e.target.value)}
-                required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="" disabled>Select Country</option>
-                <option value="SA">Saudi Arabia</option>
-                <option value="AE">United Arab Emirates</option>
-                <option value="KW">Kuwait</option>
-                <option value="QA">Qatar</option>
-                <option value="BH">Bahrain</option>
-                <option value="OM">Oman</option>
-                <option value="EG">Egypt</option>
-                <option value="JO">Jordan</option>
-                <option value="LB">Lebanon</option>
-                <option value="IQ">Iraq</option>
-                <option value="TR">Turkey</option>
-                <option value="PK">Pakistan</option>
-                <option value="IN">India</option>
-                <option value="ID">Indonesia</option>
-                <option value="MY">Malaysia</option>
-                <option value="US">United States</option>
-                <option value="GB">United Kingdom</option>
-                <option value="CA">Canada</option>
-                <option value="AU">Australia</option>
-                <option value="DE">Germany</option>
-                <option value="FR">France</option>
-              </select>
-            </div>
+
+            {/* MADA: country is auto-set to SA. Visa/Master: show full billing address */}
+            {paymentMethod === 'mada' ? (
+              <div className="space-y-2 col-span-full">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-xs text-green-800">
+                  <span className="font-semibold">مدى — المملكة العربية السعودية:</span> سيتم تعيين بلد الفوترة تلقائيًا على المملكة العربية السعودية.
+                  <br/>
+                  <span className="text-green-700">MADA — Saudi Arabia: Billing country is automatically set to Saudi Arabia.</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="street">{t('streetAddress')} *</Label>
+                  <Input
+                    id="street"
+                    type="text"
+                    value={customerDetails.street}
+                    onChange={(e) => handleInputChange('street', e.target.value)}
+                    placeholder={t('streetAddress')}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">{t('city')} *</Label>
+                  <Input
+                    id="city"
+                    type="text"
+                    value={customerDetails.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    placeholder={t('city')}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">{t('state')} *</Label>
+                  <Input
+                    id="state"
+                    type="text"
+                    value={customerDetails.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    placeholder={t('state')}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postcode">{t('postalCode')} *</Label>
+                  <Input
+                    id="postcode"
+                    type="text"
+                    value={customerDetails.postcode}
+                    onChange={(e) => handleInputChange('postcode', e.target.value)}
+                    placeholder={t('postalCode')}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">{t('country')} *</Label>
+                  <select
+                    id="country"
+                    value={customerDetails.country}
+                    onChange={(e) => handleInputChange('country', e.target.value)}
+                    required
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="" disabled>Select Country</option>
+                    <option value="SA">Saudi Arabia</option>
+                    <option value="AE">United Arab Emirates</option>
+                    <option value="KW">Kuwait</option>
+                    <option value="QA">Qatar</option>
+                    <option value="BH">Bahrain</option>
+                    <option value="OM">Oman</option>
+                    <option value="EG">Egypt</option>
+                    <option value="JO">Jordan</option>
+                    <option value="LB">Lebanon</option>
+                    <option value="IQ">Iraq</option>
+                    <option value="TR">Turkey</option>
+                    <option value="PK">Pakistan</option>
+                    <option value="IN">India</option>
+                    <option value="ID">Indonesia</option>
+                    <option value="MY">Malaysia</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="AU">Australia</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Error Display */}

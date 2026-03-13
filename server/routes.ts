@@ -1633,23 +1633,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (val.length === 2) return val.toUpperCase();
         return map[val.toLowerCase()] || val.toUpperCase().substring(0, 2);
       };
-      const normalizedCountry = normalizeCountry(customerDetails.country);
-      console.log(`HyperPay checkout: country="${customerDetails.country}" → normalized="${normalizedCountry}", amount=${selectedPlan.price}, entityId=${entityId ? entityId.substring(0,8)+'...' : 'MISSING'}`);
+      // For MADA, billing country must always be SA
+      const billingCountry = paymentMethod === 'mada' ? 'SA' : normalizeCountry(customerDetails.country);
+      console.log(`HyperPay checkout: paymentMethod=${paymentMethod}, country="${customerDetails.country}" → billing.country="${billingCountry}", amount=${selectedPlan.price}, entityId=${entityId ? entityId.substring(0,8)+'...' : 'MISSING'}`);
 
-      const checkoutData = {
+      const checkoutData: Record<string, string> = {
         entityId,
         amount: selectedPlan.price.toFixed(2),
         currency: selectedPlan.currency,
         paymentType: "DB",
         merchantTransactionId,
-        "customer.email": customerDetails.email,
-        "customer.givenName": customerDetails.givenName,
-        "customer.surname": customerDetails.surname,
-        "billing.street1": customerDetails.street,
-        "billing.city": customerDetails.city,
-        "billing.state": customerDetails.state,
-        "billing.country": normalizedCountry,
-        "billing.postcode": customerDetails.postcode,
+        "customer.email": customerDetails.email || '',
+        "customer.givenName": customerDetails.givenName || '',
+        "customer.surname": customerDetails.surname || '',
+        "billing.street1": customerDetails.street || 'N/A',
+        "billing.city": customerDetails.city || 'Riyadh',
+        "billing.state": customerDetails.state || billingCountry,
+        "billing.country": billingCountry,
+        "billing.postcode": customerDetails.postcode || '00000',
       };
 
       const formData = new URLSearchParams();
