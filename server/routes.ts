@@ -1569,7 +1569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const isProduction = true;
   const HYPERPAY_CONFIG = {
-    serverUrl: (process.env.HYPERPAY_SERVER_URL || "https://eu-prod.oppwa.com").replace(/\/$/, ""),
+    serverUrl: "https://eu-prod.oppwa.com",
     accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || "",
     entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || "",
     entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || "",
