@@ -1570,28 +1570,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const isProduction = true;
   const HYPERPAY_CONFIG = {
     serverUrl: "https://eu-prod.oppwa.com",
-    // Each entity has its own access token
-    accessTokenMada: process.env.HYPERPAY_ACCESS_TOKEN || "",
-    accessTokenVisaMaster: process.env.HYPERPAY_PROD_ACCESS_TOKEN || "",
+    // Single shared access token for all entities
+    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || "",
     entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || "",
     entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || "",
     isProduction,
   };
 
-  // Get access token by payment method string
-  const getAccessToken = (paymentMethod: string) =>
-    paymentMethod === 'visa_master'
-      ? HYPERPAY_CONFIG.accessTokenVisaMaster
-      : HYPERPAY_CONFIG.accessTokenMada;
-
-  // Get access token by entity ID (used in callbacks where paymentMethod isn't known)
-  const getAccessTokenByEntity = (entityId: string) =>
-    entityId === HYPERPAY_CONFIG.entityIdVisaMaster
-      ? HYPERPAY_CONFIG.accessTokenVisaMaster
-      : HYPERPAY_CONFIG.accessTokenMada;
+  const getAccessToken = (_paymentMethod: string) => HYPERPAY_CONFIG.accessToken;
+  const getAccessTokenByEntity = (_entityId: string) => HYPERPAY_CONFIG.accessToken;
 
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
-  console.log(`HyperPay config: accessTokenMada=${!!HYPERPAY_CONFIG.accessTokenMada}, accessTokenVisa=${!!HYPERPAY_CONFIG.accessTokenVisaMaster}, entityVisa=${!!HYPERPAY_CONFIG.entityIdVisaMaster}, entityMada=${!!HYPERPAY_CONFIG.entityIdMada}, serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
+  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityVisa=${!!HYPERPAY_CONFIG.entityIdVisaMaster}, entityMada=${!!HYPERPAY_CONFIG.entityIdMada}, serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
