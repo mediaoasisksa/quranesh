@@ -1580,7 +1580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const getAccessTokenByEntity = (_entityId: string) => HYPERPAY_CONFIG.accessToken;
 
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
-  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityMada=${HYPERPAY_CONFIG.entityIdMada?.substring(0,8)}..., entityVisa=${HYPERPAY_CONFIG.entityIdVisaMaster?.substring(0,8)}..., serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
+  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityMada=${HYPERPAY_CONFIG.entityIdMada?.substring(0,20)}..., entityVisa=${HYPERPAY_CONFIG.entityIdVisaMaster?.substring(0,20)}..., serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
