@@ -1568,27 +1568,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const pricingData = JSON.parse(fs.readFileSync(pricingPath, "utf-8"));
 
   const isProduction = true;
-  const rawAccessToken = process.env.HYPERPAY_PROD_ACCESS_TOKEN || "";
-
-  // HyperPay access tokens encode the entity ID: base64(entityId|password)
-  // Extract the entity ID from the token so we always use the authorized entity.
-  const extractEntityFromToken = (token: string): string => {
-    try {
-      const decoded = Buffer.from(token, "base64").toString("utf-8");
-      return decoded.split("|")[0] || "";
-    } catch {
-      return "";
-    }
-  };
-  const tokenEntityId = extractEntityFromToken(rawAccessToken);
-
   const HYPERPAY_CONFIG = {
     serverUrl: "https://eu-prod.oppwa.com",
-    accessToken: rawAccessToken,
-    // Use the entity embedded in the access token as the authoritative entity.
-    // Falls back to the explicit env vars only if extraction fails.
-    entityIdMada: tokenEntityId || process.env.HYPERPAY_PROD_ENTITY_ID_MADA || "",
-    entityIdVisaMaster: tokenEntityId || process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || "",
+    accessToken: process.env.HYPERPAY_PROD_ACCESS_TOKEN || "",
+    entityIdMada: process.env.HYPERPAY_PROD_ENTITY_ID_MADA || "",
+    entityIdVisaMaster: process.env.HYPERPAY_PROD_ENTITY_ID_VISA_MASTER || "",
     isProduction,
   };
 
@@ -1596,7 +1580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const getAccessTokenByEntity = (_entityId: string) => HYPERPAY_CONFIG.accessToken;
 
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
-  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, tokenEntityId=${tokenEntityId?.substring(0,8)}..., entityMada=${HYPERPAY_CONFIG.entityIdMada?.substring(0,8)}..., entityVisa=${HYPERPAY_CONFIG.entityIdVisaMaster?.substring(0,8)}..., serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
+  console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityMada=${HYPERPAY_CONFIG.entityIdMada?.substring(0,8)}..., entityVisa=${HYPERPAY_CONFIG.entityIdVisaMaster?.substring(0,8)}..., serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
 
   // Get pricing plans
   app.get("/api/pricing", (req, res) => {
