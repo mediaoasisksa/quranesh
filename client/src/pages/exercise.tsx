@@ -1056,32 +1056,35 @@ export default function Exercise() {
     <div className="min-h-screen bg-background" dir={dir}>
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between gap-2">
             <Button
               variant="ghost"
+              size="sm"
               onClick={() => setLocation("/dashboard")}
               data-testid="button-back-dashboard"
+              className="shrink-0 text-xs sm:text-sm"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('backToDashboard')}
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">{t('backToDashboard')}</span>
+              <span className="sm:hidden">{t('dashboard')}</span>
             </Button>
-            <div className="text-center flex-1">
+            <div className="text-center flex-1 min-w-0 px-2">
               <h1
-                className="text-lg font-semibold text-foreground"
+                className="text-sm sm:text-base font-semibold text-foreground leading-tight"
                 data-testid="text-exercise-title"
               >
                 {exerciseConfig ? t(exerciseConfig.titleKey as any) : ''}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
                 {exerciseConfig ? t(exerciseConfig.descriptionKey as any) : ''}
               </p>
             </div>
-            <div className="w-40 flex items-center justify-end">
+            <div className="shrink-0 flex items-center justify-end">
               <img 
                 src={logoImage} 
                 alt="Quranesh Logo" 
-                className="h-20 w-auto object-contain"
+                className="h-12 sm:h-16 w-auto object-contain"
                 data-testid="img-logo"
               />
             </div>
