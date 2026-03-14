@@ -29,6 +29,8 @@ const languages: LanguageOption[] = [
   { code: "bs", name: "Bosnian", nativeName: "Bosanski", flag: "🇧🇦" },
   { code: "sq", name: "Albanian", nativeName: "Shqip", flag: "🇦🇱" },
   { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺" },
+  { code: "hi", name: "Hindi", nativeName: "हिंदी", flag: "🇮🇳" },
+  { code: "ur", name: "Urdu", nativeName: "اردو", flag: "🇵🇰" },
   { code: "sus", name: "Soso (Guinea)", nativeName: "Sosokui", flag: "🇬🇳" },
   { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷" },
 ];
