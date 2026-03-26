@@ -304,21 +304,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/signup", async (req, res) => {
     try {
-      const validatedData = signupSchema.parse(req.body);
-
-      const existingUser = await storage.getUserByEmail(validatedData.email);
-      if (existingUser) {
-        return res
-          .status(409)
-          .json({ message: "User already exists with this email" });
+      // ── 1. Validate input ──────────────────────────────────────────────
+      let validatedData: any;
+      try {
+        validatedData = signupSchema.parse(req.body);
+      } catch (zodErr: any) {
+        console.warn("[signup] Zod validation failed:", zodErr?.errors || zodErr?.message);
+        return res.status(400).json({ message: "Invalid input data", errors: zodErr?.message });
       }
 
-      const saltRounds = 12;
-      const passwordHash = await bcrypt.hash(
-        validatedData.password,
-        saltRounds,
-      );
+      console.log(`[signup] Attempt: email=${validatedData.email} userType=${validatedData.userType}`);
 
+      // ── 2. Duplicate-email check ───────────────────────────────────────
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        console.log(`[signup] Duplicate email: ${validatedData.email}`);
+        return res.status(409).json({ message: "User already exists with this email" });
+      }
+
+      // ── 3. Hash password ───────────────────────────────────────────────
+      const passwordHash = await bcrypt.hash(validatedData.password, 12);
+
+      // ── 4. Scholarship seat pre-check for sponsored_student ────────────
       const userType = validatedData.userType || "self_funded";
       let scholarshipStatus = "none";
       let nextRoute = "/pricing";
@@ -336,15 +343,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (availableSponsorship.length > 0) {
           scholarshipStatus = "active";
           scholarshipAssigned = true;
-          nextRoute = "/dashboard";
+          nextRoute = "/exercise/daily-contextual";
+          console.log(`[signup] Scholarship seat available (sponsorship=${availableSponsorship[0].id})`);
         } else {
           scholarshipStatus = "waiting";
           nextRoute = "/scholarship-status";
+          console.log(`[signup] No seats — placing on waiting list`);
         }
       } else if (userType === "sponsor") {
         nextRoute = "/pricing?role=sponsor";
       }
 
+      // ── 5. Create user ─────────────────────────────────────────────────
       const userData = {
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
@@ -360,7 +370,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const user = await storage.createUser(userData);
+      console.log(`[signup] User created: id=${user.id} email=${user.email}`);
 
+      // ── 6. Assign scholarship seat atomically ──────────────────────────
       if (scholarshipAssigned) {
         const { sql: sqlTag, eq } = await import("drizzle-orm");
         const updated = await db.execute(
@@ -370,10 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const rows = (updated as any).rows || (updated as any);
         if (rows && rows.length > 0) {
           const spId = rows[0].id;
-          await db.insert(scholarshipMatches).values({
-            studentId: user.id,
-            sponsorshipId: spId,
-          });
+          await db.insert(scholarshipMatches).values({ studentId: user.id, sponsorshipId: spId });
 
           const endDate = new Date();
           endDate.setDate(endDate.getDate() + 365);
@@ -387,19 +396,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             transactionId: `scholarship-${spId}`,
             sponsoredUsers: 0,
           });
+          console.log(`[signup] Scholarship activated: userId=${user.id} sponsorshipId=${spId}`);
         } else {
+          // Race condition: seat taken between pre-check and update — fall back gracefully
           await db.update(users).set({ scholarshipStatus: "waiting" }).where(eq(users.id, user.id));
+          scholarshipStatus = "waiting";
           nextRoute = "/scholarship-status";
+          console.warn(`[signup] Race condition — seat taken after check, placed on waiting list: userId=${user.id}`);
         }
       }
 
+      // ── 7. Issue JWT ───────────────────────────────────────────────────
       const { passwordHash: _, ...userResponse } = user;
+      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
 
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: "24h" },
-      );
+      console.log(`[signup] Success: userId=${user.id} nextRoute=${nextRoute} scholarshipStatus=${scholarshipStatus}`);
 
       res.status(201).json({
         message: "User created successfully",
@@ -410,26 +421,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nextRoute,
         scholarshipStatus,
       });
+
     } catch (error: any) {
-      // Duplicate email (PostgreSQL unique constraint violation)
+      // Duplicate email via DB constraint (23505) in case the getUserByEmail check was bypassed
       if (error?.code === "23505" || (error?.message || "").includes("duplicate")) {
-        console.log("[signup] Duplicate email attempt");
+        console.log("[signup] DB duplicate constraint hit");
         return res.status(409).json({ message: "Email already exists" });
       }
 
-      // Zod validation failure
-      if (error?.name === "ZodError") {
-        console.warn("[signup] Validation error:", error.message);
-        return res.status(400).json({ message: "Invalid input data", errors: error.message });
-      }
-
-      // Any other error — log full detail for debugging
-      console.error("[signup] Unexpected error:", {
+      console.error("[signup] UNEXPECTED ERROR:", {
         name: error?.name,
         message: error?.message,
         code: error?.code,
         detail: error?.detail,
-        stack: error?.stack?.split("\n").slice(0, 5).join(" | "),
+        constraint: error?.constraint,
+        stack: error?.stack?.split("\n").slice(0, 6).join(" | "),
       });
       res.status(500).json({ message: "Failed to create user" });
     }

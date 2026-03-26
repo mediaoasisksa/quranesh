@@ -1,0 +1,90 @@
+We still cannot sign up on the live site.
+
+Important:
+Your fixes are not considered done unless they are live on quranesh.com after Republish.
+The screenshot currently shows a Republish button, which means the changes are not deployed yet.
+
+Now do this exact checklist:
+
+1) DEPLOY FIRST
+- Republish the app so the current fixes go live.
+- Then test directly on the production domain, not only preview/localhost.
+
+2) VERIFY THE REAL /api/signup RESPONSE ON PRODUCTION
+- Open browser devtools on quranesh.com/signup
+- Submit the form with a brand new email
+- Inspect the network request to /api/signup
+- Report:
+  - HTTP status
+  - response JSON
+  - any console error
+  - any server log for that exact request
+
+3) FIX THE CLIENT REDIRECT LOGIC
+In client/src/pages/SignUp.tsx:
+- Stop hardcoding redirect paths like /exercises
+- Use the server-returned route:
+  const redirectPath = data.nextRoute || "/pricing";
+- Right now the client may create the user successfully but then redirect incorrectly, making signup look broken.
+
+4) LOG THE EXACT PRODUCTION FAILURE
+In server/routes.ts inside POST /api/signup:
+- Add detailed server logs before and after:
+  - validatedData.email
+  - validatedData.userType
+  - createUser success/failure
+  - scholarship assignment success/failure
+  - final nextRoute
+- If an error happens, log:
+  - name
+  - message
+  - code
+  - detail
+  - constraint
+  - stack
+
+5) HANDLE THESE CASES CLEANLY
+- duplicate email => 409
+- invalid input => 400
+- production DB schema mismatch => visible log
+- scholarship assignment failure after user creation => graceful fallback
+- redirect path mismatch => fixed
+
+6) CHECK PRODUCTION ENV + DB
+Verify on the deployed app:
+- DATABASE_URL is correct
+- JWT_SECRET exists
+- production database schema includes all columns used by signup:
+  - user_type
+  - scholarship_status
+  - country_code
+  - phone_number
+- scholarship tables exist:
+  - sponsorships
+  - scholarship_matches
+  - subscriptions
+
+7) FINAL TEST MATRIX ON LIVE DOMAIN
+Test all 3 signup paths on quranesh.com after republish:
+- self_funded
+- sponsor
+- sponsored_student
+
+For each one confirm:
+- /api/signup status code
+- user created in production DB
+- token returned
+- user logged in
+- correct redirect happens
+- no raw English failure message shown to the user
+
+8) DO NOT STOP AT “WORKS LOCALLY”
+This is a production issue.
+You must verify the live domain after Republish.
+
+Deliver:
+- exact root cause
+- files changed
+- exact production response before fix
+- exact production response after fix
+- final live URL flow that works

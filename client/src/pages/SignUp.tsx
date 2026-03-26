@@ -116,21 +116,18 @@ const SignUp = () => {
           signIn(data.user, data.token);
         }
 
-        let successMsg = t('accountCreatedSuccess');
-        let redirectPath = "/pricing";
+        // Use the server-returned route — it knows the correct destination
+        const redirectPath = data.nextRoute || "/pricing";
 
+        let successMsg = t('accountCreatedSuccess');
         if (data.scholarshipStatus === "waiting") {
           successMsg = t('signupWaitingListSuccess');
-          redirectPath = "/scholarship-status";
         } else if (data.scholarshipStatus === "active") {
           successMsg = t('signupScholarshipSuccess');
-          redirectPath = "/exercise/daily-contextual";
         } else if (userType === "sponsor") {
           successMsg = t('signupSponsorCreated');
-          redirectPath = "/pricing?role=sponsor";
         } else {
           successMsg = t('signupStudentCreated');
-          redirectPath = "/pricing";
         }
 
         setSuccess(successMsg);
