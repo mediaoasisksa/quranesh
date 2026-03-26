@@ -410,23 +410,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nextRoute,
         scholarshipStatus,
       });
-    } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "code" in error &&
-        error.code === "23505"
-      ) {
+    } catch (error: any) {
+      // Duplicate email (PostgreSQL unique constraint violation)
+      if (error?.code === "23505" || (error?.message || "").includes("duplicate")) {
+        console.log("[signup] Duplicate email attempt");
         return res.status(409).json({ message: "Email already exists" });
       }
 
-      if (error instanceof Error && error.name === "ZodError") {
-        return res
-          .status(400)
-          .json({ message: "Invalid input data", errors: error.message });
+      // Zod validation failure
+      if (error?.name === "ZodError") {
+        console.warn("[signup] Validation error:", error.message);
+        return res.status(400).json({ message: "Invalid input data", errors: error.message });
       }
 
-      console.error("Signup error:", error);
+      // Any other error — log full detail for debugging
+      console.error("[signup] Unexpected error:", {
+        name: error?.name,
+        message: error?.message,
+        code: error?.code,
+        detail: error?.detail,
+        stack: error?.stack?.split("\n").slice(0, 5).join(" | "),
+      });
       res.status(500).json({ message: "Failed to create user" });
     }
   });

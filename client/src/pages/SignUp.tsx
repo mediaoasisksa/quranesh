@@ -124,7 +124,7 @@ const SignUp = () => {
           redirectPath = "/scholarship-status";
         } else if (data.scholarshipStatus === "active") {
           successMsg = t('signupScholarshipSuccess');
-          redirectPath = "/exercises";
+          redirectPath = "/exercise/daily-contextual";
         } else if (userType === "sponsor") {
           successMsg = t('signupSponsorCreated');
           redirectPath = "/pricing?role=sponsor";
@@ -139,10 +139,20 @@ const SignUp = () => {
           setLocation(redirectPath);
         }, 1500);
       } else {
-        setError(data.message || (t('accountCreationFailed')));
+        // Map server errors to user-friendly localised messages
+        const serverMsg = (data.message || "").toLowerCase();
+        if (serverMsg.includes("already exists") || serverMsg.includes("duplicate") || response.status === 409) {
+          setError(isArabic
+            ? "هذا البريد الإلكتروني مسجّل بالفعل. هل تريد تسجيل الدخول؟"
+            : "This email is already registered. Would you like to sign in?");
+        } else if (serverMsg.includes("invalid input") || response.status === 400) {
+          setError(isArabic ? "بعض البيانات المُدخلة غير صحيحة، يرجى المراجعة" : "Some input data is invalid, please review");
+        } else {
+          setError(isArabic ? "حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة مرة أخرى" : t('accountCreationFailed'));
+        }
       }
     } catch (err) {
-      setError(t('networkError'));
+      setError(isArabic ? "خطأ في الاتصال، يرجى التحقق من الإنترنت" : t('networkError'));
     } finally {
       setLoading(false);
     }
