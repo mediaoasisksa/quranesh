@@ -43,7 +43,8 @@ export default function Exercise() {
   // Use the actual user ID instead of hardcoded demo user
   const userId = user?.id || "demo-user";
 
-  const exerciseType = params?.type;
+  // Normalize URL param: "daily-contextual" → "daily_contextual" so all comparisons work
+  const exerciseType = params?.type?.replace(/-/g, '_');
   const phraseId = params?.phraseId;
 
   const [userAnswer, setUserAnswer] = useState("");
