@@ -188,6 +188,9 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
     <div className="flex items-center justify-center min-h-[60vh] p-4" dir={dir}>
       <div className="max-w-2xl w-full space-y-6">
 
+        {/* BUILD MARKER — deployment verification */}
+        <div className="text-center text-xs text-muted-foreground/50 font-mono">BUILD: 2026-03-26-0918</div>
+
         {/* Header */}
         <Card className="text-center border-2 border-amber-300 dark:border-amber-700">
           <CardHeader>
