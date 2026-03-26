@@ -1,0 +1,99 @@
+TASK: Fix the "Invalid session. Please sign in again" bug on the free scholarship card
+
+Context:
+On Quranesh, in the exercises/paywall page, the free scholarship/grant card ("مجانا / سنة كاملة منحة مجانية من المنصة") shows this raw error in red:
+
+"Invalid session. Please sign in again"
+
+This happens when clicking or loading the free grant flow.
+The current behavior is broken and confusing.
+
+What I want:
+Do a real root-cause fix, not a temporary UI hide.
+
+Expected product behavior:
+1. If the user is NOT signed in:
+   - Do NOT show "Invalid session" in red.
+   - Show a clean Arabic message telling the user to sign in first.
+   - Redirect to login or open the auth flow.
+   - After successful login, return the user to the same page and continue the scholarship flow.
+
+2. If the user IS signed in and is eligible for the free grant:
+   - Claim/apply the free scholarship correctly.
+   - Activate the entitlement correctly.
+   - Redirect the user to the proper learning/exercises page.
+   - Show a success message in Arabic.
+
+3. If the user IS signed in but already has active access:
+   - Do not fail.
+   - Show a friendly Arabic message like "لديك وصول مفعل بالفعل"
+   - Redirect to the content.
+
+4. If the session is expired/stale:
+   - Detect it cleanly.
+   - Clear invalid auth state/cookies if needed.
+   - Ask the user to sign in again in a friendly Arabic UX.
+   - Do not expose raw backend English errors to the page.
+
+What to inspect:
+- Scholarship/free grant button handler
+- Session retrieval logic on client and server
+- Auth cookies / JWT / session token validation
+- API route or server action used to claim the free grant
+- Redirect flow after login
+- Locale/i18n handling so errors are shown in Arabic
+- Whether fetch requests include credentials properly
+- Whether SSR and client session state are out of sync
+- Whether the page tries to claim the grant before auth state finishes loading
+
+Fix requirements:
+1. Remove raw English error exposure from the UI.
+2. Replace it with clean Arabic error states.
+3. Make the flow resilient for:
+   - anonymous user
+   - logged-in eligible user
+   - logged-in already entitled user
+   - expired session user
+4. Keep the free grant logic secure on the server side.
+5. Do not grant access only from frontend state.
+6. Validate entitlement server-side and then return a structured response.
+
+Implementation guidance:
+- Add a dedicated structured response shape for the grant endpoint, e.g.:
+  - status: "UNAUTHENTICATED"
+  - status: "ELIGIBLE_GRANTED"
+  - status: "ALREADY_ACTIVE"
+  - status: "SESSION_EXPIRED"
+  - status: "NOT_ELIGIBLE"
+  - status: "ERROR"
+- The frontend should switch on these statuses and render Arabic UX accordingly.
+- Do not rely on parsing raw exception messages.
+- If session is missing, redirect to login with return URL.
+- After login, continue or allow one-click retry.
+
+Also do these:
+- Add logging around the scholarship claim flow so we can diagnose future auth issues.
+- Add basic tests for the free grant/session scenarios.
+- Ensure the button is disabled while request is in progress.
+- Prevent duplicate claims from double click.
+- Ensure the page never shows broken mixed Arabic/English messaging.
+
+Deliverables:
+1. Root cause explanation
+2. Files changed
+3. Exact fix implemented
+4. Any migration or env changes needed
+5. Manual QA checklist
+6. If auth architecture is flawed, propose the correct pattern and implement it
+
+Success criteria:
+- No raw "Invalid session. Please sign in again" message appears to the end user.
+- Anonymous users are cleanly redirected to login.
+- Logged-in eligible users can successfully receive the free grant.
+- Already-active users are handled gracefully.
+- Expired sessions are handled gracefully.
+- All user-facing messages are polished Arabic.
+
+Important:
+Do not stop at analysis.
+Implement the fix completely and show the exact code changes.
