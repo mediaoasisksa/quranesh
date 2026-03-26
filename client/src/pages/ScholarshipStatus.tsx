@@ -31,26 +31,51 @@ const ScholarshipStatus = () => {
   }, []);
 
   const handleClaim = async () => {
-    if (!token) return;
+    if (!token) {
+      window.location.href = "/signup";
+      return;
+    }
+    if (claiming) return; // prevent double-click
     setClaiming(true);
     setClaimError(null);
     try {
       const res = await fetch("/api/scholarship/claim", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      const data = await res.json();
+
+      let data: any = {};
+      try { data = await res.json(); } catch { /* ignore */ }
+
       if (res.status === 401) {
-        // Expired or invalid token — clear localStorage and send to sign in
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
-        window.location.href = "/signin?redirect=/scholarship-status";
+        window.location.href = "/signup";
         return;
       }
-      if (!res.ok) throw new Error(data.message || "Failed to claim scholarship");
+
+      if (res.status === 400) {
+        const status = data?.status || "";
+        if (status === "ALREADY_ACTIVE" || (data?.message || "").toLowerCase().includes("already")) {
+          setClaimed(true); // treat as success — they already have access
+          return;
+        }
+        setClaimError(
+          isRTL
+            ? "لا توجد مقاعد متاحة حاليًا، يرجى المحاولة لاحقًا"
+            : "No seats available at the moment"
+        );
+        return;
+      }
+
+      if (!res.ok) {
+        setClaimError(isRTL ? "حدث خطأ، يرجى المحاولة مرة أخرى" : "An error occurred, please try again");
+        return;
+      }
+
       setClaimed(true);
-    } catch (err: any) {
-      setClaimError(err.message || "An error occurred");
+    } catch {
+      setClaimError(isRTL ? "خطأ في الاتصال، يرجى التحقق من الإنترنت" : "Connection error, please try again");
     } finally {
       setClaiming(false);
     }
