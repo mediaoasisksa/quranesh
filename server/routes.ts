@@ -296,7 +296,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Grant legacy free access to all users registered before payment system launch
     await runLegacyBackfill();
-  })();
+  })().catch((err) => {
+    // Log startup errors but never crash the server — DB may be waking up from suspension
+    console.error("⚠️ Startup init error (non-fatal):", err?.message ?? err);
+  });
 
   // Authentication routes
   app.post("/api/signup", async (req, res) => {
