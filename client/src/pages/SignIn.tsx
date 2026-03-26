@@ -44,11 +44,12 @@ const SignIn = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Use the signIn function from the auth hook
         signIn(data.user, data.token);
 
-        // Redirect to dashboard or home page
-        setLocation("/");
+        // Honour the ?redirect= query param so users return to where they came from
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get("redirect") || "/";
+        setLocation(redirectTo);
       } else {
         setError(data.message || "Sign in failed");
       }

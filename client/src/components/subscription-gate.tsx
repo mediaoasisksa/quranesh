@@ -40,12 +40,18 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
       .catch(() => {});
   }, []);
 
+  const returnUrl = typeof window !== "undefined"
+    ? encodeURIComponent(window.location.pathname + window.location.search)
+    : "%2F";
+
   const handleClaimScholarship = async () => {
-    // Not logged in at all → go to signup
+    // Not logged in at all → send to sign-in with return URL
     if (!isAuthenticated || !token) {
-      setLocation("/signup");
+      setLocation(`/signin?redirect=${returnUrl}`);
       return;
     }
+
+    if (claiming) return; // prevent double-click
 
     setClaiming(true);
     setClaimError(null);
@@ -67,9 +73,9 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
       }
 
       if (res.status === 401) {
-        // Expired or invalid token — clear auth state and send to signup
+        // Expired or invalid token — clear auth state and send to sign-in
         signOut();
-        setLocation("/signup");
+        setLocation(`/signin?redirect=${returnUrl}`);
         return;
       }
 
@@ -245,14 +251,25 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
                 </p>
               </div>
             ) : !isAuthenticated ? (
-              /* Not logged in — send to signup */
-              <Button
-                className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => setLocation("/signup")}
-              >
-                <UserPlus className="w-4 h-4" />
-                {isArabic ? "سجّل مجانًا واحصل على وصول فوري" : "Sign up free & get instant access"}
-              </Button>
+              /* Not logged in — send to sign-in page with return URL */
+              <div className="space-y-2">
+                <Button
+                  className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => setLocation(`/signup`)}
+                >
+                  <UserPlus className="w-4 h-4" />
+                  {isArabic ? "إنشاء حساب مجاني والحصول على وصول فوري" : "Create free account & get instant access"}
+                </Button>
+                <p className="text-xs text-center text-green-700 dark:text-green-400">
+                  {isArabic ? "لديك حساب؟" : "Have an account?"}{" "}
+                  <button
+                    onClick={() => setLocation(`/signin?redirect=${returnUrl}`)}
+                    className="underline font-medium"
+                  >
+                    {isArabic ? "سجّل دخولك للمطالبة بالمنحة" : "Sign in to claim your grant"}
+                  </button>
+                </p>
+              </div>
             ) : hasSeats ? (
               <Button
                 className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
@@ -280,15 +297,6 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
               </Button>
             )}
 
-            {/* Sign-in link for returning users */}
-            {!isAuthenticated && (
-              <p className="text-xs text-center text-green-700 dark:text-green-400">
-                {isArabic ? "لديك حساب بالفعل؟" : "Already have an account?"}{" "}
-                <Link href="/signin" className="underline font-medium">
-                  {isArabic ? "تسجيل الدخول" : "Sign in"}
-                </Link>
-              </p>
-            )}
           </CardContent>
         </Card>
 

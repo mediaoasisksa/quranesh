@@ -1,0 +1,150 @@
+المشكلة ليست واحدة، بل 4 مشاكل متصلة:
+
+الصفحة التي يظهر فيها الخطأ ليست ScholarshipStatus.tsx
+بل هي غالبا من:
+client/src/components/subscription-gate.tsx
+في subscription-gate.tsx عند الضغط على زر المنحة:
+يرسل الطلب بـ token من localStorage
+وإذا كان الـ token منتهي أو فاسد، يعرض الرسالة الخام القادمة من السيرفر كما هي:
+Invalid session. Please sign in again
+ولا ينظف الجلسة
+ولا يحول المستخدم إلى تسجيل الدخول
+في use-auth.tsx
+التطبيق يعتبر أي authToken موجود في localStorage جلسة صالحة بدون التحقق من صلاحيتها
+لذلك قد يبدو للموقع أنك “مسجل” بينما الـ JWT منتهي فعليا.
+في SignIn.tsx
+حتى لو أرسلت المستخدم إلى:
+/signin?redirect=...
+بعد تسجيل الدخول يرجعه دائمًا إلى /
+وليس إلى الصفحة الأصلية.
+
+لهذا السبب ريبلت قد يقول إنه أصلح المشكلة، لكنه أصلح المسار الخطأ أو أصلح صفحة المنحة المستقلة فقط، بينما زر المنحة داخل صفحات التمارين ما زال معطوبا.
+
+هذا هو التوجيه الصحيح الذي ترسله لريبلت
+
+انسخه كما هو:
+
+You fixed the wrong flow.
+
+The broken button on the live site is not only in ScholarshipStatus.tsx.
+The actual failing UI on exercise pages is rendered by:
+
+client/src/components/subscription-gate.tsx
+
+Root cause found in code:
+1) subscription-gate.tsx sends /api/scholarship/claim using a token from localStorage
+2) it does NOT handle 401/expired token properly
+3) it shows the raw backend message directly in the UI
+4) use-auth.tsx trusts any localStorage authToken without validating expiry
+5) SignIn.tsx ignores the redirect query param and always goes to "/"
+
+You must fix the real production path, not just the standalone scholarship page.
+
+Required file-by-file fixes:
+
+1. client/src/components/subscription-gate.tsx
+- Fix handleClaimScholarship()
+- If there is no token: redirect to /signin?redirect=<current page>
+- If response is 401:
+  - clear authToken and user from localStorage
+  - redirect to /signin?redirect=<current page>
+  - do NOT show raw English error text
+- Map backend responses to clean Arabic messages
+- Add duplicate-click protection and keep loading state
+- After successful claim, invalidate subscription status and redirect to the content/dashboard
+
+2. client/src/hooks/use-auth.tsx
+- On mount, do NOT trust localStorage blindly
+- Validate JWT expiry from token payload before setting isAuthenticated=true
+- If token is expired or malformed:
+  - clear localStorage authToken and user
+  - set unauthenticated state
+- Export a reusable clearAuth() helper
+
+3. client/src/pages/SignIn.tsx
+- Read the redirect query parameter
+- After successful sign in:
+  - redirect to that route if present
+  - otherwise fallback to "/"
+
+4. server/routes.ts
+- In /api/scholarship/claim do not return raw messages like:
+  "Invalid session. Please sign in again."
+- Return structured statuses instead:
+  { status: "UNAUTHENTICATED" }
+  { status: "SESSION_EXPIRED" }
+  { status: "ALREADY_ACTIVE" }
+  { status: "ELIGIBLE_GRANTED" }
+  { status: "NO_SEATS" }
+  { status: "ERROR" }
+- The frontend must switch on status, not display raw exception text
+
+Important:
+The exercise page currently uses subscription-gate.tsx, so fixing ScholarshipStatus.tsx alone is insufficient.
+
+Implementation details:
+
+A) In use-auth.tsx add a local JWT expiry check, for example:
+- parse token payload
+- if exp * 1000 <= Date.now(), clear auth and set unauthenticated
+
+B) In subscription-gate.tsx:
+- use current path:
+  const returnTo = window.location.pathname + window.location.search;
+- redirect unauthenticated users to:
+  /signin?redirect=${encodeURIComponent(returnTo)}
+
+C) In SignIn.tsx:
+- after signIn(data.user, data.token)
+  const params = new URLSearchParams(window.location.search)
+  const redirectTo = params.get("redirect") || "/"
+  setLocation(redirectTo)
+
+D) In subscription-gate.tsx never do:
+  setClaimError(data.message)
+for auth/session errors.
+Use Arabic UX text instead.
+
+Success criteria:
+- On /exercise/... pages the free scholarship button no longer shows raw English errors
+- Expired localStorage token is cleared automatically
+- Clicking the free grant button sends user to sign in
+- After sign in, user returns to the same exercise page
+- Eligible users can successfully claim the scholarship
+- Already-active users are handled gracefully
+- The fix is confirmed on quranesh.com, not only in preview
+
+Do not stop at analysis.
+Implement the actual code changes in the exact files above and republish.
+والأهم: اطلب منه هذه الجملة بالضبط
+
+لأنها تكشف له أنه أصلح المكان الخطأ:
+
+You fixed ScholarshipStatus.tsx, but the live broken button on /exercise/... is coming from client/src/components/subscription-gate.tsx. Fix the production path actually used by the exercise gate.
+لماذا أنا متأكد؟
+
+لأن الكود الحالي فيه هذا النمط:
+
+client/src/components/subscription-gate.tsx
+يعرض الخطأ الخام للمستخدم بدل معالجة 401
+client/src/hooks/use-auth.tsx
+يثق في localStorage بلا تحقق
+client/src/pages/SignIn.tsx
+لا يعيد المستخدم إلى الصفحة المطلوبة
+server/routes.ts
+يرجع نفس الرسالة الإنجليزية الخام
+
+يعني المشكلة بنيوية وليست مجرد نص ترجمة.
+
+بعد أن ينفذ التعديل
+
+اختبر هكذا:
+
+افتح الموقع في نافذة خفية
+اذهب إلى /exercise/conversation
+اضغط زر المنحة المجانية
+يجب أن يذهب إلى تسجيل الدخول
+بعد الدخول يجب أن يرجع لنفس الصفحة
+إذا كانت المنحة متاحة يجب أن تتفعل
+يجب ألا تظهر عبارة
+Invalid session. Please sign in again.
