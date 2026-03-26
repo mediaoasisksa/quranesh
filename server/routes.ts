@@ -194,6 +194,54 @@ async function runLegacyBackfill() {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+
+  // ── DIAGNOSTIC ENDPOINTS (deployment verification) ──────────────────
+  app.get("/api/version", (_req, res) => {
+    res.json({ build: "2026-03-26-0918", ok: true });
+  });
+
+  app.get("/api/debug/db-test", async (_req, res) => {
+    const t0 = Date.now();
+    try {
+      const { sql: sqlTag } = await import("drizzle-orm");
+      const rows = await db.execute(sqlTag`SELECT 1 AS test, now() AS ts`);
+      const t1 = Date.now();
+      res.json({ ok: true, elapsed_ms: t1 - t0, rows });
+    } catch (err: any) {
+      res.status(500).json({
+        ok: false,
+        elapsed_ms: Date.now() - t0,
+        error: {
+          name: err?.name,
+          message: err?.message,
+          code: err?.code,
+          detail: err?.detail,
+          stack: err?.stack?.split("\n").slice(0, 6),
+        },
+      });
+    }
+  });
+
+  app.post("/api/debug/signin-test", async (req, res) => {
+    const { email, password } = req.body || {};
+    const t0 = Date.now();
+    try {
+      const { eq } = await import("drizzle-orm");
+      const rows = await db.select().from(users).where(eq(users.email, (email || "").toLowerCase().trim())).limit(1);
+      const t1 = Date.now();
+      if (!rows.length) return res.json({ ok: false, step: "user_not_found", elapsed_ms: t1 - t0 });
+      const u = rows[0];
+      const hashOk = await bcrypt.compare(password || "", u.passwordHash || "");
+      res.json({ ok: hashOk, step: hashOk ? "password_ok" : "password_wrong", elapsed_ms: Date.now() - t0, userId: u.id, hasHash: !!u.passwordHash });
+    } catch (err: any) {
+      res.status(500).json({
+        ok: false, step: "exception", elapsed_ms: Date.now() - t0,
+        error: { name: err?.name, message: err?.message, code: err?.code, stack: err?.stack?.split("\n").slice(0, 5) },
+      });
+    }
+  });
+  // ─────────────────────────────────────────────────────────────────────
+
   // Validate JWT secret on startup
   const JWT_SECRET = process.env.JWT_SECRET;
   if (!JWT_SECRET) {
