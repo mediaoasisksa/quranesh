@@ -1,10 +1,10 @@
 import { useSubscription } from "@/hooks/use-subscription";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2, Sparkles } from "lucide-react";
+import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,14 +14,16 @@ interface SubscriptionGateProps {
 }
 
 export default function SubscriptionGate({ children }: SubscriptionGateProps) {
-  const { isAuthenticated, isLoading: authLoading, token } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, token, signOut } = useAuth();
   const { hasActiveSubscription, isAdmin, isLegacyFree, isLoading: subLoading } = useSubscription();
   const { dir, language, t } = useLanguage();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [plans, setPlans] = useState<any[]>([]);
   const [availability, setAvailability] = useState<{ availableSeats: number; hasSeats: boolean } | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [claimSuccess, setClaimSuccess] = useState(false);
   const [legacyBannerDismissed, setLegacyBannerDismissed] = useState(false);
 
   const isArabic = language === "ar";
@@ -41,7 +43,10 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
   }, [hasActiveSubscription, isAdmin, isAuthenticated]);
 
   const handleClaimScholarship = async () => {
-    if (!token) return;
+    if (!token) {
+      setLocation("/signin");
+      return;
+    }
     setClaiming(true);
     setClaimError(null);
     try {
@@ -50,10 +55,19 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      if (res.status === 401) {
+        // Session expired or invalid — clear auth and redirect to sign in
+        signOut();
+        setLocation("/signin");
+        return;
+      }
       if (!res.ok) {
         setClaimError(data.message || (isArabic ? "حدث خطأ، حاول مرة أخرى" : "An error occurred, please try again"));
       } else {
+        setClaimSuccess(true);
         queryClient.invalidateQueries({ queryKey: ["/api/subscription-status"] });
+        // Navigate to dashboard after a short delay so the success state is visible
+        setTimeout(() => setLocation("/dashboard"), 2000);
       }
     } catch {
       setClaimError(isArabic ? "حدث خطأ في الشبكة" : "Network error, please try again");
@@ -191,10 +205,27 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
             )}
 
             {claimError && (
-              <p className="text-xs text-center text-red-600 font-medium">{claimError}</p>
+              <div className="text-xs text-center text-red-600 font-medium space-y-2">
+                <p>{claimError}</p>
+                <Link href="/signin">
+                  <Button size="sm" variant="outline" className="w-full">
+                    {isArabic ? "تسجيل الدخول مجدداً" : "Sign In Again"}
+                  </Button>
+                </Link>
+              </div>
             )}
 
-            {hasSeats ? (
+            {claimSuccess ? (
+              <div className="text-center space-y-2 py-2">
+                <CheckCircle2 className="w-10 h-10 text-green-600 mx-auto" />
+                <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                  {isArabic ? "🎉 تم تفعيل المنحة بنجاح!" : "🎉 Scholarship activated!"}
+                </p>
+                <p className="text-xs text-green-700 dark:text-green-400">
+                  {isArabic ? "جاري التوجيه إلى لوحة التحكم..." : "Redirecting to dashboard..."}
+                </p>
+              </div>
+            ) : hasSeats ? (
               <Button
                 className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleClaimScholarship}
