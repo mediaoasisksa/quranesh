@@ -64,17 +64,24 @@ const SignIn = () => {
         // response body not JSON
       }
 
+      // Always log the raw response for production debugging
+      console.log(`[signin] status=${response.status} body=`, JSON.stringify(data));
+
       if (response.ok) {
+        console.log(`[signin] success — userId=${data.user?.id} token=${!!data.token}`);
         signIn(data.user, data.token);
 
         // Honour the ?redirect= query param so users return to where they came from
         const params = new URLSearchParams(window.location.search);
         const redirectTo = params.get("redirect") || "/";
+        console.log(`[signin] redirecting to: ${redirectTo}`);
         setLocation(redirectTo);
       } else {
+        console.warn(`[signin] failed: status=${response.status} message=${data?.message}`);
         setError(getErrorMessage(response.status));
       }
     } catch (err) {
+      console.error("[signin] network error:", err);
       setError(isAr ? "خطأ في الاتصال، تحقق من الإنترنت وحاول مرة أخرى" : "Network error. Please try again.");
     } finally {
       setLoading(false);

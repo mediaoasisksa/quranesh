@@ -484,14 +484,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: userResponse,
       });
     } catch (error: any) {
-      console.error(`[signin] error for ${reqEmail}:`, error?.message || error);
-      // Handle validation errors
+      // Detailed error capture for production debugging
+      console.error(`[signin] UNEXPECTED ERROR for ${reqEmail}:`, {
+        name: error?.name,
+        message: error?.message,
+        code: error?.code,
+        detail: error?.detail,
+        constraint: error?.constraint,
+        stack: error?.stack?.split("\n").slice(0, 5).join(" | "),
+      });
       if (error instanceof Error && error.name === "ZodError") {
         return res
           .status(400)
           .json({ message: "Invalid email or password format" });
       }
-
       res.status(500).json({ message: "Login failed" });
     }
   });

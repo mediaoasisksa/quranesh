@@ -45,8 +45,11 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
     : "%2F";
 
   const handleClaimScholarship = async () => {
+    console.log(`[claim] isAuthenticated=${isAuthenticated} hasToken=${!!token}`);
+
     // Not logged in at all → send to sign-in with return URL
     if (!isAuthenticated || !token) {
+      console.warn("[claim] no auth — redirecting to signin");
       setLocation(`/signin?redirect=${returnUrl}`);
       return;
     }
@@ -57,6 +60,7 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
     setClaimError(null);
 
     try {
+      console.log(`[claim] sending POST /api/scholarship/claim with token length=${token.length}`);
       const res = await fetch("/api/scholarship/claim", {
         method: "POST",
         headers: {
@@ -72,8 +76,11 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
         // ignore JSON parse failure
       }
 
+      console.log(`[claim] response: status=${res.status} body=`, JSON.stringify(data));
+
       if (res.status === 401) {
         // Expired or invalid token — clear auth state and send to sign-in
+        console.warn("[claim] 401 — signing out and redirecting to signin");
         signOut();
         setLocation(`/signin?redirect=${returnUrl}`);
         return;
