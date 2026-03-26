@@ -1,0 +1,109 @@
+الصورة الأولى تُظهر أن صفحة التمرين ما زالت تعرض:
+Invalid session. Please sign in again
+
+والصورة الثانية تُظهر أن تسجيل الدخول من الجوال يعيد:
+Login failed
+
+هذا يعني أن الخلل غالبا في واحد أو أكثر من هذه النقاط:
+
+تسجيل الدخول نفسه يفشل على الجوال
+أو التوكن يُنشأ لكن لا يُحفَظ أو لا يُقرأ بعد تسجيل الدخول
+أو جلسة المستخدم على الجوال تصبح غير صالحة مباشرة
+أو تدفق المنحة يعتمد على جلسة غير موجودة/منتهية
+والواجهة ما زالت تعرض رسائل خام بالإنجليزية بدل معالجة الحالة
+
+أرسل إلى Replit هذا التوجيه كما هو:
+
+URGENT: Mobile auth is still broken on quranesh.com
+
+Current live symptoms from production:
+1. On exercise pages, the free scholarship flow still shows:
+   "Invalid session. Please sign in again"
+2. On mobile login, entering credentials returns:
+   "Login failed"
+
+This is no longer just a scholarship-button issue.
+This is a real mobile authentication/session persistence issue on the live domain.
+
+You must investigate the full auth flow on MOBILE PRODUCTION, not localhost only.
+
+Scope to inspect:
+- POST /api/login
+- POST /api/signup
+- POST /api/scholarship/claim
+- client/src/pages/SignIn.tsx
+- client/src/hooks/use-auth.tsx
+- client/src/components/subscription-gate.tsx
+- any auth middleware / token validation in server/routes.ts
+- token storage logic (localStorage / cookie / JWT)
+- redirect after login on mobile
+- mobile browser persistence behavior
+
+Required debugging steps:
+1. Test on the live production domain quranesh.com in a mobile viewport and on a real phone if possible.
+2. For login, inspect the exact /api/login request:
+   - status code
+   - response JSON
+   - response headers
+   - whether token is returned
+3. After successful login response, verify:
+   - is token stored?
+   - is user stored?
+   - is auth state updated?
+   - does a page refresh lose the session?
+4. For scholarship claim, inspect /api/scholarship/claim on mobile:
+   - what Authorization/token is being sent?
+   - is token missing, expired, or malformed?
+5. Add server logs for:
+   - login attempt email
+   - login success/failure reason
+   - JWT generation
+   - scholarship claim auth parsing
+   - 401 causes
+6. Add client logs temporarily for:
+   - login response data
+   - token save result
+   - current auth state after login
+   - token existence before scholarship claim
+
+What to fix:
+1. If login succeeds server-side, persist session correctly on mobile.
+2. If using localStorage:
+   - confirm token is saved after login
+   - confirm use-auth reads and validates it correctly
+   - clear malformed/expired tokens automatically
+3. If using cookies anywhere:
+   - verify SameSite / Secure / Path / Domain settings
+   - ensure mobile browsers actually send them
+4. In SignIn.tsx:
+   - do not show generic raw "Login failed"
+   - map backend errors to Arabic messages
+   - log the exact backend reason during debugging
+5. In subscription-gate.tsx:
+   - if no valid auth, redirect to sign in cleanly
+   - do not show raw English "Invalid session. Please sign in again"
+6. In use-auth.tsx:
+   - validate JWT expiry before treating user as signed in
+   - export clearAuth() and use it on 401/session-expired
+7. Ensure after successful login the user can immediately claim scholarship and enter exercises on mobile.
+
+User-facing Arabic messages required:
+- invalid credentials → "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+- session expired → "انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى"
+- login temporarily unavailable → "تعذر تسجيل الدخول حاليا، حاول مرة أخرى"
+- scholarship requires auth → "يرجى تسجيل الدخول أولا للحصول على المنحة"
+
+Success criteria:
+- Mobile login works on quranesh.com
+- Session persists after login on mobile
+- Scholarship claim works from mobile
+- No raw English auth errors appear
+- Exercise pages open correctly after login/grant
+- Verified after republish on the live domain
+
+Deliver:
+1. exact root cause
+2. exact file(s) changed
+3. before/after production response for /api/login
+4. before/after production response for /api/scholarship/claim
+5. final QA results on mobile after republish

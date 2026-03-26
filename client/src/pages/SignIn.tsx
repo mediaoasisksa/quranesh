@@ -25,7 +25,23 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
+  const isAr = language === "ar";
+
+  // Map server response to a user-friendly localized message
+  const getErrorMessage = (status: number): string => {
+    if (status === 401 || status === 400) {
+      return isAr
+        ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+        : "Incorrect email or password";
+    }
+    if (status === 500) {
+      return isAr
+        ? "تعذر تسجيل الدخول حاليًا، يرجى المحاولة مرة أخرى"
+        : "Login temporarily unavailable, please try again";
+    }
+    return isAr ? "حدث خطأ، يرجى المحاولة مرة أخرى" : "An error occurred, please try again";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +57,12 @@ const SignIn = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        data = await response.json();
+      } catch {
+        // response body not JSON
+      }
 
       if (response.ok) {
         signIn(data.user, data.token);
@@ -51,10 +72,10 @@ const SignIn = () => {
         const redirectTo = params.get("redirect") || "/";
         setLocation(redirectTo);
       } else {
-        setError(data.message || "Sign in failed");
+        setError(getErrorMessage(response.status));
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      setError(isAr ? "خطأ في الاتصال، تحقق من الإنترنت وحاول مرة أخرى" : "Network error. Please try again.");
     } finally {
       setLoading(false);
     }

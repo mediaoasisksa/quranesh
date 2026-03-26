@@ -442,20 +442,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/signin", async (req, res) => {
+    const reqEmail = (req.body?.email || "").toLowerCase().trim();
+    console.log(`[signin] attempt: ${reqEmail}`);
     try {
       const validatedData = signinSchema.parse(req.body);
 
       // Find user by email (email is already normalized by schema)
       const user = await storage.getUserByEmail(validatedData.email);
       if (!user) {
+        console.log(`[signin] user not found: ${validatedData.email}`);
         return res.status(401).json({ message: "Invalid email or password" });
       }
+      console.log(`[signin] user found id=${user.id} hasHash=${!!user.passwordHash}`);
 
       // Verify password
       const isValidPassword = await bcrypt.compare(
         validatedData.password,
         user.passwordHash,
       );
+      console.log(`[signin] password valid: ${isValidPassword}`);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
@@ -466,6 +471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         JWT_SECRET,
         { expiresIn: "24h" },
       );
+      console.log(`[signin] success for ${validatedData.email}`);
 
       // Remove password hash from response
       const { passwordHash: _, ...userResponse } = user;
@@ -477,7 +483,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresIn: "24h",
         user: userResponse,
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error(`[signin] error for ${reqEmail}:`, error?.message || error);
       // Handle validation errors
       if (error instanceof Error && error.name === "ZodError") {
         return res
