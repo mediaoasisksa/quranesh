@@ -1,0 +1,84 @@
+Based on the screenshot, the page loads and the exercise card renders, but the question body is blank on mobile. That usually means one of these:
+
+the question data is loaded but hidden by mobile CSS
+the question container has zero height / overflow clipping
+the text color matches the background on small screens
+a mobile-only conditional render is failing
+hydration/state updates work on desktop but not on mobile
+
+Send this to Replit exactly:
+
+BUG: Questions disappear on mobile screen in the exercise page
+
+Live symptom:
+On mobile, the exercise page opens and shows the header/card, but the actual question text/options do not appear.
+The content area is blank under "التمرين".
+
+Important:
+This is a mobile-specific rendering bug. Do not assume it is fixed unless it is verified on the live site in a mobile viewport.
+
+What to inspect:
+1. The exercise page/component that renders the question body
+2. Mobile CSS classes (Tailwind responsive classes, hidden/block, overflow, min-h, absolute positioning, z-index)
+3. Whether question text exists in DOM but is invisible
+4. Whether the API data is missing only on mobile
+5. Whether hydration/state is failing after first render
+6. Whether Arabic RTL layout is collapsing the content container
+7. Whether there is a conditional like `isMobile ? ... : ...` hiding the question
+8. Whether an animation/skeleton/loading state never clears on mobile
+
+Required debugging steps:
+1. Open the exact exercise page in desktop and mobile viewport
+2. Compare:
+   - network response payload
+   - rendered DOM
+   - computed styles of the question container
+3. Confirm whether:
+   - question text exists in DOM but hidden
+   - question text never renders
+   - options render off-screen
+   - container height becomes 0
+4. Inspect any classes such as:
+   - hidden / md:block / block md:hidden
+   - overflow-hidden
+   - h-0 / max-h-0
+   - absolute/fixed positioning
+   - text-white on white bg
+   - opacity-0
+   - translate-x / translate-y on mobile
+5. Add temporary console logs for:
+   - fetched exercise data
+   - currentQuestion
+   - currentQuestion.text
+   - options length
+   - isLoading
+   - viewport/mobile flag
+
+What to fix:
+- Make the question text and answers always visible on mobile
+- Ensure the question container has a real min-height
+- Remove any mobile-only class that hides the content
+- Ensure RTL layout does not collapse or push content outside the card
+- If loading state is stuck, fix the state transition
+- If data exists but text is invisible, fix the text color/background contrast
+- If options are below the fold due to layout bug, fix spacing and height
+
+Add safeguards:
+- If question data is missing, show a friendly Arabic fallback:
+  "تعذر تحميل السؤال. حاول إعادة فتح التمرين."
+- If loading is still active, show a proper loading state
+- Never show an empty white card with no explanation
+
+Deliverables:
+1. Root cause
+2. Exact file(s) changed
+3. Exact mobile CSS/render bug found
+4. Fix implemented
+5. Screenshots before/after in mobile viewport
+6. Verification on the live domain after republish
+
+Success criteria:
+- On mobile, the question text appears clearly
+- The answer choices appear clearly
+- The exercise is fully usable on Android/iPhone widths
+- No blank exercise card remains

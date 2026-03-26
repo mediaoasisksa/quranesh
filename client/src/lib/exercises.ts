@@ -44,7 +44,10 @@ export const exerciseTypes = [
 ];
 
 export function getExerciseType(id: string) {
-  return exerciseTypes.find(type => type.id === id);
+  // Normalize URL hyphens to underscores so both /exercise/daily-contextual
+  // and /exercise/daily_contextual resolve to the same exercise type.
+  const normalized = id.replace(/-/g, '_');
+  return exerciseTypes.find(type => type.id === normalized);
 }
 
 export function getRandomExerciseType() {
