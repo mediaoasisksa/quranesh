@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Lock, Crown, BookOpen, Users, Award, Check, ShoppingCart, GraduationCap, Loader2, Sparkles, CheckCircle2, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,48 +29,90 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
   const isArabic = language === "ar";
 
   useEffect(() => {
-    if (!hasActiveSubscription && !isAdmin && isAuthenticated) {
-      fetch("/api/pricing")
-        .then(r => r.json())
-        .then(data => setPlans(data.plans || []))
-        .catch(() => {});
+    fetch("/api/pricing")
+      .then(r => r.json())
+      .then(data => setPlans(data.plans || []))
+      .catch(() => {});
 
-      fetch("/api/scholarship/availability")
-        .then(r => r.json())
-        .then(setAvailability)
-        .catch(() => {});
-    }
-  }, [hasActiveSubscription, isAdmin, isAuthenticated]);
+    fetch("/api/scholarship/availability")
+      .then(r => r.json())
+      .then(setAvailability)
+      .catch(() => {});
+  }, []);
 
   const handleClaimScholarship = async () => {
-    if (!token) {
-      setLocation("/signin");
+    // Not logged in at all → go to signup
+    if (!isAuthenticated || !token) {
+      setLocation("/signup");
       return;
     }
+
     setClaiming(true);
     setClaimError(null);
+
     try {
       const res = await fetch("/api/scholarship/claim", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
-      const data = await res.json();
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        // ignore JSON parse failure
+      }
+
       if (res.status === 401) {
-        // Session expired or invalid — clear auth and redirect to sign in
+        // Expired or invalid token — clear auth state and send to signup
         signOut();
-        setLocation("/signin");
+        setLocation("/signup");
         return;
       }
-      if (!res.ok) {
-        setClaimError(data.message || (isArabic ? "حدث خطأ، حاول مرة أخرى" : "An error occurred, please try again"));
-      } else {
-        setClaimSuccess(true);
-        queryClient.invalidateQueries({ queryKey: ["/api/subscription-status"] });
-        // Navigate to dashboard after a short delay so the success state is visible
-        setTimeout(() => setLocation("/dashboard"), 2000);
+
+      if (res.status === 400) {
+        const msg = data?.message || "";
+        // Already has access — just redirect to exercises
+        if (
+          msg.toLowerCase().includes("already") ||
+          msg.toLowerCase().includes("active")
+        ) {
+          queryClient.invalidateQueries({ queryKey: ["/api/subscription-status"] });
+          setClaimSuccess(true);
+          setTimeout(() => setLocation("/exercise/daily-contextual"), 1500);
+          return;
+        }
+        // No seats available
+        setClaimError(
+          isArabic
+            ? "لا توجد مقاعد متاحة حاليًا، يرجى المحاولة لاحقًا"
+            : "No seats available at the moment"
+        );
+        return;
       }
+
+      if (!res.ok) {
+        setClaimError(
+          isArabic
+            ? "حدث خطأ، يرجى المحاولة مرة أخرى"
+            : "An error occurred, please try again"
+        );
+        return;
+      }
+
+      // Success
+      setClaimSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription-status"] });
+      setTimeout(() => setLocation("/exercise/daily-contextual"), 2000);
     } catch {
-      setClaimError(isArabic ? "حدث خطأ في الشبكة" : "Network error, please try again");
+      setClaimError(
+        isArabic
+          ? "خطأ في الاتصال، يرجى التحقق من الإنترنت والمحاولة مجددًا"
+          : "Connection error, please check your internet and try again"
+      );
     } finally {
       setClaiming(false);
     }
@@ -80,27 +122,6 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] p-4" dir={dir}>
-        <Card className="max-w-md w-full text-center">
-          <CardHeader>
-            <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
-            <CardTitle>{isArabic ? "يرجى تسجيل الدخول" : "Sign in required"}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              {isArabic ? "يرجى تسجيل الدخول للوصول إلى التمارين." : "Please sign in to access exercises."}
-            </p>
-            <Link href="/signin">
-              <Button className="w-full">{isArabic ? "تسجيل الدخول" : "Sign In"}</Button>
-            </Link>
-          </CardContent>
-        </Card>
       </div>
     );
   }
@@ -147,11 +168,14 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
   };
 
   const seatsLeft = availability?.availableSeats ?? null;
-  const hasSeats = availability?.hasSeats ?? true;
+  const hasSeats = availability?.hasSeats !== false;
+  const totalSeats = 1000;
 
   return (
     <div className="flex items-center justify-center min-h-[60vh] p-4" dir={dir}>
       <div className="max-w-2xl w-full space-y-6">
+
+        {/* Header */}
         <Card className="text-center border-2 border-amber-300 dark:border-amber-700">
           <CardHeader>
             <Crown className="w-14 h-14 mx-auto text-amber-500 mb-2" />
@@ -159,7 +183,7 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
               {isArabic ? "اشتراك مطلوب للوصول للتمارين" : "Subscription Required"}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <p className="text-muted-foreground text-lg">
               {isArabic
                 ? "اشترك لفتح جميع التمارين والمحتوى التعليمي"
@@ -168,7 +192,7 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
           </CardContent>
         </Card>
 
-        {/* Platform Scholarship Card */}
+        {/* Platform Scholarship Card — shown to everyone */}
         <Card className="border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-950/30">
           <CardHeader className="text-center pb-2">
             <GraduationCap className="w-10 h-10 mx-auto text-green-600 dark:text-green-400 mb-2" />
@@ -199,20 +223,15 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
             {seatsLeft !== null && (
               <p className="text-xs text-center text-green-700 dark:text-green-400 font-medium">
                 {isArabic
-                  ? `${seatsLeft} مقعد متاح من أصل 200`
-                  : `${seatsLeft} seats available out of 200`}
+                  ? `${seatsLeft} مقعد متاح من أصل ${totalSeats}`
+                  : `${seatsLeft} of ${totalSeats} seats available`}
               </p>
             )}
 
             {claimError && (
-              <div className="text-xs text-center text-red-600 font-medium space-y-2">
-                <p>{claimError}</p>
-                <Link href="/signin">
-                  <Button size="sm" variant="outline" className="w-full">
-                    {isArabic ? "تسجيل الدخول مجدداً" : "Sign In Again"}
-                  </Button>
-                </Link>
-              </div>
+              <p className="text-xs text-center text-red-600 dark:text-red-400 font-medium bg-red-50 dark:bg-red-950/30 rounded p-2">
+                {claimError}
+              </p>
             )}
 
             {claimSuccess ? (
@@ -222,9 +241,18 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
                   {isArabic ? "🎉 تم تفعيل المنحة بنجاح!" : "🎉 Scholarship activated!"}
                 </p>
                 <p className="text-xs text-green-700 dark:text-green-400">
-                  {isArabic ? "جاري التوجيه إلى لوحة التحكم..." : "Redirecting to dashboard..."}
+                  {isArabic ? "جاري الانتقال للتمارين..." : "Taking you to exercises..."}
                 </p>
               </div>
+            ) : !isAuthenticated ? (
+              /* Not logged in — send to signup */
+              <Button
+                className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => setLocation("/signup")}
+              >
+                <UserPlus className="w-4 h-4" />
+                {isArabic ? "سجّل مجانًا واحصل على وصول فوري" : "Sign up free & get instant access"}
+              </Button>
             ) : hasSeats ? (
               <Button
                 className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
@@ -251,9 +279,20 @@ export default function SubscriptionGate({ children }: SubscriptionGateProps) {
                 )}
               </Button>
             )}
+
+            {/* Sign-in link for returning users */}
+            {!isAuthenticated && (
+              <p className="text-xs text-center text-green-700 dark:text-green-400">
+                {isArabic ? "لديك حساب بالفعل؟" : "Already have an account?"}{" "}
+                <Link href="/signin" className="underline font-medium">
+                  {isArabic ? "تسجيل الدخول" : "Sign in"}
+                </Link>
+              </p>
+            )}
           </CardContent>
         </Card>
 
+        {/* Paid plans */}
         {plans.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {plans.filter(p => p.id === "learner" || p.id === "sponsor-5").map((plan) => {

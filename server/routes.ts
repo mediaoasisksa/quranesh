@@ -2041,40 +2041,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Authentication required" });
+        console.log("[scholarship/claim] No auth header — unauthenticated");
+        return res.status(401).json({ status: "UNAUTHENTICATED", message: "Authentication required" });
       }
-      const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const userId = decoded.userId;
 
-      const { eq, lt, and, sql: sqlTag } = await import("drizzle-orm");
+      const token = authHeader.split(" ")[1];
+      let decoded: { userId: string };
+      try {
+        decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      } catch (jwtErr: any) {
+        const isExpired = jwtErr?.name === "TokenExpiredError";
+        console.log(`[scholarship/claim] JWT error: ${jwtErr?.name}`);
+        return res.status(401).json({
+          status: isExpired ? "SESSION_EXPIRED" : "UNAUTHENTICATED",
+          message: "Session invalid",
+        });
+      }
+
+      const userId = decoded.userId;
+      const { eq, sql: sqlTag } = await import("drizzle-orm");
 
       const userRecord = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (userRecord.length === 0) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(401).json({ status: "UNAUTHENTICATED", message: "User not found" });
       }
       const user = userRecord[0];
 
+      // Already has an active scholarship or subscription
       if (user.scholarshipStatus === "active") {
-        return res.status(400).json({ message: "You already have an active scholarship" });
+        console.log(`[scholarship/claim] userId=${userId} already has active scholarship`);
+        return res.status(400).json({ status: "ALREADY_ACTIVE", message: "Scholarship already active" });
       }
 
-      const existingMatch = await db.select().from(scholarshipMatches).where(eq(scholarshipMatches.studentId, userId)).limit(1);
+      const existingMatch = await db
+        .select()
+        .from(scholarshipMatches)
+        .where(eq(scholarshipMatches.studentId, userId))
+        .limit(1);
       if (existingMatch.length > 0) {
-        return res.status(400).json({ message: "Scholarship already claimed" });
+        console.log(`[scholarship/claim] userId=${userId} already claimed`);
+        return res.status(400).json({ status: "ALREADY_ACTIVE", message: "Scholarship already claimed" });
       }
 
+      // Atomically reserve a seat from the platform wallet
       const updated = await db.execute(
-        sqlTag`UPDATE sponsorships SET used_seats = used_seats + 1, is_fully_used = (used_seats + 1 >= total_seats) WHERE used_seats < total_seats RETURNING id`
+        sqlTag`UPDATE sponsorships
+               SET used_seats = used_seats + 1,
+                   is_fully_used = (used_seats + 1 >= total_seats)
+               WHERE sponsor_id = 'platform'
+                 AND used_seats < total_seats
+               RETURNING id`
       );
       const rows = (updated as any).rows || (updated as any);
       if (!rows || rows.length === 0) {
-        return res.status(400).json({ message: "No available scholarship seats" });
+        console.log(`[scholarship/claim] No seats available in platform wallet`);
+        return res.status(400).json({ status: "NO_SEATS", message: "No scholarship seats available" });
       }
       const spId = rows[0].id;
 
+      // Record the match and activate the user
       await db.insert(scholarshipMatches).values({ studentId: userId, sponsorshipId: spId });
-
       await db.update(users).set({ scholarshipStatus: "active" }).where(eq(users.id, userId));
 
       const endDate = new Date();
@@ -2090,17 +2116,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sponsoredUsers: 0,
       });
 
-      console.log(`Scholarship claimed: userId=${userId}, sponsorshipId=${spId}`);
-      res.json({ success: true, message: "Scholarship activated successfully" });
+      console.log(`[scholarship/claim] SUCCESS: userId=${userId}, sponsorshipId=${spId}`);
+      res.json({ status: "ELIGIBLE_GRANTED", success: true });
     } catch (error: any) {
-      console.error("Scholarship claim error:", error);
-      if (error.name === "TokenExpiredError") {
-        return res.status(401).json({ message: "Session expired. Please sign in again." });
-      }
-      if (error.name === "JsonWebTokenError") {
-        return res.status(401).json({ message: "Invalid session. Please sign in again." });
-      }
-      res.status(500).json({ message: "Failed to claim scholarship" });
+      console.error("[scholarship/claim] Unexpected error:", error);
+      res.status(500).json({ status: "ERROR", message: "Server error" });
     }
   });
 
