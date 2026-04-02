@@ -678,9 +678,9 @@ var init_schema = __esm({
 });
 
 // server/db.ts
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-var sql2, db;
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+var connectionString, isNeon, client, db;
 var init_db = __esm({
   "server/db.ts"() {
     "use strict";
@@ -690,13 +690,21 @@ var init_db = __esm({
         "DATABASE_URL must be set. Did you forget to provision a database?"
       );
     }
-    sql2 = neon(process.env.DATABASE_URL);
-    db = drizzle(sql2, { schema: schema_exports });
+    connectionString = process.env.DATABASE_URL;
+    isNeon = connectionString.includes("neon.tech") || connectionString.includes("neon.database") || connectionString.includes("neondb");
+    client = postgres(connectionString, {
+      ssl: isNeon ? "require" : false,
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+      prepare: false
+    });
+    db = drizzle(client, { schema: schema_exports });
   }
 });
 
 // server/quran-validator.ts
-import { sql as sql3, isNull, eq, or } from "drizzle-orm";
+import { sql as sql2, isNull, eq, or } from "drizzle-orm";
 function isNonQuranicPhrase(text2) {
   const normalized = text2.replace(/[\u064B-\u065F\u0670]/g, "").replace(/\s+/g, " ").trim();
   return NON_QURANIC_PHRASES.has(normalized);
@@ -7569,7 +7577,7 @@ var add_wisdom_data_exports = {};
 __export(add_wisdom_data_exports, {
   addWisdomData: () => addWisdomData
 });
-import { sql as sql4 } from "drizzle-orm";
+import { sql as sql3 } from "drizzle-orm";
 async function addWisdomData() {
   console.log(`
 \u{1F4DA} \u0625\u0636\u0627\u0641\u0629/\u062A\u062D\u062F\u064A\u062B ${wisdomData.length} \u062D\u0643\u0645\u0629 \u0628\u0634\u0631\u064A\u0629 \u0641\u064A \u0642\u0627\u0639\u062F\u0629 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A...
@@ -7586,12 +7594,12 @@ async function addWisdomData() {
         blocked++;
         continue;
       }
-      const existing = await db.select().from(philosophicalSentences).where(sql4`arabic_text = ${wisdom.arabicText}`).limit(1);
+      const existing = await db.select().from(philosophicalSentences).where(sql3`arabic_text = ${wisdom.arabicText}`).limit(1);
       if (existing.length > 0) {
         if (wisdom.conceptTags && wisdom.conceptTags.length > 0) {
           const existingTags = existing[0].conceptTags || [];
           if (existingTags.length === 0) {
-            await db.update(philosophicalSentences).set({ conceptTags: wisdom.conceptTags }).where(sql4`arabic_text = ${wisdom.arabicText}`);
+            await db.update(philosophicalSentences).set({ conceptTags: wisdom.conceptTags }).where(sql3`arabic_text = ${wisdom.arabicText}`);
             updated++;
           } else {
             skipped++;
@@ -7861,7 +7869,7 @@ var init_arabic_normalizer = __esm({
 });
 
 // server/daily-quranic-elements-job.ts
-import { eq as eq3, sql as sql5 } from "drizzle-orm";
+import { eq as eq3, sql as sql4 } from "drizzle-orm";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 async function getUsedPhrases() {
   const used = await db.select({ phraseAr: usedQuranicPhrases.phraseAr }).from(usedQuranicPhrases);
@@ -7872,7 +7880,7 @@ async function getRandomAyahs(count) {
     surahNameArabic: quranText.surahNameArabic,
     ayahNumber: quranText.ayahNumber,
     arabicText: quranText.arabicText
-  }).from(quranText).orderBy(sql5`RANDOM()`).limit(count * 2);
+  }).from(quranText).orderBy(sql4`RANDOM()`).limit(count * 2);
   return ayahs.map((a) => ({
     surah: a.surahNameArabic,
     ayah: a.ayahNumber,
@@ -14303,13 +14311,13 @@ async function registerRoutes(app2) {
   app2.get("/api/daily-quranic-elements/stats", async (req, res) => {
     try {
       const { dailyQuranicElements: dailyQuranicElements2, usedQuranicPhrases: usedQuranicPhrases2 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-      const { sql: sql6 } = await import("drizzle-orm");
-      const totalElements = await db.select({ count: sql6`count(*)` }).from(dailyQuranicElements2);
-      const totalUsed = await db.select({ count: sql6`count(*)` }).from(usedQuranicPhrases2);
+      const { sql: sql5 } = await import("drizzle-orm");
+      const totalElements = await db.select({ count: sql5`count(*)` }).from(dailyQuranicElements2);
+      const totalUsed = await db.select({ count: sql5`count(*)` }).from(usedQuranicPhrases2);
       const batchDates = await db.select({
         batchDate: dailyQuranicElements2.batchDate,
-        count: sql6`count(*)`
-      }).from(dailyQuranicElements2).groupBy(dailyQuranicElements2.batchDate).orderBy(sql6`batch_date DESC`).limit(10);
+        count: sql5`count(*)`
+      }).from(dailyQuranicElements2).groupBy(dailyQuranicElements2.batchDate).orderBy(sql5`batch_date DESC`).limit(10);
       res.json({
         totalElements: totalElements[0]?.count || 0,
         totalUsedPhrases: totalUsed[0]?.count || 0,
@@ -14509,11 +14517,11 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/diploma/stats", async (_req, res) => {
     try {
-      const { sql: sql6 } = await import("drizzle-orm");
-      const [weekCount] = await db.select({ count: sql6`count(*)` }).from(diplomaWeeks);
-      const [vocabCount] = await db.select({ count: sql6`count(*)` }).from(diplomaVocabulary);
-      const [exerciseCount] = await db.select({ count: sql6`count(*)` }).from(diplomaExercises);
-      const [enrolledCount] = await db.select({ count: sql6`count(*)` }).from(userDiplomaProgress);
+      const { sql: sql5 } = await import("drizzle-orm");
+      const [weekCount] = await db.select({ count: sql5`count(*)` }).from(diplomaWeeks);
+      const [vocabCount] = await db.select({ count: sql5`count(*)` }).from(diplomaVocabulary);
+      const [exerciseCount] = await db.select({ count: sql5`count(*)` }).from(diplomaExercises);
+      const [enrolledCount] = await db.select({ count: sql5`count(*)` }).from(userDiplomaProgress);
       res.json({
         totalWeeks: weekCount?.count || 0,
         totalVocabulary: vocabCount?.count || 0,
@@ -14562,10 +14570,10 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/admin/stats", requireAdmin, async (_req, res) => {
     try {
-      const { sql: sql6 } = await import("drizzle-orm");
-      const [userCount] = await db.select({ count: sql6`count(*)` }).from(users);
-      const [situationCount] = await db.select({ count: sql6`count(*)` }).from(humanSituations);
-      const [exerciseCount] = await db.select({ count: sql6`count(*)` }).from(exerciseSessions);
+      const { sql: sql5 } = await import("drizzle-orm");
+      const [userCount] = await db.select({ count: sql5`count(*)` }).from(users);
+      const [situationCount] = await db.select({ count: sql5`count(*)` }).from(humanSituations);
+      const [exerciseCount] = await db.select({ count: sql5`count(*)` }).from(exerciseSessions);
       res.json({
         totalUsers: userCount?.count || 0,
         totalSituations: situationCount?.count || 0,
