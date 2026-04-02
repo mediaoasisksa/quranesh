@@ -26,10 +26,25 @@ node --version  # should print v20.x.x
 
 ## Step 2: Install PostgreSQL 16
 
+The production SQL dump was created with PostgreSQL 16. Install exactly version 16 using the official PGDG repository to avoid import compatibility issues:
+
 ```bash
-sudo apt-get install -y postgresql postgresql-contrib
+# Add the PostgreSQL Global Development Group repository
+sudo apt-get install -y curl ca-certificates
+sudo install -d /usr/share/postgresql-common/pgdg
+curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail \
+  https://www.postgresql.org/media/keys/ACCC4CF8.asc
+sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] \
+  https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+  > /etc/apt/sources.list.d/pgdg.list'
+
+sudo apt-get update
+sudo apt-get install -y postgresql-16 postgresql-client-16
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
+
+# Verify version
+psql --version  # must print: psql (PostgreSQL) 16.x
 ```
 
 ---
@@ -219,10 +234,7 @@ curl https://quranesh.com/api/debug/db-test
 
 ```bash
 cd /var/www/quranesh
-git pull
-npm install
-npm run build
-pm2 restart quranesh
+git pull && npm install && npm run build && pm2 restart all
 ```
 
 ---
