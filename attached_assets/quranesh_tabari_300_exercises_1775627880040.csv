@@ -1,0 +1,301 @@
+﻿id,surah_number,surah_name_ar,ayah,verse_text,prompt_en,question_en,option_A,option_B,option_C,option_D,correct_answer,correct_word,source
+1,1,الفاتحة,1,بِسمِ اللَّهِ الرَّحمـٰنِ الرَّحيمِ,In the name of,What is the exact Arabic word that means: In the name of?,بِسمِ,الرَّحيمِ,اللَّهِ,الرَّحمـٰنِ,A,بِسمِ,Tafsir al-Tabari only
+2,1,الفاتحة,1,بِسمِ اللَّهِ الرَّحمـٰنِ الرَّحيمِ,Allah,What is the exact Arabic word that means: Allah?,الرَّحمـٰنِ,اللَّهِ,الرَّحيمِ,بِسمِ,B,اللَّهِ,Tafsir al-Tabari only
+3,1,الفاتحة,1,بِسمِ اللَّهِ الرَّحمـٰنِ الرَّحيمِ,The Most Merciful,What is the exact Arabic word that means: The Most Merciful?,اللَّهِ,الرَّحيمِ,بِسمِ,الرَّحمـٰنِ,D,الرَّحمـٰنِ,Tafsir al-Tabari only
+4,1,الفاتحة,1,بِسمِ اللَّهِ الرَّحمـٰنِ الرَّحيمِ,The Especially Merciful,What is the exact Arabic word that means: The Especially Merciful?,اللَّهِ,الرَّحمـٰنِ,الرَّحيمِ,بِسمِ,C,الرَّحيمِ,Tafsir al-Tabari only
+5,1,الفاتحة,2,الحَمدُ لِلَّهِ رَبِّ العالَمينَ,all praise,What is the exact Arabic word that means: all praise?,رَبِّ,الحَمدُ,العالَمينَ,لِلَّهِ,B,الحَمدُ,Tafsir al-Tabari only
+6,1,الفاتحة,2,الحَمدُ لِلَّهِ رَبِّ العالَمينَ,to Allah,What is the exact Arabic word that means: to Allah?,العالَمينَ,رَبِّ,الحَمدُ,لِلَّهِ,D,لِلَّهِ,Tafsir al-Tabari only
+7,1,الفاتحة,2,الحَمدُ لِلَّهِ رَبِّ العالَمينَ,Lord,What is the exact Arabic word that means: Lord?,لِلَّهِ,رَبِّ,الحَمدُ,العالَمينَ,B,رَبِّ,Tafsir al-Tabari only
+8,1,الفاتحة,2,الحَمدُ لِلَّهِ رَبِّ العالَمينَ,the worlds,What is the exact Arabic word that means: the worlds?,الحَمدُ,رَبِّ,لِلَّهِ,العالَمينَ,D,العالَمينَ,Tafsir al-Tabari only
+9,1,الفاتحة,4,مالِكِ يَومِ الدّينِ,Master,What is the exact Arabic word that means: Master?,إِيّاكَ,مالِكِ,يَومِ,الدّينِ,B,مالِكِ,Tafsir al-Tabari only
+10,1,الفاتحة,4,مالِكِ يَومِ الدّينِ,Day,What is the exact Arabic word that means: Day?,إِيّاكَ,الدّينِ,يَومِ,مالِكِ,C,يَومِ,Tafsir al-Tabari only
+11,1,الفاتحة,4,مالِكِ يَومِ الدّينِ,Judgment / religion,What is the exact Arabic word that means: Judgment / religion?,الدّينِ,إِيّاكَ,يَومِ,مالِكِ,A,الدّينِ,Tafsir al-Tabari only
+12,1,الفاتحة,5,إِيّاكَ نَعبُدُ وَإِيّاكَ نَستَعينُ,You alone,What is the exact Arabic word that means: You alone?,إِيّاكَ,وَإِيّاكَ,نَعبُدُ,نَستَعينُ,A,إِيّاكَ,Tafsir al-Tabari only
+13,1,الفاتحة,5,إِيّاكَ نَعبُدُ وَإِيّاكَ نَستَعينُ,we worship,What is the exact Arabic word that means: we worship?,نَستَعينُ,نَعبُدُ,وَإِيّاكَ,إِيّاكَ,B,نَعبُدُ,Tafsir al-Tabari only
+14,1,الفاتحة,5,إِيّاكَ نَعبُدُ وَإِيّاكَ نَستَعينُ,and You alone,What is the exact Arabic word that means: and You alone?,إِيّاكَ,نَعبُدُ,وَإِيّاكَ,نَستَعينُ,C,وَإِيّاكَ,Tafsir al-Tabari only
+15,1,الفاتحة,5,إِيّاكَ نَعبُدُ وَإِيّاكَ نَستَعينُ,we ask for help,What is the exact Arabic word that means: we ask for help?,نَستَعينُ,إِيّاكَ,وَإِيّاكَ,نَعبُدُ,A,نَستَعينُ,Tafsir al-Tabari only
+16,1,الفاتحة,6,اهدِنَا الصِّراطَ المُستَقيمَ,guide us,What is the exact Arabic word that means: guide us?,المُستَقيمَ,اهدِنَا,صِراطَ,الصِّراطَ,B,اهدِنَا,Tafsir al-Tabari only
+17,1,الفاتحة,6,اهدِنَا الصِّراطَ المُستَقيمَ,the path,What is the exact Arabic word that means: the path?,المُستَقيمَ,الصِّراطَ,اهدِنَا,صِراطَ,B,الصِّراطَ,Tafsir al-Tabari only
+18,1,الفاتحة,6,اهدِنَا الصِّراطَ المُستَقيمَ,the straight,What is the exact Arabic word that means: the straight?,المُستَقيمَ,صِراطَ,الصِّراطَ,اهدِنَا,A,المُستَقيمَ,Tafsir al-Tabari only
+19,1,الفاتحة,7,صِراطَ الَّذينَ أَنعَمتَ عَلَيهِم غَيرِ المَغضوبِ عَلَيهِم وَلَا الضّالّينَ,path,What is the exact Arabic word that means: path?,الَّذينَ,أَنعَمتَ,عَلَيهِم,صِراطَ,D,صِراطَ,Tafsir al-Tabari only
+20,1,الفاتحة,7,صِراطَ الَّذينَ أَنعَمتَ عَلَيهِم غَيرِ المَغضوبِ عَلَيهِم وَلَا الضّالّينَ,those who,What is the exact Arabic word that means: those who?,صِراطَ,عَلَيهِم,الَّذينَ,أَنعَمتَ,C,الَّذينَ,Tafsir al-Tabari only
+21,93,الضحى,1,وَالضُّحىٰ,By the morning brightness,What is the exact Arabic word that means: By the morning brightness?,وَاللَّيلِ,وَالضُّحىٰ,سَجىٰ,إِذا,B,وَالضُّحىٰ,Tafsir al-Tabari only
+22,93,الضحى,2,وَاللَّيلِ إِذا سَجىٰ,and by the night,What is the exact Arabic word that means: and by the night?,سَجىٰ,وَاللَّيلِ,ما,إِذا,B,وَاللَّيلِ,Tafsir al-Tabari only
+23,93,الضحى,2,وَاللَّيلِ إِذا سَجىٰ,when,What is the exact Arabic word that means: when?,ما,إِذا,وَاللَّيلِ,سَجىٰ,B,إِذا,Tafsir al-Tabari only
+24,93,الضحى,2,وَاللَّيلِ إِذا سَجىٰ,grew still,What is the exact Arabic word that means: grew still?,ما,وَاللَّيلِ,إِذا,سَجىٰ,D,سَجىٰ,Tafsir al-Tabari only
+25,93,الضحى,3,ما وَدَّعَكَ رَبُّكَ وَما قَلىٰ,what / that which,What is the exact Arabic word that means: what / that which?,رَبُّكَ,ما,وَدَّعَكَ,وَما,B,ما,Tafsir al-Tabari only
+26,93,الضحى,3,ما وَدَّعَكَ رَبُّكَ وَما قَلىٰ,forsook you,What is the exact Arabic word that means: forsook you?,وَدَّعَكَ,وَما,رَبُّكَ,ما,A,وَدَّعَكَ,Tafsir al-Tabari only
+27,93,الضحى,3,ما وَدَّعَكَ رَبُّكَ وَما قَلىٰ,your Lord,What is the exact Arabic word that means: your Lord?,وَدَّعَكَ,رَبُّكَ,ما,وَما,B,رَبُّكَ,Tafsir al-Tabari only
+28,93,الضحى,3,ما وَدَّعَكَ رَبُّكَ وَما قَلىٰ,and not / and whatever,What is the exact Arabic word that means: and not / and whatever?,وَما,وَدَّعَكَ,ما,رَبُّكَ,A,وَما,Tafsir al-Tabari only
+29,93,الضحى,3,ما وَدَّعَكَ رَبُّكَ وَما قَلىٰ,detested,What is the exact Arabic word that means: detested?,ما,وَدَّعَكَ,رَبُّكَ,قَلىٰ,D,قَلىٰ,Tafsir al-Tabari only
+30,93,الضحى,4,وَلَلآخِرَةُ خَيرٌ لَكَ مِنَ الأولىٰ,and surely the Hereafter,What is the exact Arabic word that means: and surely the Hereafter?,مِنَ,خَيرٌ,وَلَلآخِرَةُ,لَكَ,C,وَلَلآخِرَةُ,Tafsir al-Tabari only
+31,93,الضحى,4,وَلَلآخِرَةُ خَيرٌ لَكَ مِنَ الأولىٰ,best,What is the exact Arabic word that means: best?,وَلَلآخِرَةُ,خَيرٌ,مِنَ,لَكَ,B,خَيرٌ,Tafsir al-Tabari only
+32,93,الضحى,4,وَلَلآخِرَةُ خَيرٌ لَكَ مِنَ الأولىٰ,for you,What is the exact Arabic word that means: for you?,وَلَلآخِرَةُ,خَيرٌ,مِنَ,لَكَ,D,لَكَ,Tafsir al-Tabari only
+33,93,الضحى,4,وَلَلآخِرَةُ خَيرٌ لَكَ مِنَ الأولىٰ,from,What is the exact Arabic word that means: from?,خَيرٌ,مِنَ,وَلَلآخِرَةُ,لَكَ,B,مِنَ,Tafsir al-Tabari only
+34,93,الضحى,4,وَلَلآخِرَةُ خَيرٌ لَكَ مِنَ الأولىٰ,the first life,What is the exact Arabic word that means: the first life?,خَيرٌ,لَكَ,وَلَلآخِرَةُ,الأولىٰ,D,الأولىٰ,Tafsir al-Tabari only
+35,93,الضحى,5,وَلَسَوفَ يُعطيكَ رَبُّكَ فَتَرضىٰ,and surely soon,What is the exact Arabic word that means: and surely soon?,رَبُّكَ,فَتَرضىٰ,وَلَسَوفَ,يُعطيكَ,C,وَلَسَوفَ,Tafsir al-Tabari only
+36,93,الضحى,5,وَلَسَوفَ يُعطيكَ رَبُّكَ فَتَرضىٰ,He will give you,What is the exact Arabic word that means: He will give you?,رَبُّكَ,وَلَسَوفَ,فَتَرضىٰ,يُعطيكَ,D,يُعطيكَ,Tafsir al-Tabari only
+37,93,الضحى,5,وَلَسَوفَ يُعطيكَ رَبُّكَ فَتَرضىٰ,so you will be pleased,What is the exact Arabic word that means: so you will be pleased?,وَلَسَوفَ,رَبُّكَ,يُعطيكَ,فَتَرضىٰ,D,فَتَرضىٰ,Tafsir al-Tabari only
+38,93,الضحى,6,أَلَم يَجِدكَ يَتيمًا فَآوىٰ,Did not,What is the exact Arabic word that means: Did not?,يَتيمًا,يَجِدكَ,أَلَم,فَآوىٰ,C,أَلَم,Tafsir al-Tabari only
+39,94,الشرح,1,أَلَم نَشرَح لَكَ صَدرَكَ,We expand,What is the exact Arabic word that means: We expand?,نَشرَح,لَكَ,صَدرَكَ,أَلَم,A,نَشرَح,Tafsir al-Tabari only
+40,94,الشرح,1,أَلَم نَشرَح لَكَ صَدرَكَ,your chest,What is the exact Arabic word that means: your chest?,صَدرَكَ,نَشرَح,أَلَم,لَكَ,A,صَدرَكَ,Tafsir al-Tabari only
+41,94,الشرح,2,وَوَضَعنا عَنكَ وِزرَكَ,and We removed,What is the exact Arabic word that means: and We removed?,الَّذي,وِزرَكَ,عَنكَ,وَوَضَعنا,D,وَوَضَعنا,Tafsir al-Tabari only
+42,94,الشرح,2,وَوَضَعنا عَنكَ وِزرَكَ,from you,What is the exact Arabic word that means: from you?,عَنكَ,وِزرَكَ,الَّذي,وَوَضَعنا,A,عَنكَ,Tafsir al-Tabari only
+43,94,الشرح,2,وَوَضَعنا عَنكَ وِزرَكَ,your burden,What is the exact Arabic word that means: your burden?,وِزرَكَ,وَوَضَعنا,الَّذي,عَنكَ,A,وِزرَكَ,Tafsir al-Tabari only
+44,94,الشرح,3,الَّذي أَنقَضَ ظَهرَكَ,the one who,What is the exact Arabic word that means: the one who?,ظَهرَكَ,أَنقَضَ,الَّذي,وَرَفَعنا,C,الَّذي,Tafsir al-Tabari only
+45,94,الشرح,3,الَّذي أَنقَضَ ظَهرَكَ,weighed down / cracked,What is the exact Arabic word that means: weighed down / cracked?,وَرَفَعنا,الَّذي,أَنقَضَ,ظَهرَكَ,C,أَنقَضَ,Tafsir al-Tabari only
+46,94,الشرح,3,الَّذي أَنقَضَ ظَهرَكَ,your back,What is the exact Arabic word that means: your back?,ظَهرَكَ,أَنقَضَ,وَرَفَعنا,الَّذي,A,ظَهرَكَ,Tafsir al-Tabari only
+47,94,الشرح,4,وَرَفَعنا لَكَ ذِكرَكَ,and We raised,What is the exact Arabic word that means: and We raised?,ذِكرَكَ,فَإِنَّ,لَكَ,وَرَفَعنا,D,وَرَفَعنا,Tafsir al-Tabari only
+48,94,الشرح,4,وَرَفَعنا لَكَ ذِكرَكَ,your mention,What is the exact Arabic word that means: your mention?,ذِكرَكَ,وَرَفَعنا,لَكَ,فَإِنَّ,A,ذِكرَكَ,Tafsir al-Tabari only
+49,94,الشرح,5,فَإِنَّ مَعَ العُسرِ يُسرًا,for indeed,What is the exact Arabic word that means: for indeed?,العُسرِ,يُسرًا,فَإِنَّ,مَعَ,C,فَإِنَّ,Tafsir al-Tabari only
+50,94,الشرح,5,فَإِنَّ مَعَ العُسرِ يُسرًا,with,What is the exact Arabic word that means: with?,مَعَ,العُسرِ,يُسرًا,فَإِنَّ,A,مَعَ,Tafsir al-Tabari only
+51,94,الشرح,5,فَإِنَّ مَعَ العُسرِ يُسرًا,hardship,What is the exact Arabic word that means: hardship?,مَعَ,العُسرِ,يُسرًا,فَإِنَّ,B,العُسرِ,Tafsir al-Tabari only
+52,94,الشرح,5,فَإِنَّ مَعَ العُسرِ يُسرًا,ease,What is the exact Arabic word that means: ease?,فَإِنَّ,يُسرًا,العُسرِ,مَعَ,B,يُسرًا,Tafsir al-Tabari only
+53,94,الشرح,6,إِنَّ مَعَ العُسرِ يُسرًا,indeed,What is the exact Arabic word that means: indeed?,مَعَ,يُسرًا,إِنَّ,العُسرِ,C,إِنَّ,Tafsir al-Tabari only
+54,95,التين,1,وَالتّينِ وَالزَّيتونِ,By the fig,What is the exact Arabic word that means: By the fig?,وَالتّينِ,وَالزَّيتونِ,سينينَ,وَطورِ,A,وَالتّينِ,Tafsir al-Tabari only
+55,95,التين,1,وَالتّينِ وَالزَّيتونِ,and the olive,What is the exact Arabic word that means: and the olive?,وَالتّينِ,وَالزَّيتونِ,وَطورِ,سينينَ,B,وَالزَّيتونِ,Tafsir al-Tabari only
+56,95,التين,2,وَطورِ سينينَ,and Mount,What is the exact Arabic word that means: and Mount?,سينينَ,وَهـٰذَا,البَلَدِ,وَطورِ,D,وَطورِ,Tafsir al-Tabari only
+57,95,التين,2,وَطورِ سينينَ,Sinai,What is the exact Arabic word that means: Sinai?,وَهـٰذَا,البَلَدِ,سينينَ,وَطورِ,C,سينينَ,Tafsir al-Tabari only
+58,95,التين,3,وَهـٰذَا البَلَدِ الأَمينِ,and this,What is the exact Arabic word that means: and this?,لَقَد,وَهـٰذَا,الأَمينِ,البَلَدِ,B,وَهـٰذَا,Tafsir al-Tabari only
+59,95,التين,3,وَهـٰذَا البَلَدِ الأَمينِ,the city/land,What is the exact Arabic word that means: the city/land?,البَلَدِ,وَهـٰذَا,لَقَد,الأَمينِ,A,البَلَدِ,Tafsir al-Tabari only
+60,95,التين,3,وَهـٰذَا البَلَدِ الأَمينِ,secure,What is the exact Arabic word that means: secure?,البَلَدِ,لَقَد,الأَمينِ,وَهـٰذَا,C,الأَمينِ,Tafsir al-Tabari only
+61,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,certainly,What is the exact Arabic word that means: certainly?,لَقَد,في,خَلَقنَا,الإِنسانَ,A,لَقَد,Tafsir al-Tabari only
+62,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,We created,What is the exact Arabic word that means: We created?,الإِنسانَ,خَلَقنَا,لَقَد,في,B,خَلَقنَا,Tafsir al-Tabari only
+63,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,the human being,What is the exact Arabic word that means: the human being?,لَقَد,خَلَقنَا,الإِنسانَ,في,C,الإِنسانَ,Tafsir al-Tabari only
+64,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,in,What is the exact Arabic word that means: in?,في,لَقَد,الإِنسانَ,خَلَقنَا,A,في,Tafsir al-Tabari only
+65,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,best,What is the exact Arabic word that means: best?,الإِنسانَ,خَلَقنَا,لَقَد,أَحسَنِ,D,أَحسَنِ,Tafsir al-Tabari only
+66,95,التين,4,لَقَد خَلَقنَا الإِنسانَ في أَحسَنِ تَقويمٍ,form / stature,What is the exact Arabic word that means: form / stature?,خَلَقنَا,الإِنسانَ,لَقَد,تَقويمٍ,D,تَقويمٍ,Tafsir al-Tabari only
+67,95,التين,5,ثُمَّ رَدَدناهُ أَسفَلَ سافِلينَ,then,What is the exact Arabic word that means: then?,ثُمَّ,أَسفَلَ,سافِلينَ,رَدَدناهُ,A,ثُمَّ,Tafsir al-Tabari only
+68,95,التين,5,ثُمَّ رَدَدناهُ أَسفَلَ سافِلينَ,We returned him,What is the exact Arabic word that means: We returned him?,ثُمَّ,رَدَدناهُ,أَسفَلَ,سافِلينَ,B,رَدَدناهُ,Tafsir al-Tabari only
+69,95,التين,5,ثُمَّ رَدَدناهُ أَسفَلَ سافِلينَ,lowest,What is the exact Arabic word that means: lowest?,رَدَدناهُ,ثُمَّ,سافِلينَ,أَسفَلَ,D,أَسفَلَ,Tafsir al-Tabari only
+70,95,التين,5,ثُمَّ رَدَدناهُ أَسفَلَ سافِلينَ,of the low,What is the exact Arabic word that means: of the low?,أَسفَلَ,رَدَدناهُ,سافِلينَ,ثُمَّ,C,سافِلينَ,Tafsir al-Tabari only
+71,95,التين,6,إِلَّا الَّذينَ آمَنوا وَعَمِلُوا الصّالِحاتِ فَلَهُم أَجرٌ غَيرُ مَمنونٍ,except,What is the exact Arabic word that means: except?,آمَنوا,إِلَّا,الَّذينَ,وَعَمِلُوا,B,إِلَّا,Tafsir al-Tabari only
+72,96,العلق,1,اقرَأ بِاسمِ رَبِّكَ الَّذي خَلَقَ,Read,What is the exact Arabic word that means: Read?,الَّذي,اقرَأ,بِاسمِ,رَبِّكَ,B,اقرَأ,Tafsir al-Tabari only
+73,96,العلق,1,اقرَأ بِاسمِ رَبِّكَ الَّذي خَلَقَ,in the name of,What is the exact Arabic word that means: in the name of?,الَّذي,اقرَأ,بِاسمِ,رَبِّكَ,C,بِاسمِ,Tafsir al-Tabari only
+74,96,العلق,1,اقرَأ بِاسمِ رَبِّكَ الَّذي خَلَقَ,created,What is the exact Arabic word that means: created?,خَلَقَ,اقرَأ,بِاسمِ,رَبِّكَ,A,خَلَقَ,Tafsir al-Tabari only
+75,96,العلق,2,خَلَقَ الإِنسانَ مِن عَلَقٍ,clinging substance,What is the exact Arabic word that means: clinging substance?,مِن,عَلَقٍ,الإِنسانَ,خَلَقَ,B,عَلَقٍ,Tafsir al-Tabari only
+76,96,العلق,3,اقرَأ وَرَبُّكَ الأَكرَمُ,and your Lord,What is the exact Arabic word that means: and your Lord?,الأَكرَمُ,وَرَبُّكَ,الَّذي,اقرَأ,B,وَرَبُّكَ,Tafsir al-Tabari only
+77,96,العلق,3,اقرَأ وَرَبُّكَ الأَكرَمُ,the Most Generous,What is the exact Arabic word that means: the Most Generous?,وَرَبُّكَ,الَّذي,الأَكرَمُ,اقرَأ,C,الأَكرَمُ,Tafsir al-Tabari only
+78,96,العلق,4,الَّذي عَلَّمَ بِالقَلَمِ,taught,What is the exact Arabic word that means: taught?,الَّذي,الإِنسانَ,بِالقَلَمِ,عَلَّمَ,D,عَلَّمَ,Tafsir al-Tabari only
+79,96,العلق,4,الَّذي عَلَّمَ بِالقَلَمِ,by the pen,What is the exact Arabic word that means: by the pen?,الإِنسانَ,الَّذي,بِالقَلَمِ,عَلَّمَ,C,بِالقَلَمِ,Tafsir al-Tabari only
+80,96,العلق,5,عَلَّمَ الإِنسانَ ما لَم يَعلَم,did not,What is the exact Arabic word that means: did not?,ما,عَلَّمَ,لَم,الإِنسانَ,C,لَم,Tafsir al-Tabari only
+81,96,العلق,5,عَلَّمَ الإِنسانَ ما لَم يَعلَم,knows / يعلم,What is the exact Arabic word that means: knows / يعلم?,عَلَّمَ,ما,الإِنسانَ,يَعلَم,D,يَعلَم,Tafsir al-Tabari only
+82,96,العلق,6,كَلّا إِنَّ الإِنسانَ لَيَطغىٰ,No indeed,What is the exact Arabic word that means: No indeed?,إِنَّ,كَلّا,الإِنسانَ,لَيَطغىٰ,B,كَلّا,Tafsir al-Tabari only
+83,96,العلق,6,كَلّا إِنَّ الإِنسانَ لَيَطغىٰ,to transgress,What is the exact Arabic word that means: to transgress?,الإِنسانَ,لَيَطغىٰ,كَلّا,إِنَّ,B,لَيَطغىٰ,Tafsir al-Tabari only
+84,96,العلق,7,أَن رَآهُ استَغنىٰ,sees himself,What is the exact Arabic word that means: sees himself?,رَآهُ,إِنَّ,أَن,استَغنىٰ,A,رَآهُ,Tafsir al-Tabari only
+85,96,العلق,7,أَن رَآهُ استَغنىٰ,self-sufficient,What is the exact Arabic word that means: self-sufficient?,رَآهُ,استَغنىٰ,أَن,إِنَّ,B,استَغنىٰ,Tafsir al-Tabari only
+86,96,العلق,8,إِنَّ إِلىٰ رَبِّكَ الرُّجعىٰ,to,What is the exact Arabic word that means: to?,رَبِّكَ,إِنَّ,الرُّجعىٰ,إِلىٰ,D,إِلىٰ,Tafsir al-Tabari only
+87,96,العلق,8,إِنَّ إِلىٰ رَبِّكَ الرُّجعىٰ,the return,What is the exact Arabic word that means: the return?,إِلىٰ,الرُّجعىٰ,رَبِّكَ,إِنَّ,B,الرُّجعىٰ,Tafsir al-Tabari only
+88,96,العلق,9,أَرَأَيتَ الَّذي يَنهىٰ,Have you seen,What is the exact Arabic word that means: Have you seen?,أَرَأَيتَ,عَبدًا,الَّذي,يَنهىٰ,A,أَرَأَيتَ,Tafsir al-Tabari only
+89,96,العلق,9,أَرَأَيتَ الَّذي يَنهىٰ,forbids,What is the exact Arabic word that means: forbids?,عَبدًا,أَرَأَيتَ,يَنهىٰ,الَّذي,C,يَنهىٰ,Tafsir al-Tabari only
+90,96,العلق,10,عَبدًا إِذا صَلّىٰ,a servant,What is the exact Arabic word that means: a servant?,عَبدًا,إِذا,أَرَأَيتَ,صَلّىٰ,A,عَبدًا,Tafsir al-Tabari only
+91,96,العلق,10,عَبدًا إِذا صَلّىٰ,prayed,What is the exact Arabic word that means: prayed?,صَلّىٰ,أَرَأَيتَ,إِذا,عَبدًا,A,صَلّىٰ,Tafsir al-Tabari only
+92,97,القدر,1,إِنّا أَنزَلناهُ في لَيلَةِ القَدرِ,indeed We,What is the exact Arabic word that means: indeed We?,إِنّا,في,أَنزَلناهُ,لَيلَةِ,A,إِنّا,Tafsir al-Tabari only
+93,97,القدر,1,إِنّا أَنزَلناهُ في لَيلَةِ القَدرِ,We sent it down,What is the exact Arabic word that means: We sent it down?,إِنّا,لَيلَةِ,أَنزَلناهُ,في,C,أَنزَلناهُ,Tafsir al-Tabari only
+94,97,القدر,1,إِنّا أَنزَلناهُ في لَيلَةِ القَدرِ,night,What is the exact Arabic word that means: night?,إِنّا,لَيلَةِ,في,أَنزَلناهُ,B,لَيلَةِ,Tafsir al-Tabari only
+95,97,القدر,1,إِنّا أَنزَلناهُ في لَيلَةِ القَدرِ,decree / destiny,What is the exact Arabic word that means: decree / destiny?,في,إِنّا,أَنزَلناهُ,القَدرِ,D,القَدرِ,Tafsir al-Tabari only
+96,97,القدر,2,وَما أَدراكَ ما لَيلَةُ القَدرِ,made you know,What is the exact Arabic word that means: made you know?,لَيلَةُ,أَدراكَ,ما,وَما,B,أَدراكَ,Tafsir al-Tabari only
+97,97,القدر,3,لَيلَةُ القَدرِ خَيرٌ مِن أَلفِ شَهرٍ,a thousand,What is the exact Arabic word that means: a thousand?,القَدرِ,أَلفِ,خَيرٌ,لَيلَةُ,B,أَلفِ,Tafsir al-Tabari only
+98,97,القدر,3,لَيلَةُ القَدرِ خَيرٌ مِن أَلفِ شَهرٍ,month,What is the exact Arabic word that means: month?,شَهرٍ,القَدرِ,لَيلَةُ,خَيرٌ,A,شَهرٍ,Tafsir al-Tabari only
+99,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,descend,What is the exact Arabic word that means: descend?,فيها,وَالرّوحُ,تَنَزَّلُ,المَلائِكَةُ,C,تَنَزَّلُ,Tafsir al-Tabari only
+100,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,the angels,What is the exact Arabic word that means: the angels?,المَلائِكَةُ,وَالرّوحُ,تَنَزَّلُ,فيها,A,المَلائِكَةُ,Tafsir al-Tabari only
+101,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,and the Spirit,What is the exact Arabic word that means: and the Spirit?,المَلائِكَةُ,تَنَزَّلُ,وَالرّوحُ,فيها,C,وَالرّوحُ,Tafsir al-Tabari only
+102,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,in it,What is the exact Arabic word that means: in it?,المَلائِكَةُ,تَنَزَّلُ,فيها,وَالرّوحُ,C,فيها,Tafsir al-Tabari only
+103,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,by permission,What is the exact Arabic word that means: by permission?,وَالرّوحُ,تَنَزَّلُ,بِإِذنِ,المَلائِكَةُ,C,بِإِذنِ,Tafsir al-Tabari only
+104,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,their Lord,What is the exact Arabic word that means: their Lord?,المَلائِكَةُ,رَبِّهِم,وَالرّوحُ,تَنَزَّلُ,B,رَبِّهِم,Tafsir al-Tabari only
+105,97,القدر,4,تَنَزَّلُ المَلائِكَةُ وَالرّوحُ فيها بِإِذنِ رَبِّهِم مِن كُلِّ أَمرٍ,every,What is the exact Arabic word that means: every?,كُلِّ,تَنَزَّلُ,المَلائِكَةُ,وَالرّوحُ,A,كُلِّ,Tafsir al-Tabari only
+106,97,القدر,5,سَلامٌ هِيَ حَتّىٰ مَطلَعِ الفَجرِ,peace,What is the exact Arabic word that means: peace?,سَلامٌ,حَتّىٰ,هِيَ,مَطلَعِ,A,سَلامٌ,Tafsir al-Tabari only
+107,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,be,What is the exact Arabic word that means: be?,كَفَروا,لَم,الَّذينَ,يَكُنِ,D,يَكُنِ,Tafsir al-Tabari only
+108,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,disbelieved,What is the exact Arabic word that means: disbelieved?,كَفَروا,يَكُنِ,الَّذينَ,لَم,A,كَفَروا,Tafsir al-Tabari only
+109,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,people / أهل,What is the exact Arabic word that means: people / أهل?,يَكُنِ,أَهلِ,لَم,الَّذينَ,B,أَهلِ,Tafsir al-Tabari only
+110,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,the Scripture,What is the exact Arabic word that means: the Scripture?,الكِتابِ,يَكُنِ,لَم,الَّذينَ,A,الكِتابِ,Tafsir al-Tabari only
+111,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,and the polytheists,What is the exact Arabic word that means: and the polytheists?,لَم,وَالمُشرِكينَ,الَّذينَ,يَكُنِ,B,وَالمُشرِكينَ,Tafsir al-Tabari only
+112,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,ceasing / separated,What is the exact Arabic word that means: ceasing / separated?,يَكُنِ,لَم,الَّذينَ,مُنفَكّينَ,D,مُنفَكّينَ,Tafsir al-Tabari only
+113,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,comes to them,What is the exact Arabic word that means: comes to them?,يَكُنِ,الَّذينَ,تَأتِيَهُمُ,لَم,C,تَأتِيَهُمُ,Tafsir al-Tabari only
+114,98,البينة,1,لَم يَكُنِ الَّذينَ كَفَروا مِن أَهلِ الكِتابِ وَالمُشرِكينَ مُنفَكّينَ حَتّىٰ تَأتِيَهُمُ البَيِّنَةُ,the clear proof,What is the exact Arabic word that means: the clear proof?,الَّذينَ,البَيِّنَةُ,يَكُنِ,لَم,B,البَيِّنَةُ,Tafsir al-Tabari only
+115,98,البينة,2,رَسولٌ مِنَ اللَّهِ يَتلو صُحُفًا مُطَهَّرَةً,messenger,What is the exact Arabic word that means: messenger?,اللَّهِ,يَتلو,مِنَ,رَسولٌ,D,رَسولٌ,Tafsir al-Tabari only
+116,98,البينة,2,رَسولٌ مِنَ اللَّهِ يَتلو صُحُفًا مُطَهَّرَةً,reciting,What is the exact Arabic word that means: reciting?,يَتلو,رَسولٌ,مِنَ,اللَّهِ,A,يَتلو,Tafsir al-Tabari only
+117,98,البينة,2,رَسولٌ مِنَ اللَّهِ يَتلو صُحُفًا مُطَهَّرَةً,pages / scriptures,What is the exact Arabic word that means: pages / scriptures?,مِنَ,صُحُفًا,رَسولٌ,اللَّهِ,B,صُحُفًا,Tafsir al-Tabari only
+118,98,البينة,2,رَسولٌ مِنَ اللَّهِ يَتلو صُحُفًا مُطَهَّرَةً,purified,What is the exact Arabic word that means: purified?,مُطَهَّرَةً,اللَّهِ,مِنَ,رَسولٌ,A,مُطَهَّرَةً,Tafsir al-Tabari only
+119,98,البينة,3,فيها كُتُبٌ قَيِّمَةٌ,writings,What is the exact Arabic word that means: writings?,كُتُبٌ,وَما,فيها,قَيِّمَةٌ,A,كُتُبٌ,Tafsir al-Tabari only
+120,98,البينة,3,فيها كُتُبٌ قَيِّمَةٌ,upright / correct,What is the exact Arabic word that means: upright / correct?,وَما,فيها,قَيِّمَةٌ,كُتُبٌ,C,قَيِّمَةٌ,Tafsir al-Tabari only
+121,98,البينة,4,وَما تَفَرَّقَ الَّذينَ أوتُوا الكِتابَ إِلّا مِن بَعدِ ما جاءَتهُمُ البَيِّنَةُ,split apart,What is the exact Arabic word that means: split apart?,وَما,تَفَرَّقَ,أوتُوا,الَّذينَ,B,تَفَرَّقَ,Tafsir al-Tabari only
+122,98,البينة,4,وَما تَفَرَّقَ الَّذينَ أوتُوا الكِتابَ إِلّا مِن بَعدِ ما جاءَتهُمُ البَيِّنَةُ,were given,What is the exact Arabic word that means: were given?,تَفَرَّقَ,وَما,الَّذينَ,أوتُوا,D,أوتُوا,Tafsir al-Tabari only
+123,98,البينة,4,وَما تَفَرَّقَ الَّذينَ أوتُوا الكِتابَ إِلّا مِن بَعدِ ما جاءَتهُمُ البَيِّنَةُ,came to them,What is the exact Arabic word that means: came to them?,تَفَرَّقَ,جاءَتهُمُ,وَما,الَّذينَ,B,جاءَتهُمُ,Tafsir al-Tabari only
+124,98,البينة,5,وَما أُمِروا إِلّا لِيَعبُدُوا اللَّهَ مُخلِصينَ لَهُ الدّينَ حُنَفاءَ وَيُقيمُوا الصَّلاةَ وَيُؤتُوا الزَّكاةَ ۚ وَذٰلِكَ دينُ القَيِّمَةِ,they were commanded,What is the exact Arabic word that means: they were commanded?,لِيَعبُدُوا,إِلّا,وَما,أُمِروا,D,أُمِروا,Tafsir al-Tabari only
+125,98,البينة,5,وَما أُمِروا إِلّا لِيَعبُدُوا اللَّهَ مُخلِصينَ لَهُ الدّينَ حُنَفاءَ وَيُقيمُوا الصَّلاةَ وَيُؤتُوا الزَّكاةَ ۚ وَذٰلِكَ دينُ القَيِّمَةِ,to worship,What is the exact Arabic word that means: to worship?,إِلّا,لِيَعبُدُوا,وَما,أُمِروا,B,لِيَعبُدُوا,Tafsir al-Tabari only
+126,99,الزلزلة,1,إِذا زُلزِلَتِ الأَرضُ زِلزالَها,was shaken,What is the exact Arabic word that means: was shaken?,زُلزِلَتِ,إِذا,الأَرضُ,زِلزالَها,A,زُلزِلَتِ,Tafsir al-Tabari only
+127,99,الزلزلة,1,إِذا زُلزِلَتِ الأَرضُ زِلزالَها,the earth,What is the exact Arabic word that means: the earth?,الأَرضُ,زِلزالَها,إِذا,زُلزِلَتِ,A,الأَرضُ,Tafsir al-Tabari only
+128,99,الزلزلة,1,إِذا زُلزِلَتِ الأَرضُ زِلزالَها,its quake,What is the exact Arabic word that means: its quake?,إِذا,الأَرضُ,زُلزِلَتِ,زِلزالَها,D,زِلزالَها,Tafsir al-Tabari only
+129,99,الزلزلة,2,وَأَخرَجَتِ الأَرضُ أَثقالَها,and brought out,What is the exact Arabic word that means: and brought out?,وَأَخرَجَتِ,وَقالَ,أَثقالَها,الأَرضُ,A,وَأَخرَجَتِ,Tafsir al-Tabari only
+130,99,الزلزلة,2,وَأَخرَجَتِ الأَرضُ أَثقالَها,its burdens,What is the exact Arabic word that means: its burdens?,وَأَخرَجَتِ,الأَرضُ,وَقالَ,أَثقالَها,D,أَثقالَها,Tafsir al-Tabari only
+131,99,الزلزلة,3,وَقالَ الإِنسانُ ما لَها,said,What is the exact Arabic word that means: said?,لَها,ما,وَقالَ,الإِنسانُ,C,وَقالَ,Tafsir al-Tabari only
+132,99,الزلزلة,3,وَقالَ الإِنسانُ ما لَها,for it,What is the exact Arabic word that means: for it?,وَقالَ,لَها,ما,الإِنسانُ,B,لَها,Tafsir al-Tabari only
+133,99,الزلزلة,4,يَومَئِذٍ تُحَدِّثُ أَخبارَها,that Day,What is the exact Arabic word that means: that Day?,بِأَنَّ,أَخبارَها,يَومَئِذٍ,تُحَدِّثُ,C,يَومَئِذٍ,Tafsir al-Tabari only
+134,99,الزلزلة,4,يَومَئِذٍ تُحَدِّثُ أَخبارَها,its أخبار / news,What is the exact Arabic word that means: its أخبار / news?,يَومَئِذٍ,تُحَدِّثُ,أَخبارَها,بِأَنَّ,C,أَخبارَها,Tafsir al-Tabari only
+135,99,الزلزلة,5,بِأَنَّ رَبَّكَ أَوحىٰ لَها,inspired,What is the exact Arabic word that means: inspired?,رَبَّكَ,بِأَنَّ,لَها,أَوحىٰ,D,أَوحىٰ,Tafsir al-Tabari only
+136,99,الزلزلة,6,يَومَئِذٍ يَصدُرُ النّاسُ أَشتاتًا لِيُرَوا أَعمالَهُم,will depart,What is the exact Arabic word that means: will depart?,النّاسُ,يَومَئِذٍ,أَشتاتًا,يَصدُرُ,D,يَصدُرُ,Tafsir al-Tabari only
+137,99,الزلزلة,6,يَومَئِذٍ يَصدُرُ النّاسُ أَشتاتًا لِيُرَوا أَعمالَهُم,people / mankind,What is the exact Arabic word that means: people / mankind?,النّاسُ,يَصدُرُ,يَومَئِذٍ,أَشتاتًا,A,النّاسُ,Tafsir al-Tabari only
+138,99,الزلزلة,6,يَومَئِذٍ يَصدُرُ النّاسُ أَشتاتًا لِيُرَوا أَعمالَهُم,scattered groups,What is the exact Arabic word that means: scattered groups?,يَصدُرُ,أَشتاتًا,النّاسُ,يَومَئِذٍ,B,أَشتاتًا,Tafsir al-Tabari only
+139,99,الزلزلة,6,يَومَئِذٍ يَصدُرُ النّاسُ أَشتاتًا لِيُرَوا أَعمالَهُم,to be shown,What is the exact Arabic word that means: to be shown?,لِيُرَوا,يَومَئِذٍ,يَصدُرُ,النّاسُ,A,لِيُرَوا,Tafsir al-Tabari only
+140,99,الزلزلة,6,يَومَئِذٍ يَصدُرُ النّاسُ أَشتاتًا لِيُرَوا أَعمالَهُم,their deeds,What is the exact Arabic word that means: their deeds?,يَومَئِذٍ,يَصدُرُ,أَعمالَهُم,النّاسُ,C,أَعمالَهُم,Tafsir al-Tabari only
+141,100,العاديات,1,وَالعادِياتِ ضَبحًا,By the chargers,What is the exact Arabic word that means: By the chargers?,وَالعادِياتِ,فَالمورِياتِ,قَدحًا,ضَبحًا,A,وَالعادِياتِ,Tafsir al-Tabari only
+142,100,العاديات,1,وَالعادِياتِ ضَبحًا,panting,What is the exact Arabic word that means: panting?,وَالعادِياتِ,فَالمورِياتِ,ضَبحًا,قَدحًا,C,ضَبحًا,Tafsir al-Tabari only
+143,100,العاديات,2,فَالمورِياتِ قَدحًا,then striking sparks,What is the exact Arabic word that means: then striking sparks?,قَدحًا,فَالمورِياتِ,فَالمُغيراتِ,صُبحًا,B,فَالمورِياتِ,Tafsir al-Tabari only
+144,100,العاديات,2,فَالمورِياتِ قَدحًا,sparking,What is the exact Arabic word that means: sparking?,صُبحًا,قَدحًا,فَالمورِياتِ,فَالمُغيراتِ,B,قَدحًا,Tafsir al-Tabari only
+145,100,العاديات,3,فَالمُغيراتِ صُبحًا,then raiding,What is the exact Arabic word that means: then raiding?,فَأَثَرنَ,صُبحًا,بِهِ,فَالمُغيراتِ,D,فَالمُغيراتِ,Tafsir al-Tabari only
+146,100,العاديات,3,فَالمُغيراتِ صُبحًا,at dawn,What is the exact Arabic word that means: at dawn?,صُبحًا,فَالمُغيراتِ,فَأَثَرنَ,بِهِ,A,صُبحًا,Tafsir al-Tabari only
+147,100,العاديات,4,فَأَثَرنَ بِهِ نَقعًا,then they stirred up,What is the exact Arabic word that means: then they stirred up?,فَأَثَرنَ,بِهِ,نَقعًا,فَوَسَطنَ,A,فَأَثَرنَ,Tafsir al-Tabari only
+148,100,العاديات,4,فَأَثَرنَ بِهِ نَقعًا,with it / by it,What is the exact Arabic word that means: with it / by it?,فَأَثَرنَ,نَقعًا,فَوَسَطنَ,بِهِ,D,بِهِ,Tafsir al-Tabari only
+149,100,العاديات,4,فَأَثَرنَ بِهِ نَقعًا,dust,What is the exact Arabic word that means: dust?,فَأَثَرنَ,فَوَسَطنَ,بِهِ,نَقعًا,D,نَقعًا,Tafsir al-Tabari only
+150,100,العاديات,5,فَوَسَطنَ بِهِ جَمعًا,then they reached the midst,What is the exact Arabic word that means: then they reached the midst?,بِهِ,فَوَسَطنَ,إِنَّ,جَمعًا,B,فَوَسَطنَ,Tafsir al-Tabari only
+151,100,العاديات,5,فَوَسَطنَ بِهِ جَمعًا,a جمع / host,What is the exact Arabic word that means: a جمع / host?,جَمعًا,فَوَسَطنَ,إِنَّ,بِهِ,A,جَمعًا,Tafsir al-Tabari only
+152,100,العاديات,6,إِنَّ الإِنسانَ لِرَبِّهِ لَكَنودٌ,to his Lord,What is the exact Arabic word that means: to his Lord?,إِنَّ,الإِنسانَ,لِرَبِّهِ,لَكَنودٌ,C,لِرَبِّهِ,Tafsir al-Tabari only
+153,100,العاديات,6,إِنَّ الإِنسانَ لِرَبِّهِ لَكَنودٌ,ungrateful,What is the exact Arabic word that means: ungrateful?,لِرَبِّهِ,الإِنسانَ,لَكَنودٌ,إِنَّ,C,لَكَنودٌ,Tafsir al-Tabari only
+154,100,العاديات,7,وَإِنَّهُ عَلىٰ ذٰلِكَ لَشَهيدٌ,and indeed he,What is the exact Arabic word that means: and indeed he?,وَإِنَّهُ,لَشَهيدٌ,عَلىٰ,ذٰلِكَ,A,وَإِنَّهُ,Tafsir al-Tabari only
+155,100,العاديات,7,وَإِنَّهُ عَلىٰ ذٰلِكَ لَشَهيدٌ,surely a witness,What is the exact Arabic word that means: surely a witness?,عَلىٰ,ذٰلِكَ,لَشَهيدٌ,وَإِنَّهُ,C,لَشَهيدٌ,Tafsir al-Tabari only
+156,101,القارعة,1,القارِعَةُ,the Striking Calamity,What is the exact Arabic word that means: the Striking Calamity?,وَما,مَا,أَدراكَ,القارِعَةُ,D,القارِعَةُ,Tafsir al-Tabari only
+157,101,القارعة,4,يَومَ يَكونُ النّاسُ كَالفَراشِ المَبثوثِ,will be,What is the exact Arabic word that means: will be?,كَالفَراشِ,يَومَ,النّاسُ,يَكونُ,D,يَكونُ,Tafsir al-Tabari only
+158,101,القارعة,4,يَومَ يَكونُ النّاسُ كَالفَراشِ المَبثوثِ,like moths,What is the exact Arabic word that means: like moths?,يَومَ,النّاسُ,يَكونُ,كَالفَراشِ,D,كَالفَراشِ,Tafsir al-Tabari only
+159,101,القارعة,4,يَومَ يَكونُ النّاسُ كَالفَراشِ المَبثوثِ,scattered,What is the exact Arabic word that means: scattered?,المَبثوثِ,النّاسُ,يَومَ,يَكونُ,A,المَبثوثِ,Tafsir al-Tabari only
+160,101,القارعة,5,وَتَكونُ الجِبالُ كَالعِهنِ المَنفوشِ,and will become,What is the exact Arabic word that means: and will become?,المَنفوشِ,وَتَكونُ,كَالعِهنِ,الجِبالُ,B,وَتَكونُ,Tafsir al-Tabari only
+161,101,القارعة,5,وَتَكونُ الجِبالُ كَالعِهنِ المَنفوشِ,the mountains,What is the exact Arabic word that means: the mountains?,وَتَكونُ,الجِبالُ,المَنفوشِ,كَالعِهنِ,B,الجِبالُ,Tafsir al-Tabari only
+162,101,القارعة,5,وَتَكونُ الجِبالُ كَالعِهنِ المَنفوشِ,like wool,What is the exact Arabic word that means: like wool?,الجِبالُ,كَالعِهنِ,المَنفوشِ,وَتَكونُ,B,كَالعِهنِ,Tafsir al-Tabari only
+163,101,القارعة,5,وَتَكونُ الجِبالُ كَالعِهنِ المَنفوشِ,fluffed / carded,What is the exact Arabic word that means: fluffed / carded?,كَالعِهنِ,المَنفوشِ,الجِبالُ,وَتَكونُ,B,المَنفوشِ,Tafsir al-Tabari only
+164,101,القارعة,6,فَأَمّا مَن ثَقُلَت مَوازينُهُ,were heavy,What is the exact Arabic word that means: were heavy?,فَأَمّا,مَن,مَوازينُهُ,ثَقُلَت,D,ثَقُلَت,Tafsir al-Tabari only
+165,101,القارعة,6,فَأَمّا مَن ثَقُلَت مَوازينُهُ,his scales,What is the exact Arabic word that means: his scales?,فَأَمّا,مَن,ثَقُلَت,مَوازينُهُ,D,مَوازينُهُ,Tafsir al-Tabari only
+166,101,القارعة,7,فَهُوَ في عيشَةٍ راضِيَةٍ,then he is,What is the exact Arabic word that means: then he is?,راضِيَةٍ,عيشَةٍ,في,فَهُوَ,D,فَهُوَ,Tafsir al-Tabari only
+167,101,القارعة,7,فَهُوَ في عيشَةٍ راضِيَةٍ,a life,What is the exact Arabic word that means: a life?,راضِيَةٍ,فَهُوَ,في,عيشَةٍ,D,عيشَةٍ,Tafsir al-Tabari only
+168,101,القارعة,7,فَهُوَ في عيشَةٍ راضِيَةٍ,pleasant,What is the exact Arabic word that means: pleasant?,فَهُوَ,في,راضِيَةٍ,عيشَةٍ,C,راضِيَةٍ,Tafsir al-Tabari only
+169,101,القارعة,8,وَأَمّا مَن خَفَّت مَوازينُهُ,were light,What is the exact Arabic word that means: were light?,وَأَمّا,مَوازينُهُ,خَفَّت,مَن,C,خَفَّت,Tafsir al-Tabari only
+170,101,القارعة,9,فَأُمُّهُ هاوِيَةٌ,his abode,What is the exact Arabic word that means: his abode?,فَأُمُّهُ,وَما,أَدراكَ,هاوِيَةٌ,A,فَأُمُّهُ,Tafsir al-Tabari only
+171,102,التكاثر,1,أَلهاكُمُ التَّكاثُرُ,distracted you,What is the exact Arabic word that means: distracted you?,التَّكاثُرُ,زُرتُمُ,أَلهاكُمُ,حَتّىٰ,C,أَلهاكُمُ,Tafsir al-Tabari only
+172,102,التكاثر,1,أَلهاكُمُ التَّكاثُرُ,rivalry in increase,What is the exact Arabic word that means: rivalry in increase?,حَتّىٰ,أَلهاكُمُ,التَّكاثُرُ,زُرتُمُ,C,التَّكاثُرُ,Tafsir al-Tabari only
+173,102,التكاثر,2,حَتّىٰ زُرتُمُ المَقابِرَ,you visited,What is the exact Arabic word that means: you visited?,زُرتُمُ,كَلّا,حَتّىٰ,المَقابِرَ,A,زُرتُمُ,Tafsir al-Tabari only
+174,102,التكاثر,2,حَتّىٰ زُرتُمُ المَقابِرَ,the graves,What is the exact Arabic word that means: the graves?,زُرتُمُ,حَتّىٰ,كَلّا,المَقابِرَ,D,المَقابِرَ,Tafsir al-Tabari only
+175,102,التكاثر,3,كَلّا سَوفَ تَعلَمونَ,soon,What is the exact Arabic word that means: soon?,ثُمَّ,سَوفَ,كَلّا,تَعلَمونَ,B,سَوفَ,Tafsir al-Tabari only
+176,102,التكاثر,3,كَلّا سَوفَ تَعلَمونَ,you will know,What is the exact Arabic word that means: you will know?,كَلّا,ثُمَّ,سَوفَ,تَعلَمونَ,D,تَعلَمونَ,Tafsir al-Tabari only
+177,102,التكاثر,5,كَلّا لَو تَعلَمونَ عِلمَ اليَقينِ,if only,What is the exact Arabic word that means: if only?,تَعلَمونَ,عِلمَ,كَلّا,لَو,D,لَو,Tafsir al-Tabari only
+178,102,التكاثر,5,كَلّا لَو تَعلَمونَ عِلمَ اليَقينِ,certainty,What is the exact Arabic word that means: certainty?,تَعلَمونَ,كَلّا,لَو,اليَقينِ,D,اليَقينِ,Tafsir al-Tabari only
+179,102,التكاثر,6,لَتَرَوُنَّ الجَحيمَ,you will surely see,What is the exact Arabic word that means: you will surely see?,لَتَرَوُنَّها,الجَحيمَ,ثُمَّ,لَتَرَوُنَّ,D,لَتَرَوُنَّ,Tafsir al-Tabari only
+180,102,التكاثر,6,لَتَرَوُنَّ الجَحيمَ,the Blaze,What is the exact Arabic word that means: the Blaze?,لَتَرَوُنَّ,الجَحيمَ,ثُمَّ,لَتَرَوُنَّها,B,الجَحيمَ,Tafsir al-Tabari only
+181,102,التكاثر,7,ثُمَّ لَتَرَوُنَّها عَينَ اليَقينِ,you will surely see it,What is the exact Arabic word that means: you will surely see it?,عَينَ,ثُمَّ,اليَقينِ,لَتَرَوُنَّها,D,لَتَرَوُنَّها,Tafsir al-Tabari only
+182,102,التكاثر,7,ثُمَّ لَتَرَوُنَّها عَينَ اليَقينِ,eye,What is the exact Arabic word that means: eye?,اليَقينِ,لَتَرَوُنَّها,ثُمَّ,عَينَ,D,عَينَ,Tafsir al-Tabari only
+183,103,العصر,1,وَالعَصرِ,By time,What is the exact Arabic word that means: By time?,لَفي,إِنَّ,الإِنسانَ,وَالعَصرِ,D,وَالعَصرِ,Tafsir al-Tabari only
+184,103,العصر,2,إِنَّ الإِنسانَ لَفي خُسرٍ,surely in,What is the exact Arabic word that means: surely in?,إِنَّ,خُسرٍ,الإِنسانَ,لَفي,D,لَفي,Tafsir al-Tabari only
+185,103,العصر,2,إِنَّ الإِنسانَ لَفي خُسرٍ,loss,What is the exact Arabic word that means: loss?,لَفي,إِنَّ,خُسرٍ,الإِنسانَ,C,خُسرٍ,Tafsir al-Tabari only
+186,103,العصر,3,إِلَّا الَّذينَ آمَنوا وَعَمِلُوا الصّالِحاتِ وَتَواصَوا بِالحَقِّ وَتَواصَوا بِالصَّبرِ,and they urged one another,What is the exact Arabic word that means: and they urged one another?,آمَنوا,وَتَواصَوا,الَّذينَ,إِلَّا,B,وَتَواصَوا,Tafsir al-Tabari only
+187,103,العصر,3,إِلَّا الَّذينَ آمَنوا وَعَمِلُوا الصّالِحاتِ وَتَواصَوا بِالحَقِّ وَتَواصَوا بِالصَّبرِ,to the truth,What is the exact Arabic word that means: to the truth?,بِالحَقِّ,الَّذينَ,آمَنوا,إِلَّا,A,بِالحَقِّ,Tafsir al-Tabari only
+188,103,العصر,3,إِلَّا الَّذينَ آمَنوا وَعَمِلُوا الصّالِحاتِ وَتَواصَوا بِالحَقِّ وَتَواصَوا بِالصَّبرِ,to patience,What is the exact Arabic word that means: to patience?,آمَنوا,إِلَّا,بِالصَّبرِ,الَّذينَ,C,بِالصَّبرِ,Tafsir al-Tabari only
+189,104,الهمزة,1,وَيلٌ لِكُلِّ هُمَزَةٍ لُمَزَةٍ,woe,What is the exact Arabic word that means: woe?,وَيلٌ,لُمَزَةٍ,هُمَزَةٍ,لِكُلِّ,A,وَيلٌ,Tafsir al-Tabari only
+190,104,الهمزة,1,وَيلٌ لِكُلِّ هُمَزَةٍ لُمَزَةٍ,for every,What is the exact Arabic word that means: for every?,لِكُلِّ,هُمَزَةٍ,وَيلٌ,لُمَزَةٍ,A,لِكُلِّ,Tafsir al-Tabari only
+191,104,الهمزة,1,وَيلٌ لِكُلِّ هُمَزَةٍ لُمَزَةٍ,backbiter,What is the exact Arabic word that means: backbiter?,وَيلٌ,هُمَزَةٍ,لِكُلِّ,لُمَزَةٍ,B,هُمَزَةٍ,Tafsir al-Tabari only
+192,104,الهمزة,1,وَيلٌ لِكُلِّ هُمَزَةٍ لُمَزَةٍ,slanderer,What is the exact Arabic word that means: slanderer?,وَيلٌ,لُمَزَةٍ,لِكُلِّ,هُمَزَةٍ,B,لُمَزَةٍ,Tafsir al-Tabari only
+193,104,الهمزة,2,الَّذي جَمَعَ مالًا وَعَدَّدَهُ,gathered,What is the exact Arabic word that means: gathered?,وَعَدَّدَهُ,جَمَعَ,مالًا,الَّذي,B,جَمَعَ,Tafsir al-Tabari only
+194,104,الهمزة,2,الَّذي جَمَعَ مالًا وَعَدَّدَهُ,wealth,What is the exact Arabic word that means: wealth?,وَعَدَّدَهُ,مالًا,جَمَعَ,الَّذي,B,مالًا,Tafsir al-Tabari only
+195,104,الهمزة,3,يَحسَبُ أَنَّ مالَهُ أَخلَدَهُ,thinks,What is the exact Arabic word that means: thinks?,مالَهُ,يَحسَبُ,أَخلَدَهُ,أَنَّ,B,يَحسَبُ,Tafsir al-Tabari only
+196,104,الهمزة,3,يَحسَبُ أَنَّ مالَهُ أَخلَدَهُ,his wealth,What is the exact Arabic word that means: his wealth?,أَنَّ,أَخلَدَهُ,مالَهُ,يَحسَبُ,C,مالَهُ,Tafsir al-Tabari only
+197,104,الهمزة,3,يَحسَبُ أَنَّ مالَهُ أَخلَدَهُ,made him immortal,What is the exact Arabic word that means: made him immortal?,أَنَّ,أَخلَدَهُ,مالَهُ,يَحسَبُ,B,أَخلَدَهُ,Tafsir al-Tabari only
+198,104,الهمزة,4,كَلّا ۖ لَيُنبَذَنَّ فِي الحُطَمَةِ,will surely be thrown,What is the exact Arabic word that means: will surely be thrown?,الحُطَمَةِ,لَيُنبَذَنَّ,كَلّا,فِي,B,لَيُنبَذَنَّ,Tafsir al-Tabari only
+199,104,الهمزة,4,كَلّا ۖ لَيُنبَذَنَّ فِي الحُطَمَةِ,the Crusher,What is the exact Arabic word that means: the Crusher?,لَيُنبَذَنَّ,الحُطَمَةِ,فِي,كَلّا,B,الحُطَمَةِ,Tafsir al-Tabari only
+200,104,الهمزة,6,نارُ اللَّهِ الموقَدَةُ,kindled,What is the exact Arabic word that means: kindled?,نارُ,اللَّهِ,الَّتي,الموقَدَةُ,D,الموقَدَةُ,Tafsir al-Tabari only
+201,104,الهمزة,7,الَّتي تَطَّلِعُ عَلَى الأَفئِدَةِ,which,What is the exact Arabic word that means: which?,عَلَى,الَّتي,تَطَّلِعُ,الأَفئِدَةِ,B,الَّتي,Tafsir al-Tabari only
+202,104,الهمزة,7,الَّتي تَطَّلِعُ عَلَى الأَفئِدَةِ,rises over / reaches,What is the exact Arabic word that means: rises over / reaches?,الأَفئِدَةِ,الَّتي,تَطَّلِعُ,عَلَى,C,تَطَّلِعُ,Tafsir al-Tabari only
+203,104,الهمزة,7,الَّتي تَطَّلِعُ عَلَى الأَفئِدَةِ,the hearts,What is the exact Arabic word that means: the hearts?,الأَفئِدَةِ,عَلَى,تَطَّلِعُ,الَّتي,A,الأَفئِدَةِ,Tafsir al-Tabari only
+204,105,الفيل,1,أَلَم تَرَ كَيفَ فَعَلَ رَبُّكَ بِأَصحابِ الفيلِ,you see,What is the exact Arabic word that means: you see?,كَيفَ,أَلَم,فَعَلَ,تَرَ,D,تَرَ,Tafsir al-Tabari only
+205,105,الفيل,1,أَلَم تَرَ كَيفَ فَعَلَ رَبُّكَ بِأَصحابِ الفيلِ,how,What is the exact Arabic word that means: how?,تَرَ,كَيفَ,فَعَلَ,أَلَم,B,كَيفَ,Tafsir al-Tabari only
+206,105,الفيل,1,أَلَم تَرَ كَيفَ فَعَلَ رَبُّكَ بِأَصحابِ الفيلِ,did,What is the exact Arabic word that means: did?,فَعَلَ,تَرَ,كَيفَ,أَلَم,A,فَعَلَ,Tafsir al-Tabari only
+207,105,الفيل,1,أَلَم تَرَ كَيفَ فَعَلَ رَبُّكَ بِأَصحابِ الفيلِ,with the أصحاب of,What is the exact Arabic word that means: with the أصحاب of?,تَرَ,بِأَصحابِ,كَيفَ,أَلَم,B,بِأَصحابِ,Tafsir al-Tabari only
+208,105,الفيل,1,أَلَم تَرَ كَيفَ فَعَلَ رَبُّكَ بِأَصحابِ الفيلِ,the elephant,What is the exact Arabic word that means: the elephant?,أَلَم,تَرَ,الفيلِ,كَيفَ,C,الفيلِ,Tafsir al-Tabari only
+209,105,الفيل,2,أَلَم يَجعَل كَيدَهُم في تَضليلٍ,make,What is the exact Arabic word that means: make?,يَجعَل,كَيدَهُم,أَلَم,في,A,يَجعَل,Tafsir al-Tabari only
+210,105,الفيل,2,أَلَم يَجعَل كَيدَهُم في تَضليلٍ,their plot,What is the exact Arabic word that means: their plot?,كَيدَهُم,في,يَجعَل,أَلَم,A,كَيدَهُم,Tafsir al-Tabari only
+211,105,الفيل,2,أَلَم يَجعَل كَيدَهُم في تَضليلٍ,misguidance / ruin,What is the exact Arabic word that means: misguidance / ruin?,تَضليلٍ,كَيدَهُم,يَجعَل,أَلَم,A,تَضليلٍ,Tafsir al-Tabari only
+212,105,الفيل,3,وَأَرسَلَ عَلَيهِم طَيرًا أَبابيلَ,and sent,What is the exact Arabic word that means: and sent?,طَيرًا,عَلَيهِم,أَبابيلَ,وَأَرسَلَ,D,وَأَرسَلَ,Tafsir al-Tabari only
+213,105,الفيل,3,وَأَرسَلَ عَلَيهِم طَيرًا أَبابيلَ,birds,What is the exact Arabic word that means: birds?,أَبابيلَ,عَلَيهِم,وَأَرسَلَ,طَيرًا,D,طَيرًا,Tafsir al-Tabari only
+214,105,الفيل,3,وَأَرسَلَ عَلَيهِم طَيرًا أَبابيلَ,in flocks,What is the exact Arabic word that means: in flocks?,وَأَرسَلَ,طَيرًا,عَلَيهِم,أَبابيلَ,D,أَبابيلَ,Tafsir al-Tabari only
+215,105,الفيل,4,تَرميهِم بِحِجارَةٍ مِن سِجّيلٍ,pelting them,What is the exact Arabic word that means: pelting them?,تَرميهِم,بِحِجارَةٍ,مِن,سِجّيلٍ,A,تَرميهِم,Tafsir al-Tabari only
+216,106,قريش,1,لِإيلافِ قُرَيشٍ,for the accustomed security of,What is the exact Arabic word that means: for the accustomed security of?,لِإيلافِ,رِحلَةَ,إيلافِهِم,قُرَيشٍ,A,لِإيلافِ,Tafsir al-Tabari only
+217,106,قريش,1,لِإيلافِ قُرَيشٍ,Quraysh,What is the exact Arabic word that means: Quraysh?,لِإيلافِ,رِحلَةَ,قُرَيشٍ,إيلافِهِم,C,قُرَيشٍ,Tafsir al-Tabari only
+218,106,قريش,2,إيلافِهِم رِحلَةَ الشِّتاءِ وَالصَّيفِ,their accustomed security,What is the exact Arabic word that means: their accustomed security?,إيلافِهِم,الشِّتاءِ,رِحلَةَ,وَالصَّيفِ,A,إيلافِهِم,Tafsir al-Tabari only
+219,106,قريش,2,إيلافِهِم رِحلَةَ الشِّتاءِ وَالصَّيفِ,journey,What is the exact Arabic word that means: journey?,رِحلَةَ,الشِّتاءِ,إيلافِهِم,وَالصَّيفِ,A,رِحلَةَ,Tafsir al-Tabari only
+220,106,قريش,2,إيلافِهِم رِحلَةَ الشِّتاءِ وَالصَّيفِ,winter,What is the exact Arabic word that means: winter?,إيلافِهِم,وَالصَّيفِ,الشِّتاءِ,رِحلَةَ,C,الشِّتاءِ,Tafsir al-Tabari only
+221,106,قريش,2,إيلافِهِم رِحلَةَ الشِّتاءِ وَالصَّيفِ,and summer,What is the exact Arabic word that means: and summer?,إيلافِهِم,وَالصَّيفِ,رِحلَةَ,الشِّتاءِ,B,وَالصَّيفِ,Tafsir al-Tabari only
+222,106,قريش,3,فَليَعبُدوا رَبَّ هـٰذَا البَيتِ,so let them worship,What is the exact Arabic word that means: so let them worship?,هـٰذَا,فَليَعبُدوا,البَيتِ,رَبَّ,B,فَليَعبُدوا,Tafsir al-Tabari only
+223,106,قريش,3,فَليَعبُدوا رَبَّ هـٰذَا البَيتِ,this,What is the exact Arabic word that means: this?,البَيتِ,رَبَّ,هـٰذَا,فَليَعبُدوا,C,هـٰذَا,Tafsir al-Tabari only
+224,106,قريش,3,فَليَعبُدوا رَبَّ هـٰذَا البَيتِ,the House,What is the exact Arabic word that means: the House?,رَبَّ,فَليَعبُدوا,هـٰذَا,البَيتِ,D,البَيتِ,Tafsir al-Tabari only
+225,106,قريش,4,الَّذي أَطعَمَهُم مِن جوعٍ وَآمَنَهُم مِن خَوفٍ,fed them,What is the exact Arabic word that means: fed them?,الَّذي,مِن,جوعٍ,أَطعَمَهُم,D,أَطعَمَهُم,Tafsir al-Tabari only
+226,107,الماعون,1,أَرَأَيتَ الَّذي يُكَذِّبُ بِالدّينِ,denies,What is the exact Arabic word that means: denies?,الَّذي,بِالدّينِ,أَرَأَيتَ,يُكَذِّبُ,D,يُكَذِّبُ,Tafsir al-Tabari only
+227,107,الماعون,2,فَذٰلِكَ الَّذي يَدُعُّ اليَتيمَ,then that is the one,What is the exact Arabic word that means: then that is the one?,فَذٰلِكَ,يَدُعُّ,الَّذي,اليَتيمَ,A,فَذٰلِكَ,Tafsir al-Tabari only
+228,107,الماعون,2,فَذٰلِكَ الَّذي يَدُعُّ اليَتيمَ,drives away,What is the exact Arabic word that means: drives away?,فَذٰلِكَ,اليَتيمَ,يَدُعُّ,الَّذي,C,يَدُعُّ,Tafsir al-Tabari only
+229,107,الماعون,3,وَلا يَحُضُّ عَلىٰ طَعامِ المِسكينِ,encourages,What is the exact Arabic word that means: encourages?,وَلا,عَلىٰ,طَعامِ,يَحُضُّ,D,يَحُضُّ,Tafsir al-Tabari only
+230,107,الماعون,3,وَلا يَحُضُّ عَلىٰ طَعامِ المِسكينِ,food,What is the exact Arabic word that means: food?,وَلا,يَحُضُّ,عَلىٰ,طَعامِ,D,طَعامِ,Tafsir al-Tabari only
+231,107,الماعون,3,وَلا يَحُضُّ عَلىٰ طَعامِ المِسكينِ,the poor,What is the exact Arabic word that means: the poor?,وَلا,يَحُضُّ,المِسكينِ,عَلىٰ,C,المِسكينِ,Tafsir al-Tabari only
+232,107,الماعون,4,فَوَيلٌ لِلمُصَلّينَ,so woe,What is the exact Arabic word that means: so woe?,لِلمُصَلّينَ,فَوَيلٌ,الَّذينَ,هُم,B,فَوَيلٌ,Tafsir al-Tabari only
+233,107,الماعون,4,فَوَيلٌ لِلمُصَلّينَ,to those who pray,What is the exact Arabic word that means: to those who pray?,لِلمُصَلّينَ,هُم,فَوَيلٌ,الَّذينَ,A,لِلمُصَلّينَ,Tafsir al-Tabari only
+234,107,الماعون,5,الَّذينَ هُم عَن صَلاتِهِم ساهونَ,their prayer,What is the exact Arabic word that means: their prayer?,هُم,صَلاتِهِم,الَّذينَ,عَن,B,صَلاتِهِم,Tafsir al-Tabari only
+235,107,الماعون,5,الَّذينَ هُم عَن صَلاتِهِم ساهونَ,heedless,What is the exact Arabic word that means: heedless?,عَن,ساهونَ,الَّذينَ,هُم,B,ساهونَ,Tafsir al-Tabari only
+236,107,الماعون,6,الَّذينَ هُم يُراءونَ,showing off,What is the exact Arabic word that means: showing off?,الَّذينَ,هُم,يُراءونَ,وَيَمنَعونَ,C,يُراءونَ,Tafsir al-Tabari only
+237,107,الماعون,7,وَيَمنَعونَ الماعونَ,small acts of help,What is the exact Arabic word that means: small acts of help?,هُم,الَّذينَ,الماعونَ,وَيَمنَعونَ,C,الماعونَ,Tafsir al-Tabari only
+238,108,الكوثر,1,إِنّا أَعطَيناكَ الكَوثَرَ,We have given you,What is the exact Arabic word that means: We have given you?,فَصَلِّ,إِنّا,أَعطَيناكَ,الكَوثَرَ,C,أَعطَيناكَ,Tafsir al-Tabari only
+239,108,الكوثر,1,إِنّا أَعطَيناكَ الكَوثَرَ,abundant good,What is the exact Arabic word that means: abundant good?,أَعطَيناكَ,الكَوثَرَ,إِنّا,فَصَلِّ,B,الكَوثَرَ,Tafsir al-Tabari only
+240,108,الكوثر,2,فَصَلِّ لِرَبِّكَ وَانحَر,so pray,What is the exact Arabic word that means: so pray?,وَانحَر,فَصَلِّ,لِرَبِّكَ,إِنَّ,B,فَصَلِّ,Tafsir al-Tabari only
+241,108,الكوثر,2,فَصَلِّ لِرَبِّكَ وَانحَر,and sacrifice,What is the exact Arabic word that means: and sacrifice?,لِرَبِّكَ,فَصَلِّ,وَانحَر,إِنَّ,C,وَانحَر,Tafsir al-Tabari only
+242,108,الكوثر,3,إِنَّ شانِئَكَ هُوَ الأَبتَرُ,your hater,What is the exact Arabic word that means: your hater?,هُوَ,الأَبتَرُ,إِنَّ,شانِئَكَ,D,شانِئَكَ,Tafsir al-Tabari only
+243,108,الكوثر,3,إِنَّ شانِئَكَ هُوَ الأَبتَرُ,he / it,What is the exact Arabic word that means: he / it?,إِنَّ,هُوَ,شانِئَكَ,الأَبتَرُ,B,هُوَ,Tafsir al-Tabari only
+244,108,الكوثر,3,إِنَّ شانِئَكَ هُوَ الأَبتَرُ,cut off,What is the exact Arabic word that means: cut off?,هُوَ,إِنَّ,شانِئَكَ,الأَبتَرُ,D,الأَبتَرُ,Tafsir al-Tabari only
+245,109,الكافرون,1,قُل يا أَيُّهَا الكافِرونَ,Say,What is the exact Arabic word that means: Say?,قُل,الكافِرونَ,أَيُّهَا,يا,A,قُل,Tafsir al-Tabari only
+246,109,الكافرون,1,قُل يا أَيُّهَا الكافِرونَ,O,What is the exact Arabic word that means: O?,الكافِرونَ,أَيُّهَا,يا,قُل,C,يا,Tafsir al-Tabari only
+247,109,الكافرون,1,قُل يا أَيُّهَا الكافِرونَ,O you,What is the exact Arabic word that means: O you?,يا,الكافِرونَ,قُل,أَيُّهَا,D,أَيُّهَا,Tafsir al-Tabari only
+248,109,الكافرون,1,قُل يا أَيُّهَا الكافِرونَ,disbelievers,What is the exact Arabic word that means: disbelievers?,أَيُّهَا,الكافِرونَ,قُل,يا,B,الكافِرونَ,Tafsir al-Tabari only
+249,109,الكافرون,2,لا أَعبُدُ ما تَعبُدونَ,I worship,What is the exact Arabic word that means: I worship?,ما,تَعبُدونَ,أَعبُدُ,لا,C,أَعبُدُ,Tafsir al-Tabari only
+250,109,الكافرون,2,لا أَعبُدُ ما تَعبُدونَ,you worship,What is the exact Arabic word that means: you worship?,أَعبُدُ,لا,ما,تَعبُدونَ,D,تَعبُدونَ,Tafsir al-Tabari only
+251,109,الكافرون,3,وَلا أَنتُم عابِدونَ ما أَعبُدُ,you,What is the exact Arabic word that means: you?,وَلا,ما,عابِدونَ,أَنتُم,D,أَنتُم,Tafsir al-Tabari only
+252,109,الكافرون,3,وَلا أَنتُم عابِدونَ ما أَعبُدُ,worshippers,What is the exact Arabic word that means: worshippers?,وَلا,أَنتُم,عابِدونَ,ما,C,عابِدونَ,Tafsir al-Tabari only
+253,109,الكافرون,4,وَلا أَنا عابِدٌ ما عَبَدتُم,worshipper,What is the exact Arabic word that means: worshipper?,أَنا,وَلا,عابِدٌ,ما,C,عابِدٌ,Tafsir al-Tabari only
+254,109,الكافرون,4,وَلا أَنا عابِدٌ ما عَبَدتُم,you worshipped,What is the exact Arabic word that means: you worshipped?,أَنا,عابِدٌ,عَبَدتُم,وَلا,C,عَبَدتُم,Tafsir al-Tabari only
+255,109,الكافرون,6,لَكُم دينُكُم وَلِيَ دينِ,for you,What is the exact Arabic word that means: for you?,وَلِيَ,دينُكُم,لَكُم,دينِ,C,لَكُم,Tafsir al-Tabari only
+256,109,الكافرون,6,لَكُم دينُكُم وَلِيَ دينِ,your religion,What is the exact Arabic word that means: your religion?,دينُكُم,دينِ,لَكُم,وَلِيَ,A,دينُكُم,Tafsir al-Tabari only
+257,110,النصر,1,إِذا جاءَ نَصرُ اللَّهِ وَالفَتحُ,came,What is the exact Arabic word that means: came?,نَصرُ,اللَّهِ,جاءَ,إِذا,C,جاءَ,Tafsir al-Tabari only
+258,110,النصر,1,إِذا جاءَ نَصرُ اللَّهِ وَالفَتحُ,help / victory,What is the exact Arabic word that means: help / victory?,إِذا,اللَّهِ,جاءَ,نَصرُ,D,نَصرُ,Tafsir al-Tabari only
+259,110,النصر,1,إِذا جاءَ نَصرُ اللَّهِ وَالفَتحُ,and the opening / conquest,What is the exact Arabic word that means: and the opening / conquest?,جاءَ,وَالفَتحُ,إِذا,نَصرُ,B,وَالفَتحُ,Tafsir al-Tabari only
+260,110,النصر,2,وَرَأَيتَ النّاسَ يَدخُلونَ في دينِ اللَّهِ أَفواجًا,and you saw,What is the exact Arabic word that means: and you saw?,النّاسَ,يَدخُلونَ,وَرَأَيتَ,في,C,وَرَأَيتَ,Tafsir al-Tabari only
+261,110,النصر,2,وَرَأَيتَ النّاسَ يَدخُلونَ في دينِ اللَّهِ أَفواجًا,entering,What is the exact Arabic word that means: entering?,النّاسَ,في,وَرَأَيتَ,يَدخُلونَ,D,يَدخُلونَ,Tafsir al-Tabari only
+262,110,النصر,2,وَرَأَيتَ النّاسَ يَدخُلونَ في دينِ اللَّهِ أَفواجًا,in crowds,What is the exact Arabic word that means: in crowds?,النّاسَ,وَرَأَيتَ,أَفواجًا,يَدخُلونَ,C,أَفواجًا,Tafsir al-Tabari only
+263,110,النصر,3,فَسَبِّح بِحَمدِ رَبِّكَ وَاستَغفِرهُ ۚ إِنَّهُ كانَ تَوّابًا,then glorify,What is the exact Arabic word that means: then glorify?,رَبِّكَ,وَاستَغفِرهُ,بِحَمدِ,فَسَبِّح,D,فَسَبِّح,Tafsir al-Tabari only
+264,110,النصر,3,فَسَبِّح بِحَمدِ رَبِّكَ وَاستَغفِرهُ ۚ إِنَّهُ كانَ تَوّابًا,with praise,What is the exact Arabic word that means: with praise?,وَاستَغفِرهُ,فَسَبِّح,بِحَمدِ,رَبِّكَ,C,بِحَمدِ,Tafsir al-Tabari only
+265,110,النصر,3,فَسَبِّح بِحَمدِ رَبِّكَ وَاستَغفِرهُ ۚ إِنَّهُ كانَ تَوّابًا,and seek His forgiveness,What is the exact Arabic word that means: and seek His forgiveness?,بِحَمدِ,رَبِّكَ,وَاستَغفِرهُ,فَسَبِّح,C,وَاستَغفِرهُ,Tafsir al-Tabari only
+266,110,النصر,3,فَسَبِّح بِحَمدِ رَبِّكَ وَاستَغفِرهُ ۚ إِنَّهُ كانَ تَوّابًا,indeed He,What is the exact Arabic word that means: indeed He?,فَسَبِّح,بِحَمدِ,إِنَّهُ,رَبِّكَ,C,إِنَّهُ,Tafsir al-Tabari only
+267,111,المسد,1,تَبَّت يَدا أَبي لَهَبٍ وَتَبَّ,perished,What is the exact Arabic word that means: perished?,لَهَبٍ,أَبي,يَدا,تَبَّت,D,تَبَّت,Tafsir al-Tabari only
+268,111,المسد,1,تَبَّت يَدا أَبي لَهَبٍ وَتَبَّ,the two hands,What is the exact Arabic word that means: the two hands?,تَبَّت,أَبي,يَدا,لَهَبٍ,C,يَدا,Tafsir al-Tabari only
+269,111,المسد,1,تَبَّت يَدا أَبي لَهَبٍ وَتَبَّ,of Abu,What is the exact Arabic word that means: of Abu?,تَبَّت,يَدا,أَبي,لَهَبٍ,C,أَبي,Tafsir al-Tabari only
+270,111,المسد,1,تَبَّت يَدا أَبي لَهَبٍ وَتَبَّ,flame,What is the exact Arabic word that means: flame?,يَدا,أَبي,تَبَّت,لَهَبٍ,D,لَهَبٍ,Tafsir al-Tabari only
+271,111,المسد,1,تَبَّت يَدا أَبي لَهَبٍ وَتَبَّ,and perished he,What is the exact Arabic word that means: and perished he?,تَبَّت,يَدا,أَبي,وَتَبَّ,D,وَتَبَّ,Tafsir al-Tabari only
+272,111,المسد,2,ما أَغنىٰ عَنهُ مالُهُ وَما كَسَبَ,availed,What is the exact Arabic word that means: availed?,عَنهُ,أَغنىٰ,ما,مالُهُ,B,أَغنىٰ,Tafsir al-Tabari only
+273,111,المسد,2,ما أَغنىٰ عَنهُ مالُهُ وَما كَسَبَ,earned,What is the exact Arabic word that means: earned?,كَسَبَ,ما,عَنهُ,أَغنىٰ,A,كَسَبَ,Tafsir al-Tabari only
+274,111,المسد,3,سَيَصلىٰ نارًا ذاتَ لَهَبٍ,he will burn,What is the exact Arabic word that means: he will burn?,ذاتَ,نارًا,سَيَصلىٰ,لَهَبٍ,C,سَيَصلىٰ,Tafsir al-Tabari only
+275,111,المسد,3,سَيَصلىٰ نارًا ذاتَ لَهَبٍ,possessing,What is the exact Arabic word that means: possessing?,سَيَصلىٰ,لَهَبٍ,ذاتَ,نارًا,C,ذاتَ,Tafsir al-Tabari only
+276,111,المسد,4,وَامرَأَتُهُ حَمّالَةَ الحَطَبِ,and his wife,What is the exact Arabic word that means: and his wife?,وَامرَأَتُهُ,الحَطَبِ,حَمّالَةَ,في,A,وَامرَأَتُهُ,Tafsir al-Tabari only
+277,111,المسد,4,وَامرَأَتُهُ حَمّالَةَ الحَطَبِ,carrier,What is the exact Arabic word that means: carrier?,في,الحَطَبِ,وَامرَأَتُهُ,حَمّالَةَ,D,حَمّالَةَ,Tafsir al-Tabari only
+278,111,المسد,4,وَامرَأَتُهُ حَمّالَةَ الحَطَبِ,firewood,What is the exact Arabic word that means: firewood?,وَامرَأَتُهُ,الحَطَبِ,حَمّالَةَ,في,B,الحَطَبِ,Tafsir al-Tabari only
+279,112,الإخلاص,1,قُل هُوَ اللَّهُ أَحَدٌ,One,What is the exact Arabic word that means: One?,هُوَ,قُل,أَحَدٌ,اللَّهُ,C,أَحَدٌ,Tafsir al-Tabari only
+280,112,الإخلاص,2,اللَّهُ الصَّمَدُ,the Self-Sufficient,What is the exact Arabic word that means: the Self-Sufficient?,اللَّهُ,يَلِد,الصَّمَدُ,لَم,C,الصَّمَدُ,Tafsir al-Tabari only
+281,112,الإخلاص,3,لَم يَلِد وَلَم يولَد,begets,What is the exact Arabic word that means: begets?,لَم,يولَد,وَلَم,يَلِد,D,يَلِد,Tafsir al-Tabari only
+282,112,الإخلاص,3,لَم يَلِد وَلَم يولَد,and did not,What is the exact Arabic word that means: and did not?,يولَد,وَلَم,يَلِد,لَم,B,وَلَم,Tafsir al-Tabari only
+283,112,الإخلاص,3,لَم يَلِد وَلَم يولَد,is born,What is the exact Arabic word that means: is born?,لَم,يولَد,يَلِد,وَلَم,B,يولَد,Tafsir al-Tabari only
+284,112,الإخلاص,4,وَلَم يَكُن لَهُ كُفُوًا أَحَدٌ,equal,What is the exact Arabic word that means: equal?,لَهُ,كُفُوًا,يَكُن,وَلَم,B,كُفُوًا,Tafsir al-Tabari only
+285,113,الفلق,1,قُل أَعوذُ بِرَبِّ الفَلَقِ,I seek refuge,What is the exact Arabic word that means: I seek refuge?,الفَلَقِ,قُل,بِرَبِّ,أَعوذُ,D,أَعوذُ,Tafsir al-Tabari only
+286,113,الفلق,1,قُل أَعوذُ بِرَبِّ الفَلَقِ,in the Lord of,What is the exact Arabic word that means: in the Lord of?,قُل,بِرَبِّ,الفَلَقِ,أَعوذُ,B,بِرَبِّ,Tafsir al-Tabari only
+287,113,الفلق,1,قُل أَعوذُ بِرَبِّ الفَلَقِ,daybreak,What is the exact Arabic word that means: daybreak?,قُل,أَعوذُ,بِرَبِّ,الفَلَقِ,D,الفَلَقِ,Tafsir al-Tabari only
+288,113,الفلق,3,وَمِن شَرِّ غاسِقٍ إِذا وَقَبَ,darkness,What is the exact Arabic word that means: darkness?,إِذا,شَرِّ,غاسِقٍ,وَمِن,C,غاسِقٍ,Tafsir al-Tabari only
+289,113,الفلق,3,وَمِن شَرِّ غاسِقٍ إِذا وَقَبَ,settles,What is the exact Arabic word that means: settles?,وَمِن,غاسِقٍ,وَقَبَ,شَرِّ,C,وَقَبَ,Tafsir al-Tabari only
+290,113,الفلق,4,وَمِن شَرِّ النَّفّاثاتِ فِي العُقَدِ,blowers,What is the exact Arabic word that means: blowers?,شَرِّ,فِي,وَمِن,النَّفّاثاتِ,D,النَّفّاثاتِ,Tafsir al-Tabari only
+291,113,الفلق,4,وَمِن شَرِّ النَّفّاثاتِ فِي العُقَدِ,knots,What is the exact Arabic word that means: knots?,العُقَدِ,وَمِن,النَّفّاثاتِ,شَرِّ,A,العُقَدِ,Tafsir al-Tabari only
+292,113,الفلق,5,وَمِن شَرِّ حاسِدٍ إِذا حَسَدَ,envier,What is the exact Arabic word that means: envier?,شَرِّ,وَمِن,حاسِدٍ,إِذا,C,حاسِدٍ,Tafsir al-Tabari only
+293,113,الفلق,5,وَمِن شَرِّ حاسِدٍ إِذا حَسَدَ,envied,What is the exact Arabic word that means: envied?,شَرِّ,حاسِدٍ,وَمِن,حَسَدَ,D,حَسَدَ,Tafsir al-Tabari only
+294,114,الناس,2,مَلِكِ النّاسِ,King,What is the exact Arabic word that means: King?,قُل,مَلِكِ,إِلـٰهِ,النّاسِ,B,مَلِكِ,Tafsir al-Tabari only
+295,114,الناس,3,إِلـٰهِ النّاسِ,God,What is the exact Arabic word that means: God?,النّاسِ,شَرِّ,إِلـٰهِ,مِن,C,إِلـٰهِ,Tafsir al-Tabari only
+296,114,الناس,4,مِن شَرِّ الوَسواسِ الخَنّاسِ,the whisperer,What is the exact Arabic word that means: the whisperer?,مِن,الوَسواسِ,شَرِّ,الخَنّاسِ,B,الوَسواسِ,Tafsir al-Tabari only
+297,114,الناس,4,مِن شَرِّ الوَسواسِ الخَنّاسِ,the retreating whisperer,What is the exact Arabic word that means: the retreating whisperer?,الوَسواسِ,شَرِّ,مِن,الخَنّاسِ,D,الخَنّاسِ,Tafsir al-Tabari only
+298,114,الناس,5,الَّذي يُوَسوِسُ في صُدورِ النّاسِ,whispers,What is the exact Arabic word that means: whispers?,صُدورِ,الَّذي,يُوَسوِسُ,في,C,يُوَسوِسُ,Tafsir al-Tabari only
+299,114,الناس,5,الَّذي يُوَسوِسُ في صُدورِ النّاسِ,chests,What is the exact Arabic word that means: chests?,في,صُدورِ,الَّذي,يُوَسوِسُ,B,صُدورِ,Tafsir al-Tabari only
+300,114,الناس,6,مِنَ الجِنَّةِ وَالنّاسِ,the jinn,What is the exact Arabic word that means: the jinn?,مِنَ,الَّذي,وَالنّاسِ,الجِنَّةِ,D,الجِنَّةِ,Tafsir al-Tabari only

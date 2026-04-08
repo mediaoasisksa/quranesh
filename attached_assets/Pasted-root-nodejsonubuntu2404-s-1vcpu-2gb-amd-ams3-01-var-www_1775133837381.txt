@@ -1,0 +1,47 @@
+root@nodejsonubuntu2404-s-1vcpu-2gb-amd-ams3-01:/var/www/quranesh# pm2 logs quranesh --lines 20
+curl http://127.0.0.1:3005
+[TAILING] Tailing last 20 lines for [quranesh] process (change the value with --lines option)
+/root/.pm2/logs/quranesh-out.log last 20 lines:
+16|quranes | 7:49:16 PM [express] POST /api/signin 500 in 6ms :: {"message":"Login failed"}
+16|quranes | 7:49:19 PM [express] POST /api/signin 500 in 6ms :: {"message":"Login failed"}
+16|quranes | 4:46:04 AM [express] GET /api/scholarship/availability 500 in 8ms :: {"message":"Failed to check sch…
+16|quranes | 4:48:11 AM [express] POST /api/signup 500 in 9ms :: {"message":"Failed to create user"}
+16|quranes | 4:48:17 AM [express] GET /api/scholarship/availability 500 in 6ms :: {"message":"Failed to check sch…
+16|quranes | 4:48:24 AM [express] POST /api/signup 500 in 7ms :: {"message":"Failed to create user"}
+16|quranes | 4:48:53 AM [express] POST /api/signup 500 in 7ms :: {"message":"Failed to create user"}
+16|quranes | 🕐 8:00 AM Riyadh time - Starting daily job...
+16|quranes | 🌙 Starting Daily Quranic Elements Job...
+16|quranes | 7:57:45 AM [express] POST /api/signin 500 in 6ms :: {"message":"Login failed"}
+16|quranes | 11:11:18 AM [express] GET /api/scholarship/availability 500 in 12ms :: {"message":"Failed to check sc…
+16|quranes | 11:12:22 AM [express] POST /api/signup 500 in 8ms :: {"message":"Failed to create user"}
+16|quranes | 11:12:46 AM [express] POST /api/signin 500 in 9ms :: {"message":"Login failed"}
+16|quranes | HyperPay: PRODUCTION mode
+16|quranes | HyperPay config: accessToken=true, entityMada=8ac9a4ca94ef658d0194..., entityVisa=8ac9a4ca94ef658d0194..., serverUrl=https://eu-prod.oppwa.com
+16|quranes | 12:43:31 PM [express] serving on port 3005
+16|quranes | 🚀 Starting Quranic Elements Scheduler...
+16|quranes | 📍 Current Riyadh time: 15:43
+16|quranes | ⏰ Next run at 8:00 AM Riyadh time
+16|quranes | ⏳ Time until next run: 16h 16m
+
+/root/.pm2/logs/quranesh-error.log last 20 lines:
+16|quranes |       fingerprint256: '06:52:95:10:F3:69:61:70:8D:B1:60:49:F0:F8:9A:3F:BA:E5:B4:AE:F0:4D:A8:BA:DC:A9:C5:99:F4:B1:A5:2A',
+16|quranes |       fingerprint512: '96:84:2B:25:AA:BA:35:AE:E4:07:03:93:5D:DE:8A:1F:E5:64:63:79:EB:C5:F7:AE:55:16:33:7D:F3:A1:EF:CE:DE:A5:DC:AF:5A:33:0E:51:8F:9D:6F:43:4B:7E:C0:2B:77:48:B1:F1:BA:3B:F1:7B:68:0D:D7:AF:6D:DE:FF:50',
+16|quranes |       ext_key_usage: [Array],
+16|quranes |       serialNumber: '053F50E3925967045024DC35C8D1B7CBEA6E',
+16|quranes |       raw: <Buffer 30 82 03 98 30 82 03 1f a0 03 02 01 02 02 12 05 3f 50 e3 92 59 67 04 50 24 dc 35 c8 d1 b7 cb ea 6e 30 0a 06 08 2a 86 48 ce 3d 04 03 03 30 32 31 0b 30 ... 874 more bytes>,
+16|quranes |       asn1Curve: 'prime256v1',
+16|quranes |       nistCurve: 'P-256',
+16|quranes |       issuerCertificate: [Object]
+16|quranes |     }
+16|quranes |   },
+16|quranes |   Symbol(kMessage): "Hostname/IP does not match certificate's altnames: IP: 127.0.0.1 is not in the cert's list: "
+16|quranes | }
+16|quranes | Error: DATABASE_URL must be set. Did you forget to provision a database?
+16|quranes |     at server/db.ts (file:///var/www/quranesh/dist/index.js:689:13)
+16|quranes |     at __init (file:///var/www/quranesh/dist/index.js:4:56)
+16|quranes |     at file:///var/www/quranesh/dist/index.js:8300:1
+16|quranes |     at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+16|quranes |     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+16|quranes |     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26)
+16|quranes | ⚠️ Startup init error (non-fatal): permission denied for table users
+
