@@ -21,6 +21,7 @@ import Analytics from "@/pages/Analytics";
 import DiplomaPage from "@/pages/diploma";
 import AdminPage from "@/pages/admin";
 import ScholarshipStatus from "@/pages/ScholarshipStatus";
+import TabariExercise from "@/pages/tabari-exercise";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/translation-manager" component={TranslationManager} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/scholarship-status" component={ScholarshipStatus} />
+      <Route path="/tabari-exercises" component={TabariExercise} />
       <Route component={NotFound} />
     </Switch>
   );

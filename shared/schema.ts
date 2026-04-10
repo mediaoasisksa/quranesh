@@ -637,3 +637,31 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+// Tabari Exercises — تمارين تفسير الطبري (300 MCQ)
+export const tabariExercises = pgTable("tabari_exercises", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  surahNumber: integer("surah_number").notNull(),
+  surahNameAr: text("surah_name_ar").notNull(),
+  ayah: integer("ayah").notNull(),
+  verseText: text("verse_text").notNull(),
+  promptEn: text("prompt_en").notNull(),
+  questionEn: text("question_en").notNull(),
+  optionA: text("option_a").notNull(),
+  optionB: text("option_b").notNull(),
+  optionC: text("option_c").notNull(),
+  optionD: text("option_d").notNull(),
+  correctAnswer: text("correct_answer").notNull(),
+  correctWord: text("correct_word").notNull(),
+  source: text("source").default("Tafsir al-Tabari only"),
+  contextMode: text("context_mode").default("single_ayah"),
+  contextStartAyah: integer("context_start_ayah"),
+  contextEndAyah: integer("context_end_ayah"),
+  primaryAyahNumber: integer("primary_ayah_number"),
+  displayedPassageText: text("displayed_passage_text"),
+  optionsSourceScope: text("options_source_scope").default("displayed_passage_only"),
+});
+
+export const insertTabariExerciseSchema = createInsertSchema(tabariExercises).omit({ id: true });
+export type TabariExercise = typeof tabariExercises.$inferSelect;
+export type InsertTabariExercise = z.infer<typeof insertTabariExerciseSchema>;

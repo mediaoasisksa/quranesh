@@ -326,7 +326,28 @@ export default function Dashboard() {
                 />
               );
             })}
-            
+
+            {/* Tabari Vocabulary Exercises card */}
+            <Card className="border-2 border-amber-200 dark:border-amber-800 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => setLocation("/tabari-exercises")}>
+              <CardContent className="p-6 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-xl">
+                    📖
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-foreground text-sm">Tafsir al-Tabari Vocabulary</h3>
+                    <p className="text-xs text-amber-600 dark:text-amber-400">تفسير الطبري</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground flex-1">
+                  300 multiple-choice questions on Quranic word meanings sourced from Tafsir al-Tabari — covering Surah Al-Fatiha and Surahs 93–114.
+                </p>
+                <div className="mt-4 flex items-center gap-2">
+                  <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2 py-1 rounded-full">300 exercises</span>
+                  <span className="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">22 surahs</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 

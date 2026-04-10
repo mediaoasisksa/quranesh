@@ -31,6 +31,7 @@ import {
   subscriptions,
   sponsorships,
   scholarshipMatches,
+  tabariExercises,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -344,6 +345,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Grant legacy free access to all users registered before payment system launch
     await runLegacyBackfill();
+
+    // Seed Tabari vocabulary exercises (300 MCQ)
+    const { seedTabariExercises } = await import("./seed-tabari");
+    await seedTabariExercises();
   })().catch((err) => {
     // Log startup errors but never crash the server — DB may be waking up from suspension
     console.error("⚠️ Startup init error (non-fatal):", err?.message ?? err);
@@ -3645,6 +3650,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch messages" });
     }
   });
+
+  // ── TABARI VOCABULARY EXERCISES ──────────────────────────────────────
+  app.get("/api/tabari-exercises/random", async (req, res) => {
+    try {
+      const { sql: sqlTag } = await import("drizzle-orm");
+      const surahParam = req.query.surah ? parseInt(req.query.surah as string) : null;
+      const excludeIds: string[] = req.query.exclude
+        ? String(req.query.exclude).split(",").map(s => s.trim()).filter(Boolean)
+        : [];
+
+      const { eq, notInArray, and } = await import("drizzle-orm");
+
+      const conditions: any[] = [];
+      if (surahParam) conditions.push(eq(tabariExercises.surahNumber, surahParam));
+      if (excludeIds.length > 0) conditions.push(notInArray(tabariExercises.id, excludeIds));
+
+      const rows = conditions.length > 0
+        ? await db.select().from(tabariExercises).where(and(...conditions))
+        : await db.select().from(tabariExercises);
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "No exercises found" });
+      }
+
+      const exercise = rows[Math.floor(Math.random() * rows.length)];
+      res.json(exercise);
+    } catch (err: any) {
+      console.error("Tabari random error:", err);
+      res.status(500).json({ message: "Failed to fetch exercise" });
+    }
+  });
+
+  app.get("/api/tabari-exercises/stats", async (_req, res) => {
+    try {
+      const { sql: sqlTag, count } = await import("drizzle-orm");
+      const rows = await db
+        .select({
+          surahNumber: tabariExercises.surahNumber,
+          surahNameAr: tabariExercises.surahNameAr,
+          cnt: count(),
+        })
+        .from(tabariExercises)
+        .groupBy(tabariExercises.surahNumber, tabariExercises.surahNameAr);
+      const total = rows.reduce((acc, r) => acc + Number(r.cnt), 0);
+      res.json({ total, bySurah: rows });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  app.post("/api/tabari-exercises/validate", async (req, res) => {
+    try {
+      const { exerciseId, selectedAnswer } = req.body;
+      if (!exerciseId || !selectedAnswer) {
+        return res.status(400).json({ message: "exerciseId and selectedAnswer required" });
+      }
+      const { eq } = await import("drizzle-orm");
+      const [exercise] = await db
+        .select()
+        .from(tabariExercises)
+        .where(eq(tabariExercises.id, String(exerciseId)))
+        .limit(1);
+
+      if (!exercise) return res.status(404).json({ message: "Exercise not found" });
+
+      const isCorrect = selectedAnswer.toUpperCase() === exercise.correctAnswer.toUpperCase();
+      const optionMap: Record<string, string> = {
+        A: exercise.optionA,
+        B: exercise.optionB,
+        C: exercise.optionC,
+        D: exercise.optionD,
+      };
+
+      res.json({
+        isCorrect,
+        correctAnswer: exercise.correctAnswer,
+        correctWord: exercise.correctWord,
+        selectedWord: optionMap[selectedAnswer.toUpperCase()] ?? selectedAnswer,
+        explanation: isCorrect
+          ? `✅ Correct! "${exercise.correctWord}" means "${exercise.promptEn}" in ${exercise.surahNameAr}:${exercise.ayah}`
+          : `❌ The correct answer is "${exercise.correctWord}" which means "${exercise.promptEn}"`,
+      });
+    } catch (err: any) {
+      console.error("Tabari validate error:", err);
+      res.status(500).json({ message: "Failed to validate answer" });
+    }
+  });
+  // ─────────────────────────────────────────────────────────────────────
 
   const httpServer = createServer(app);
   return httpServer;
