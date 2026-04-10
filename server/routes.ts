@@ -3654,8 +3654,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ── TABARI VOCABULARY EXERCISES ──────────────────────────────────────
   app.get("/api/tabari-exercises/random", async (req, res) => {
     try {
-      const { sql: sqlTag } = await import("drizzle-orm");
-      const surahParam = req.query.surah ? parseInt(req.query.surah as string) : null;
+      const surahParam = (req.query.surah_number || req.query.surah)
+        ? parseInt(String(req.query.surah_number || req.query.surah))
+        : null;
       const excludeIds: string[] = req.query.exclude
         ? String(req.query.exclude).split(",").map(s => s.trim()).filter(Boolean)
         : [];
@@ -3684,7 +3685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/tabari-exercises/stats", async (_req, res) => {
     try {
-      const { sql: sqlTag, count } = await import("drizzle-orm");
+      const { count } = await import("drizzle-orm");
       const rows = await db
         .select({
           surahNumber: tabariExercises.surahNumber,
@@ -3724,7 +3725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       res.json({
-        isCorrect,
+        correct: isCorrect,
         correctAnswer: exercise.correctAnswer,
         correctWord: exercise.correctWord,
         selectedWord: optionMap[selectedAnswer.toUpperCase()] ?? selectedAnswer,

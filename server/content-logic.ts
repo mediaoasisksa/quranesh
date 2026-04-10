@@ -152,10 +152,30 @@ Example 4:
   Answer: صَبْرًا — (الكهف:67)
 `;
 
+// ── TABARI SOURCE ENFORCEMENT ────────────────────────────────────────────────
+// The Tabari Vocabulary Exercise Bank (300 MCQ) is the CANONICAL and ONLY
+// permitted source for pre-seeded Quranic vocabulary exercises.
+// All vocabulary answers in Tabari exercises are sourced EXCLUSIVELY from
+// Tafsir al-Tabari.  When AI generation is used for vocabulary exercises
+// it must respect this same standard: every Arabic word answer must be
+// traceable back to Tafsir al-Tabari commentary on the exact verse cited.
+// AI MUST NOT fabricate or infer word meanings not attested in al-Tabari.
+export const TABARI_SOURCE_NOTE = `
+⚠️  SOURCE CONSTRAINT — TAFSIR AL-TABARI ONLY:
+Every Arabic word meaning you provide MUST come from Tafsir al-Tabari (تفسير الطبري).
+• Al-Tabari is the ONLY permitted tafsir source.
+• Do NOT use Ibn Kathir, Al-Jalalayn, Al-Qurtubi, or any other tafsir.
+• Do NOT infer meanings from modern dictionaries alone.
+• Each word meaning must be directly attested in al-Tabari's commentary on that verse.
+• If al-Tabari does not comment on a word in the cited verse, DO NOT generate that exercise.
+`;
+
 export function buildGenerationPrompt(count: number, exerciseType: 'conversation' | 'roleplay' | 'daily_contextual'): string {
   return `${CONTENT_LOGIC_ROLE}
 
 ${TRIGGER_RESPONSE_RULES}
+
+${TABARI_SOURCE_NOTE}
 
 TASK: Generate ${count} vocabulary search exercises for non-Arabic speaking Quran memorizers.
 

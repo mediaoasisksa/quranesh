@@ -13,7 +13,7 @@ import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 type AnswerLetter = "A" | "B" | "C" | "D";
 
 interface ValidationResult {
-  isCorrect: boolean;
+  correct: boolean;
   correctAnswer: string;
   correctWord: string;
   selectedWord: string;
@@ -119,7 +119,7 @@ export default function TabariExercisePage() {
     onSuccess: (result) => {
       setValidationResult(result);
       setScore(prev => ({
-        correct: prev.correct + (result.isCorrect ? 1 : 0),
+        correct: prev.correct + (result.correct ? 1 : 0),
         total: prev.total + 1,
       }));
     },
@@ -173,7 +173,7 @@ export default function TabariExercisePage() {
       if (letter === correct) {
         return "border-emerald-500 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-100";
       }
-      if (letter === selectedAnswer && !validationResult.isCorrect) {
+      if (letter === selectedAnswer && !validationResult.correct) {
         return "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300";
       }
     }
@@ -290,7 +290,7 @@ export default function TabariExercisePage() {
                     {submitted && validationResult && letter === validationResult.correctAnswer.toUpperCase() && (
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 ml-auto flex-shrink-0" />
                     )}
-                    {submitted && validationResult && letter === selectedAnswer && !validationResult.isCorrect && letter !== validationResult.correctAnswer.toUpperCase() && (
+                    {submitted && validationResult && letter === selectedAnswer && !validationResult.correct && letter !== validationResult.correctAnswer.toUpperCase() && (
                       <XCircle className="h-5 w-5 text-red-500 ml-auto flex-shrink-0" />
                     )}
                   </button>
@@ -309,13 +309,13 @@ export default function TabariExercisePage() {
                 <div className="space-y-3">
                   <div
                     className={`rounded-xl p-4 border ${
-                      validationResult?.isCorrect
+                      validationResult?.correct
                         ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700"
                         : "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-700"
                     }`}
                   >
                     <p className="font-semibold text-sm">
-                      {validationResult?.isCorrect ? "🎉 Correct!" : "📖 Not quite"}
+                      {validationResult?.correct ? "🎉 Correct!" : "📖 Not quite"}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
                       {validationResult?.explanation}

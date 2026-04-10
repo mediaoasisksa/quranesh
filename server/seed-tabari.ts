@@ -136,17 +136,6 @@ function expandContext(
 }
 
 export async function seedTabariExercises() {
-  const { sql: sqlTag } = await import("drizzle-orm");
-
-  const count = await db
-    .select({ cnt: sqlTag<number>`count(*)` })
-    .from(tabariExercises);
-  const existing = Number((count[0] as any).cnt);
-  if (existing > 0) {
-    console.log(`✓ Tabari exercises already seeded (${existing} rows). Skipping.`);
-    return;
-  }
-
   const csvPath = path.resolve(
     __dirname,
     "../attached_assets/quranesh_tabari_300_exercises_1775627880040.csv"
@@ -159,12 +148,42 @@ export async function seedTabariExercises() {
 
   const raw = fs.readFileSync(csvPath, "utf-8").replace(/^\uFEFF/, "");
   const rows = parseCsv(raw);
+
+  // Load existing rows for per-row idempotency check.
+  // Key: "surahNumber:ayah:correctWord" — unique per question since each ayah
+  // can have multiple questions but each targets a distinct correct word.
+  const existing = await db
+    .select({
+      surahNumber: tabariExercises.surahNumber,
+      ayah: tabariExercises.ayah,
+      correctWord: tabariExercises.correctWord,
+    })
+    .from(tabariExercises);
+
+  const existingKeys = new Set(
+    existing.map(r => `${r.surahNumber}:${r.ayah}:${r.correctWord}`)
+  );
+
+  if (existingKeys.size >= rows.length) {
+    console.log(`✓ Tabari exercises already fully seeded (${existingKeys.size} rows). Skipping.`);
+    return;
+  }
+
   const verseMap = buildVerseMap(rows);
 
-  console.log(`Seeding ${rows.length} Tabari exercises...`);
+  const toInsert = rows.filter(
+    row => !existingKeys.has(`${row.surah_number}:${row.ayah}:${row.correct_word}`)
+  );
+
+  if (toInsert.length === 0) {
+    console.log(`✓ All Tabari exercises already present. Skipping.`);
+    return;
+  }
+
+  console.log(`Seeding ${toInsert.length} new Tabari exercises (${rows.length - toInsert.length} already present)...`);
 
   let multiAyahCount = 0;
-  const inserts = rows.map(row => {
+  const inserts = toInsert.map(row => {
     const options = [row.option_A, row.option_B, row.option_C, row.option_D];
     const ctx = expandContext(row.surah_number, row.ayah, options, verseMap);
     if (ctx.contextMode === "multi_ayah") multiAyahCount++;
@@ -197,5 +216,5 @@ export async function seedTabariExercises() {
     await db.insert(tabariExercises).values(inserts.slice(i, i + BATCH));
   }
 
-  console.log(`✅ Seeded ${rows.length} Tabari exercises (${multiAyahCount} multi-ayah, ${rows.length - multiAyahCount} single-ayah).`);
+  console.log(`✅ Seeded ${inserts.length} Tabari exercises (${multiAyahCount} multi-ayah, ${inserts.length - multiAyahCount} single-ayah).`);
 }
