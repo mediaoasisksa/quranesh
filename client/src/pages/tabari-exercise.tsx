@@ -112,7 +112,7 @@ export default function TabariExercisePage() {
   });
 
   const validateMutation = useMutation({
-    mutationFn: async (data: { exerciseId: number; selectedAnswer: string }) => {
+    mutationFn: async (data: { exerciseId: string; selectedAnswer: string }) => {
       const res = await apiRequest("POST", "/api/tabari-exercises/validate", data);
       return res.json() as Promise<ValidationResult>;
     },
@@ -133,10 +133,7 @@ export default function TabariExercisePage() {
 
   const handleNext = useCallback(() => {
     if (exercise) {
-      setSeenIds(prev => {
-        const next = [...prev, exercise.id];
-        return next.length > 280 ? next.slice(-50) : next;
-      });
+      setSeenIds(prev => [...prev, exercise.id]);
     }
     setSelectedAnswer(null);
     setSubmitted(false);

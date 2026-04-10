@@ -37,7 +37,14 @@ You are NOT testing interpretation, emotional intelligence, or deep Tafsir. You 
 - Juz Amma — surahs 78–114 (from An-Naba النبأ to An-Nas الناس)
 Any verse from outside these surahs is AUTOMATICALLY REJECTED.
 
-⛔ ABSOLUTE RULE: Every answer MUST be a word, phrase, or short verse that exists verbatim in the Mushaf from the allowed surahs above, with Surah name and verse number.`;
+⛔ ABSOLUTE RULE: Every answer MUST be a word, phrase, or short verse that exists verbatim in the Mushaf from the allowed surahs above, with Surah name and verse number.
+
+⛔ TAFSIR SOURCE — TAFSIR AL-TABARI ONLY:
+All word meanings and interpretations you provide MUST come exclusively from Tafsir al-Tabari (تفسير الطبري جامع البيان).
+• You MUST NOT use Ibn Kathir, Al-Jalalayn, Al-Qurtubi, Al-Baghawi, or any other tafsir.
+• You MUST NOT infer meanings from modern Arabic dictionaries alone.
+• If Tafsir al-Tabari does not contain commentary on the specific word in the cited verse, DO NOT generate that exercise.
+• This constraint applies equally to word choices, distractors, and explanations.`;
 
 export const TRIGGER_RESPONSE_RULES = `
 EXERCISE FRAMEWORK: VOCABULARY SEARCH (البحث عن المفردات)
@@ -85,6 +92,13 @@ RULE 6 — BEGINNER LEVEL:
 Keep vocabulary at a basic level. Focus on high-frequency Quranic words:
   ✅ رب، الله، الحمد، الصراط، المستقيم، نعبد، نستعين، تبارك، الملك، قدير، الموت، الحياة
   ❌ Don't use rare or advanced vocabulary that requires scholarly knowledge
+
+RULE 7 — TAFSIR SOURCE: TAFSIR AL-TABARI ONLY (الطبري فقط):
+Every word meaning MUST be sourced exclusively from Tafsir al-Tabari.
+  ✅ Only use meanings attested in al-Tabari's commentary (جامع البيان)
+  ❌ Do NOT use Ibn Kathir, Al-Jalalayn, Al-Qurtubi, or any other tafsir
+  ❌ Do NOT use meanings derived solely from modern dictionaries
+  ❌ Do NOT generate an exercise if al-Tabari does not comment on that word
 `;
 
 export const VALIDATION_CHECKLIST = `
@@ -95,6 +109,7 @@ VALIDATION CHECKLIST (apply to EVERY exercise):
 □ Is the hint practical (first letter, fill-in-blank, or word position)?
 □ Is the answer a real Quranic word/phrase with Surah:Ayah reference?
 □ Is the difficulty appropriate for a beginner non-Arabic speaker?
+□ Is the word meaning sourced from Tafsir al-Tabari (NOT from other tafasir)?
 
 QA AUTO-REJECTION RULES:
 ✘ If the verse is from outside Al-Fatiha / Al-Kahf / Al-Mulk → REJECT
@@ -102,6 +117,8 @@ QA AUTO-REJECTION RULES:
 ✘ If the question asks about interpretation, emotions, or social situations → REJECT
 ✘ If the answer is a common du'a, hadith, or non-Quranic phrase → REJECT
 ✘ If the hint is vague or emotional → REJECT and rewrite with first letter or fill-in-blank
+✘ If the word meaning is NOT attested in Tafsir al-Tabari → REJECT
+✘ If the meaning comes from Ibn Kathir, Al-Jalalayn, or any other tafsir → REJECT
 `;
 
 export const EXERCISE_FORMAT = `
@@ -199,7 +216,9 @@ export function buildValidationPrompt(scenarioText: string, verseText: string, t
 
 ${TRIGGER_RESPONSE_RULES}
 
-TASK: Validate whether this exercise follows the vocabulary-focused rules.
+${TABARI_SOURCE_NOTE}
+
+TASK: Validate whether this exercise follows the vocabulary-focused Tabari-only rules.
 
 QUESTION: "${scenarioText}"
 ANSWER: "${verseText}"
@@ -209,6 +228,7 @@ Check:
 2. Does the question mention the surah name?
 3. Is it vocabulary-focused (not interpretation)?
 4. Is the answer authentic Quranic text?
+5. Is the word meaning sourced from Tafsir al-Tabari (not other tafasir)?
 
 Return ONLY valid JSON:
 {
@@ -217,6 +237,7 @@ Return ONLY valid JSON:
   "reason": "Brief explanation",
   "surahValid": true/false,
   "vocabularyFocused": true/false,
+  "tabariSourceValid": true/false,
   "correctedScenario": "If invalid, suggest a corrected vocabulary question. If valid, omit."
 }`;
 }
