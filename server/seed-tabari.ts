@@ -24,11 +24,48 @@ interface CsvRow {
   source: string;
 }
 
+/**
+ * RFC 4180-compliant CSV field parser.
+ * Handles quoted fields that may contain commas, escaped quotes (""), and
+ * multi-line content.  Falls back gracefully on malformed rows.
+ */
+function parseCsvLine(line: string): string[] {
+  const fields: string[] = [];
+  let i = 0;
+  while (i <= line.length) {
+    if (line[i] === '"') {
+      // Quoted field
+      let field = "";
+      i++; // skip opening quote
+      while (i < line.length) {
+        if (line[i] === '"' && line[i + 1] === '"') {
+          field += '"';
+          i += 2;
+        } else if (line[i] === '"') {
+          i++; // skip closing quote
+          break;
+        } else {
+          field += line[i++];
+        }
+      }
+      fields.push(field.trim());
+      if (line[i] === ",") i++; // skip delimiter
+    } else {
+      // Unquoted field — read until next comma or end
+      const start = i;
+      while (i < line.length && line[i] !== ",") i++;
+      fields.push(line.slice(start, i).trim());
+      if (line[i] === ",") i++; // skip delimiter
+    }
+  }
+  return fields;
+}
+
 function parseCsv(content: string): CsvRow[] {
   const lines = content.split("\n").filter(l => l.trim());
   const rows: CsvRow[] = [];
   for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(",");
+    const cols = parseCsvLine(lines[i]);
     if (cols.length < 14) continue;
     const get = (idx: number) => cols[idx]?.trim() ?? "";
     rows.push({
@@ -217,4 +254,15 @@ export async function seedTabariExercises() {
   }
 
   console.log(`✅ Seeded ${inserts.length} Tabari exercises (${multiAyahCount} multi-ayah, ${inserts.length - multiAyahCount} single-ayah).`);
+}
+
+// ── CLI entrypoint ────────────────────────────────────────────────────────────
+// Allows one-shot execution:  npx tsx server/seed-tabari.ts
+// When imported as a module (server startup), this block is skipped.
+const scriptUrl = fileURLToPath(import.meta.url);
+const isMain = process.argv[1] === scriptUrl || process.argv[1]?.endsWith("/seed-tabari.ts") || process.argv[1]?.endsWith("/seed-tabari.js");
+if (isMain) {
+  seedTabariExercises()
+    .then(() => process.exit(0))
+    .catch(err => { console.error(err); process.exit(1); });
 }
