@@ -349,6 +349,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Seed Tabari vocabulary exercises (300 MCQ)
     const { seedTabariExercises } = await import("./seed-tabari");
     await seedTabariExercises();
+
+    // Re-validate context fields and expand passage for any row whose
+    // options are not fully covered by its displayed_passage_text.
+    const { backfillTabariContext } = await import("./backfill-tabari-context");
+    const backfillResult = await backfillTabariContext();
+    console.log(`✅ Tabari context backfill: ${backfillResult.updated} rows updated, ${backfillResult.reviewNeeded} review_needed, ${backfillResult.singleAyah} single-ayah, ${backfillResult.multiAyah} multi-ayah.`);
   })().catch((err) => {
     // Log startup errors but never crash the server — DB may be waking up from suspension
     console.error("⚠️ Startup init error (non-fatal):", err?.message ?? err);
@@ -3661,15 +3667,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? String(req.query.exclude).split(",").map(s => s.trim()).filter(Boolean)
         : [];
 
-      const { eq, notInArray, and } = await import("drizzle-orm");
-
-      const conditions: any[] = [];
+      const { eq, notInArray, and, ne } = await import("drizzle-orm");
+      const conditions: any[] = [ne(tabariExercises.optionsSourceScope, "review_needed")];
       if (surahParam) conditions.push(eq(tabariExercises.surahNumber, surahParam));
       if (excludeIds.length > 0) conditions.push(notInArray(tabariExercises.id, excludeIds));
 
-      const rows = conditions.length > 0
-        ? await db.select().from(tabariExercises).where(and(...conditions))
-        : await db.select().from(tabariExercises);
+      const rows = await db.select().from(tabariExercises).where(and(...conditions));
 
       if (rows.length === 0) {
         return res.status(404).json({ message: "No exercises found" });
@@ -3695,9 +3698,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(tabariExercises)
         .groupBy(tabariExercises.surahNumber, tabariExercises.surahNameAr);
       const total = rows.reduce((acc, r) => acc + Number(r.cnt), 0);
-      res.json({ total, bySurah: rows });
+      // Also return context_mode and options_source_scope breakdown
+      const { count: countFn } = await import("drizzle-orm");
+      const contextRows = await db
+        .select({
+          contextMode: tabariExercises.contextMode,
+          optionsSourceScope: tabariExercises.optionsSourceScope,
+          cnt: countFn(),
+        })
+        .from(tabariExercises)
+        .groupBy(tabariExercises.contextMode, tabariExercises.optionsSourceScope);
+      res.json({ total, bySurah: rows, byContext: contextRows });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // Admin: re-run context backfill on demand
+  app.post("/api/admin/tabari-backfill", async (req, res) => {
+    try {
+      const { backfillTabariContext } = await import("./backfill-tabari-context");
+      const result = await backfillTabariContext();
+      res.json({ success: true, ...result });
+    } catch (err: any) {
+      console.error("Tabari backfill error:", err);
+      res.status(500).json({ message: "Backfill failed", error: err?.message });
     }
   });
 

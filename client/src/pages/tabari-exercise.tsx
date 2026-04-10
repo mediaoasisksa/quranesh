@@ -27,15 +27,20 @@ function AyahPassage({ exercise }: { exercise: TabariExercise }) {
   if (!isMulti) {
     return (
       <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-5 text-center">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Badge variant="outline" className="text-emerald-700 border-emerald-400 text-xs">
+            {exercise.surahNameAr}
+          </Badge>
+          <Badge variant="outline" className="text-emerald-600 border-emerald-300 text-xs">
+            آية {exercise.contextStartAyah ?? exercise.ayah}
+          </Badge>
+        </div>
         <p
           className="text-2xl leading-loose font-amiri text-emerald-900 dark:text-emerald-100"
           dir="rtl"
           lang="ar"
         >
-          {exercise.verseText}
-        </p>
-        <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
-          {exercise.surahNameAr} — آية {exercise.ayah}
+          {exercise.displayedPassageText || exercise.verseText}
         </p>
       </div>
     );
@@ -95,6 +100,8 @@ export default function TabariExercisePage() {
 
   const excludeParam = seenIds.join(",");
 
+  const [allExhausted, setAllExhausted] = useState(false);
+
   const {
     data: exercise,
     isLoading,
@@ -105,10 +112,16 @@ export default function TabariExercisePage() {
     queryFn: async () => {
       const params = excludeParam ? `?exclude=${excludeParam}` : "";
       const res = await fetch(`/api/tabari-exercises/random${params}`);
+      if (res.status === 404) {
+        setAllExhausted(true);
+        throw new Error("exhausted");
+      }
       if (!res.ok) throw new Error("Failed to load exercise");
+      setAllExhausted(false);
       return res.json();
     },
     staleTime: 0,
+    retry: false,
   });
 
   const validateMutation = useMutation({
@@ -147,6 +160,7 @@ export default function TabariExercisePage() {
     setSubmitted(false);
     setValidationResult(null);
     setScore({ correct: 0, total: 0 });
+    setAllExhausted(false);
     refetch();
   }, [refetch]);
 
@@ -236,6 +250,37 @@ export default function TabariExercisePage() {
                   ))}
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        ) : allExhausted ? (
+          <Card>
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="text-5xl">🎉</div>
+              <h2 className="text-xl font-bold text-emerald-700 dark:text-emerald-400">
+                أنهيت جميع التمارين!
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                لقد أجبت على جميع التمارين المتاحة في هذه الجلسة.
+                <br />
+                You've answered all {seenIds.length} available exercises in this session.
+              </p>
+              <div className="flex gap-3 justify-center pt-2">
+                <Badge variant="outline" className="text-emerald-700 border-emerald-300 text-base px-3 py-1">
+                  ✅ {score.correct} / {score.total} correct
+                </Badge>
+                {score.total > 0 && (
+                  <Badge variant="outline" className="text-amber-700 border-amber-300 text-base px-3 py-1">
+                    🎯 {Math.round((score.correct / score.total) * 100)}%
+                  </Badge>
+                )}
+              </div>
+              <Button
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-2"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Start New Session
+              </Button>
             </CardContent>
           </Card>
         ) : error ? (

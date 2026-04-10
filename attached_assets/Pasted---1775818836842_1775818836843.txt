@@ -1,0 +1,255 @@
+أريد الآن تعديل محرك إنشاء الأسئلة نفسه، وليس فقط إصلاح الأسئلة بعد إنشائها.
+
+المطلوب:
+منع توليد أي سؤال من نوع اختيار الكلمة العربية من الأصل إذا لم ينجح في وضع single_ayah، إلا إذا نجح تلقائيا في multi_ayah validation.
+
+المعنى:
+قاعدة multi-ayah يجب أن تصبح جزءا من generation pipeline نفسه، لا خطوة لاحقة بعد التوليد.
+
+════════════════════════════════════
+1) القاعدة الجديدة داخل محرك الإنشاء
+════════════════════════════════════
+
+لكل سؤال جديد من نوع:
+- meaning_to_arabic_word
+- أو أي نوع يعتمد على استخراج 4 خيارات عربية من النص القرآني
+
+اتبع هذا الترتيب الإجباري:
+
+Step A — Try single_ayah generation
+1. استخدم الآية المستهدفة وحدها
+2. حاول استخراج 4 خيارات صالحة من نفس الآية
+3. شغّل validation الكامل على single_ayah:
+   - enough_valid_options_check
+   - correct_option_uniqueness_check
+   - options_from_displayed_passage_only_check
+   - ambiguity_check
+   - sacred_presentation_check
+
+إذا نجح:
+- أنشئ السؤال بوضع:
+  context_mode = single_ayah
+- وانتهى
+
+إذا فشل:
+- لا تنشر السؤال
+- لا تحفظه كpublished
+- انتقل تلقائيا إلى Step B
+
+Step B — Try multi_ayah generation
+1. وسّع السياق تدريجيا داخل نفس السورة فقط
+2. استخدم آيات متجاورة contiguous only
+3. ابدأ بأقل توسع ممكن:
+   - الآية + التالية
+   - أو السابقة + الآية
+   - ثم السابقة + الآية + التالية
+   - ثم توسع محدود إضافي إذا لزم
+4. بعد كل توسع شغّل validation الكامل
+
+إذا نجح أول context صالح:
+- أنشئ السؤال بوضع:
+  context_mode = multi_ayah
+  context_start_ayah = ...
+  context_end_ayah = ...
+  primary_ayah_number = target ayah
+  displayed_passage_text = actual displayed passage
+
+إذا فشل كل التوسعات:
+- لا تولّد السؤال إطلاقا
+- لا تنشره
+- أرسله إلى review queue أو generation_failed queue
+- مع reason واضح:
+  insufficient_valid_context
+  أو
+  ambiguous_multi_ayah
+
+════════════════════════════════════
+2) لا أريد fallback ضعيفا
+════════════════════════════════════
+
+امنع تماما هذه السلوكيات:
+- fake distractors
+- خيارات من خارج النص المعروض
+- نشر single_ayah ناقص
+- حفظ سؤال invalid ثم إصلاحه لاحقا
+- توسيع إلى آيات غير متجاورة
+- خلط آيات من سور مختلفة
+- إبقاء السؤال live إذا فشل validation
+
+يعني:
+question generation must be validation-gated from the start.
+
+════════════════════════════════════
+3) Generation pipeline المطلوب
+════════════════════════════════════
+
+أريد pipeline واضحة بهذا الشكل:
+
+candidate item
+→ single_ayah generation attempt
+→ single_ayah validation
+→ if pass: publishable candidate
+→ if fail: multi_ayah generation attempt
+→ multi_ayah validation
+→ if pass: publishable candidate
+→ if fail: reject / review queue
+
+ولا أريد أي مسار ثالث غير مضبوط.
+
+════════════════════════════════════
+4) Database / status fields
+════════════════════════════════════
+
+أضف أو استخدم حقولا واضحة لكل generated question:
+- generation_status
+  values:
+  - generated_single_pass
+  - generated_multi_pass
+  - generation_failed
+  - sent_to_review
+
+- generation_failure_reason
+  values like:
+  - insufficient_options_single_ayah
+  - ambiguous_single_ayah
+  - insufficient_options_multi_ayah
+  - ambiguous_multi_ayah
+  - target_not_in_passage
+  - validation_failed
+
+- context_mode
+  single_ayah | multi_ayah
+
+- context_start_ayah
+- context_end_ayah
+- primary_ayah_number
+- displayed_passage_text
+
+════════════════════════════════════
+5) Validation must be generation-blocking
+════════════════════════════════════
+
+أريد validation functions أن تكون blocking gates، لا مجرد warnings.
+
+Specifically:
+- if enough_valid_options_check fails → generation fails for that context
+- if ambiguity_check fails → generation fails for that context
+- if options_from_displayed_passage_only_check fails → generation fails
+- if correct_option_uniqueness_check fails → generation fails
+- if sacred_presentation_check fails → generation fails
+
+Only passed candidates may move forward.
+
+════════════════════════════════════
+6) Quiz engine behavior
+════════════════════════════════════
+
+بعد التوليد:
+- quiz engine لا يجب أن يتعامل مع سؤال invalid أصلا
+- لا يجب أن توجد أسئلة منشورة تحتاج runtime patching لتصبح صالحة
+- runtime should consume only already validated questions
+
+يعني:
+حل المشكلة يجب أن يكون upstream in generation, not downstream in delivery.
+
+════════════════════════════════════
+7) Review queue integration
+════════════════════════════════════
+
+إذا فشل السؤال في single_ayah وmulti_ayah معًا:
+- أرسل item إلى review queue
+- اعرض للمراجع:
+  - target ayah
+  - attempted contexts
+  - failure reasons
+  - candidate options if any
+  - suggested nearest valid context if available
+
+أضف review reason codes:
+- single_ayah_failed
+- multi_ayah_failed
+- insufficient_displayed_options
+- multi_ayah_ambiguity
+- needs_manual_question_design
+
+════════════════════════════════════
+8) Existing content backfill
+════════════════════════════════════
+
+لا يكفي تعديل generation للمحتوى الجديد فقط.
+
+أريد أيضا:
+1. فحص الأسئلة الحالية المنشورة من هذا النوع
+2. إعادة التحقق عليها بنفس القواعد الجديدة
+3. إذا كان سؤال منشور:
+   - single_ayah invalid
+   - لكنه multi_ayah valid
+   => حدّثه إلى multi_ayah
+4. إذا فشل في الاثنين:
+   => deactivate + send to review queue
+5. أرسل تقريرا بعدد:
+   - kept as single_ayah
+   - upgraded to multi_ayah
+   - deactivated
+   - sent to review
+
+════════════════════════════════════
+9) Tests المطلوبة
+════════════════════════════════════
+
+أريد tests حقيقية لهذه القاعدة الجديدة:
+
+1. single_ayah success publishes question as single_ayah
+2. single_ayah failure triggers multi_ayah attempt
+3. multi_ayah success publishes question as multi_ayah
+4. failure in both modes prevents generation
+5. generated question never uses options outside displayed passage
+6. generated question never mixes surahs
+7. generated question never uses non-contiguous ayahs in multi mode
+8. invalid generated question is never publishable
+9. existing invalid question is backfilled or deactivated correctly
+
+════════════════════════════════════
+10) Build order
+════════════════════════════════════
+
+نفّذ بهذا الترتيب:
+
+Step 1
+Refactor generator to support explicit context attempts
+
+Step 2
+Attach blocking validation gates to generation
+
+Step 3
+Implement automatic fallback from single_ayah to multi_ayah
+
+Step 4
+Store generation status + failure reasons
+
+Step 5
+Integrate with review queue
+
+Step 6
+Run backfill on existing content
+
+Step 7
+Add tests
+
+Step 8
+Send final report
+
+════════════════════════════════════
+11) Final requirement
+════════════════════════════════════
+
+أريد المبدأ التالي مطبقا حرفيا في الكود:
+
+No single-ayah question should ever be generated or published if it fails validation, unless a valid multi-ayah version is successfully generated and validated automatically.
+
+بمعنى:
+- لا نشر قبل النجاح
+- لا إصلاح يدوي لاحق كحل أساسي
+- لا سؤال invalid يدخل قاعدة الأسئلة الحية
+
+هذا يجب أن يصبح جزءا أصيلا من question generation engine.
