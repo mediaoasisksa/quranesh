@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, XCircle, BookOpen, ChevronLeft } from "lucide-react";
+import { ArrowRight, RotateCcw, CheckCircle2, XCircle, BookOpen, ChevronLeft, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { apiRequest } from "@/lib/queryClient";
 import type { TabariExercise } from "@shared/schema";
@@ -138,13 +138,14 @@ export default function TabariExercisePage() {
     },
   });
 
-  const handleSubmit = useCallback(() => {
-    if (!exercise || !selectedAnswer || submitted) return;
+  const handleOptionClick = (letter: AnswerLetter) => {
+    if (submitted || validateMutation.isPending || !exercise) return;
+    setSelectedAnswer(letter);
     setSubmitted(true);
-    validateMutation.mutate({ exerciseId: exercise.id, selectedAnswer });
-  }, [exercise, selectedAnswer, submitted, validateMutation]);
+    validateMutation.mutate({ exerciseId: exercise.id, selectedAnswer: letter });
+  };
 
-  const handleNext = useCallback(() => {
+  const handleNext = () => {
     if (exercise) {
       setSeenIds(prev => [...prev, exercise.id]);
     }
@@ -152,9 +153,9 @@ export default function TabariExercisePage() {
     setSubmitted(false);
     setValidationResult(null);
     refetch();
-  }, [exercise, refetch]);
+  };
 
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     setSeenIds([]);
     setSelectedAnswer(null);
     setSubmitted(false);
@@ -162,7 +163,7 @@ export default function TabariExercisePage() {
     setScore({ correct: 0, total: 0 });
     setAllExhausted(false);
     refetch();
-  }, [refetch]);
+  };
 
   const options: Array<{ letter: AnswerLetter; text: string }> = exercise
     ? [
@@ -319,12 +320,14 @@ export default function TabariExercisePage() {
                 {options.map(({ letter, text }) => (
                   <button
                     key={letter}
-                    onClick={() => !submitted && setSelectedAnswer(letter)}
-                    disabled={submitted}
-                    className={`flex items-center gap-3 w-full text-start px-4 py-3 rounded-lg border-2 transition-all duration-150 cursor-pointer disabled:cursor-not-allowed ${getOptionClass(letter)}`}
+                    onClick={() => handleOptionClick(letter)}
+                    disabled={submitted || validateMutation.isPending}
+                    className={`flex items-center gap-3 w-full text-start px-4 py-3 rounded-lg border-2 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed ${getOptionClass(letter)}`}
                   >
                     <span className="flex-shrink-0 w-7 h-7 rounded-full bg-muted flex items-center justify-center font-bold text-sm">
-                      {letter}
+                      {validateMutation.isPending && letter === selectedAnswer
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : letter}
                     </span>
                     <span className="font-amiri text-xl" dir="rtl" lang="ar">
                       {text}
@@ -339,41 +342,42 @@ export default function TabariExercisePage() {
                 ))}
               </div>
 
-              {!submitted ? (
-                <Button
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                  disabled={!selectedAnswer || validateMutation.isPending}
-                  onClick={handleSubmit}
-                >
-                  {validateMutation.isPending ? "Checking..." : "Submit Answer"}
-                </Button>
-              ) : (
+              {submitted && (
                 <div className="space-y-3">
-                  <div
-                    className={`rounded-xl p-4 border ${
-                      validationResult?.correct
-                        ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700"
-                        : "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-700"
-                    }`}
-                  >
-                    <p className="font-semibold text-sm">
-                      {validationResult?.correct ? "🎉 Correct!" : "📖 Not quite"}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {validationResult?.explanation}
-                    </p>
-                  </div>
+                  {validateMutation.isPending ? (
+                    <div className="rounded-xl p-4 border border-border bg-muted/40 text-center text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+                      Checking your answer…
+                    </div>
+                  ) : validationResult ? (
+                    <div
+                      className={`rounded-xl p-4 border ${
+                        validationResult.correct
+                          ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700"
+                          : "bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-700"
+                      }`}
+                    >
+                      <p className="font-semibold text-sm">
+                        {validationResult.correct ? "🎉 Correct!" : "📖 Not quite"}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {validationResult.explanation}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <Button
                     className="w-full gap-2"
                     variant="outline"
                     onClick={handleNext}
+                    disabled={validateMutation.isPending}
                   >
                     Next Exercise
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
               )}
+
             </CardContent>
           </Card>
         ) : null}

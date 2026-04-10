@@ -7,6 +7,7 @@ import {
   Settings,
   UserCircle,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -72,6 +73,15 @@ const Header = () => {
             ))}
             {isAuthenticated && (
               <Link
+                href="/tabari-exercises"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span>Vocabulary</span>
+              </Link>
+            )}
+            {isAuthenticated && (
+              <Link
                 href="/analytics"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-2"
               >
@@ -109,6 +119,12 @@ const Header = () => {
                     <Link href="/dashboard" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>{t('dashboard')}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/tabari-exercises" className="cursor-pointer">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      <span>Vocabulary Exercises</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -211,6 +227,12 @@ const Header = () => {
                       <Button variant="ghost" className="justify-start w-full">
                         <User className="mr-2 h-4 w-4" />
                         {t('dashboard')}
+                      </Button>
+                    </Link>
+                    <Link href="/tabari-exercises">
+                      <Button variant="ghost" className="justify-start w-full">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        Vocabulary Exercises
                       </Button>
                     </Link>
                     <Link href="/analytics">

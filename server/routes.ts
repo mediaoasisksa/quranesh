@@ -3668,11 +3668,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : [];
 
       const { eq, notInArray, and, ne } = await import("drizzle-orm");
-      const conditions: any[] = [ne(tabariExercises.optionsSourceScope, "review_needed")];
-      if (surahParam) conditions.push(eq(tabariExercises.surahNumber, surahParam));
-      if (excludeIds.length > 0) conditions.push(notInArray(tabariExercises.id, excludeIds));
+      const baseCondition = ne(tabariExercises.optionsSourceScope, "review_needed");
+      const surahCondition = surahParam ? eq(tabariExercises.surahNumber, surahParam) : undefined;
+      const excludeCondition = excludeIds.length > 0 ? notInArray(tabariExercises.id, excludeIds) : undefined;
 
-      const rows = await db.select().from(tabariExercises).where(and(...conditions));
+      const rows = await db
+        .select()
+        .from(tabariExercises)
+        .where(and(baseCondition, surahCondition, excludeCondition));
 
       if (rows.length === 0) {
         return res.status(404).json({ message: "No exercises found" });
@@ -3715,7 +3718,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin: re-run context backfill on demand
-  app.post("/api/admin/tabari-backfill", async (req, res) => {
+  app.post("/api/admin/tabari-backfill", requireAdminAuth, async (req, res) => {
     try {
       const { backfillTabariContext } = await import("./backfill-tabari-context");
       const result = await backfillTabariContext();
