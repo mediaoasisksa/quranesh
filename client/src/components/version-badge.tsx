@@ -9,43 +9,37 @@ interface VersionInfo {
   startedAt: string;
 }
 
-function detectDeploymentTarget(): string {
-  if (typeof window === "undefined") return "server";
+function detectDeploymentTarget(): { label: string; colorClass: string } {
+  if (typeof window === "undefined") return { label: "server", colorClass: "bg-gray-600 text-white" };
   const host = window.location.hostname;
-  if (host.includes("quranesh.com")) return "quranesh.com";
-  if (host.includes(".replit.app")) return "replit-deploy";
-  if (host.includes(".replit.dev") || host.includes("replit.dev")) return "replit-preview";
-  return "local";
+  if (host.includes("quranesh.com")) return { label: "quranesh.com", colorClass: "bg-green-600 text-white" };
+  if (host.includes(".replit.app")) return { label: "replit-deploy", colorClass: "bg-blue-600 text-white" };
+  if (host.includes(".replit.dev") || host.endsWith("repl.co")) return { label: "replit-preview", colorClass: "bg-amber-500 text-white" };
+  return { label: "localhost", colorClass: "bg-slate-500 text-white" };
 }
 
-const targetColors: Record<string, string> = {
-  "quranesh.com": "bg-green-700 text-white",
-  "replit-deploy": "bg-blue-700 text-white",
-  "replit-preview": "bg-yellow-600 text-white",
-  "local": "bg-gray-600 text-white",
-};
-
 export function VersionBadge() {
-  const { data } = useQuery<VersionInfo>({
+  const { data, isLoading } = useQuery<VersionInfo>({
     queryKey: ["/api/version"],
     staleTime: Infinity,
     refetchOnWindowFocus: false,
+    retry: 2,
   });
 
-  const target = detectDeploymentTarget();
-  const colorClass = targetColors[target] ?? "bg-gray-600 text-white";
-
-  if (!data?.commit) return null;
+  const { label, colorClass } = detectDeploymentTarget();
+  const commit = data?.commit ?? (isLoading ? "…" : "?");
 
   return (
     <div
-      className={`fixed bottom-2 right-2 z-50 flex items-center gap-1 rounded px-2 py-1 text-xs font-mono opacity-75 hover:opacity-100 transition-opacity shadow-md ${colorClass}`}
-      title={`Build: ${data.buildId}\nEnv: ${data.env}\nServer started: ${data.startedAt}`}
+      style={{ position: "fixed", bottom: "10px", right: "10px", zIndex: 99999 }}
+      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono shadow-lg cursor-default select-none ${colorClass}`}
+      title={data ? `Build: ${data.buildId}\nEnv: ${data.env}\nServer started: ${data.startedAt}` : "Loading build info…"}
       data-testid="version-badge"
     >
-      <span className="font-semibold">{target}</span>
-      <span className="opacity-70">|</span>
-      <span>{data.commit}</span>
+      <span className="w-1.5 h-1.5 rounded-full bg-white opacity-80 inline-block" />
+      <span className="font-semibold">{label}</span>
+      <span className="opacity-60">|</span>
+      <span>{commit}</span>
     </div>
   );
 }
