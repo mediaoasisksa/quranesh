@@ -4683,9 +4683,17 @@ export async function generateVocabularyExercise(userLanguage: string = 'en', su
   // ── Safe fallback: pick from the globally pre-validated pool ────────────────
   // All entries here have already passed the validator, so we NEVER serve
   // options that are not literally present in the displayed passage.
-  const globalPool = GLOBALLY_VALID_POOL.length > 0
-    ? GLOBALLY_VALID_POOL
-    : null;
+  // Respect surahFilter here too: prefer same-surah entries in the global pool.
+  const globalPool = (() => {
+    if (GLOBALLY_VALID_POOL.length === 0) return null;
+    if (surahFilter) {
+      const surahPool = GLOBALLY_VALID_POOL.filter(
+        v => v.exercise.surahAr === surahFilter || v.exercise.surahEn === surahFilter
+      );
+      return surahPool.length > 0 ? surahPool : GLOBALLY_VALID_POOL;
+    }
+    return GLOBALLY_VALID_POOL;
+  })();
 
   if (globalPool) {
     const picked = globalPool[Math.floor(Math.random() * globalPool.length)];
