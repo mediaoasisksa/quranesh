@@ -2,6 +2,7 @@ import axios from "axios";
 import type { Phrase } from "@shared/schema";
 import { isNonQuranicPhrase } from "./quran-validator";
 import { JUZ_AMMA_BANK } from "./juz-amma-vocab";
+import { validateAndRebuildOptions, buildSurahVerseMaps } from "./vocab-validator";
 
 // قوائم الكلمات المفتاحية للحماية السياقية
 // منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
@@ -2172,6 +2173,9 @@ export interface VocabularyExercise {
   correctVerse: string;
   correctVerseMeaning: string;
   options: { text: string; isCorrect: boolean }[];
+  /** Set when the displayed passage extends beyond correctVerse (multi-ayah mode). */
+  displayedPassageText?: string;
+  contextMode?: "single_ayah" | "multi_ayah";
 }
 
 const VOCAB_BANK: VocabularyExercise[] = [
@@ -4533,6 +4537,13 @@ const VOCAB_BANK: VocabularyExercise[] = [
 
 VOCAB_BANK.push(...(JUZ_AMMA_BANK as unknown as VocabularyExercise[]));
 
+// ── Verse maps (built once at module load) ───────────────────────────────────
+// Maps surahAr → (ayahNumber → verseText), used by the option validator when
+// a single ayah doesn't provide enough distinct words for 4 options.
+const SURAH_VERSE_MAPS: Map<string, Map<number, string>> = buildSurahVerseMaps(
+  VOCAB_BANK.map(e => ({ surahAr: e.surahAr, ayahNumber: e.ayahNumber, correctVerse: e.correctVerse }))
+);
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -4554,17 +4565,16 @@ export function getVocabBankSurahs(): { surahAr: string; surahEn: string; count:
 }
 
 export async function generateVocabularyExercise(userLanguage: string = 'en', surahFilter?: string): Promise<VocabularyExercise & { translatedWordMeaning: string; translatedVerseMeaning: string }> {
-  let exercise: VocabularyExercise;
 
-  if (surahFilter) {
-    const filtered = VOCAB_BANK.filter(e => e.surahAr === surahFilter || e.surahEn === surahFilter);
-    const pool = filtered.length > 0 ? filtered : VOCAB_BANK;
-    exercise = pool[Math.floor(Math.random() * pool.length)];
-  } else {
+  // Build the candidate pool for this request
+  const pool: VocabularyExercise[] = (() => {
+    if (surahFilter) {
+      const filtered = VOCAB_BANK.filter(e => e.surahAr === surahFilter || e.surahEn === surahFilter);
+      return filtered.length > 0 ? filtered : VOCAB_BANK;
+    }
     const allSurahs = [...new Set(VOCAB_BANK.map(e => e.surahAr))];
     const fatihaEntries = VOCAB_BANK.filter(e => e.surahAr === 'الفاتحة');
     let targetSurah: string;
-
     if (fatihaEntries.length > 0 && Math.random() < 0.30) {
       targetSurah = 'الفاتحة';
     } else {
@@ -4573,17 +4583,67 @@ export async function generateVocabularyExercise(userLanguage: string = 'en', su
         ? otherSurahs[Math.floor(Math.random() * otherSurahs.length)]
         : allSurahs[Math.floor(Math.random() * allSurahs.length)];
     }
+    return VOCAB_BANK.filter(e => e.surahAr === targetSurah);
+  })();
 
-    const surahPool = VOCAB_BANK.filter(e => e.surahAr === targetSurah);
-    exercise = surahPool[Math.floor(Math.random() * surahPool.length)];
+  // Try exercises from the pool until one passes the option-in-passage gate.
+  // Shuffle the pool so we try different exercises on each request.
+  const shuffledPool = shuffleArray([...pool]);
+
+  for (const candidate of shuffledPool) {
+    const surahVerseMap = SURAH_VERSE_MAPS.get(candidate.surahAr);
+
+    const validated = validateAndRebuildOptions(
+      candidate.targetWord,
+      candidate.correctVerse,
+      candidate.ayahNumber,
+      candidate.options,
+      surahVerseMap,
+    );
+
+    if (validated === null) {
+      // This exercise cannot be built with valid options — skip it
+      continue;
+    }
+
+    const translatedWordMeaning =
+      candidate.targetWordTranslations[userLanguage] ||
+      candidate.targetWordTranslations['en'] ||
+      candidate.targetWordMeaning;
+    const translatedVerseMeaning =
+      candidate.correctVerseMeaningTranslations[userLanguage] ||
+      candidate.correctVerseMeaningTranslations['en'] ||
+      candidate.correctVerseMeaning;
+
+    return {
+      ...candidate,
+      id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      options: validated.options,
+      targetWordMeaning: translatedWordMeaning,
+      correctVerseMeaning: translatedVerseMeaning,
+      translatedWordMeaning,
+      translatedVerseMeaning,
+      // Pass through context fields so the frontend can show the correct passage
+      displayedPassageText: validated.displayedPassageText,
+      contextMode: validated.contextMode,
+    };
   }
-  const shuffledOptions = shuffleArray(exercise.options);
-  const translatedWordMeaning = exercise.targetWordTranslations[userLanguage] || exercise.targetWordTranslations['en'] || exercise.targetWordMeaning;
-  const translatedVerseMeaning = exercise.correctVerseMeaningTranslations[userLanguage] || exercise.correctVerseMeaningTranslations['en'] || exercise.correctVerseMeaning;
+
+  // Absolute fallback: return any exercise with shuffled options if all fail
+  // (should not happen given the current bank, but protects against empty pools)
+  const fallback = pool[Math.floor(Math.random() * pool.length)];
+  const translatedWordMeaning =
+    fallback.targetWordTranslations[userLanguage] ||
+    fallback.targetWordTranslations['en'] ||
+    fallback.targetWordMeaning;
+  const translatedVerseMeaning =
+    fallback.correctVerseMeaningTranslations[userLanguage] ||
+    fallback.correctVerseMeaningTranslations['en'] ||
+    fallback.correctVerseMeaning;
   return {
-    ...exercise,
+    ...fallback,
     id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    options: shuffledOptions,
+    options: shuffleArray(fallback.options),
     targetWordMeaning: translatedWordMeaning,
     correctVerseMeaning: translatedVerseMeaning,
     translatedWordMeaning,
