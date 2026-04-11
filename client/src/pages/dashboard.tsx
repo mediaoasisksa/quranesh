@@ -38,6 +38,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import ExerciseCard from "@/components/exercise-card";
 import PhraseCard from "@/components/phrase-card";
 import ProgressStats from "@/components/progress-stats";
+import { InlineBuildBadge } from "@/components/version-badge";
 
 import { exerciseTypes, getRandomExerciseType } from "@/lib/exercises";
 import type { Phrase, DailyStats, UserProgress } from "@shared/schema";
@@ -192,7 +193,7 @@ export default function Dashboard() {
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
-            <div className="flex items-center">
+            <div className="flex items-center gap-3">
               <Link href="/" className="cursor-pointer">
                 <img 
                   src={logoImage} 
@@ -200,6 +201,7 @@ export default function Dashboard() {
                   className="h-20 w-auto object-contain hover:opacity-90 transition-opacity"
                 />
               </Link>
+              <InlineBuildBadge />
             </div>
 
             <div className="flex items-center space-x-4">

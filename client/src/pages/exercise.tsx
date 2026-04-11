@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import SubscriptionGate from "@/components/subscription-gate";
+import { InlineBuildBadge } from "@/components/version-badge";
 
 
 export default function Exercise() {
@@ -1112,6 +1113,9 @@ export default function Exercise() {
               <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
                 {exerciseConfig ? t(exerciseConfig.descriptionKey as any) : ''}
               </p>
+              <div className="flex justify-center mt-1">
+                <InlineBuildBadge />
+              </div>
             </div>
             <div className="shrink-0 flex items-center justify-end">
               <img 
