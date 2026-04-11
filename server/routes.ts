@@ -872,6 +872,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const lang = typeof language === "string" ? language : "en";
       const surahFilter = typeof surah === "string" ? surah : undefined;
       const exercise = await generateVocabularyExercise(lang, surahFilter);
+
+      // ── SERVER-SIDE KILL SWITCH ──────────────────────────────────────────
+      // Final gate: verify every option is a literal visible token of the
+      // displayed Arabic text before sending to the client. This runs AFTER
+      // the generator's own rebuild, so it catches any edge case that slipped
+      // through. If it fails the client receives failedValidation:true and
+      // renders the "under review" fallback instead of a broken exercise.
+      const { validateExerciseUsesOnlyVisibleArabic } = await import("./exerciseVisibleValidator");
+      const { buildVisibleArabicSet, normalizeArabic } = await import("../shared/arabicVisibleTokens");
+
+      const displayedText = exercise.displayedPassageText ?? exercise.correctVerse ?? "";
+      const visibleSet = buildVisibleArabicSet(displayedText);
+      const badOptions = (exercise.options || []).filter(
+        (o: { text: string }) => !visibleSet.has(normalizeArabic(o.text))
+      );
+
+      if (badOptions.length > 0) {
+        console.error(
+          `[kill-switch] Blocked malformed exercise: surah=${exercise.surahAr} ayah=${exercise.ayahNumber} ` +
+          `displayed="${displayedText}" bad_opts=${badOptions.map((o: { text: string }) => o.text).join(",")}`
+        );
+        return res.status(200).json({
+          failedValidation: true,
+          reason: `Options not in displayed text: ${badOptions.map((o: { text: string }) => o.text).join(", ")}`,
+        });
+      }
+
       res.json(exercise);
     } catch (error) {
       console.error("Error generating vocabulary exercise:", error);

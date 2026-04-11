@@ -123,7 +123,7 @@ export default function Exercise() {
     enabled: !!exerciseType && isThematicExercise,
   });
 
-  const { data: vocabExercise, isLoading: vocabLoading } = useQuery<{
+  const { data: vocabExercise, isLoading: vocabLoading, refetch: refetchVocab } = useQuery<{
     id: string;
     surahAr: string;
     surahEn: string;
@@ -146,6 +146,9 @@ export default function Exercise() {
     correctVerseMeaning: string;
     translatedWordMeaning: string;
     translatedVerseMeaning: string;
+    displayedPassageText?: string;
+    failedValidation?: boolean;
+    reason?: string;
   }>({
     queryKey: ["/api/vocabulary-exercise", language, exerciseType, selectedSurahName],
     queryFn: async () => {
@@ -717,6 +720,27 @@ export default function Exercise() {
 
       case "conversation":
       case "daily_contextual":
+        // ── KILL SWITCH: server flagged this exercise as invalid ──────────────
+        if (vocabExercise?.failedValidation) {
+          return (
+            <div className="flex flex-col items-center justify-center gap-4 p-8 text-center rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700">
+              <div className="text-4xl">🔄</div>
+              <p className="arabic-text text-xl font-bold text-amber-800 dark:text-amber-200" dir="rtl" lang="ar">
+                هذا التمرين قيد المراجعة
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300" dir={dir}>
+                {language === 'ar' ? 'جارٍ توليد تمرين صحيح…' : 'Generating a correct exercise…'}
+              </p>
+              <button
+                className="mt-2 px-5 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm font-semibold"
+                onClick={() => refetchVocab()}
+              >
+                {language === 'ar' ? 'تمرين جديد' : 'Try Another'}
+              </button>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-5">
             {/* Surah Badge + Ayah */}

@@ -1,0 +1,91 @@
+نغيّر طريقة العمل الآن.
+
+لا أريد محاولة إصلاح عامة أخرى.
+أريد تنفيذًا على مراحل، ولا تنتقل من مرحلة إلى التي بعدها إلا بعد تسليمي مخرجات المرحلة السابقة.
+
+PHASE 1 — IDENTIFY THE REAL LIVE PATH
+
+1. حدّد الملف الفعلي الذي يولد أسئلة:
+   /exercise/conversation
+   /exercise/daily_contextual
+2. أثبت ذلك بأسماء الملفات والمسار الذي يستدعيها.
+3. أرسل لي:
+
+   * route file
+   * generator file
+   * validator file إن وجد
+   * component/render path الفعلي
+
+لا تبدأ أي إصلاح قبل إنهاء هذه المرحلة.
+
+PHASE 2 — ADD FAIL-FAST VALIDATION
+أضف server-side validator نهائي يعمل قبل render:
+
+* ابن displayedArabicTokenSet من النص العربي الظاهر فقط
+* طبّع النص بإزالة التشكيل والرموز
+* افحص كل خيار
+* إذا لم يكن الخيار موجودا حرفيا في displayedArabicText:
+  reject exercise immediately
+
+أضف kill switch:
+
+* إذا failedValidation=true
+  لا تُعرض المسألة
+  بل أظهر fallback:
+  "هذا التمرين قيد المراجعة، جار توليد تمرين صحيح"
+
+PHASE 3 — TEST ONLY THE REAL FAILING CASES
+أضف اختبارات على هذه الأمثلة نفسها:
+
+Case A
+displayed text:
+"قل أعوذ برب الفلق"
+must reject:
+"الظلمات"
+"الناس"
+"الصبح"
+
+Case B
+displayed text:
+"عبس وتولى"
+must reject:
+"قال"
+"جاء"
+
+Case C
+displayed text:
+"يا أيتها النفس المطمئنة"
+must reject:
+"الراضية"
+unless the next verse is visibly rendered too
+
+Case D
+multi-ayah mode:
+allowed only if all source ayat are actually displayed to the learner
+
+PHASE 4 — PATCH THE GENERATOR
+عدّل generator الحقيقي فقط:
+
+* single-ayah first
+* if distractors insufficient -> expand visible text with previous/next ayah
+* rebuild displayedArabicTokenSet from the new visible text
+* revalidate
+* if fail again -> discard and regenerate
+
+PHASE 5 — PROVE THE FIX
+لا تقل "fixed" إلا بعد أن ترسل لي:
+
+1. أسماء الملفات المعدلة
+2. diff أو ملخص patch واضح
+3. نتائج الاختبارات
+4. screenshot جديدة من نفس الروابط الفاشلة
+5. تأكيد أن validator يعمل server-side before render
+
+RULES
+
+* لا تصلح الواجهة فقط
+* لا تعدل ملفات غير مستخدمة
+* لا تعلن النجاح بدون proof
+* لا يجوز أن يظهر خيار واحد من خارج النص العربي الظاهر
+
+ابدأ الآن فقط بـ PHASE 1 وأرسل أسماء الملفات والمسار الحقيقي المستخدم في الإنتاج.
