@@ -4538,11 +4538,49 @@ const VOCAB_BANK: VocabularyExercise[] = [
 VOCAB_BANK.push(...(JUZ_AMMA_BANK as unknown as VocabularyExercise[]));
 
 // ── Verse maps (built once at module load) ───────────────────────────────────
-// Maps surahAr → (ayahNumber → verseText), used by the option validator when
-// a single ayah doesn't provide enough distinct words for 4 options.
+// buildSurahVerseMaps merges the JUZ_AMMA_BANK entries with the comprehensive
+// SURAH_VERSE_SUPPLEMENT so multi-ayah expansion always has adjacent verse data.
 const SURAH_VERSE_MAPS: Map<string, Map<number, string>> = buildSurahVerseMaps(
   VOCAB_BANK.map(e => ({ surahAr: e.surahAr, ayahNumber: e.ayahNumber, correctVerse: e.correctVerse }))
 );
+
+// ── Pre-validated exercise pool ───────────────────────────────────────────────
+// Run every VOCAB_BANK entry through the validator at startup.
+// Only exercises that produce valid options (all options literally in the
+// displayed passage) are included. This guarantees the global fallback never
+// serves an exercise with options outside the displayed Arabic text.
+interface ValidatedExercise {
+  exercise: VocabularyExercise;
+  validatedOptions: Array<{ text: string; isCorrect: boolean }>;
+  displayedPassageText: string;
+  contextMode: "single_ayah" | "multi_ayah";
+}
+
+function buildValidatedPool(): ValidatedExercise[] {
+  const result: ValidatedExercise[] = [];
+  for (const candidate of VOCAB_BANK) {
+    const surahVerseMap = SURAH_VERSE_MAPS.get(candidate.surahAr);
+    const validated = validateAndRebuildOptions(
+      candidate.targetWord,
+      candidate.correctVerse,
+      candidate.ayahNumber,
+      candidate.options,
+      surahVerseMap,
+    );
+    if (validated !== null) {
+      result.push({
+        exercise: candidate,
+        validatedOptions: validated.options,
+        displayedPassageText: validated.displayedPassageText,
+        contextMode: validated.contextMode,
+      });
+    }
+  }
+  return result;
+}
+
+// Built once; safe to reference throughout the module lifetime
+const GLOBALLY_VALID_POOL: ValidatedExercise[] = buildValidatedPool();
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -4629,26 +4667,39 @@ export async function generateVocabularyExercise(userLanguage: string = 'en', su
     };
   }
 
-  // Absolute fallback: return any exercise with shuffled options if all fail
-  // (should not happen given the current bank, but protects against empty pools)
-  const fallback = pool[Math.floor(Math.random() * pool.length)];
-  const translatedWordMeaning =
-    fallback.targetWordTranslations[userLanguage] ||
-    fallback.targetWordTranslations['en'] ||
-    fallback.targetWordMeaning;
-  const translatedVerseMeaning =
-    fallback.correctVerseMeaningTranslations[userLanguage] ||
-    fallback.correctVerseMeaningTranslations['en'] ||
-    fallback.correctVerseMeaning;
-  return {
-    ...fallback,
-    id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    options: shuffleArray(fallback.options),
-    targetWordMeaning: translatedWordMeaning,
-    correctVerseMeaning: translatedVerseMeaning,
-    translatedWordMeaning,
-    translatedVerseMeaning,
-  };
+  // ── Safe fallback: pick from the globally pre-validated pool ────────────────
+  // All entries here have already passed the validator, so we NEVER serve
+  // options that are not literally present in the displayed passage.
+  const globalPool = GLOBALLY_VALID_POOL.length > 0
+    ? GLOBALLY_VALID_POOL
+    : null;
+
+  if (globalPool) {
+    const picked = globalPool[Math.floor(Math.random() * globalPool.length)];
+    const fb = picked.exercise;
+    const translatedWordMeaning =
+      fb.targetWordTranslations[userLanguage] ||
+      fb.targetWordTranslations['en'] ||
+      fb.targetWordMeaning;
+    const translatedVerseMeaning =
+      fb.correctVerseMeaningTranslations[userLanguage] ||
+      fb.correctVerseMeaningTranslations['en'] ||
+      fb.correctVerseMeaning;
+    return {
+      ...fb,
+      id: `vocab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      options: picked.validatedOptions,
+      targetWordMeaning: translatedWordMeaning,
+      correctVerseMeaning: translatedVerseMeaning,
+      translatedWordMeaning,
+      translatedVerseMeaning,
+      displayedPassageText: picked.displayedPassageText,
+      contextMode: picked.contextMode,
+    };
+  }
+
+  // Should never reach here (GLOBALLY_VALID_POOL is built from 145+ exercises)
+  throw new Error("VOCAB_VALIDATOR: No valid exercises available in the global pool.");
 }
 
 export async function validateVocabularyAnswer(

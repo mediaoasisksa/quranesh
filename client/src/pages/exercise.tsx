@@ -379,7 +379,7 @@ export default function Exercise() {
 
       // Fetch meaning breakdown for conversation/roleplay when answer is correct
       if (result.isCorrect && isVocabQuizExercise) {
-        const verseText = vocabExercise?.correctVerse;
+        const verseText = vocabExercise?.displayedPassageText ?? vocabExercise?.correctVerse;
         if (verseText) {
           setIsLoadingBreakdown(true);
           try {
@@ -728,10 +728,10 @@ export default function Exercise() {
               </span>
             </div>
 
-            {/* Full Verse as Context */}
+            {/* Full Verse as Context — shows displayedPassageText so all options are visually present */}
             <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 text-center border border-border">
               <p className="arabic-text text-2xl leading-loose text-foreground font-semibold" lang="ar" dir="rtl" data-testid="text-verse-context">
-                {vocabExercise?.correctVerse}
+                {vocabExercise?.displayedPassageText ?? vocabExercise?.correctVerse}
               </p>
               <p className="text-sm text-muted-foreground mt-2" dir={dir}>
                 {vocabExercise?.translatedVerseMeaning || vocabExercise?.correctVerseMeaning}
@@ -833,7 +833,7 @@ export default function Exercise() {
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 mt-2">
                     <p className="arabic-text text-lg text-foreground" lang="ar" dir="rtl">
-                      {vocabExercise.correctVerse}
+                      {vocabExercise.displayedPassageText ?? vocabExercise.correctVerse}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1" dir={dir}>
                       {vocabExercise.translatedVerseMeaning || vocabExercise.correctVerseMeaning}
@@ -1385,13 +1385,13 @@ export default function Exercise() {
                     </p>
                   </div>
                 </div>
-                {isAnswered && vocabExercise.correctVerse && (
+                {isAnswered && (vocabExercise.displayedPassageText ?? vocabExercise.correctVerse) && (
                   <div className="mt-4">
                     <p className="text-sm font-medium text-muted-foreground mb-1">
                       {t('correctAnswer')}
                     </p>
                     <p className="arabic-text text-lg text-foreground" data-testid="text-conversation-verse" lang="ar" dir="rtl">
-                      {vocabExercise.correctVerse}
+                      {vocabExercise.displayedPassageText ?? vocabExercise.correctVerse}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1" dir={dir}>
                       {vocabExercise.translatedVerseMeaning || vocabExercise.correctVerseMeaning}

@@ -1,0 +1,96 @@
+BUG REPORT — EXERCISE OPTION GENERATION IS STILL BROKEN
+
+This is not a minor quality issue. The current generator is still violating the core rule of the product.
+
+Observed failures from live examples:
+
+Displayed verse: "قل أعوذ برب الفلق"
+Invalid options shown: "الظلمات" / "الناس"
+These words are not in the displayed verse.
+Displayed verse: "عبس وتولى"
+Invalid options shown: "قال" / "جاء"
+These words are not in the displayed verse.
+
+This means the generator is still pulling distractors from outside the Arabic text visible to the learner.
+That is a hard failure.
+
+NON-NEGOTIABLE RULE
+Every option shown to the learner must be found literally inside the Arabic text currently displayed in the exercise.
+Not from the same surah.
+Not from a nearby verse unless that verse is also visibly rendered.
+Not from the same root.
+Not from a synonym bank.
+Not from inferred morphology.
+
+Required fix:
+You must repair the generation pipeline and add a final validator that rejects any exercise whose choices are not a strict subset of the displayed Arabic tokens.
+
+Implementation requirements:
+
+Build displayedArabicTokenSet from the exact Arabic text rendered in the exercise.
+Normalize tokens consistently before comparison:
+remove tashkeel
+normalize hamza/alif variants if needed
+trim punctuation/ornamental marks
+do NOT allow root-based or lemma-based matching
+Validate every choice against displayedArabicTokenSet.
+If any choice is not present literally in displayedArabicText:
+reject the candidate
+regenerate
+If single-ayah does not provide enough valid distractors:
+expand to previous/next ayah
+visibly render the expanded ayah text in the exercise
+then rebuild displayedArabicTokenSet from the full displayed text
+validate again
+If it still fails, discard the exercise entirely.
+
+Pipeline must become:
+generate candidate
+→ build displayed token set
+→ validate all choices
+→ if fail regenerate
+→ if needed expand displayed ayah window
+→ validate again
+→ if fail discard
+
+Do NOT patch the frontend only.
+Do NOT manually fix individual examples.
+This must be enforced inside the generator and final validation layer.
+
+ACCEPTANCE TESTS — MUST ALL PASS
+
+Test 1: strict subset rule
+Displayed text: "يا أيتها النفس المطمئنة"
+Allowed options must be subset of:
+["يا", "أيتها", "النفس", "المطمئنة"]
+If "الراضية" appears, test must fail.
+
+Test 2: hidden next verse rejection
+Displayed text: "قل أعوذ برب الفلق"
+If any option includes "الناس" or "الظلمات", test must fail.
+
+Test 3: exact surface-form match only
+Displayed text: "عبس وتولى"
+Allowed options may include only forms literally present in displayed text.
+If "قال" or "جاء" appears, test must fail.
+
+Test 4: multi-ayah allowed only when visibly rendered
+If an option comes from previous/next ayah, that ayah must be included in the displayed Arabic text.
+Otherwise fail.
+
+Test 5: no root-only acceptance
+A choice that shares the same root but is not the exact displayed surface form must fail.
+
+Required deliverables:
+
+Files changed
+Generator file
+Validation file
+Exact validator logic added
+Test files added
+Test results
+Before/after examples using the failing live cases above
+
+Final acceptance criterion:
+It must become impossible for the system to publish an exercise containing even one option that is not literally visible in the Arabic text shown to the learner.
+If one such option survives, the fix is rejected.
