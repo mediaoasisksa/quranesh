@@ -1,0 +1,395 @@
+أريد تطبيق هذا الحل البرمجي كما هو. لا أريد شرحا، بل دمجه في المشروع ثم تشغيل الاختبارات.
+
+الفكرة الأساسية:
+
+* الخيارات يجب أن تُسحب من `displayedArabicText` فقط
+* وليس من `sourceAyahText`
+* وليس من الآية الكاملة في قاعدة البيانات
+* وليس من آية مجاورة غير معروضة
+* وليس من نفس الجذر أو المعنى
+
+### 1) أضف هذا الملف: `shared/arabicVisibleTokens.ts`
+
+```ts
+export type ArabicToken = {
+  raw: string;
+  norm: string;
+};
+
+const ARABIC_DIACRITICS =
+  /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+
+const ARABIC_PUNCT =
+  /[.,/#!$%^&*;:{}=\-_`~()«»"“”'،؛؟[\]\\|<>]/g;
+
+export function normalizeArabic(input: string): string {
+  return input
+    .replace(ARABIC_DIACRITICS, "")
+    .replace(/\u0640/g, "") // tatweel
+    .replace(/[ٱأإآ]/g, "ا")
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    .replace(/ى/g, "ي")
+    .replace(ARABIC_PUNCT, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function extractVisibleArabicTokens(displayedArabicText: string): ArabicToken[] {
+  const cleaned = displayedArabicText
+    .replace(ARABIC_PUNCT, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned) return [];
+
+  const rawTokens = cleaned.split(" ").filter(Boolean);
+
+  return rawTokens
+    .map((raw) => ({
+      raw,
+      norm: normalizeArabic(raw),
+    }))
+    .filter((t) => t.norm.length > 0);
+}
+
+export function buildVisibleArabicSet(displayedArabicText: string): Set<string> {
+  return new Set(extractVisibleArabicTokens(displayedArabicText).map((t) => t.norm));
+}
+
+export function isChoiceVisibleInDisplayedText(
+  choice: string,
+  displayedArabicText: string
+): boolean {
+  const visibleSet = buildVisibleArabicSet(displayedArabicText);
+  return visibleSet.has(normalizeArabic(choice));
+}
+
+export function getUniqueVisibleChoices(displayedArabicText: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  for (const token of extractVisibleArabicTokens(displayedArabicText)) {
+    if (!seen.has(token.norm)) {
+      seen.add(token.norm);
+      out.push(token.raw);
+    }
+  }
+
+  return out;
+}
+```
+
+### 2) أضف هذا الملف: `server/exerciseVisibleValidator.ts`
+
+```ts
+import {
+  buildVisibleArabicSet,
+  normalizeArabic,
+} from "../shared/arabicVisibleTokens";
+
+export type ExerciseChoice = {
+  id?: string;
+  text: string;
+};
+
+export type GeneratedExercise = {
+  displayedArabicText: string;
+  sourceAyahText?: string;
+  answerArabic: string;
+  choices: ExerciseChoice[];
+};
+
+export function validateExerciseUsesOnlyVisibleArabic(
+  exercise: GeneratedExercise
+): { ok: true } | { ok: false; reason: string } {
+  const visibleSet = buildVisibleArabicSet(exercise.displayedArabicText);
+
+  if (!exercise.displayedArabicText?.trim()) {
+    return { ok: false, reason: "displayedArabicText is empty" };
+  }
+
+  if (!visibleSet.size) {
+    return { ok: false, reason: "No visible Arabic tokens found" };
+  }
+
+  const normalizedAnswer = normalizeArabic(exercise.answerArabic);
+  if (!visibleSet.has(normalizedAnswer)) {
+    return {
+      ok: false,
+      reason: `Answer is not visible to learner: ${exercise.answerArabic}`,
+    };
+  }
+
+  if (!exercise.choices || exercise.choices.length < 2) {
+    return { ok: false, reason: "Not enough choices" };
+  }
+
+  for (const choice of exercise.choices) {
+    const norm = normalizeArabic(choice.text);
+    if (!visibleSet.has(norm)) {
+      return {
+        ok: false,
+        reason: `Choice is not visible in displayed text: ${choice.text}`,
+      };
+    }
+  }
+
+  const uniqueChoiceNorms = new Set(
+    exercise.choices.map((c) => normalizeArabic(c.text))
+  );
+
+  if (uniqueChoiceNorms.size !== exercise.choices.length) {
+    return { ok: false, reason: "Duplicate choices after normalization" };
+  }
+
+  return { ok: true };
+}
+```
+
+### 3) عدّل مولد التمارين ليستعمل النص المعروض فقط
+
+إذا كان عندكم ملف مثل:
+
+* `server/generateExercise.ts`
+  أو
+* `server/exerciseGenerator.ts`
+
+فاستبدل منطق الخيارات بهذا النمط:
+
+```ts
+import {
+  getUniqueVisibleChoices,
+  normalizeArabic,
+} from "../shared/arabicVisibleTokens";
+import { validateExerciseUsesOnlyVisibleArabic } from "./exerciseVisibleValidator";
+
+type Choice = { id: string; text: string };
+
+function shuffle<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function pickChoicesFromDisplayedText(
+  displayedArabicText: string,
+  answerArabic: string,
+  choiceCount = 4
+): Choice[] {
+  const visibleWords = getUniqueVisibleChoices(displayedArabicText);
+  const answerNorm = normalizeArabic(answerArabic);
+
+  const answerRaw =
+    visibleWords.find((w) => normalizeArabic(w) === answerNorm) || answerArabic;
+
+  const distractors = visibleWords.filter(
+    (w) => normalizeArabic(w) !== answerNorm
+  );
+
+  if (distractors.length < choiceCount - 1) {
+    throw new Error(
+      `Not enough visible distractors. visible=${visibleWords.join(" | ")}`
+    );
+  }
+
+  const chosen = shuffle(distractors).slice(0, choiceCount - 1);
+  const all = shuffle([answerRaw, ...chosen]);
+
+  return all.map((text, index) => ({
+    id: String.fromCharCode(65 + index),
+    text,
+  }));
+}
+
+export function buildExerciseFromDisplayedArabic(params: {
+  displayedArabicText: string;
+  answerArabic: string;
+  sourceAyahText?: string;
+}) {
+  const exercise = {
+    displayedArabicText: params.displayedArabicText,
+    sourceAyahText: params.sourceAyahText,
+    answerArabic: params.answerArabic,
+    choices: pickChoicesFromDisplayedText(
+      params.displayedArabicText,
+      params.answerArabic,
+      4
+    ),
+  };
+
+  const validation = validateExerciseUsesOnlyVisibleArabic(exercise);
+  if (!validation.ok) {
+    throw new Error(`Exercise rejected: ${validation.reason}`);
+  }
+
+  return exercise;
+}
+```
+
+### 4) إذا لم تكفِ كلمات النص المعروض، وسّع النص أولا ثم ابنِ الخيارات
+
+```ts
+import { getUniqueVisibleChoices, normalizeArabic } from "../shared/arabicVisibleTokens";
+
+export function expandDisplayedTextIfNeeded(params: {
+  displayedArabicText: string;
+  answerArabic: string;
+  previousAyahText?: string;
+  nextAyahText?: string;
+  minUniqueChoices?: number;
+}): string {
+  const minUniqueChoices = params.minUniqueChoices ?? 4;
+
+  const hasEnough = (text: string) => {
+    const words = getUniqueVisibleChoices(text);
+    const answerNorm = normalizeArabic(params.answerArabic);
+    const distinct = words.filter((w) => normalizeArabic(w) !== answerNorm);
+    return words.some((w) => normalizeArabic(w) === answerNorm) &&
+      distinct.length >= minUniqueChoices - 1;
+  };
+
+  if (hasEnough(params.displayedArabicText)) return params.displayedArabicText;
+
+  if (params.previousAyahText) {
+    const expanded = `${params.previousAyahText} ${params.displayedArabicText}`;
+    if (hasEnough(expanded)) return expanded;
+  }
+
+  if (params.nextAyahText) {
+    const expanded = `${params.displayedArabicText} ${params.nextAyahText}`;
+    if (hasEnough(expanded)) return expanded;
+  }
+
+  if (params.previousAyahText && params.nextAyahText) {
+    const expanded = `${params.previousAyahText} ${params.displayedArabicText} ${params.nextAyahText}`;
+    if (hasEnough(expanded)) return expanded;
+  }
+
+  throw new Error("Cannot build valid exercise from visible text even after expansion");
+}
+```
+
+### 5) أصلح الواجهة إذا كانت تقص النص العربي بصريا
+
+إذا كان النص العربي قد يكون مقصوصا داخل component العرض، أضف هذا:
+
+```tsx
+<div
+  className="w-full rounded-xl border bg-white px-6 py-5 text-right"
+  style={{
+    whiteSpace: "normal",
+    overflow: "visible",
+    textOverflow: "clip",
+    wordBreak: "normal",
+    lineHeight: "2.2",
+    direction: "rtl",
+  }}
+>
+  {displayedArabicText}
+</div>
+```
+
+وممنوع استخدام:
+
+* `overflow: hidden`
+* `white-space: nowrap`
+* `text-overflow: ellipsis`
+
+على صندوق الآية.
+
+### 6) أضف اختبارات قبول صريحة
+
+ملف: `server/__tests__/exerciseVisibleValidator.test.ts`
+
+```ts
+import { describe, it, expect } from "vitest";
+import { validateExerciseUsesOnlyVisibleArabic } from "../exerciseVisibleValidator";
+
+describe("exercise visible-text validation", () => {
+  it("rejects choice from hidden next verse", () => {
+    const result = validateExerciseUsesOnlyVisibleArabic({
+      displayedArabicText: "يا أيتها النفس المطمئنة",
+      answerArabic: "المطمئنة",
+      choices: [
+        { text: "المطمئنة" },
+        { text: "النفس" },
+        { text: "أيتها" },
+        { text: "الراضية" },
+      ],
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects option outside displayed verse", () => {
+    const result = validateExerciseUsesOnlyVisibleArabic({
+      displayedArabicText: "قل أعوذ برب الفلق",
+      answerArabic: "الفلق",
+      choices: [
+        { text: "الفلق" },
+        { text: "قل" },
+        { text: "أعوذ" },
+        { text: "الناس" },
+      ],
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects option from backend source but not visible to learner", () => {
+    const result = validateExerciseUsesOnlyVisibleArabic({
+      displayedArabicText: "إنك كادح إلى ربك كدحا",
+      sourceAyahText: "يا أيها الإنسان إنك كادح إلى ربك كدحا فملاقيه",
+      answerArabic: "كادح",
+      choices: [
+        { text: "كادح" },
+        { text: "ربك" },
+        { text: "لأيه" },
+        { text: "الإنسان" },
+      ],
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("accepts only literal visible tokens", () => {
+    const result = validateExerciseUsesOnlyVisibleArabic({
+      displayedArabicText: "عبس وتولى",
+      answerArabic: "عبس",
+      choices: [
+        { text: "عبس" },
+        { text: "تولى" },
+      ],
+    });
+
+    expect(result.ok).toBe(true);
+  });
+});
+```
+
+### 7) قاعدة قبول نهائية داخل pipeline
+
+قبل حفظ أي تمرين في DB أو إرساله للواجهة:
+
+```ts
+const validation = validateExerciseUsesOnlyVisibleArabic(exercise);
+if (!validation.ok) {
+  throw new Error(`REJECTED_EXERCISE: ${validation.reason}`);
+}
+```
+
+### 8) المطلوب بعد التنفيذ
+
+أرسل لي:
+
+1. أسماء الملفات المعدلة
+2. diff أو snippets الفعلية
+3. نتيجة الاختبارات
+4. before/after للحالات:
+
+   * "يا أيتها النفس المطمئنة" مع "الراضية"
+   * "قل أعوذ برب الفلق" مع "الناس"
+   * "عبس وتولى" مع "قال" أو "جاء"
+   * "إنك كادح..." مع "الإنسان"
+
+معيار القبول النهائي:
+إذا ظهر خيار واحد فقط ليس موجودا حرفيا ومرئيا بالكامل داخل النص العربي الظاهر للطالب، فالإصلاح مرفوض.

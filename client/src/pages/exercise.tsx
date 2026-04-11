@@ -729,8 +729,16 @@ export default function Exercise() {
             </div>
 
             {/* Full Verse as Context — shows displayedPassageText so all options are visually present */}
-            <div className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 text-center border border-border">
-              <p className="arabic-text text-2xl leading-loose text-foreground font-semibold" lang="ar" dir="rtl" data-testid="text-verse-context">
+            <div
+              className="bg-muted/30 dark:bg-muted/20 rounded-xl p-5 text-center border border-border"
+              style={{
+                overflow: "visible",
+                whiteSpace: "normal",
+                textOverflow: "clip",
+                wordBreak: "normal",
+              }}
+            >
+              <p className="arabic-text text-2xl leading-loose text-foreground font-semibold" lang="ar" dir="rtl" data-testid="text-verse-context" style={{ whiteSpace: "normal", overflow: "visible", lineHeight: "2.2" }}>
                 {vocabExercise?.displayedPassageText ?? vocabExercise?.correctVerse}
               </p>
               <p className="text-sm text-muted-foreground mt-2" dir={dir}>

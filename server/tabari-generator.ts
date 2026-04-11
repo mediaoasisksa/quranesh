@@ -23,6 +23,11 @@
  *   - Minimum viable expansion: +1 / -1, growing to ±10 at most
  */
 
+import {
+  buildVisibleArabicSet,
+  normalizeArabic,
+} from "../shared/arabicVisibleTokens";
+
 export type ContextMode = "single_ayah" | "multi_ayah";
 
 export interface ContextInfo {
@@ -68,11 +73,6 @@ export function stripDiacritics(s: string): string {
   return s.replace(/[\u064B-\u065F\u0670]/g, "");
 }
 
-/** Case-insensitive substring check after diacritics normalisation. */
-function optionInText(option: string, text: string): boolean {
-  return stripDiacritics(text).includes(stripDiacritics(option));
-}
-
 // ─── Validation gates ────────────────────────────────────────────────────────
 
 interface GateResult {
@@ -83,10 +83,10 @@ interface GateResult {
 
 /**
  * Gate 1: options_distinct
- * All 4 options must be distinct (after diacritics stripping and trimming).
+ * All 4 options must be distinct (after full normalisation and trimming).
  */
 function gateOptionsDistinct(options: string[]): GateResult {
-  const normalised = options.map(o => stripDiacritics(o.trim()).toLowerCase());
+  const normalised = options.map(o => normalizeArabic(o.trim()));
   if (new Set(normalised).size < normalised.length) {
     return { passed: false, failedGate: "options_distinct", reason: "duplicate_options" };
   }
@@ -95,16 +95,21 @@ function gateOptionsDistinct(options: string[]): GateResult {
 
 /**
  * Gate 2: options_from_displayed_passage_only
- * Every option must appear as a literal substring in the displayed passage
- * (after diacritics normalisation on both sides).
- * This is the CORE generation gate — if any option is absent from the passage,
- * the context is rejected.
+ * Every option must be an EXACT SURFACE TOKEN of the displayed passage
+ * (whole-word token-set membership, NOT substring matching).
+ *
+ * This prevents "الإنسان" from passing when the passage is
+ * "يا أيها الإنسان إنك كادح إلى ربك كدحا فملاقيه" but the
+ * displayed text only shows "إنك كادح إلى ربك كدحا".
+ *
+ * Both sides are normalised with normalizeArabic() before comparison.
  */
 function gateAllOptionsInPassage(
   options: string[],
   passage: string
 ): GateResult {
-  const missing = options.filter(o => !optionInText(o, passage));
+  const visibleTokens = buildVisibleArabicSet(passage);
+  const missing = options.filter(o => !visibleTokens.has(normalizeArabic(o)));
   if (missing.length > 0) {
     return {
       passed: false,

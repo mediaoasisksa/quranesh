@@ -3,6 +3,7 @@ import type { Phrase } from "@shared/schema";
 import { isNonQuranicPhrase } from "./quran-validator";
 import { JUZ_AMMA_BANK } from "./juz-amma-vocab";
 import { validateAndRebuildOptions, buildSurahVerseMaps } from "./vocab-validator";
+import { validateExerciseUsesOnlyVisibleArabic } from "./exerciseVisibleValidator";
 
 // قوائم الكلمات المفتاحية للحماية السياقية
 // منتجات بشرية/تقنية - يجب عدم استخدام آيات الخلق معها
@@ -4652,6 +4653,18 @@ export async function generateVocabularyExercise(userLanguage: string = 'en', su
       candidate.correctVerseMeaningTranslations[userLanguage] ||
       candidate.correctVerseMeaningTranslations['en'] ||
       candidate.correctVerseMeaning;
+
+    // Final gate: confirm every option is literally visible in displayedPassageText
+    const finalCheck = validateExerciseUsesOnlyVisibleArabic({
+      displayedArabicText: validated.displayedPassageText,
+      sourceAyahText: candidate.correctVerse,
+      answerArabic: candidate.targetWord,
+      choices: validated.options.map(o => ({ text: o.text })),
+    });
+    if (!finalCheck.ok) {
+      console.warn(`[vocab-gate] Final gate rejected exercise: ${finalCheck.reason}`);
+      continue;
+    }
 
     return {
       ...candidate,
