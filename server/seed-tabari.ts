@@ -1,11 +1,35 @@
+/**
+ * Tabari Exercise Seeder
+ * ======================
+ * Reads the canonical CSV and inserts rows into tabari_exercises.
+ * ALL rows pass through generateWithValidation() before being saved.
+ *
+ * Generation pipeline (per row):
+ *   → single_ayah validation  → PASS → insert as generated_single_pass, is_active=true
+ *                             → FAIL ↓
+ *   → multi_ayah expansion    → PASS → insert as generated_multi_pass, is_active=true
+ *                             → FAIL → insert as generation_failed, is_active=false
+ *
+ * This is idempotent: rows already in the DB (matched by surah+ayah+correctWord)
+ * are skipped.
+ */
+
 import { db } from "./db";
 import { tabariExercises } from "@shared/schema";
-import { eq } from "drizzle-orm";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import {
+  generateWithValidation,
+  buildVerseMap,
+  mergeSupplementaryVerses,
+  SUPPLEMENTARY_VERSES,
+  type VerseMap,
+} from "./tabari-generator";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ─── CSV types ────────────────────────────────────────────────────────────────
 
 interface CsvRow {
   id: number;
@@ -24,38 +48,33 @@ interface CsvRow {
   source: string;
 }
 
-/**
- * RFC 4180-compliant CSV field parser.
- * Handles quoted fields that may contain commas, escaped quotes (""), and
- * multi-line content.  Falls back gracefully on malformed rows.
- */
+// ─── RFC 4180-compliant CSV parser ───────────────────────────────────────────
+
 function parseCsvLine(line: string): string[] {
   const fields: string[] = [];
   let i = 0;
-  while (i <= line.length) {
+  while (i < line.length) {
     if (line[i] === '"') {
-      // Quoted field
       let field = "";
-      i++; // skip opening quote
+      i++;
       while (i < line.length) {
         if (line[i] === '"' && line[i + 1] === '"') {
           field += '"';
           i += 2;
         } else if (line[i] === '"') {
-          i++; // skip closing quote
+          i++;
           break;
         } else {
           field += line[i++];
         }
       }
       fields.push(field.trim());
-      if (line[i] === ",") i++; // skip delimiter
+      if (line[i] === ",") i++;
     } else {
-      // Unquoted field — read until next comma or end
       const start = i;
       while (i < line.length && line[i] !== ",") i++;
       fields.push(line.slice(start, i).trim());
-      if (line[i] === ",") i++; // skip delimiter
+      if (line[i] === ",") i++;
     }
   }
   return fields;
@@ -88,89 +107,7 @@ function parseCsv(content: string): CsvRow[] {
   return rows;
 }
 
-function allOptionsInText(options: string[], text: string): boolean {
-  return options.every(opt => opt && text.includes(opt));
-}
-
-function buildVerseMap(rows: CsvRow[]): Map<number, Map<number, string>> {
-  const map = new Map<number, Map<number, string>>();
-  for (const row of rows) {
-    if (!map.has(row.surah_number)) map.set(row.surah_number, new Map());
-    const surahMap = map.get(row.surah_number)!;
-    if (!surahMap.has(row.ayah)) {
-      surahMap.set(row.ayah, row.verse_text);
-    }
-  }
-  return map;
-}
-
-function expandContext(
-  surahNum: number,
-  primaryAyah: number,
-  options: string[],
-  verseMap: Map<number, Map<number, string>>
-): {
-  contextMode: string;
-  contextStartAyah: number;
-  contextEndAyah: number;
-  displayedPassageText: string;
-} {
-  const surahVerses = verseMap.get(surahNum);
-  if (!surahVerses) {
-    return {
-      contextMode: "single_ayah",
-      contextStartAyah: primaryAyah,
-      contextEndAyah: primaryAyah,
-      displayedPassageText: verseMap.get(surahNum)?.get(primaryAyah) ?? "",
-    };
-  }
-
-  const primaryText = surahVerses.get(primaryAyah) ?? "";
-
-  if (allOptionsInText(options, primaryText)) {
-    return {
-      contextMode: "single_ayah",
-      contextStartAyah: primaryAyah,
-      contextEndAyah: primaryAyah,
-      displayedPassageText: primaryText,
-    };
-  }
-
-  const sortedAyahs = Array.from(surahVerses.keys()).sort((a, b) => a - b);
-  const minAyah = sortedAyahs[0];
-  const maxAyah = sortedAyahs[sortedAyahs.length - 1];
-
-  for (let expansion = 1; expansion <= 6; expansion++) {
-    const start = Math.max(minAyah, primaryAyah - expansion);
-    const end = Math.min(maxAyah, primaryAyah + expansion);
-
-    const parts: string[] = [];
-    for (let a = start; a <= end; a++) {
-      const text = surahVerses.get(a);
-      if (text) parts.push(text);
-    }
-    const combined = parts.join(" ");
-
-    if (allOptionsInText(options, combined)) {
-      return {
-        contextMode: "multi_ayah",
-        contextStartAyah: start,
-        contextEndAyah: end,
-        displayedPassageText: combined,
-      };
-    }
-  }
-
-  // Could not cover all options — use widest available context for this surah
-  const allParts: string[] = [];
-  for (const [, text] of surahVerses) allParts.push(text);
-  return {
-    contextMode: "multi_ayah",
-    contextStartAyah: minAyah,
-    contextEndAyah: maxAyah,
-    displayedPassageText: allParts.join(" "),
-  };
-}
+// ─── Main seeder ─────────────────────────────────────────────────────────────
 
 export async function seedTabariExercises() {
   const csvPath = path.resolve(
@@ -184,11 +121,9 @@ export async function seedTabariExercises() {
   }
 
   const raw = fs.readFileSync(csvPath, "utf-8").replace(/^\uFEFF/, "");
-  const rows = parseCsv(raw);
+  const csvRows = parseCsv(raw);
 
-  // Load existing rows for per-row idempotency check.
-  // Key: "surahNumber:ayah:correctWord" — unique per question since each ayah
-  // can have multiple questions but each targets a distinct correct word.
+  // Skip-if-done check
   const existing = await db
     .select({
       surahNumber: tabariExercises.surahNumber,
@@ -201,15 +136,13 @@ export async function seedTabariExercises() {
     existing.map(r => `${r.surahNumber}:${r.ayah}:${r.correctWord}`)
   );
 
-  if (existingKeys.size >= rows.length) {
+  if (existingKeys.size >= csvRows.length) {
     console.log(`✓ Tabari exercises already fully seeded (${existingKeys.size} rows). Skipping.`);
     return;
   }
 
-  const verseMap = buildVerseMap(rows);
-
-  const toInsert = rows.filter(
-    row => !existingKeys.has(`${row.surah_number}:${row.ayah}:${row.correct_word}`)
+  const toInsert = csvRows.filter(
+    r => !existingKeys.has(`${r.surah_number}:${r.ayah}:${r.correct_word}`)
   );
 
   if (toInsert.length === 0) {
@@ -217,13 +150,61 @@ export async function seedTabariExercises() {
     return;
   }
 
-  console.log(`Seeding ${toInsert.length} new Tabari exercises (${rows.length - toInsert.length} already present)...`);
+  // Build verse map from ALL CSV rows (not just the ones being inserted)
+  const verseMap: VerseMap = buildVerseMap(
+    csvRows.map(r => ({
+      surahNumber: r.surah_number,
+      ayah: r.ayah,
+      verseText: r.verse_text,
+    }))
+  );
+  mergeSupplementaryVerses(verseMap, SUPPLEMENTARY_VERSES);
 
-  let multiAyahCount = 0;
+  console.log(`Seeding ${toInsert.length} new Tabari exercises (${csvRows.length - toInsert.length} already present)...`);
+
+  let singlePass = 0;
+  let multiPass = 0;
+  let failed = 0;
+
   const inserts = toInsert.map(row => {
     const options = [row.option_A, row.option_B, row.option_C, row.option_D];
-    const ctx = expandContext(row.surah_number, row.ayah, options, verseMap);
-    if (ctx.contextMode === "multi_ayah") multiAyahCount++;
+    const result = generateWithValidation(row.surah_number, row.ayah, options, verseMap);
+
+    let contextMode = "single_ayah";
+    let contextStartAyah = row.ayah;
+    let contextEndAyah = row.ayah;
+    let displayedPassageText = row.verse_text;
+    let optionsSourceScope = "review_needed";
+    let generationStatus: string = "generation_failed";
+    let generationFailureReason: string | null = null;
+    let isActive = false;
+
+    if (result.status === "generated_single_pass") {
+      contextMode = "single_ayah";
+      contextStartAyah = result.context.contextStartAyah;
+      contextEndAyah = result.context.contextEndAyah;
+      displayedPassageText = result.context.displayedPassageText;
+      optionsSourceScope = "displayed_passage_only";
+      generationStatus = "generated_single_pass";
+      isActive = true;
+      singlePass++;
+    } else if (result.status === "generated_multi_pass") {
+      contextMode = "multi_ayah";
+      contextStartAyah = result.context.contextStartAyah;
+      contextEndAyah = result.context.contextEndAyah;
+      displayedPassageText = result.context.displayedPassageText;
+      optionsSourceScope = "displayed_passage_only";
+      generationStatus = "generated_multi_pass";
+      isActive = true;
+      multiPass++;
+    } else {
+      // generation_failed — still insert for audit purposes but mark inactive
+      generationStatus = "generation_failed";
+      generationFailureReason = result.reason ?? "insufficient_options_multi_ayah";
+      optionsSourceScope = "review_needed";
+      isActive = false;
+      failed++;
+    }
 
     return {
       surahNumber: row.surah_number,
@@ -239,12 +220,15 @@ export async function seedTabariExercises() {
       correctAnswer: row.correct_answer,
       correctWord: row.correct_word,
       source: row.source || "Tafsir al-Tabari only",
-      contextMode: ctx.contextMode,
-      contextStartAyah: ctx.contextStartAyah,
-      contextEndAyah: ctx.contextEndAyah,
+      contextMode,
+      contextStartAyah,
+      contextEndAyah,
       primaryAyahNumber: row.ayah,
-      displayedPassageText: ctx.displayedPassageText,
-      optionsSourceScope: "displayed_passage_only",
+      displayedPassageText,
+      optionsSourceScope,
+      generationStatus,
+      generationFailureReason,
+      isActive,
     };
   });
 
@@ -253,14 +237,20 @@ export async function seedTabariExercises() {
     await db.insert(tabariExercises).values(inserts.slice(i, i + BATCH));
   }
 
-  console.log(`✅ Seeded ${inserts.length} Tabari exercises (${multiAyahCount} multi-ayah, ${inserts.length - multiAyahCount} single-ayah).`);
+  console.log(
+    `✅ Seeded ${inserts.length} Tabari exercises: ` +
+    `${singlePass} single_pass, ${multiPass} multi_pass, ${failed} generation_failed (is_active=false).`
+  );
 }
 
 // ── CLI entrypoint ────────────────────────────────────────────────────────────
-// Allows one-shot execution:  npx tsx server/seed-tabari.ts
-// When imported as a module (server startup), this block is skipped.
+// One-shot execution:  npx tsx server/seed-tabari.ts
 const scriptUrl = fileURLToPath(import.meta.url);
-const isMain = process.argv[1] === scriptUrl || process.argv[1]?.endsWith("/seed-tabari.ts") || process.argv[1]?.endsWith("/seed-tabari.js");
+const isMain =
+  process.argv[1] === scriptUrl ||
+  process.argv[1]?.endsWith("/seed-tabari.ts") ||
+  process.argv[1]?.endsWith("/seed-tabari.js");
+
 if (isMain) {
   seedTabariExercises()
     .then(() => process.exit(0))

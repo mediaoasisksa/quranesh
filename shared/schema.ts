@@ -660,6 +660,13 @@ export const tabariExercises = pgTable("tabari_exercises", {
   primaryAyahNumber: integer("primary_ayah_number"),
   displayedPassageText: text("displayed_passage_text"),
   optionsSourceScope: text("options_source_scope").default("displayed_passage_only"),
+  // ── Generation-pipeline fields (added 2026-04) ───────────────────────────
+  // generated_single_pass | generated_multi_pass | generation_failed | sent_to_review
+  generationStatus: text("generation_status").default("generated_single_pass"),
+  // null when generation succeeded; set to a failure code otherwise
+  generationFailureReason: text("generation_failure_reason"),
+  // false for generation_failed / deactivated rows — excluded from random serving
+  isActive: boolean("is_active").default(true),
 });
 
 export const insertTabariExerciseSchema = createInsertSchema(tabariExercises).omit({ id: true });

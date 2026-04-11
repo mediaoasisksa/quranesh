@@ -1,219 +1,153 @@
 /**
- * Backfill / re-validation pass for tabari_exercises context fields.
+ * Tabari Context Backfill
+ * =======================
+ * Re-validates ALL rows in tabari_exercises using the canonical generation
+ * pipeline (server/tabari-generator.ts) and persists any field changes.
  *
- * Problem: the original seed built the verse map ONLY from CSV rows, so surahs
- * whose trailing ayahs have no questions (e.g. القارعة:10-11, المسد:5) were
- * missing from the map and the expand algorithm could not include them.
+ * This is the upstream fix — every row is re-classified through the same
+ * blocking validation gates used at insert time:
  *
- * Fix: supplement the verse map with hard-coded texts for every missing ayah,
- * re-run expandContext for every row, and persist any rows that changed.
+ *   existing row → generateWithValidation()
+ *     → generated_single_pass  → is_active=true,  context_mode=single_ayah
+ *     → generated_multi_pass   → is_active=true,  context_mode=multi_ayah
+ *     → generation_failed      → is_active=false, generation_failure_reason=...
  *
- * Safety: this is fully idempotent — re-running produces no DB writes when
- * every row already passes the options-in-passage validation.
+ * After this runs, the database contains NO live (is_active=true) rows whose
+ * options are not fully covered by their displayed_passage_text.
+ *
+ * Safety: fully idempotent — re-running produces no DB writes when every row
+ * already matches the pipeline output.
  */
 
 import { db } from "./db";
 import { tabariExercises } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import {
+  generateWithValidation,
+  buildVerseMap,
+  mergeSupplementaryVerses,
+  SUPPLEMENTARY_VERSES,
+  type VerseMap,
+} from "./tabari-generator";
 
-// ────────────────────────────────────────────────────────────────────
-// Supplementary verse texts that are NOT present in the CSV but are
-// needed so the expansion algorithm can cover distractor options.
-// Key format: "surahNumber:ayahNumber"
-// ────────────────────────────────────────────────────────────────────
-const SUPPLEMENTARY_VERSES: Record<string, string> = {
-  // الفاتحة — complete
-  "1:1": "بِسمِ اللَّهِ الرَّحمٰنِ الرَّحيمِ",
-  "1:2": "الحَمدُ لِلَّهِ رَبِّ العالَمينَ",
-  "1:3": "الرَّحمٰنِ الرَّحيمِ",
-  "1:4": "مالِكِ يَومِ الدّينِ",
-  "1:5": "إِيّاكَ نَعبُدُ وَإِيّاكَ نَستَعينُ",
-  "1:6": "اهدِنَا الصِّراطَ المُستَقيمَ",
-  "1:7": "صِراطَ الَّذينَ أَنعَمتَ عَلَيهِم غَيرِ المَغضوبِ عَلَيهِم وَلَا الضّالّينَ",
-
-  // القارعة — ayahs 10–11 needed for distractors وَما / أَدراكَ
-  "101:10": "وَما أَدراكَ ما هِيَه",
-  "101:11": "نارٌ حامِيَة",
-
-  // المسد — ayah 5 needed for distractor في
-  "111:5": "في جيدِها حَبلٌ مِن مَسَدٍ",
-
-  // الناس — ayah 1 needed for distractor قُل
-  "114:1": "قُل أَعوذُ بِرَبِّ النّاسِ",
-};
-
-// ────────────────────────────────────────────────────────────────────
-// Helpers (mirrors seed-tabari.ts logic)
-// ────────────────────────────────────────────────────────────────────
-
-/**
- * Strip Arabic tashkeel/diacritics (U+064B–U+065F and U+0670) so that
- * مَا and ما are treated as the same word during passage coverage checks.
- * This prevents false FAIL results from diacritic encoding differences
- * between CSV distractor options and Quranic verse text.
- */
-function stripDiacritics(s: string): string {
-  return s.replace(/[\u064B-\u065F\u0670]/g, "");
-}
-
-function allOptionsInText(options: string[], text: string): boolean {
-  const stripped = stripDiacritics(text);
-  return options.every(opt => opt && stripped.includes(stripDiacritics(opt)));
-}
-
-type VerseMap = Map<number, Map<number, string>>;
-
-function expandContext(
-  surahNum: number,
-  primaryAyah: number,
-  options: string[],
-  verseMap: VerseMap,
-): {
-  contextMode: string;
-  contextStartAyah: number;
-  contextEndAyah: number;
-  displayedPassageText: string;
-  validationPassed: boolean;
-} {
-  const surahVerses = verseMap.get(surahNum);
-  if (!surahVerses) {
-    const fallback = "";
-    return {
-      contextMode: "single_ayah",
-      contextStartAyah: primaryAyah,
-      contextEndAyah: primaryAyah,
-      displayedPassageText: fallback,
-      validationPassed: false,
-    };
-  }
-
-  const primaryText = surahVerses.get(primaryAyah) ?? "";
-
-  if (allOptionsInText(options, primaryText)) {
-    return {
-      contextMode: "single_ayah",
-      contextStartAyah: primaryAyah,
-      contextEndAyah: primaryAyah,
-      displayedPassageText: primaryText,
-      validationPassed: true,
-    };
-  }
-
-  const sortedAyahs = Array.from(surahVerses.keys()).sort((a, b) => a - b);
-  const minAyah = sortedAyahs[0];
-  const maxAyah = sortedAyahs[sortedAyahs.length - 1];
-
-  for (let expansion = 1; expansion <= 10; expansion++) {
-    const start = Math.max(minAyah, primaryAyah - expansion);
-    const end = Math.min(maxAyah, primaryAyah + expansion);
-
-    const parts: string[] = [];
-    for (let a = start; a <= end; a++) {
-      const text = surahVerses.get(a);
-      if (text) parts.push(text);
-    }
-    const combined = parts.join(" ");
-
-    if (allOptionsInText(options, combined)) {
-      return {
-        contextMode: "multi_ayah",
-        contextStartAyah: start,
-        contextEndAyah: end,
-        displayedPassageText: combined,
-        validationPassed: true,
-      };
-    }
-  }
-
-  // Last resort: use full surah context from map
-  const allParts: string[] = [];
-  for (const a of sortedAyahs) {
-    const t = surahVerses.get(a);
-    if (t) allParts.push(t);
-  }
-  const fullText = allParts.join(" ");
-  return {
-    contextMode: "multi_ayah",
-    contextStartAyah: minAyah,
-    contextEndAyah: maxAyah,
-    displayedPassageText: fullText,
-    validationPassed: allOptionsInText(options, fullText),
-  };
-}
-
-// ────────────────────────────────────────────────────────────────────
-// Main backfill
-// ────────────────────────────────────────────────────────────────────
-export async function backfillTabariContext(): Promise<{
+export interface BackfillReport {
   total: number;
-  singleAyah: number;
-  multiAyah: number;
+  keptSinglePass: number;
+  upgradedToMulti: number;
+  deactivated: number;
+  sentToReview: number;
   updated: number;
-  reviewNeeded: number;
-}> {
+}
+
+export async function backfillTabariContext(): Promise<BackfillReport> {
   const rows = await db.select().from(tabariExercises);
 
-  // Build verse map from DB + supplements
-  const verseMap: VerseMap = new Map();
+  // Build verse map: DB rows first, then supplementary hard-coded verses
+  const verseMap: VerseMap = buildVerseMap(
+    rows.map(r => ({ surahNumber: r.surahNumber, ayah: r.ayah, verseText: r.verseText }))
+  );
+  mergeSupplementaryVerses(verseMap, SUPPLEMENTARY_VERSES);
 
-  // 1. From DB rows
-  for (const row of rows) {
-    if (!verseMap.has(row.surahNumber)) verseMap.set(row.surahNumber, new Map());
-    const sm = verseMap.get(row.surahNumber)!;
-    if (!sm.has(row.ayah)) sm.set(row.ayah, row.verseText);
-    // Also capture passage sub-verses that aren't in the CSV
-    if (row.primaryAyahNumber && row.contextStartAyah && row.contextEndAyah) {
-      // We can't recover individual ayah texts from a joined passage easily,
-      // so we rely on supplementary verses for the known gaps.
-    }
-  }
-
-  // 2. From supplementary hard-coded map
-  for (const [key, text] of Object.entries(SUPPLEMENTARY_VERSES)) {
-    const [s, a] = key.split(":").map(Number);
-    if (!verseMap.has(s)) verseMap.set(s, new Map());
-    const sm = verseMap.get(s)!;
-    if (!sm.has(a)) sm.set(a, text);
-  }
-
+  let keptSinglePass = 0;
+  let upgradedToMulti = 0;
+  let deactivated = 0;
   let updated = 0;
-  let reviewNeeded = 0;
-  let singleAyah = 0;
-  let multiAyah = 0;
 
   for (const row of rows) {
     const options = [row.optionA, row.optionB, row.optionC, row.optionD];
-    const result = expandContext(row.surahNumber, row.ayah, options, verseMap);
+    const result = generateWithValidation(row.surahNumber, row.ayah, options, verseMap);
 
-    if (result.contextMode === "single_ayah") singleAyah++;
-    else multiAyah++;
+    let newContextMode: string;
+    let newContextStartAyah: number;
+    let newContextEndAyah: number;
+    let newDisplayedPassage: string;
+    let newOptionsSourceScope: string;
+    let newGenerationStatus: string;
+    let newGenerationFailureReason: string | null;
+    let newIsActive: boolean;
 
-    if (!result.validationPassed) reviewNeeded++;
+    if (result.status === "generated_single_pass") {
+      newContextMode = "single_ayah";
+      newContextStartAyah = result.context.contextStartAyah;
+      newContextEndAyah = result.context.contextEndAyah;
+      newDisplayedPassage = result.context.displayedPassageText;
+      newOptionsSourceScope = "displayed_passage_only";
+      newGenerationStatus = "generated_single_pass";
+      newGenerationFailureReason = null;
+      newIsActive = true;
+      keptSinglePass++;
+    } else if (result.status === "generated_multi_pass") {
+      newContextMode = "multi_ayah";
+      newContextStartAyah = result.context.contextStartAyah;
+      newContextEndAyah = result.context.contextEndAyah;
+      newDisplayedPassage = result.context.displayedPassageText;
+      newOptionsSourceScope = "displayed_passage_only";
+      newGenerationStatus = "generated_multi_pass";
+      newGenerationFailureReason = null;
+      newIsActive = true;
+      upgradedToMulti++;
+    } else {
+      // generation_failed — deactivate; keep row for audit / manual review
+      const candidate = result.candidateContext;
+      newContextMode = candidate?.contextMode ?? row.contextMode ?? "single_ayah";
+      newContextStartAyah = candidate?.contextStartAyah ?? row.contextStartAyah ?? row.ayah;
+      newContextEndAyah = candidate?.contextEndAyah ?? row.contextEndAyah ?? row.ayah;
+      newDisplayedPassage = candidate?.displayedPassageText ?? row.displayedPassageText ?? "";
+      newOptionsSourceScope = "review_needed";
+      newGenerationStatus = "generation_failed";
+      newGenerationFailureReason = result.reason ?? "insufficient_options_multi_ayah";
+      newIsActive = false;
+      deactivated++;
+    }
 
-    // Determine if row needs updating
+    // Force-update any row whose generation-pipeline columns are still NULL
+    // (i.e. rows inserted before the generation_status / is_active columns existed).
+    const hasNullPipelineFields = row.generationStatus === null || row.isActive === null;
+
     const changed =
-      result.contextMode !== row.contextMode ||
-      result.contextStartAyah !== row.contextStartAyah ||
-      result.contextEndAyah !== row.contextEndAyah ||
-      result.displayedPassageText !== (row.displayedPassageText ?? "");
+      hasNullPipelineFields ||
+      newContextMode !== (row.contextMode ?? "single_ayah") ||
+      newContextStartAyah !== (row.contextStartAyah ?? row.ayah) ||
+      newContextEndAyah !== (row.contextEndAyah ?? row.ayah) ||
+      newDisplayedPassage !== (row.displayedPassageText ?? "") ||
+      newOptionsSourceScope !== (row.optionsSourceScope ?? "displayed_passage_only") ||
+      newGenerationStatus !== (row.generationStatus ?? "generated_single_pass") ||
+      newGenerationFailureReason !== (row.generationFailureReason ?? null) ||
+      newIsActive !== (row.isActive ?? true);
 
     if (changed) {
       await db
         .update(tabariExercises)
         .set({
-          contextMode: result.contextMode,
-          contextStartAyah: result.contextStartAyah,
-          contextEndAyah: result.contextEndAyah,
+          contextMode: newContextMode,
+          contextStartAyah: newContextStartAyah,
+          contextEndAyah: newContextEndAyah,
           primaryAyahNumber: row.ayah,
-          displayedPassageText: result.displayedPassageText,
-          optionsSourceScope: result.validationPassed
-            ? "displayed_passage_only"
-            : "review_needed",
+          displayedPassageText: newDisplayedPassage,
+          optionsSourceScope: newOptionsSourceScope,
+          generationStatus: newGenerationStatus,
+          generationFailureReason: newGenerationFailureReason,
+          isActive: newIsActive,
         })
         .where(eq(tabariExercises.id, row.id));
       updated++;
     }
   }
 
-  return { total: rows.length, singleAyah, multiAyah, updated, reviewNeeded };
+  const sentToReview = deactivated; // all deactivated rows are candidates for manual review
+
+  console.log(
+    `✅ Tabari backfill complete: ${rows.length} total, ` +
+    `${keptSinglePass} single_pass, ${upgradedToMulti} multi_pass, ` +
+    `${deactivated} deactivated (generation_failed), ${updated} rows updated.`
+  );
+
+  return {
+    total: rows.length,
+    keptSinglePass,
+    upgradedToMulti,
+    deactivated,
+    sentToReview,
+    updated,
+  };
 }

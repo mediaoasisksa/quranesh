@@ -354,7 +354,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // options are not fully covered by its displayed_passage_text.
     const { backfillTabariContext } = await import("./backfill-tabari-context");
     const backfillResult = await backfillTabariContext();
-    console.log(`✅ Tabari context backfill: ${backfillResult.updated} rows updated, ${backfillResult.reviewNeeded} review_needed, ${backfillResult.singleAyah} single-ayah, ${backfillResult.multiAyah} multi-ayah.`);
+    console.log(
+      `✅ Tabari backfill: ${backfillResult.updated} rows updated, ` +
+      `${backfillResult.keptSinglePass} single_pass, ${backfillResult.upgradedToMulti} multi_pass, ` +
+      `${backfillResult.deactivated} deactivated.`
+    );
   })().catch((err) => {
     // Log startup errors but never crash the server — DB may be waking up from suspension
     console.error("⚠️ Startup init error (non-fatal):", err?.message ?? err);
@@ -3667,15 +3671,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? String(req.query.exclude).split(",").map(s => s.trim()).filter(Boolean)
         : [];
 
-      const { eq, notInArray, and, ne } = await import("drizzle-orm");
-      const baseCondition = ne(tabariExercises.optionsSourceScope, "review_needed");
+      const { eq, notInArray, and, ne, or, isNull } = await import("drizzle-orm");
+      // Only serve rows that passed the generation pipeline.
+      // ne(false) matches both true AND null — handles legacy rows before backfill.
+      const activeCondition = ne(tabariExercises.isActive, false);
+      const notReviewNeeded = ne(tabariExercises.optionsSourceScope, "review_needed");
       const surahCondition = surahParam ? eq(tabariExercises.surahNumber, surahParam) : undefined;
       const excludeCondition = excludeIds.length > 0 ? notInArray(tabariExercises.id, excludeIds) : undefined;
 
       const rows = await db
         .select()
         .from(tabariExercises)
-        .where(and(baseCondition, surahCondition, excludeCondition));
+        .where(and(activeCondition, notReviewNeeded, surahCondition, excludeCondition));
 
       if (rows.length === 0) {
         return res.status(404).json({ message: "No exercises found" });
@@ -3692,7 +3699,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tabari-exercises/stats", async (_req, res) => {
     try {
       const { count } = await import("drizzle-orm");
-      const rows = await db
+
+      const bySurah = await db
         .select({
           surahNumber: tabariExercises.surahNumber,
           surahNameAr: tabariExercises.surahNameAr,
@@ -3700,18 +3708,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(tabariExercises)
         .groupBy(tabariExercises.surahNumber, tabariExercises.surahNameAr);
-      const total = rows.reduce((acc, r) => acc + Number(r.cnt), 0);
-      // Also return context_mode and options_source_scope breakdown
-      const { count: countFn } = await import("drizzle-orm");
-      const contextRows = await db
+
+      const total = bySurah.reduce((acc, r) => acc + Number(r.cnt), 0);
+
+      const byContext = await db
         .select({
           contextMode: tabariExercises.contextMode,
           optionsSourceScope: tabariExercises.optionsSourceScope,
-          cnt: countFn(),
+          cnt: count(),
         })
         .from(tabariExercises)
         .groupBy(tabariExercises.contextMode, tabariExercises.optionsSourceScope);
-      res.json({ total, bySurah: rows, byContext: contextRows });
+
+      // Generation pipeline breakdown
+      const byGenerationStatus = await db
+        .select({
+          generationStatus: tabariExercises.generationStatus,
+          isActive: tabariExercises.isActive,
+          cnt: count(),
+        })
+        .from(tabariExercises)
+        .groupBy(tabariExercises.generationStatus, tabariExercises.isActive);
+
+      res.json({ total, bySurah, byContext, byGenerationStatus });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch stats" });
     }
