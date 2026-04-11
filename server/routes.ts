@@ -33,6 +33,7 @@ import {
   sponsorships,
   scholarshipMatches,
   tabariExercises,
+  pricingPlans,
   type User,
   type ExerciseSession,
   type DiplomaWeek,
@@ -1706,17 +1707,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log(`HyperPay: ${HYPERPAY_CONFIG.isProduction ? 'PRODUCTION' : 'TEST'} mode`);
   console.log(`HyperPay config: accessToken=${!!HYPERPAY_CONFIG.accessToken}, entityMada=${HYPERPAY_CONFIG.entityIdMada?.substring(0,20)}..., entityVisa=${HYPERPAY_CONFIG.entityIdVisaMaster?.substring(0,20)}..., serverUrl=${HYPERPAY_CONFIG.serverUrl}`);
 
-  // Get pricing plans
-  app.get("/api/pricing", (req, res) => {
-    res.json(pricingData);
+  // ── Seed pricing plans from JSON into DB (idempotent) ────────────────────
+  (async () => {
+    try {
+      const { eq } = await import("drizzle-orm");
+      for (const plan of pricingData.plans) {
+        const existing = await db.select().from(pricingPlans).where(eq(pricingPlans.id, plan.id)).limit(1);
+        if (existing.length === 0) {
+          await db.insert(pricingPlans).values({ id: plan.id, price: plan.price, currency: plan.currency || "SAR" });
+          console.log(`✅ Seeded pricing plan: ${plan.id} = ${plan.price} SAR`);
+        }
+      }
+    } catch (e) {
+      console.error("❌ Failed to seed pricing plans:", e);
+    }
+  })();
+
+  // Helper: merge JSON plan metadata with DB price
+  async function getPlansWithDbPrices() {
+    const { eq: _eq } = await import("drizzle-orm");
+    const dbPlans = await db.select().from(pricingPlans);
+    const priceMap = Object.fromEntries(dbPlans.map(p => [p.id, p]));
+    return pricingData.plans.map((plan: any) => ({
+      ...plan,
+      price: priceMap[plan.id]?.price ?? plan.price,
+      currency: priceMap[plan.id]?.currency ?? plan.currency,
+    }));
+  }
+
+  // Get pricing plans (public — merges DB prices with JSON metadata)
+  app.get("/api/pricing", async (_req, res) => {
+    try {
+      const plans = await getPlansWithDbPrices();
+      res.json({ plans });
+    } catch {
+      res.json(pricingData);
+    }
+  });
+
+  // Admin: get all pricing plans with current DB prices
+  app.get("/api/admin/pricing", async (req: any, res) => {
+    if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin only" });
+    try {
+      const { eq: _eq } = await import("drizzle-orm");
+      const dbPlans = await db.select().from(pricingPlans);
+      const priceMap = Object.fromEntries(dbPlans.map(p => [p.id, p]));
+      const plans = pricingData.plans.map((plan: any) => ({
+        ...plan,
+        price: priceMap[plan.id]?.price ?? plan.price,
+        currency: priceMap[plan.id]?.currency ?? "SAR",
+        updatedAt: priceMap[plan.id]?.updatedAt ?? null,
+        updatedBy: priceMap[plan.id]?.updatedBy ?? null,
+      }));
+      res.json({ plans });
+    } catch (e) {
+      res.status(500).json({ message: "Failed to fetch pricing plans" });
+    }
+  });
+
+  // Admin: update a plan's price
+  app.put("/api/admin/pricing/:planId", async (req: any, res) => {
+    if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin only" });
+    const { planId } = req.params;
+    const { price } = req.body;
+    if (typeof price !== "number" || price < 0) {
+      return res.status(400).json({ message: "Invalid price. Must be a non-negative number." });
+    }
+    const validIds = pricingData.plans.map((p: any) => p.id);
+    if (!validIds.includes(planId)) {
+      return res.status(400).json({ message: "Unknown plan ID" });
+    }
+    try {
+      const { eq } = await import("drizzle-orm");
+      await db.insert(pricingPlans)
+        .values({ id: planId, price, currency: "SAR", updatedBy: req.user.email, updatedAt: new Date() })
+        .onConflictDoUpdate({
+          target: pricingPlans.id,
+          set: { price, updatedBy: req.user.email, updatedAt: new Date() },
+        });
+      console.log(`✅ Admin updated plan ${planId} price to ${price} SAR by ${req.user.email}`);
+      res.json({ ok: true, planId, price });
+    } catch (e) {
+      res.status(500).json({ message: "Failed to update price" });
+    }
   });
 
   app.post("/api/create-checkout", async (req, res) => {
     try {
       const { planId, customerDetails, userId, paymentMethod } = req.body;
 
-      // Find the selected plan
-      const selectedPlan = pricingData.plans.find(
+      // Find the selected plan with live DB price
+      const plans = await getPlansWithDbPrices();
+      const selectedPlan = plans.find(
         (plan: any) => plan.id === planId,
       );
       if (!selectedPlan) {

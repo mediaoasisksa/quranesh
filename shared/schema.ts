@@ -672,3 +672,17 @@ export const tabariExercises = pgTable("tabari_exercises", {
 export const insertTabariExerciseSchema = createInsertSchema(tabariExercises).omit({ id: true });
 export type TabariExercise = typeof tabariExercises.$inferSelect;
 export type InsertTabariExercise = z.infer<typeof insertTabariExerciseSchema>;
+
+// ── Pricing Plans (admin-editable prices) ───────────────────────────────────
+export const pricingPlans = pgTable("pricing_plans", {
+  id: text("id").primaryKey(), // "learner" | "sponsor-5" | "sponsor-10" | "certificate"
+  price: integer("price").notNull(),
+  currency: text("currency").default("SAR").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+  updatedBy: text("updated_by"),
+});
+
+export const insertPricingPlanSchema = createInsertSchema(pricingPlans);
+export type PricingPlan = typeof pricingPlans.$inferSelect;
+export type InsertPricingPlan = z.infer<typeof insertPricingPlanSchema>;

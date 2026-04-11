@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import { Users, BookOpen, Settings, Shield, Plus, Trash2, Edit, ArrowLeft, BarChart3, MessageSquare, Drama, BookText } from "lucide-react";
+import { Users, BookOpen, Settings, Shield, Plus, Trash2, Edit, ArrowLeft, BarChart3, MessageSquare, Drama, BookText, Tag, Save } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface User {
@@ -87,6 +87,151 @@ interface PhraseItem {
   isPracticalDailyUse: number;
   usageDomain: string | null;
   register: string | null;
+}
+
+interface AdminPricingPlan {
+  id: string;
+  name: string;
+  nameEn: string;
+  price: number;
+  currency: string;
+  duration: string;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+
+function PricingTab() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editPrices, setEditPrices] = useState<Record<string, string>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery<{ plans: AdminPricingPlan[] }>({
+    queryKey: ["/api/admin/pricing"],
+  });
+
+  const handleEdit = (id: string, currentPrice: number) => {
+    setEditPrices(prev => ({ ...prev, [id]: String(currentPrice) }));
+  };
+
+  const handleSave = async (planId: string) => {
+    const newPrice = parseInt(editPrices[planId] ?? "");
+    if (isNaN(newPrice) || newPrice < 0) {
+      toast({ title: "خطأ", description: "يرجى إدخال سعر صحيح (رقم موجب)", variant: "destructive" });
+      return;
+    }
+    setSavingId(planId);
+    try {
+      await apiRequest("PUT", `/api/admin/pricing/${planId}`, { price: newPrice });
+      toast({ title: "✅ تم التحديث", description: `تم تغيير سعر الباقة إلى ${newPrice} ريال` });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pricing"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pricing"] });
+      setEditPrices(prev => { const n = { ...prev }; delete n[planId]; return n; });
+    } catch {
+      toast({ title: "خطأ", description: "فشل تحديث السعر، حاول مرة أخرى", variant: "destructive" });
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const PLAN_LABELS: Record<string, string> = {
+    "learner": "متعلم",
+    "sponsor-5": "راعي فضي (5 طلاب)",
+    "sponsor-10": "متعلم ذهبي (10 طلاب)",
+    "certificate": "شهادة أداء رسمية",
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5" />
+            إدارة أسعار الباقات
+          </CardTitle>
+          <CardDescription>
+            يمكنك تعديل سعر أي باقة مباشرة. السعر المحدث يظهر فوراً في صفحة التسعير وعملية الدفع.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-muted-foreground text-center py-8">جار التحميل…</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">الباقة</TableHead>
+                  <TableHead className="text-right">الاسم بالإنجليزية</TableHead>
+                  <TableHead className="text-right">المدة</TableHead>
+                  <TableHead className="text-right">السعر الحالي (ريال)</TableHead>
+                  <TableHead className="text-right">السعر الجديد</TableHead>
+                  <TableHead className="text-right">آخر تعديل</TableHead>
+                  <TableHead className="text-right">حفظ</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.plans.map(plan => (
+                  <TableRow key={plan.id}>
+                    <TableCell className="font-medium">
+                      {PLAN_LABELS[plan.id] ?? plan.name}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{plan.nameEn}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {plan.duration === "year" ? "سنوي" : "مرة واحدة"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xl font-bold text-primary">{plan.price}</span>
+                      <span className="text-xs text-muted-foreground mr-1">ريال</span>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        min={0}
+                        className="w-28 text-center"
+                        placeholder={String(plan.price)}
+                        value={editPrices[plan.id] ?? ""}
+                        onChange={e => handleEdit(plan.id, plan.price) || setEditPrices(prev => ({ ...prev, [plan.id]: e.target.value }))}
+                        onFocus={() => handleEdit(plan.id, plan.price)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {plan.updatedAt
+                        ? new Date(plan.updatedAt).toLocaleDateString("ar-SA")
+                        : "—"}
+                      {plan.updatedBy && (
+                        <div className="text-xs opacity-60">{plan.updatedBy}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        disabled={!editPrices[plan.id] || savingId === plan.id}
+                        onClick={() => handleSave(plan.id)}
+                        className="gap-1"
+                      >
+                        <Save className="h-3.5 w-3.5" />
+                        {savingId === plan.id ? "جار الحفظ…" : "حفظ"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/10">
+        <CardContent className="pt-5">
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            ⚠️ تغيير السعر لا يؤثر على الاشتراكات الحالية — فقط على المدفوعات الجديدة. الأسعار مخزنة في قاعدة البيانات ولا تتطلب إعادة نشر.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export default function AdminPage() {
@@ -262,6 +407,7 @@ export default function AdminPage() {
             <TabsTrigger value="questions" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />بنك الأسئلة</TabsTrigger>
             <TabsTrigger value="situations" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />المواقف</TabsTrigger>
             <TabsTrigger value="legacy" className="gap-1 text-xs sm:text-sm"><Shield className="h-4 w-4" />الوصول المجاني القديم</TabsTrigger>
+            <TabsTrigger value="pricing" className="gap-1 text-xs sm:text-sm"><Tag className="h-4 w-4" />الأسعار</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1 text-xs sm:text-sm"><Settings className="h-4 w-4" />الإعدادات</TabsTrigger>
           </TabsList>
 
@@ -847,6 +993,11 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Pricing */}
+          <TabsContent value="pricing">
+            <PricingTab />
           </TabsContent>
 
           {/* Settings */}
