@@ -1,0 +1,31 @@
+name: Deploy quranesh
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: deploy-quranesh-production
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on production server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GH_REPO_SYNC_TOKEN: ${{ secrets.GH_REPO_SYNC_TOKEN }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          script_stop: true
+          envs: GH_REPO_SYNC_TOKEN
+          script: |
+            set -e
+            cd /var/www/quranesh
+            git fetch https://x-access-token:${GH_REPO_SYNC_TOKEN}@github.com/mediaoasisksa/quranesh.git main
+            git reset --hard FETCH_HEAD
+            pm2 restart quranesh
+            pm2 save
+            echo "Deployed $(git rev-parse --short HEAD)"
+            pm2 ls --no-color | grep quranesh
