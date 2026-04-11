@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { BUILD_INFO } from "./build-info";
 import { db } from "./db";
 import { ALLOWED_SURAHS } from "./content-logic";
 import {
@@ -198,7 +199,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ── DIAGNOSTIC ENDPOINTS (deployment verification) ──────────────────
   app.get("/api/version", (_req, res) => {
-    res.json({ build: "2026-03-26-0918", ok: true });
+    res.json({
+      ok: true,
+      commit: BUILD_INFO.commit,
+      commitDate: BUILD_INFO.commitDate,
+      buildId: BUILD_INFO.buildId,
+      env: BUILD_INFO.env,
+      startedAt: BUILD_INFO.startedAt,
+    });
   });
 
   app.get("/api/debug/db-test", async (_req, res) => {

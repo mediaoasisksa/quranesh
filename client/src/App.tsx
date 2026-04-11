@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider, useLanguage } from "@/contexts/language-context";
 import LanguageToggle from "@/components/language-toggle";
+import { VersionBadge } from "@/components/version-badge";
 import HomePage from "@/pages/HomePage";
 import Dashboard from "@/pages/dashboard";
 import Exercise from "@/pages/exercise";
@@ -69,6 +70,7 @@ function App() {
             <Toaster />
             <GlobalLanguageToggle />
             <Router />
+            <VersionBadge />
           </div>
         </TooltipProvider>
       </LanguageProvider>
