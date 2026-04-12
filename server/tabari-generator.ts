@@ -21,6 +21,19 @@
  *   - SAME surah only
  *   - CONTIGUOUS ayahs only (no gaps)
  *   - Minimum viable expansion: +1 / -1, growing to ±10 at most
+ *
+ * Strict prohibitions (enforced by gateAllOptionsInPassage):
+ *   ✗ Distractors from same surah if NOT in displayed text
+ *   ✗ Words from hidden ayahs
+ *   ✗ Similar roots (same surface form required)
+ *   ✗ Interpretive words or synonyms
+ *   ✗ External word banks if not displayed to the student
+ *
+ * Logging:
+ *   Every gate decision emits structured [tabari-gen] log lines showing:
+ *   displayedArabicText, displayedArabicTokenSet, candidate choices,
+ *   validation result, rejection reason, multi-ayah expansion trigger,
+ *   and which ayahs were added.
  */
 
 import {
@@ -73,6 +86,50 @@ export function stripDiacritics(s: string): string {
   return s.replace(/[\u064B-\u065F\u0670]/g, "");
 }
 
+// ─── Structured logging ──────────────────────────────────────────────────────
+
+function logGateAttempt(
+  surahNum: number,
+  primaryAyah: number,
+  step: "single_ayah" | `multi_ayah(±${number})`,
+  contextStart: number,
+  contextEnd: number,
+  passage: string,
+  options: string[],
+  gateResult: GateResult
+): void {
+  const tokenSet = buildVisibleArabicSet(passage);
+  const normOptions = options.map(o => normalizeArabic(o));
+  const missingFromTokenSet = normOptions.filter(n => !tokenSet.has(n));
+
+  console.log(
+    `[tabari-gen] surah=${surahNum} ayah=${primaryAyah} step=${step} ` +
+    `context=[${contextStart}..${contextEnd}]`
+  );
+  console.log(
+    `[tabari-gen]   displayedArabicText: "${passage}"`
+  );
+  console.log(
+    `[tabari-gen]   displayedArabicTokenSet: [${[...tokenSet].join(" | ")}]`
+  );
+  console.log(
+    `[tabari-gen]   candidate choices (normalised): [${normOptions.join(" | ")}]`
+  );
+
+  if (gateResult.passed) {
+    console.log(`[tabari-gen]   ✅ PASS — all choices in token set`);
+  } else {
+    console.log(
+      `[tabari-gen]   ❌ FAIL gate="${gateResult.failedGate}" reason="${gateResult.reason}"`
+    );
+    if (missingFromTokenSet.length > 0) {
+      console.log(
+        `[tabari-gen]   choices NOT in token set: [${missingFromTokenSet.join(" | ")}]`
+      );
+    }
+  }
+}
+
 // ─── Validation gates ────────────────────────────────────────────────────────
 
 interface GateResult {
@@ -103,6 +160,13 @@ function gateOptionsDistinct(options: string[]): GateResult {
  * displayed text only shows "إنك كادح إلى ربك كدحا".
  *
  * Both sides are normalised with normalizeArabic() before comparison.
+ *
+ * STRICT PROHIBITIONS enforced here:
+ *   ✗ No distractors from same surah unless in displayed text
+ *   ✗ No words from hidden / adjacent undisplayed ayahs
+ *   ✗ No similar roots (exact normalized surface token required)
+ *   ✗ No interpretive words or synonyms
+ *   ✗ No external word bank entries unless visible in passage
  */
 function gateAllOptionsInPassage(
   options: string[],
@@ -161,6 +225,12 @@ function buildPassage(
  * Given a target surah, primary ayah, four options, and the verse map,
  * returns either a publishable candidate (single or multi-ayah) or a
  * generation_failed result.  No published question may bypass this function.
+ *
+ * Fail-closed contract:
+ *   - If any gate fails, the exercise is REJECTED — no silent fallback.
+ *   - Only exercises passing 100% of gates are marked is_active=true.
+ *   - Multi-ayah expansion adds ayahs LITERALLY to the displayed text shown
+ *     to the student, so choices drawn from expanded text are always visible.
  */
 export function generateWithValidation(
   surahNum: number,
@@ -170,10 +240,12 @@ export function generateWithValidation(
 ): GenerationResult {
   const surahVerses = verseMap.get(surahNum);
   if (!surahVerses) {
+    console.log(`[tabari-gen] REJECT surah=${surahNum} — surah_not_in_verse_map`);
     return { status: "generation_failed", reason: "surah_not_in_verse_map" };
   }
 
   if (!surahVerses.has(primaryAyah)) {
+    console.log(`[tabari-gen] REJECT surah=${surahNum} ayah=${primaryAyah} — primary_ayah_not_in_verse_map`);
     return { status: "generation_failed", reason: "primary_ayah_not_in_verse_map" };
   }
 
@@ -181,6 +253,8 @@ export function generateWithValidation(
   const singlePassage = buildPassage(primaryAyah, primaryAyah, surahVerses);
   if (singlePassage !== null) {
     const gateResult = runValidationGates(options, singlePassage);
+    logGateAttempt(surahNum, primaryAyah, "single_ayah", primaryAyah, primaryAyah, singlePassage, options, gateResult);
+
     if (gateResult.passed) {
       return {
         status: "generated_single_pass",
@@ -192,9 +266,15 @@ export function generateWithValidation(
         },
       };
     }
+
+    console.log(
+      `[tabari-gen] single_ayah failed — triggering multi_ayah expansion for surah=${surahNum} ayah=${primaryAyah}`
+    );
   }
 
   // ── Step B: multi_ayah — progressive contiguous expansion ───────────────
+  // Each expansion adds previous AND/OR next ayah to the DISPLAYED text shown
+  // to the student. Choices are then validated against this wider visible text.
   const sortedAyahs = Array.from(surahVerses.keys()).sort((a, b) => a - b);
   const minAyah = sortedAyahs[0];
   const maxAyah = sortedAyahs[sortedAyahs.length - 1];
@@ -216,7 +296,18 @@ export function generateWithValidation(
     };
 
     const gateResult = runValidationGates(options, passage);
+    logGateAttempt(
+      surahNum, primaryAyah,
+      `multi_ayah(±${expansion})`,
+      start, end,
+      passage, options, gateResult
+    );
+
     if (gateResult.passed) {
+      console.log(
+        `[tabari-gen] ✅ multi_ayah PASS — added ayahs [${start}..${end}] ` +
+        `(expansion ±${expansion}) to displayed text`
+      );
       return {
         status: "generated_multi_pass",
         context: lastMultiContext,
@@ -228,6 +319,12 @@ export function generateWithValidation(
   }
 
   // ── Both steps failed ────────────────────────────────────────────────────
+  console.log(
+    `[tabari-gen] ❌ FINAL REJECT surah=${surahNum} ayah=${primaryAyah} — ` +
+    `no valid displayed-text context found after full expansion. ` +
+    `Exercise will NOT be published (fail-closed).`
+  );
+
   return {
     status: "generation_failed",
     reason: "insufficient_options_multi_ayah",
