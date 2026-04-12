@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { apiRequest } from "@/lib/queryClient";
 import type { TabariExercise } from "@shared/schema";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
+import { InlineBuildBadge } from "@/components/version-badge";
 
 type AnswerLetter = "A" | "B" | "C" | "D";
 
@@ -196,9 +197,12 @@ export default function TabariExercisePage() {
     <div className="min-h-screen bg-background" dir={dir}>
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/">
-            <img src={logoImage} alt="Quranesh" className="h-14 w-auto object-contain" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <img src={logoImage} alt="Quranesh" className="h-14 w-auto object-contain" />
+            </Link>
+            <InlineBuildBadge />
+          </div>
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="gap-2">
               <ChevronLeft className="h-4 w-4" />
