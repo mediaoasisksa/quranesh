@@ -9,26 +9,30 @@ interface VersionInfo {
   startedAt: string;
 }
 
-function detectDeploymentTarget(): { label: string; bg: string; dot: string } {
+function detectHost(): { label: string; bg: string; dot: string } {
   if (typeof window === "undefined") return { label: "server", bg: "#64748b", dot: "#fff" };
   const host = window.location.hostname;
-  if (host.includes("quranesh.com")) return { label: "quranesh.com", bg: "#16a34a", dot: "#bbf7d0" };
+  if (host.includes("quranesh.com")) return { label: "production", bg: "#16a34a", dot: "#bbf7d0" };
   if (host.includes(".replit.app")) return { label: "replit-deploy", bg: "#2563eb", dot: "#bfdbfe" };
   if (host.includes(".replit.dev") || host.endsWith("repl.co")) return { label: "replit-preview", bg: "#d97706", dot: "#fde68a" };
   return { label: "localhost", bg: "#64748b", dot: "#e2e8f0" };
 }
 
-/** Fixed overlay badge — always present on every page */
-export function VersionBadge() {
-  const { data, isLoading } = useQuery<VersionInfo>({
+function useVersionData() {
+  return useQuery<VersionInfo>({
     queryKey: ["/api/version"],
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     retry: 2,
   });
+}
 
-  const { label, bg, dot } = detectDeploymentTarget();
+/** Fixed overlay badge — bottom-right corner, every page */
+export function VersionBadge() {
+  const { data, isLoading } = useVersionData();
+  const { label, bg, dot } = detectHost();
   const commit = data?.commit ?? (isLoading ? "…" : "?");
+  const serverEnv = data?.env;
 
   return (
     <div
@@ -51,26 +55,23 @@ export function VersionBadge() {
         cursor: "default",
         userSelect: "none",
       }}
-      title={data ? `Build: ${data.buildId}\nEnv: ${data.env}\nStarted: ${data.startedAt}` : "Loading…"}
+      title={data
+        ? `Build: ${data.buildId}\nServer env: ${data.env}\nStarted: ${data.startedAt}`
+        : "Loading…"}
       data-testid="version-badge"
     >
       <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: dot, display: "inline-block" }} />
-      {label} | {commit}
+      {label}{serverEnv && serverEnv !== "development" ? ` [${serverEnv}]` : ""} | {commit}
     </div>
   );
 }
 
-/** Inline badge — embed directly inside page content (header, toolbar, etc.) */
+/** Inline badge — embedded directly inside page headers */
 export function InlineBuildBadge() {
-  const { data, isLoading } = useQuery<VersionInfo>({
-    queryKey: ["/api/version"],
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-    retry: 2,
-  });
-
-  const { label, bg, dot } = detectDeploymentTarget();
+  const { data, isLoading } = useVersionData();
+  const { label, bg, dot } = detectHost();
   const commit = data?.commit ?? (isLoading ? "…" : "?");
+  const serverEnv = data?.env;
 
   return (
     <span
@@ -91,11 +92,13 @@ export function InlineBuildBadge() {
         userSelect: "none",
         flexShrink: 0,
       }}
-      title={data ? `Build: ${data.buildId}\nEnv: ${data.env}\nStarted: ${data.startedAt}` : "Loading…"}
+      title={data
+        ? `Build: ${data.buildId}\nServer env: ${data.env}\nStarted: ${data.startedAt}`
+        : "Loading…"}
       data-testid="inline-build-badge"
     >
       <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: dot, display: "inline-block", flexShrink: 0 }} />
-      {label} | {commit}
+      {label}{serverEnv && serverEnv !== "development" ? ` [${serverEnv}]` : ""} | {commit}
     </span>
   );
 }
