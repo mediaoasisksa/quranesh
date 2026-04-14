@@ -1,0 +1,185 @@
+يوجد خطأ حي على الموقع المنشور وما زال يتكرر رغم التوجيهات السابقة:
+
+المشكلة:
+في بعض التمارين يظهر للمستخدم نص آية معيّن، لكن الخيارات المعروضة تحتوي كلمات ليست موجودة داخل النص الظاهر للآية/المقطع.
+هذا مخالف تماما للقاعدة المعتمدة:
+All options must come from displayed_passage_text only.
+
+هذا ليس issue بسيطا في الواجهة.
+هذا bug في منطق التوليد أو الاسترجاع أو النشر، ويجب إصلاحه فورًا على مستوى:
+1) generation
+2) API delivery
+3) published content backfill
+
+════════════════════════════════════
+1) قرار فوري
+════════════════════════════════════
+
+اعتبر هذا النوع من الأسئلة blocked in production إلى أن ينجح الفحص.
+
+أي سؤال من هذا النوع إذا فشل فيه الشرط التالي:
+every option ∈ displayed_passage_text
+=> لا يُعرض للمستخدم إطلاقا
+
+بدلا من ذلك:
+- skip invalid question
+- fetch next valid question
+- log incident
+- mark item for review/deactivation
+
+════════════════════════════════════
+2) المطلوب الآن: Hotfix server-side فوري
+════════════════════════════════════
+
+أريد إضافة validation guard على مستوى API / quiz delivery، وليس فقط عند التوليد.
+
+قبل أن يرسل الخادم أي سؤال للواجهة:
+تحقق من التالي:
+
+1. displayed_passage_text exists
+2. correct answer exists inside displayed_passage_text
+3. every distractor exists inside displayed_passage_text
+4. no option is outside displayed_passage_text
+5. if context_mode = single_ayah
+   then all options must be inside that single displayed ayah text
+6. if context_mode = multi_ayah
+   then all options must be inside the displayed multi-ayah passage only
+
+إذا فشل أي شرط:
+- do not return the question to client
+- mark question invalid_delivery_candidate
+- log question id + failure reason
+- fetch another valid question
+
+هذا يجب أن يكون hotfix فوري على الخادم الحي.
+
+════════════════════════════════════
+3) Root cause hunt
+════════════════════════════════════
+
+أريدك أن تبحث عن السبب الحقيقي في أحد هذه الأماكن:
+
+A. Generator bug
+- هل generator ما زال يبني distractors من pool خارجي لا من displayed passage؟
+
+B. Normalization bug
+- هل displayed_passage_text مختلف عن passage المستخدم فعليا لتوليد الخيارات؟
+
+C. Delivery bug
+- هل API ترجع options من record مختلف عن displayed passage الحالي؟
+
+D. Migration/backfill bug
+- هل بعض الأسئلة القديمة بقيت منشورة بصيغة قديمة ولم يطبق عليها النظام الجديد؟
+
+E. Caching bug
+- هل الواجهة أو API cache ما زالت تخدم records قديمة invalid؟
+
+لا أريد تخمينات.
+أريد trace واضح من database → generation → API → frontend.
+
+════════════════════════════════════
+4) Permanent invariant
+════════════════════════════════════
+
+أريد تثبيت invariant صريح في الكود:
+
+For this exercise type, no question is valid unless every visible option is extracted from the exact displayed Quran passage shown to the learner.
+
+طبّق هذا invariant في:
+- generator
+- admin save/update
+- publish pipeline
+- delivery API
+- review tools
+- backfill scripts
+
+════════════════════════════════════
+5) Backfill on live published data
+════════════════════════════════════
+
+أريد script فوري يفحص كل الأسئلة المنشورة من هذا النوع في قاعدة البيانات:
+
+For each published item:
+- parse displayed_passage_text
+- verify every option exists in displayed_passage_text
+- verify correct answer exists in displayed_passage_text
+
+النتائج:
+1. valid → keep
+2. invalid but repairable via multi_ayah rebuild → rebuild and revalidate
+3. invalid and not repairable → deactivate immediately + send to review queue
+
+أريد هذا على المحتوى المنشور الحالي، لا على المحتوى الجديد فقط.
+
+════════════════════════════════════
+6) Frontend safety net
+════════════════════════════════════
+
+أضف أيضا safety net في الواجهة:
+إذا وصل سؤال invalid رغم كل شيء:
+- لا تعرضه للمستخدم
+- أظهر loading / fetch next question
+- أرسل telemetry event
+لكن هذا safety net ثانوي
+وليس بديلا عن fix server-side
+
+════════════════════════════════════
+7) Logging and observability
+════════════════════════════════════
+
+أريد logging واضح بهذه الأسباب:
+- option_not_in_displayed_passage
+- correct_answer_not_in_displayed_passage
+- stale_published_item
+- cache_served_invalid_question
+- generator_passage_mismatch
+- delivery_record_mismatch
+
+وأريد counters في admin/debug dashboard:
+- invalid questions blocked at delivery
+- invalid published items found
+- rebuilt items
+- deactivated items
+- remaining review items
+
+════════════════════════════════════
+8) Tests المطلوبة الآن
+════════════════════════════════════
+
+أضف tests production-critical:
+
+1. delivery API never returns a question with an option outside displayed_passage_text
+2. delivery API skips invalid question and returns next valid one
+3. backfill script deactivates invalid published questions
+4. generator never saves invalid question
+5. publish pipeline blocks invalid question
+6. multi_ayah question still requires all options to come from displayed passage only
+7. cached stale invalid item is not returned after validation guard
+
+════════════════════════════════════
+9) Emergency policy
+════════════════════════════════════
+
+حتى يكتمل الإصلاح:
+إذا كان هذا question type غير مضمون 100%،
+أوقف تقديمه مؤقتا على الإنتاج
+أو فعّل فقط الأسئلة التي اجتازت revalidation الجديدة.
+
+لا أريد استمرار عرض أسئلة خاطئة أمام المستخدمين.
+
+════════════════════════════════════
+10) Final deliverable
+════════════════════════════════════
+
+أريد منك بعد التنفيذ:
+1. السبب الجذري الحقيقي للمشكلة
+2. الملفات المعدلة
+3. أين وُضع delivery guard
+4. عدد الأسئلة المنشورة التي كانت invalid
+5. عدد ما تم إصلاحه
+6. عدد ما تم تعطيله
+7. نتيجة tests
+8. تأكيد صريح أن API لن تعيد بعد الآن أي سؤال يحتوي خيارات خارج النص المعروض
+
+المبدأ النهائي الذي يجب أن يصبح enforced:
+No learner should ever see an option that is not present in the exact Quran passage displayed in the exercise.

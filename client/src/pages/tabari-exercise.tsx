@@ -1,15 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, RotateCcw, CheckCircle2, XCircle, BookOpen, ChevronLeft, Loader2 } from "lucide-react";
+import { ArrowRight, RotateCcw, CheckCircle2, XCircle, BookOpen, ChevronLeft, Loader2, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { apiRequest } from "@/lib/queryClient";
 import type { TabariExercise } from "@shared/schema";
 import logoImage from "@assets/quranesh logo (1)_1762444380395.png";
 import { InlineBuildBadge } from "@/components/version-badge";
+import { buildVisibleArabicSet, normalizeArabic } from "@shared/arabicVisibleTokens";
+
+/**
+ * Frontend invariant guard — secondary safety net.
+ * The server-side delivery guard is the primary gate.
+ * This catches anything that slips through (e.g. cached stale responses).
+ *
+ * Returns { ok: true } if every option appears in the displayed passage.
+ * Returns { ok: false, badOptions } otherwise.
+ */
+function clientSideInvariantCheck(exercise: TabariExercise): {
+  ok: boolean;
+  badOptions: string[];
+} {
+  const passage = exercise.displayedPassageText || exercise.verseText || "";
+  if (!passage.trim()) return { ok: false, badOptions: ["(passage missing)"] };
+
+  const tokenSet = buildVisibleArabicSet(passage);
+  const options = [exercise.optionA, exercise.optionB, exercise.optionC, exercise.optionD].filter(Boolean);
+  const badOptions = options.filter(opt => !tokenSet.has(normalizeArabic(opt ?? "")));
+
+  return { ok: badOptions.length === 0, badOptions };
+}
 
 type AnswerLetter = "A" | "B" | "C" | "D";
 
@@ -98,6 +121,7 @@ export default function TabariExercisePage() {
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [seenIds, setSeenIds] = useState<string[]>([]);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [clientGuardSkip, setClientGuardSkip] = useState(false);
 
   const excludeParam = seenIds.join(",");
 
@@ -124,6 +148,37 @@ export default function TabariExercisePage() {
     staleTime: 0,
     retry: false,
   });
+
+  // ── FRONTEND SAFETY NET ─────────────────────────────────────────────────
+  // Secondary guard: if a question arrives with options outside the passage
+  // (e.g. cached stale data bypassed the server guard), skip it silently.
+  useEffect(() => {
+    if (!exercise) return;
+    const check = clientSideInvariantCheck(exercise);
+    if (!check.ok) {
+      console.warn(
+        `[client-guard] INVALID exercise id=${exercise.id}` +
+        ` badOptions=${JSON.stringify(check.badOptions)}` +
+        ` — skipping and fetching next`
+      );
+      // Telemetry: fire-and-forget log to server
+      fetch("/api/tabari-exercises/client-guard-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          exerciseId: exercise.id,
+          badOptions: check.badOptions,
+          surah: exercise.surahNameAr,
+        }),
+      }).catch(() => {});
+
+      // Auto-skip: add to seen list and refetch
+      setClientGuardSkip(true);
+      setSeenIds(prev => [...prev, exercise.id]);
+    } else {
+      setClientGuardSkip(false);
+    }
+  }, [exercise?.id]);
 
   const validateMutation = useMutation({
     mutationFn: async (data: { exerciseId: string; selectedAnswer: string }) => {
@@ -243,7 +298,7 @@ export default function TabariExercisePage() {
           </Button>
         </div>
 
-        {isLoading ? (
+        {isLoading || clientGuardSkip ? (
           <Card>
             <CardContent className="p-8 text-center">
               <div className="animate-pulse space-y-4">
@@ -255,6 +310,12 @@ export default function TabariExercisePage() {
                   ))}
                 </div>
               </div>
+              {clientGuardSkip && (
+                <p className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Loading next exercise…
+                </p>
+              )}
             </CardContent>
           </Card>
         ) : allExhausted ? (

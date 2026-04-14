@@ -3826,6 +3826,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ── TABARI VOCABULARY EXERCISES ──────────────────────────────────────
+  // ── DELIVERY GUARD ────────────────────────────────────────────────────────
+  // In-process counters for admin observability (reset on server restart).
+  // Exposed via /api/admin/tabari-delivery-stats.
+  const deliveryGuardCounters = {
+    blocked: 0,       // questions blocked at delivery
+    served: 0,        // questions that passed and were served
+    exhausted: 0,     // requests where every candidate was blocked
+    deactivated: 0,   // items auto-deactivated by the guard
+  };
+
+  /**
+   * deliveryGuard
+   * =============
+   * Enforces the invariant: every option and correct_word must appear
+   * (after Arabic normalization) in the exercise's displayed_passage_text.
+   *
+   * Failure reasons logged:
+   *   option_not_in_displayed_passage
+   *   correct_word_not_in_displayed_passage
+   *   passage_missing
+   *
+   * On failure:
+   *   1. Log incident with structured tag [delivery-guard]
+   *   2. Fire-and-forget DB deactivation (marks is_active=false)
+   *   3. Return false — caller must skip and try next candidate
+   */
+  async function deliveryGuard(
+    exercise: typeof tabariExercises.$inferSelect
+  ): Promise<boolean> {
+    const { validateDisplayedArabicTokenSet } = await import("./exerciseVisibleValidator");
+    const passage = exercise.displayedPassageText ?? "";
+
+    if (!passage.trim()) {
+      console.warn(
+        `[delivery-guard] BLOCKED id=${exercise.id} surah=${exercise.surahNameAr}` +
+        ` reason=passage_missing`
+      );
+      deliveryGuardCounters.blocked++;
+      void deactivateItem(exercise.id, "delivery_guard:passage_missing");
+      return false;
+    }
+
+    const choices: string[] = [
+      exercise.optionA,
+      exercise.optionB,
+      exercise.optionC,
+      exercise.optionD,
+    ].filter(Boolean) as string[];
+
+    // Also check correct_word if it exists (it may be a separate field from the A/B/C/D letter)
+    const correctWord = exercise.correctWord;
+    if (correctWord && !choices.includes(correctWord)) {
+      choices.push(correctWord);
+    }
+
+    const result = validateDisplayedArabicTokenSet(passage, choices);
+
+    if (!result.ok) {
+      console.warn(
+        `[delivery-guard] BLOCKED id=${exercise.id} surah=${exercise.surahNameAr}` +
+        ` context=${exercise.contextMode}` +
+        ` reason=${result.reason}` +
+        ` badChoices=${JSON.stringify(result.badChoices)}`
+      );
+      deliveryGuardCounters.blocked++;
+      void deactivateItem(exercise.id, `delivery_guard:${result.badChoices.length > 0 ? "option_not_in_displayed_passage" : result.reason}`);
+      return false;
+    }
+
+    return true;
+  }
+
+  /** Fire-and-forget: mark exercise invalid so it won't be served again */
+  async function deactivateItem(id: string, reason: string): Promise<void> {
+    try {
+      const { eq } = await import("drizzle-orm");
+      await db
+        .update(tabariExercises)
+        .set({
+          isActive: false,
+          generationFailureReason: reason,
+        })
+        .where(eq(tabariExercises.id, id));
+      deliveryGuardCounters.deactivated++;
+      console.warn(`[delivery-guard] DEACTIVATED id=${id} reason=${reason}`);
+    } catch (e: any) {
+      console.error(`[delivery-guard] Failed to deactivate id=${id}:`, e?.message);
+    }
+  }
+
   app.get("/api/tabari-exercises/random", async (req, res) => {
     try {
       const surahParam = (req.query.surah_number || req.query.surah)
@@ -3835,7 +3925,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? String(req.query.exclude).split(",").map(s => s.trim()).filter(Boolean)
         : [];
 
-      const { eq, notInArray, and, ne, or, isNull } = await import("drizzle-orm");
+      const { eq, notInArray, and, ne } = await import("drizzle-orm");
       // Only serve rows that passed the generation pipeline.
       // ne(false) matches both true AND null — handles legacy rows before backfill.
       const activeCondition = ne(tabariExercises.isActive, false);
@@ -3852,12 +3942,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "No exercises found" });
       }
 
-      const exercise = rows[Math.floor(Math.random() * rows.length)];
-      res.json(exercise);
+      // Shuffle candidates so we don't always try the same order
+      const shuffled = [...rows].sort(() => Math.random() - 0.5);
+
+      // Try up to min(15, total) candidates — the delivery guard may skip invalid ones
+      const MAX_ATTEMPTS = Math.min(15, shuffled.length);
+      for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const candidate = shuffled[i];
+        const passed = await deliveryGuard(candidate);
+        if (passed) {
+          deliveryGuardCounters.served++;
+          return res.json(candidate);
+        }
+      }
+
+      // All candidates within MAX_ATTEMPTS failed the invariant guard
+      deliveryGuardCounters.exhausted++;
+      console.error(
+        `[delivery-guard] EXHAUSTED — all ${MAX_ATTEMPTS} candidates blocked.` +
+        ` surah=${surahParam ?? "any"} exclude_count=${excludeIds.length}`
+      );
+      return res.status(404).json({
+        message: "No valid exercises available",
+        _guard: "all_candidates_blocked",
+      });
+
     } catch (err: any) {
       console.error("Tabari random error:", err);
       res.status(500).json({ message: "Failed to fetch exercise" });
     }
+  });
+
+  // ── ADMIN: delivery guard stats ───────────────────────────────────────────
+  app.get("/api/admin/tabari-delivery-stats", requireAdminAuth, (_req, res) => {
+    res.json({
+      ok: true,
+      counters: deliveryGuardCounters,
+      description: {
+        blocked: "Questions blocked at delivery by invariant guard",
+        served: "Questions that passed guard and were served to learners",
+        exhausted: "Requests where every candidate was blocked (returned 404)",
+        deactivated: "Items auto-deactivated by guard (fire-and-forget)",
+      },
+    });
+  });
+
+  // ── ADMIN: full delivery audit (scan all active items) ────────────────────
+  app.post("/api/admin/tabari-delivery-audit", requireAdminAuth, async (req, res) => {
+    const dryRun = req.body?.dryRun !== false; // default dry run
+    try {
+      const { validateDisplayedArabicTokenSet } = await import("./exerciseVisibleValidator");
+      const { ne } = await import("drizzle-orm");
+
+      const rows = await db
+        .select()
+        .from(tabariExercises)
+        .where(ne(tabariExercises.isActive, false));
+
+      let valid = 0, invalid = 0, deactivatedNow = 0;
+      const invalidItems: Array<{ id: string; surah: string; reason: string }> = [];
+
+      for (const row of rows) {
+        const passage = row.displayedPassageText ?? "";
+        if (!passage.trim()) {
+          invalid++;
+          invalidItems.push({ id: row.id, surah: row.surahNameAr ?? "", reason: "passage_missing" });
+          if (!dryRun) {
+            await deactivateItem(row.id, "audit:passage_missing");
+            deactivatedNow++;
+          }
+          continue;
+        }
+
+        const choices = [row.optionA, row.optionB, row.optionC, row.optionD].filter(Boolean) as string[];
+        if (row.correctWord && !choices.includes(row.correctWord)) choices.push(row.correctWord);
+
+        const result = validateDisplayedArabicTokenSet(passage, choices);
+        if (!result.ok) {
+          invalid++;
+          invalidItems.push({ id: row.id, surah: row.surahNameAr ?? "", reason: result.reason });
+          if (!dryRun) {
+            await deactivateItem(row.id, `audit:${result.reason.substring(0, 100)}`);
+            deactivatedNow++;
+          }
+        } else {
+          valid++;
+        }
+      }
+
+      console.log(
+        `[delivery-audit] mode=${dryRun ? "DRY_RUN" : "LIVE"}` +
+        ` total=${rows.length} valid=${valid} invalid=${invalid} deactivated=${deactivatedNow}`
+      );
+
+      res.json({
+        ok: true,
+        mode: dryRun ? "dry_run" : "live",
+        total: rows.length,
+        valid,
+        invalid,
+        deactivatedNow,
+        invalidItems: invalidItems.slice(0, 50), // return first 50
+        note: dryRun ? "Pass { dryRun: false } in body to actually deactivate invalid items" : undefined,
+      });
+    } catch (err: any) {
+      res.status(500).json({ ok: false, error: err?.message });
+    }
+  });
+
+  // ── TELEMETRY: client-side guard reports ──────────────────────────────────
+  // Receives reports from the frontend safety net when an invalid exercise
+  // slips through the server guard (e.g. cached responses).
+  const clientGuardReports: Array<{ exerciseId: string; badOptions: string[]; surah: string; ts: string }> = [];
+
+  app.post("/api/tabari-exercises/client-guard-report", async (req, res) => {
+    const { exerciseId, badOptions, surah } = req.body ?? {};
+    const report = { exerciseId: String(exerciseId ?? ""), badOptions: badOptions ?? [], surah: String(surah ?? ""), ts: new Date().toISOString() };
+    clientGuardReports.push(report);
+    if (clientGuardReports.length > 200) clientGuardReports.shift(); // cap at 200
+
+    console.warn(
+      `[client-guard-report] RECEIVED id=${report.exerciseId}` +
+      ` surah=${report.surah}` +
+      ` badOptions=${JSON.stringify(report.badOptions)}`
+    );
+
+    // Fire-and-forget deactivation if the item is still active
+    void deactivateItem(report.exerciseId, "client_guard:option_not_in_displayed_passage");
+
+    res.json({ ok: true });
+  });
+
+  // Admin: view client guard reports
+  app.get("/api/admin/tabari-client-guard-reports", requireAdminAuth, (_req, res) => {
+    res.json({ ok: true, total: clientGuardReports.length, reports: clientGuardReports });
   });
 
   app.get("/api/tabari-exercises/stats", async (_req, res) => {
