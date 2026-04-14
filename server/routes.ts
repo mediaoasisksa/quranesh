@@ -199,14 +199,61 @@ async function runLegacyBackfill() {
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // ── DIAGNOSTIC ENDPOINTS (deployment verification) ──────────────────
-  app.get("/api/version", (_req, res) => {
+
+  /**
+   * /api/version — full release fingerprint
+   * Hit this on ANY environment to determine exactly what is running.
+   * Schema: commit, commitFull, commitDate, builtAt, env, appVersion,
+   *         buildId, featureFlags (true/false only), nodeVersion,
+   *         dbFingerprint (safe — no credentials)
+   */
+  app.get("/api/version", async (_req, res) => {
+    let dbFingerprint: Record<string, unknown> = { ok: false };
+    try {
+      const { sql: sqlTag } = await import("drizzle-orm");
+      const rows = await db.execute(sqlTag`
+        SELECT
+          current_database()                                          AS db_name,
+          (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public')::int AS table_count,
+          (SELECT COUNT(*) FROM tabari_exercises WHERE is_active = true)::int  AS tabari_active,
+          (SELECT COUNT(*) FROM tabari_exercises WHERE is_active = false)::int AS tabari_failed,
+          (SELECT COUNT(*) FROM users)::int                           AS user_count,
+          (SELECT COUNT(*) FROM subscriptions WHERE status = 'active')::int AS active_subs,
+          (SELECT column_name FROM information_schema.columns
+           WHERE table_name = 'tabari_exercises' AND column_name = 'context_mode'
+           LIMIT 1)                                                   AS has_context_mode,
+          (SELECT column_name FROM information_schema.columns
+           WHERE table_name = 'tabari_exercises' AND column_name = 'generation_status'
+           LIMIT 1)                                                   AS has_generation_status
+      `);
+      const r = rows.rows?.[0] ?? rows[0] ?? {};
+      dbFingerprint = {
+        ok: true,
+        dbName: r.db_name,
+        tableCount: r.table_count,
+        tabariActive: r.tabari_active,
+        tabariRejected: r.tabari_failed,
+        userCount: r.user_count,
+        activeSubs: r.active_subs,
+        schemaHasContextMode: r.has_context_mode === "context_mode",
+        schemaHasGenerationStatus: r.has_generation_status === "generation_status",
+      };
+    } catch (e: any) {
+      dbFingerprint = { ok: false, error: e?.message };
+    }
+
     res.json({
       ok: true,
       commit: BUILD_INFO.commit,
+      commitFull: BUILD_INFO.commitFull,
       commitDate: BUILD_INFO.commitDate,
-      buildId: BUILD_INFO.buildId,
+      builtAt: BUILD_INFO.builtAt,
       env: BUILD_INFO.env,
-      startedAt: BUILD_INFO.startedAt,
+      appVersion: BUILD_INFO.appVersion,
+      buildId: BUILD_INFO.buildId,
+      featureFlags: BUILD_INFO.featureFlags,
+      nodeVersion: BUILD_INFO.nodeVersion,
+      dbFingerprint,
     });
   });
 

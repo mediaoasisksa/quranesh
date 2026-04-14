@@ -1,0 +1,173 @@
+لدينا الآن مشكلة أخطر: لا يزال هناك فرق بين النسخة التي يتم اختبارها داخليا والنسخة المنشورة التي يراها المستخدم.
+
+هذا يعني أن عندنا خللا في production parity أو deployment integrity.
+
+أريد إيقاف أي تطوير جديد مؤقتا والتركيز فقط على توحيد النسخة المختبرة مع النسخة المنشورة.
+
+════════════════════════════════════
+1) المطلوب فورا
+════════════════════════════════════
+
+أريدك أن تتعامل مع هذا كـ release integrity issue وليس bug عادي.
+
+نفّذ الآن:
+1. تحديد ما هي النسخة التي تعمل فعليا على الدومين العام
+2. تحديد ما هي النسخة التي اختبرتها أنت داخليا
+3. إثبات هل هما نفس commit أم لا
+4. إثبات هل هما على نفس قاعدة البيانات أم لا
+5. إثبات هل نفس environment variables مفعلة أم لا
+6. إثبات هل توجد cache أو CDN أو old deployment تخدم نسخة قديمة أم لا
+
+لا أريد ظنا. أريد أدلة تقنية صريحة.
+
+════════════════════════════════════
+2) أضف version fingerprint واضح
+════════════════════════════════════
+
+أريد فورا إضافة build/version fingerprint ظاهر في:
+- /api/version
+- admin dashboard footer
+- server logs on startup
+
+ويجب أن يحتوي على:
+- git commit sha
+- build timestamp
+- environment name
+- schema/migration version
+- app version
+- feature flags summary
+- database fingerprint آمن غير مكشوف بالكامل
+
+مثال:
+{
+  commit: "...",
+  builtAt: "...",
+  env: "production",
+  schemaVersion: "...",
+  appVersion: "...",
+  featureFlags: {...},
+  dbFingerprint: "prod-db-01"
+}
+
+بذلك عندما أفتح النسخة المنشورة أعرف بالضبط أي build وأي DB تعمل.
+
+════════════════════════════════════
+3) تحقق من مصدر الاختلاف
+════════════════════════════════════
+
+فتّش صراحة عن هذه الأسباب:
+
+A. Wrong deployment target
+- هل تم نشر branch أو commit مختلف عن الذي تم اختباره؟
+
+B. Wrong database
+- هل النسخة المنشورة متصلة بقاعدة بيانات مختلفة عن قاعدة الاختبار؟
+- هل فيها بيانات قديمة أو أسئلة قديمة invalid؟
+
+C. Missing migration
+- هل build المنشور يعمل على schema أقدم؟
+- هل migration الخاصة بالvalidation أو context_mode لم تُطبق على live DB؟
+
+D. Environment mismatch
+- هل feature flags مختلفة؟
+- هل locale flags أو generation flags أو publish guards غير مفعلة على live؟
+
+E. Cache / stale asset issue
+- هل المتصفح أو CDN أو edge cache ما زال يخدم JavaScript أو API responses قديمة؟
+
+F. Multiple running instances
+- هل توجد instance قديمة ما زالت تستقبل الترافيك؟
+
+════════════════════════════════════
+4) parity checklist إلزامي
+════════════════════════════════════
+
+أريد checklist يمر قبل اعتبار النشر ناجحا:
+
+- same commit sha
+- same schema version
+- same enabled feature flags
+- same question delivery guards
+- same environment variables set
+- same locale config
+- same build timestamp expected
+- same database migration state
+- same API version response
+- no stale instances receiving traffic
+
+لا تعتبر النشر ناجحا قبل اجتياز هذه القائمة.
+
+════════════════════════════════════
+5) Delivery/API proof
+════════════════════════════════════
+
+بعد الإصلاح أريد منك اختبارا مباشرا على الدومين العام نفسه، وليس على preview فقط:
+
+- افتح live domain
+- اضرب /api/version
+- اضرب endpoint التمرين نفسه
+- خذ question sample من live
+- أثبت أن كل option موجود داخل displayed_passage_text
+- سجّل النتيجة من البيئة الحية نفسها
+
+لا أريد تأكيدات مبنية على local أو preview فقط.
+
+════════════════════════════════════
+6) Freeze policy
+════════════════════════════════════
+
+من الآن:
+- أوقف أي feature جديدة
+- لا تنشر أي تعديل آخر قبل حل parity issue
+- أي hotfix يجب أن يتضمن verification على live domain بعد النشر
+
+════════════════════════════════════
+7) Smoke tests على النسخة الحية
+════════════════════════════════════
+
+أريد smoke tests post-deploy تُشغّل على live domain بعد كل deploy:
+
+1. /api/version returns expected commit
+2. exercise endpoint returns validated question only
+3. no option outside displayed_passage_text
+4. locale rendering works
+5. admin and public app point to expected environment
+6. build fingerprint visible and matches expected release
+
+إذا فشل أي smoke test:
+- اعتبر deploy failed
+- rollback أو block release
+
+════════════════════════════════════
+8) Logging المطلوب
+════════════════════════════════════
+
+أريد في startup logs:
+- commit sha
+- build timestamp
+- env name
+- db fingerprint
+- migration state
+- feature flags
+
+وأريد في request logs الحساسة:
+- which environment served request
+- version fingerprint
+- exercise validation guard result
+
+════════════════════════════════════
+9) Final deliverable
+════════════════════════════════════
+
+بعد التنفيذ أريد:
+1. رابط /api/version من النسخة الحية
+2. commit sha الفعلي على live
+3. db fingerprint الفعلي على live
+4. هل live والنسخة المختبرة نفس commit أم لا
+5. هل live والنسخة المختبرة نفس DB أم لا
+6. ما السبب الجذري للفرق
+7. ما الذي تم إصلاحه لمنع تكرار هذه المشكلة
+8. تأكيد أن أي deploy لاحق لن يمر بدون parity verification
+
+القاعدة النهائية:
+Do not trust preview parity. Trust only verified live deployment parity with visible version fingerprint and live smoke tests.

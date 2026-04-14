@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { startScheduler } from "./scheduler";
 import { setupChatSocket } from "./chat";
+import { BUILD_INFO } from "./build-info";
 
 const app = express();
 app.use(express.json());
@@ -74,8 +75,30 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen(port, "0.0.0.0", () => {
+
+    // ── RELEASE FINGERPRINT LOG (emitted on every startup) ─────────────
+    // This is the canonical startup proof. It tells you exactly what is
+    // running, which commit, which environment, and which feature flags.
+    // If two environments emit different blocks, they are NOT in parity.
     log(`serving on port ${port}`);
-    
+    log("════════════════════════════════════════════════════════");
+    log(`RELEASE FINGERPRINT`);
+    log(`  buildId    : ${BUILD_INFO.buildId}`);
+    log(`  commit     : ${BUILD_INFO.commit}  (full: ${BUILD_INFO.commitFull.substring(0, 12)}…)`);
+    log(`  commitDate : ${BUILD_INFO.commitDate}`);
+    log(`  builtAt    : ${BUILD_INFO.builtAt}`);
+    log(`  env        : ${BUILD_INFO.env}`);
+    log(`  appVersion : ${BUILD_INFO.appVersion}`);
+    log(`  node       : ${BUILD_INFO.nodeVersion}`);
+    log(`FEATURE FLAGS`);
+    for (const [k, v] of Object.entries(BUILD_INFO.featureFlags)) {
+      log(`  ${k.padEnd(40)} = ${v ? "✅ SET" : "❌ MISSING"}`);
+    }
+    log("════════════════════════════════════════════════════════");
+    log("To verify parity: curl <domain>/api/version | jq");
+    log("Smoke test: npx tsx scripts/smoke-test.ts <domain>");
+    log("════════════════════════════════════════════════════════");
+
     // Start the daily Quranic elements scheduler (runs at 8 AM Riyadh time)
     startScheduler();
   });
