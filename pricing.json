@@ -4,20 +4,20 @@
       "id": "learner",
       "name": "تدريب ألفاظ اللغة العربية القرآنية",
       "nameEn": "Quranic Arabic Training",
-      "price": 10,
+      "price": 50,
       "currency": "SAR",
       "duration": "year",
       "durationDays": 365,
       "features": [
-        "دخول كامل لدروس الألفاظ",
-        "اختبارات تفاعلية",
-        "تتبع تقدم",
+        "دخول كامل لدروس الألفاظ القرآنية",
+        "اختبارات تفاعلية غير محدودة",
+        "تتبع تقدم مفصّل",
         "شهادة إتمام رمزية"
       ],
       "featuresEn": [
-        "Full access to expression lessons",
-        "Interactive exercises",
-        "Progress tracking",
+        "Full access to Quranic vocabulary lessons",
+        "Unlimited interactive exercises",
+        "Detailed progress tracking",
         "Symbolic completion certificate"
       ]
     },
@@ -25,40 +25,44 @@
       "id": "sponsor-5",
       "name": "راعي فضي",
       "nameEn": "Silver Sponsor",
-      "price": 50,
+      "price": 200,
       "currency": "SAR",
       "duration": "year",
       "durationDays": 365,
       "sponsoredCount": 5,
       "features": [
-        "رعاية 5 متعلمين لمدة سنة",
+        "رعاية 5 متعلمين لمدة سنة (40 ريال/متعلم)",
         "صدقة جارية ما دام حرف يُتلى",
-        "شهادة راعي تعليمي"
+        "شهادة راعي تعليمي",
+        "توفير 50 ريال مقارنة بالاشتراك الفردي"
       ],
       "featuresEn": [
-        "Sponsor 5 learners for one year",
+        "Sponsor 5 learners for one year (40 SAR/learner)",
         "Ongoing charity as long as Quran is recited",
-        "Educational sponsor certificate"
+        "Educational sponsor certificate",
+        "Save 50 SAR vs individual subscriptions"
       ]
     },
     {
       "id": "sponsor-10",
-      "name": "متعلم ذهبي",
-      "nameEn": "Golden Learner",
-      "price": 100,
+      "name": "راعي ذهبي",
+      "nameEn": "Gold Sponsor",
+      "price": 400,
       "currency": "SAR",
       "duration": "year",
       "durationDays": 365,
       "sponsoredCount": 10,
       "features": [
-        "رعاية 10 متعلمين لمدة سنة",
+        "رعاية 10 متعلمين لمدة سنة (40 ريال/متعلم)",
         "من دل على خير فله مثل أجر فاعله",
-        "شهادة راعي تعليمي مميز"
+        "شهادة راعي تعليمي مميز",
+        "توفير 100 ريال مقارنة بالاشتراك الفردي"
       ],
       "featuresEn": [
-        "Sponsor 10 learners for one year",
+        "Sponsor 10 learners for one year (40 SAR/learner)",
         "Whoever guides to good has the reward of the doer",
-        "Distinguished educational sponsor certificate"
+        "Distinguished educational sponsor certificate",
+        "Save 100 SAR vs individual subscriptions"
       ]
     },
     {
