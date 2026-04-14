@@ -25,6 +25,7 @@ jobs:
             cd /var/www/quranesh
             git fetch https://x-access-token:${GH_REPO_SYNC_TOKEN}@github.com/mediaoasisksa/quranesh.git main
             git reset --hard FETCH_HEAD
+            npm run build
             pm2 restart quranesh
             pm2 save
             echo "Deployed $(git rev-parse --short HEAD)"
