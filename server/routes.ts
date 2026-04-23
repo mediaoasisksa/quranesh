@@ -4119,6 +4119,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: list tabari exercises (with optional surah filter) for keyword management
+  app.get("/api/admin/tabari-exercises", requireAdminAuth, async (req, res) => {
+    try {
+      const { eq, and, asc } = await import("drizzle-orm");
+      const surahParam = req.query.surah ? parseInt(String(req.query.surah)) : null;
+      const conditions = surahParam ? [eq(tabariExercises.surahNumber, surahParam)] : [];
+      const rows = await db
+        .select({
+          id: tabariExercises.id,
+          surahNumber: tabariExercises.surahNumber,
+          surahNameAr: tabariExercises.surahNameAr,
+          ayah: tabariExercises.ayah,
+          correctWord: tabariExercises.correctWord,
+          promptEn: tabariExercises.promptEn,
+          approvedContextReason: tabariExercises.approvedContextReason,
+          approvedMeaning: tabariExercises.approvedMeaning,
+          acceptedKeywords: tabariExercises.acceptedKeywords,
+          rejectedKeywords: tabariExercises.rejectedKeywords,
+          isActive: tabariExercises.isActive,
+        })
+        .from(tabariExercises)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(asc(tabariExercises.surahNumber), asc(tabariExercises.ayah));
+      res.json({ ok: true, exercises: rows });
+    } catch (err: any) {
+      console.error("Admin tabari-exercises list error:", err);
+      res.status(500).json({ message: "Failed to fetch exercises" });
+    }
+  });
+
+  // Admin: update accepted/rejected keywords for a single exercise
+  app.patch("/api/admin/tabari-exercises/:id/keywords", requireAdminAuth, async (req, res) => {
+    try {
+      const { eq } = await import("drizzle-orm");
+      const { id } = req.params;
+      const body = req.body ?? {};
+
+      // Validate: each field must be a string, null, or undefined
+      const ALLOWED_FIELDS = ["acceptedKeywords", "rejectedKeywords", "approvedContextReason", "approvedMeaning"] as const;
+      const MAX_LEN = 2000;
+      for (const field of ALLOWED_FIELDS) {
+        const val = body[field];
+        if (typeof val !== "undefined" && val !== null && typeof val !== "string") {
+          return res.status(400).json({ message: `Field "${field}" must be a string or null` });
+        }
+        if (typeof val === "string" && val.length > MAX_LEN) {
+          return res.status(400).json({ message: `Field "${field}" exceeds max length of ${MAX_LEN}` });
+        }
+      }
+
+      const { acceptedKeywords, rejectedKeywords, approvedContextReason, approvedMeaning } = body;
+      const updateData: Record<string, string | null> = {};
+      if (typeof acceptedKeywords !== "undefined") updateData.acceptedKeywords = acceptedKeywords || null;
+      if (typeof rejectedKeywords !== "undefined") updateData.rejectedKeywords = rejectedKeywords || null;
+      if (typeof approvedContextReason !== "undefined") updateData.approvedContextReason = approvedContextReason || null;
+      if (typeof approvedMeaning !== "undefined") updateData.approvedMeaning = approvedMeaning || null;
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: "No fields to update" });
+      }
+
+      const result = await db.update(tabariExercises).set(updateData).where(eq(tabariExercises.id, id)).returning({ id: tabariExercises.id });
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      res.json({ ok: true, updated: result.length });
+    } catch (err: any) {
+      console.error("Admin tabari keywords update error:", err);
+      res.status(500).json({ message: "Failed to update keywords" });
+    }
+  });
+
+  // Admin: seed Al-Fatiha keywords (idempotent — only fills empty rows)
+  app.post("/api/admin/tabari-seed-keywords", requireAdminAuth, async (req, res) => {
+    try {
+      const { seedTabariKeywords } = await import("./seed-tabari-keywords");
+      const result = await seedTabariKeywords();
+      res.json({ success: true, ...result });
+    } catch (err: any) {
+      console.error("Tabari keyword seed error:", err);
+      res.status(500).json({ message: "Seeding failed", error: err?.message });
+    }
+  });
+
   // Admin: re-run context backfill on demand
   app.post("/api/admin/tabari-backfill", requireAdminAuth, async (req, res) => {
     try {

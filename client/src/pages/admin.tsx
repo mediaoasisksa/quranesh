@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/language-context";
-import { Users, BookOpen, Settings, Shield, Plus, Trash2, Edit, ArrowLeft, BarChart3, MessageSquare, Drama, BookText, Tag, Save } from "lucide-react";
+import { Users, BookOpen, Settings, Shield, Plus, Trash2, Edit, ArrowLeft, BarChart3, MessageSquare, Drama, BookText, Tag, Save, KeyRound, ChevronDown, ChevronUp } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface User {
@@ -98,6 +98,245 @@ interface AdminPricingPlan {
   duration: string;
   updatedAt: string | null;
   updatedBy: string | null;
+}
+
+interface TabariExerciseRow {
+  id: string;
+  surahNumber: number;
+  surahNameAr: string;
+  ayah: number;
+  correctWord: string;
+  promptEn: string;
+  approvedContextReason: string | null;
+  approvedMeaning: string | null;
+  acceptedKeywords: string | null;
+  rejectedKeywords: string | null;
+  isActive: boolean | null;
+}
+
+function TabariKeywordsTab() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedSurah, setSelectedSurah] = useState<number>(1);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [edits, setEdits] = useState<Record<string, { acceptedKeywords: string; rejectedKeywords: string; approvedContextReason: string; approvedMeaning: string }>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const [seeding, setSeeding] = useState(false);
+  const SURAH_OPTIONS = Array.from({ length: 114 }, (_, i) => i + 1);
+
+  const { data, isLoading } = useQuery<{ ok: boolean; exercises: TabariExerciseRow[] }>({
+    queryKey: ["/api/admin/tabari-exercises", selectedSurah],
+    queryFn: () => fetch(`/api/admin/tabari-exercises?surah=${selectedSurah}`, { credentials: "include" }).then(r => r.json()),
+  });
+
+  const exercises = data?.exercises ?? [];
+  const withKeywords = exercises.filter(e => e.acceptedKeywords || e.rejectedKeywords).length;
+
+  const startEdit = (ex: TabariExerciseRow) => {
+    setEdits(prev => ({
+      ...prev,
+      [ex.id]: {
+        acceptedKeywords: ex.acceptedKeywords ?? "",
+        rejectedKeywords: ex.rejectedKeywords ?? "",
+        approvedContextReason: ex.approvedContextReason ?? "",
+        approvedMeaning: ex.approvedMeaning ?? "",
+      },
+    }));
+    setExpandedId(ex.id);
+  };
+
+  const handleSave = async (id: string) => {
+    const edit = edits[id];
+    if (!edit) return;
+    setSavingId(id);
+    try {
+      await apiRequest("PATCH", `/api/admin/tabari-exercises/${id}/keywords`, {
+        acceptedKeywords: edit.acceptedKeywords.trim() || null,
+        rejectedKeywords: edit.rejectedKeywords.trim() || null,
+        approvedContextReason: edit.approvedContextReason.trim() || null,
+        approvedMeaning: edit.approvedMeaning.trim() || null,
+      });
+      toast({ title: "✅ تم الحفظ", description: "تم تحديث الكلمات المفتاحية" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/tabari-exercises", selectedSurah] });
+      setExpandedId(null);
+      setEdits(prev => { const n = { ...prev }; delete n[id]; return n; });
+    } catch {
+      toast({ title: "خطأ", description: "فشل الحفظ، حاول مرة أخرى", variant: "destructive" });
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRound className="h-5 w-5" />
+            إدارة الكلمات المفتاحية — تمارين الشرح الذاتي (الطبري)
+          </CardTitle>
+          <CardDescription>
+            أضف <span className="font-medium text-green-700 dark:text-green-400">الكلمات المقبولة</span> (يجب أن يذكرها المتعلم) و<span className="font-medium text-red-700 dark:text-red-400">الكلمات المرفوضة</span> (علامات الخطأ) لكل تمرين. هذا يجعل تقييم الذكاء الاصطناعي أكثر دقة وتعليمية.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Label className="text-sm font-medium">اختر السورة:</Label>
+            <select
+              className="border rounded-md px-3 py-1.5 text-sm bg-background"
+              value={selectedSurah}
+              onChange={e => { setSelectedSurah(Number(e.target.value)); setExpandedId(null); }}
+            >
+              {SURAH_OPTIONS.map(n => (
+                <option key={n} value={n}>سورة {n}</option>
+              ))}
+            </select>
+            {!isLoading && (
+              <div className="flex gap-3 text-sm text-muted-foreground">
+                <span>{exercises.length} تمرين</span>
+                <span className="text-green-600 dark:text-green-400 font-medium">{withKeywords} مُثرَّى</span>
+                <span className="text-amber-600 dark:text-amber-400">{exercises.length - withKeywords} بدون كلمات مفتاحية</span>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={seeding}
+              className="gap-1 text-xs"
+              onClick={async () => {
+                setSeeding(true);
+                try {
+                  const res = await apiRequest("POST", "/api/admin/tabari-seed-keywords", {});
+                  const data = await res.json();
+                  toast({ title: "✅ تمت البذرة", description: `تحديث: ${data.updated}، تخطي: ${data.skipped}` });
+                  queryClient.invalidateQueries({ queryKey: ["/api/admin/tabari-exercises", selectedSurah] });
+                } catch {
+                  toast({ title: "خطأ", description: "فشلت عملية البذرة", variant: "destructive" });
+                } finally {
+                  setSeeding(false);
+                }
+              }}
+            >
+              <KeyRound className="h-3.5 w-3.5" />
+              {seeding ? "جارٍ البذر…" : "بذر كلمات الفاتحة"}
+            </Button>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">جارٍ التحميل…</div>
+          ) : exercises.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">لا توجد تمارين لهذه السورة</div>
+          ) : (
+            <div className="space-y-2">
+              {exercises.map(ex => {
+                const isExpanded = expandedId === ex.id;
+                const edit = edits[ex.id];
+                const hasKeywords = !!(ex.acceptedKeywords || ex.rejectedKeywords);
+
+                return (
+                  <div key={ex.id} className={`border rounded-lg overflow-hidden transition-all ${hasKeywords ? "border-green-200 dark:border-green-800" : "border-border"}`}>
+                    <button
+                      className="w-full text-right flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50 transition-colors"
+                      onClick={() => {
+                        if (isExpanded) { setExpandedId(null); }
+                        else { startEdit(ex); }
+                      }}
+                    >
+                      <div className="flex items-center gap-2 flex-wrap min-w-0">
+                        <Badge variant="outline" className="shrink-0">آية {ex.ayah}</Badge>
+                        <span className="font-medium text-sm">{ex.correctWord}</span>
+                        <span className="text-muted-foreground text-xs truncate">{ex.promptEn}</span>
+                        {!ex.isActive && <Badge variant="destructive" className="text-xs">غير نشط</Badge>}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {hasKeywords ? (
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 hover:bg-green-100 text-xs">مُثرَّى</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">بدون كلمات</Badge>
+                        )}
+                        {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                      </div>
+                    </button>
+
+                    {isExpanded && edit && (
+                      <div className="px-4 pb-4 space-y-4 border-t bg-muted/20">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-green-700 dark:text-green-400">الكلمات المقبولة (مفصولة بفاصلة)</Label>
+                            <Textarea
+                              dir="ltr"
+                              rows={2}
+                              placeholder="mercy, compassion, divine care"
+                              className="text-sm font-mono"
+                              value={edit.acceptedKeywords}
+                              onChange={e => setEdits(prev => ({ ...prev, [ex.id]: { ...prev[ex.id], acceptedKeywords: e.target.value } }))}
+                            />
+                            <p className="text-xs text-muted-foreground">المتعلم يجب أن يشير إلى هذه المفاهيم في شرحه</p>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-red-700 dark:text-red-400">الكلمات المرفوضة (مفصولة بفاصلة)</Label>
+                            <Textarea
+                              dir="ltr"
+                              rows={2}
+                              placeholder="punishment, anger, revenge"
+                              className="text-sm font-mono"
+                              value={edit.rejectedKeywords}
+                              onChange={e => setEdits(prev => ({ ...prev, [ex.id]: { ...prev[ex.id], rejectedKeywords: e.target.value } }))}
+                            />
+                            <p className="text-xs text-muted-foreground">إذا ذكر المتعلم هذه الكلمات — تُعدّ إشارة تحذيرية</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold">المعنى المعتمد للكلمة (للذكاء الاصطناعي)</Label>
+                          <Input
+                            dir="ltr"
+                            placeholder="e.g., compassionate care and mercy flowing from God's essence"
+                            className="text-sm"
+                            value={edit.approvedMeaning}
+                            onChange={e => setEdits(prev => ({ ...prev, [ex.id]: { ...prev[ex.id], approvedMeaning: e.target.value } }))}
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold">السياق المعتمد من التفسير (ground truth)</Label>
+                          <Textarea
+                            dir="ltr"
+                            rows={3}
+                            placeholder="The approved context reason from Tafsir al-Tabari…"
+                            className="text-sm"
+                            value={edit.approvedContextReason}
+                            onChange={e => setEdits(prev => ({ ...prev, [ex.id]: { ...prev[ex.id], approvedContextReason: e.target.value } }))}
+                          />
+                        </div>
+
+                        <div className="flex gap-2 justify-end pt-1">
+                          <Button variant="outline" size="sm" onClick={() => setExpandedId(null)}>إلغاء</Button>
+                          <Button size="sm" disabled={savingId === ex.id} onClick={() => handleSave(ex.id)} className="gap-1">
+                            <Save className="h-3.5 w-3.5" />
+                            {savingId === ex.id ? "جارٍ الحفظ…" : "حفظ"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/10">
+        <CardContent className="pt-5">
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            💡 <span className="font-medium">كيف تعمل الكلمات المفتاحية؟</span> عند تقييم شرح المتعلم، يتحقق الذكاء الاصطناعي مما إذا كان قد ذكر الكلمات المقبولة وتجنّب الكلمات المرفوضة. التمارين التي لا تحتوي على كلمات مفتاحية ما زالت تعمل باستخدام السياق المعتمد فقط.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 function PricingTab() {
@@ -407,6 +646,7 @@ export default function AdminPage() {
             <TabsTrigger value="questions" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />بنك الأسئلة</TabsTrigger>
             <TabsTrigger value="situations" className="gap-1 text-xs sm:text-sm"><BookOpen className="h-4 w-4" />المواقف</TabsTrigger>
             <TabsTrigger value="legacy" className="gap-1 text-xs sm:text-sm"><Shield className="h-4 w-4" />الوصول المجاني القديم</TabsTrigger>
+            <TabsTrigger value="tabari" className="gap-1 text-xs sm:text-sm"><KeyRound className="h-4 w-4" />كلمات الطبري</TabsTrigger>
             <TabsTrigger value="pricing" className="gap-1 text-xs sm:text-sm"><Tag className="h-4 w-4" />الأسعار</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1 text-xs sm:text-sm"><Settings className="h-4 w-4" />الإعدادات</TabsTrigger>
           </TabsList>
@@ -993,6 +1233,11 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Tabari Keywords */}
+          <TabsContent value="tabari">
+            <TabariKeywordsTab />
           </TabsContent>
 
           {/* Pricing */}

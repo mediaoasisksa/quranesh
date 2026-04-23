@@ -67,6 +67,8 @@ A new 3-phase exercise type at `/self-explanation` that combines MCQ selection w
 
 **Routes**: `GET /api/self-explanation/random`, `POST /api/self-explanation/evaluate`, `GET /api/admin/self-explanation-stats`. Frontend function: `evaluateSelfExplanation()` in `server/ai-service.ts`.
 
+**Admin keyword management**: A dedicated "كلمات الطبري" (Tabari Keywords) tab in the admin panel (`/admin`) lets admins set `accepted_keywords`, `rejected_keywords`, `approvedContextReason`, and `approvedMeaning` per exercise via an inline accordion editor. Routes: `GET /api/admin/tabari-exercises?surah=N`, `PATCH /api/admin/tabari-exercises/:id/keywords`, `POST /api/admin/tabari-seed-keywords`. The seed route populates Al-Fatiha (surah 1) exercises with Tafsir al-Tabari based keywords (idempotent — skips already-set rows). Seeding logic lives in `server/seed-tabari-keywords.ts`.
+
 ## Global Quranic Chat
 Real-time chat system with 11 language-specific rooms (English, French, Indonesian, Urdu, Turkish, Russian, Spanish, Bengali, Hindi, German, Swahili). Uses Socket.io for bi-directional messaging and Gemini AI for automatic Arabic↔target-language translation. Messages are persisted in the `chat_messages` table. The chat is accessible at `/chat` with a lobby showing all rooms and individual chat room views with WhatsApp-style message bubbles. Each message shows the translated text with a "Show original" toggle for learning.
 
