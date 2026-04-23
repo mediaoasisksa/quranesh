@@ -115,7 +115,7 @@ function AyahPassage({ exercise }: { exercise: TabariExercise }) {
 }
 
 export default function SelfExplanationExercisePage() {
-  const { dir, language } = useLanguage();
+  const { dir, language, t } = useLanguage();
   const locale = language || "en";
 
   const [phase, setPhase] = useState<Phase>("mcq");
@@ -288,10 +288,10 @@ export default function SelfExplanationExercisePage() {
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Brain className="h-6 w-6 text-violet-600" />
-            <h1 className="text-2xl font-bold text-foreground">Automated Self-Explanation</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t('selfExplanationTitle')}</h1>
           </div>
           <p className="text-muted-foreground text-sm">
-            Select the correct Quranic word, then explain in your own words why it fits the verse — evaluated against Tafsir al-Tabari reference data
+            {t('selfExplanationDesc')}
           </p>
         </div>
 
@@ -301,11 +301,11 @@ export default function SelfExplanationExercisePage() {
             ✅ {score.correct}/{score.total} correct
           </Badge>
           <Badge variant="outline" className="text-violet-700 border-violet-300">
-            ✍️ {score.explanations} explained
+            ✍️ {score.explanations} {t('selfExplanationExplained')}
           </Badge>
           {avgExplanationScore !== null && (
             <Badge variant="outline" className={`border-amber-300 ${avgExplanationScore >= 70 ? "text-emerald-700" : avgExplanationScore >= 40 ? "text-amber-700" : "text-red-700"}`}>
-              🎯 avg score: {avgExplanationScore}/100
+              🎯 {t('selfExplanationAvgScore')}: {avgExplanationScore}/100
             </Badge>
           )}
           <Button variant="ghost" size="sm" onClick={handleReset} className="gap-1 text-muted-foreground ml-auto">
@@ -317,9 +317,9 @@ export default function SelfExplanationExercisePage() {
         {/* Phase indicator */}
         <div className="flex items-center gap-2 mb-4">
           {[
-            { key: "mcq", icon: <Target className="h-3 w-3" />, label: "1. Choose Word" },
-            { key: "explanation", icon: <MessageSquare className="h-3 w-3" />, label: "2. Explain Why" },
-            { key: "feedback", icon: <Zap className="h-3 w-3" />, label: "3. Feedback" },
+            { key: "mcq", icon: <Target className="h-3 w-3" />, label: t('selfExplanationPhase1') },
+            { key: "explanation", icon: <MessageSquare className="h-3 w-3" />, label: t('selfExplanationPhase2') },
+            { key: "feedback", icon: <Zap className="h-3 w-3" />, label: t('selfExplanationPhase3') },
           ].map(({ key, icon, label }) => (
             <div key={key} className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all ${
               phase === key
@@ -351,13 +351,13 @@ export default function SelfExplanationExercisePage() {
           <Card>
             <CardContent className="p-8 text-center space-y-4">
               <div className="text-5xl">🎉</div>
-              <h2 className="text-xl font-bold text-violet-700 dark:text-violet-400">جلسة مكتملة!</h2>
+              <h2 className="text-xl font-bold text-violet-700 dark:text-violet-400">{t('selfExplanationSessionDone')}</h2>
               <p className="text-muted-foreground text-sm">
-                You've completed all available exercises in this session.
+                {t('selfExplanationDesc')}
               </p>
               {avgExplanationScore !== null && (
                 <div className="bg-violet-50 dark:bg-violet-950/30 rounded-xl p-4 max-w-xs mx-auto space-y-2">
-                  <p className="text-sm font-semibold text-violet-700 dark:text-violet-300">Your Explanation Scores</p>
+                  <p className="text-sm font-semibold text-violet-700 dark:text-violet-300">{t('selfExplanationScores')}</p>
                   <p className="text-3xl font-bold text-violet-700">{avgExplanationScore}<span className="text-sm font-normal">/100</span></p>
                 </div>
               )}
@@ -431,7 +431,7 @@ export default function SelfExplanationExercisePage() {
                     ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300"
                     : "bg-red-50 dark:bg-red-950/30 border-red-300"
                 }`}>
-                  <span className="font-semibold">{validationResult.correct ? "✅ Correct!" : "📖 The correct answer:"}</span>
+                  <span className="font-semibold">{validationResult.correct ? `✅ ${t('selfExplanationCorrect')}` : `📖 ${t('selfExplanationCorrectAnswer')}`}</span>
                   {!validationResult.correct && (
                     <span className="font-amiri text-lg mr-2" dir="rtl" lang="ar"> {validationResult.correctWord}</span>
                   )}
@@ -444,10 +444,11 @@ export default function SelfExplanationExercisePage() {
                   <div className="flex items-start gap-2">
                     <Lightbulb className="h-5 w-5 text-violet-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-foreground text-sm">Now explain your reasoning</p>
+                      <p className="font-semibold text-foreground text-sm">{t('selfExplanationNowExplain')}</p>
                       <p className="text-muted-foreground text-xs mt-0.5">
-                        Why is <span className="font-amiri text-base font-bold" dir="rtl" lang="ar">«{exercise.correctWord}»</span> the most appropriate word in this verse?
-                        Write in any language — your explanation will be evaluated against the Tafsir al-Tabari reference.
+                        <span className="font-amiri text-base font-bold" dir="rtl" lang="ar">«{exercise.correctWord}»</span>{' '}
+                        {t('selfExplanationWhyFits')}{' '}
+                        {t('selfExplanationWriteAny')}
                       </p>
                     </div>
                   </div>
@@ -456,7 +457,7 @@ export default function SelfExplanationExercisePage() {
                     ref={textareaRef}
                     value={explanation}
                     onChange={e => setExplanation(e.target.value)}
-                    placeholder="Write your explanation here… e.g. 'This word means… and it fits because…'"
+                    placeholder={t('selfExplanationPlaceholder')}
                     className="min-h-[110px] resize-none border-violet-200 dark:border-violet-800 focus:ring-violet-400"
                     disabled={evaluateMutation.isPending}
                   />
@@ -471,8 +472,8 @@ export default function SelfExplanationExercisePage() {
                       className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
                     >
                       {evaluateMutation.isPending
-                        ? <><Loader2 className="h-4 w-4 animate-spin" /> Evaluating…</>
-                        : <><Send className="h-4 w-4" /> Submit Explanation</>
+                        ? <><Loader2 className="h-4 w-4 animate-spin" /> {t('selfExplanationEvaluating')}</>
+                        : <><Send className="h-4 w-4" /> {t('selfExplanationSubmit')}</>
                       }
                     </Button>
                   </div>
@@ -493,28 +494,28 @@ export default function SelfExplanationExercisePage() {
                   <div>
                     <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Zap className="h-4 w-4 text-violet-600" />
-                      Explanation Scores
+                      {t('selfExplanationScores')}
                     </p>
                     <div className="space-y-3">
                       <ScoreBar
-                        label="Semantic Accuracy — Does your meaning match Tafsir?"
+                        label={t('selfExplanationSemantic')}
                         score={evalResult.semanticAccuracyScore}
                         color={evalResult.semanticAccuracyScore >= 70 ? "text-emerald-600" : evalResult.semanticAccuracyScore >= 40 ? "text-amber-600" : "text-red-600"}
                       />
                       <ScoreBar
-                        label="Context Link — Why does this word fit the verse?"
+                        label={t('selfExplanationContext')}
                         score={evalResult.contextLinkScore}
                         color={evalResult.contextLinkScore >= 70 ? "text-emerald-600" : evalResult.contextLinkScore >= 40 ? "text-amber-600" : "text-red-600"}
                       />
                       <ScoreBar
-                        label="Precision — Is your explanation grounded and clear?"
+                        label={t('selfExplanationPrecision')}
                         score={evalResult.precisionScore}
                         color={evalResult.precisionScore >= 70 ? "text-emerald-600" : evalResult.precisionScore >= 40 ? "text-amber-600" : "text-red-600"}
                       />
                     </div>
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex justify-between text-sm">
-                        <span className="font-medium text-foreground">Average Score</span>
+                        <span className="font-medium text-foreground">{t('selfExplanationAvg')}</span>
                         <span className={`font-bold text-lg ${
                           Math.round((evalResult.semanticAccuracyScore + evalResult.contextLinkScore + evalResult.precisionScore) / 3) >= 70
                             ? "text-emerald-600" : "text-amber-600"
@@ -530,8 +531,8 @@ export default function SelfExplanationExercisePage() {
                     <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-300">
                       <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-semibold">Unsupported Meaning Detected</p>
-                        <p className="text-xs mt-0.5">Your explanation introduced a meaning not found in the approved Tafsir al-Tabari reference for this verse.</p>
+                        <p className="font-semibold">{t('selfExplanationConflict')}</p>
+                        <p className="text-xs mt-0.5">{t('selfExplanationConflictDesc')}</p>
                       </div>
                     </div>
                   )}
@@ -546,7 +547,7 @@ export default function SelfExplanationExercisePage() {
 
                   {/* Short feedback */}
                   <div className="bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800 rounded-xl p-4">
-                    <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-2">Feedback</p>
+                    <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-2">{t('selfExplanationFeedback')}</p>
                     <p className="text-sm text-foreground">{evalResult.shortFeedback}</p>
                     {evalResult.detailedFeedback && evalResult.detailedFeedback !== evalResult.shortFeedback && (
                       <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-violet-200 dark:border-violet-800">
@@ -557,12 +558,12 @@ export default function SelfExplanationExercisePage() {
 
                   {/* Your explanation recap */}
                   <div className="bg-muted/40 rounded-xl p-3">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Your explanation:</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">{t('selfExplanationYourExpl')}</p>
                     <p className="text-sm text-foreground italic">"{explanation}"</p>
                   </div>
 
                   <Button className="w-full gap-2" variant="outline" onClick={handleNext}>
-                    Next Exercise
+                    {t('selfExplanationNext')}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -575,7 +576,7 @@ export default function SelfExplanationExercisePage() {
                     onClick={handleNext}
                     className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Skip explanation → Next exercise
+                    {t('selfExplanationSkip')}
                   </button>
                 </div>
               )}
@@ -585,7 +586,7 @@ export default function SelfExplanationExercisePage() {
 
         <div className="mt-8 p-4 bg-muted/40 rounded-xl text-center">
           <p className="text-xs text-muted-foreground">
-            Evaluated strictly against Tafsir al-Tabari reference data — the LLM does not generate independent interpretation
+            {t('selfExplanationFooter')}
           </p>
         </div>
       </main>
