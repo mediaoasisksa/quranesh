@@ -4789,3 +4789,135 @@ Return ONLY valid JSON:
       : `The correct answer is: ${correctAnswer} (${surahAyah})`,
   };
 }
+
+// ── Automated Self-Explanation Evaluator ─────────────────────────────────────
+// Evaluates learner's explanation STRICTLY against approved DB reference data.
+// The LLM must NOT generate independent Tafsir or introduce new meanings.
+
+export interface SelfExplanationEvalResult {
+  semanticAccuracyScore: number;
+  contextLinkScore: number;
+  precisionScore: number;
+  sourceConflict: boolean;
+  missingContextLink: string;
+  shortFeedback: string;
+  detailedFeedback: string;
+}
+
+export async function evaluateSelfExplanation(params: {
+  displayedPassageText: string;
+  targetWord: string;
+  approvedMeaning: string;
+  approvedContextReason: string;
+  acceptedKeywords: string | null;
+  rejectedKeywords: string | null;
+  learnerExplanation: string;
+  learnerLocale: string;
+}): Promise<SelfExplanationEvalResult> {
+  const {
+    displayedPassageText, targetWord, approvedMeaning,
+    approvedContextReason, acceptedKeywords, rejectedKeywords,
+    learnerExplanation, learnerLocale,
+  } = params;
+
+  const langInstruction = (() => {
+    const map: Record<string, string> = {
+      ar: "Arabic", en: "English", id: "Indonesian", tr: "Turkish",
+      fr: "French", ur: "Urdu", bn: "Bengali", ru: "Russian",
+      sw: "Swahili", ms: "Malay", zh: "Chinese", so: "Somali",
+      bs: "Bosnian", sq: "Albanian", sus: "Susu",
+    };
+    return map[learnerLocale] || "English";
+  })();
+
+  const prompt = `You are a strict Quranic Arabic vocabulary evaluator. Your ONLY role is to evaluate whether the learner's explanation matches the APPROVED REFERENCE DATA provided below. You must NOT generate your own tafsir, introduce new meanings, or interpret the Quran independently.
+
+== APPROVED REFERENCE DATA (ground truth — do not deviate from this) ==
+Quranic Passage (Arabic): ${displayedPassageText}
+Target Word: ${targetWord}
+Approved Meaning: ${approvedMeaning}
+Approved Context Reason: ${approvedContextReason}
+${acceptedKeywords ? `Accepted Keywords (learner should reference these): ${acceptedKeywords}` : ""}
+${rejectedKeywords ? `Rejected Keywords (red flags if used): ${rejectedKeywords}` : ""}
+
+== LEARNER'S EXPLANATION ==
+${learnerExplanation}
+
+== EVALUATION TASK ==
+Score the learner's explanation on these three criteria (0–100 each):
+1. semantic_accuracy_score: Does the learner correctly identify what the target word means, as stated in the approved meaning?
+2. context_link_score: Does the learner explain WHY this word fits the verse context, matching the approved context reason?
+3. precision_score: Is the explanation precise and grounded (not vague, not contradicting the approved data)?
+
+Also check:
+- source_conflict: true if the learner introduces a meaning NOT found in the approved reference data
+- missing_context_link: a short note (max 15 words) if the learner missed the key context connection, otherwise ""
+- short_feedback: 1 sentence in ${langInstruction} summarizing the evaluation
+- detailed_feedback: 2–3 sentences in ${langInstruction} explaining what was correct and what was missing (reference only the approved data — do NOT introduce new interpretations)
+
+== CRITICAL RULES ==
+1. NEVER add Tafsir not present in approved_context_reason
+2. NEVER introduce alternative meanings
+3. Keep Quranic text in Arabic even when feedback is in ${langInstruction}
+4. If learner's explanation partially matches, give partial scores (not all-or-nothing)
+
+Respond ONLY with this JSON (no markdown, no preamble):
+{
+  "semantic_accuracy_score": <0-100>,
+  "context_link_score": <0-100>,
+  "precision_score": <0-100>,
+  "source_conflict": <true|false>,
+  "missing_context_link": "<string>",
+  "short_feedback": "<string in ${langInstruction}>",
+  "detailed_feedback": "<string in ${langInstruction}>"
+}`;
+
+  try {
+    console.log(`[self-explanation] evaluating for word="${targetWord}", locale=${learnerLocale}`);
+    const response = await axios.post(GEMINI_API_URL, {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 800, topP: 0.8 },
+    });
+
+    const rawText: string = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log(`[self-explanation] raw response: ${rawText.substring(0, 200)}`);
+
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON in Gemini response");
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    return {
+      semanticAccuracyScore: Math.min(100, Math.max(0, Number(parsed.semantic_accuracy_score) || 0)),
+      contextLinkScore: Math.min(100, Math.max(0, Number(parsed.context_link_score) || 0)),
+      precisionScore: Math.min(100, Math.max(0, Number(parsed.precision_score) || 0)),
+      sourceConflict: Boolean(parsed.source_conflict),
+      missingContextLink: String(parsed.missing_context_link || ""),
+      shortFeedback: String(parsed.short_feedback || ""),
+      detailedFeedback: String(parsed.detailed_feedback || ""),
+    };
+  } catch (err) {
+    console.error("[self-explanation] evaluation failed:", err);
+    // Graceful fallback — basic keyword scoring
+    const lcExplanation = learnerExplanation.toLowerCase();
+    const lcApproved = approvedContextReason.toLowerCase();
+    const words = approvedMeaning.toLowerCase().split(/\s+/);
+    const matchCount = words.filter(w => lcExplanation.includes(w)).length;
+    const baseScore = Math.round((matchCount / Math.max(words.length, 1)) * 70);
+    const fallbackMsg = learnerLocale === 'ar'
+      ? "تعذّر تحليل الإجابة تلقائياً — يُرجى المراجعة مع مدرب."
+      : "Automatic evaluation unavailable — please review with a teacher.";
+    const approvedKeywords = (acceptedKeywords || "").split(",").filter(Boolean);
+    const contextScore = approvedKeywords.some(k => lcExplanation.includes(k.trim().toLowerCase())) ? 50 : 20;
+    const conflictWords = (rejectedKeywords || "").split(",").filter(Boolean);
+    const hasConflict = conflictWords.some(k => lcExplanation.includes(k.trim().toLowerCase()));
+    return {
+      semanticAccuracyScore: baseScore,
+      contextLinkScore: contextScore,
+      precisionScore: Math.round((baseScore + contextScore) / 2),
+      sourceConflict: hasConflict,
+      missingContextLink: lcExplanation.length < 20 ? "Explanation too short" : "",
+      shortFeedback: fallbackMsg,
+      detailedFeedback: fallbackMsg,
+    };
+  }
+}

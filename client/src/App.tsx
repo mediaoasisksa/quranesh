@@ -23,6 +23,7 @@ import DiplomaPage from "@/pages/diploma";
 import AdminPage from "@/pages/admin";
 import ScholarshipStatus from "@/pages/ScholarshipStatus";
 import TabariExercise from "@/pages/tabari-exercise";
+import SelfExplanationExercise from "@/pages/self-explanation-exercise";
 
 function Router() {
   return (
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/admin" component={AdminPage} />
       <Route path="/scholarship-status" component={ScholarshipStatus} />
       <Route path="/tabari-exercises" component={TabariExercise} />
+      <Route path="/self-explanation" component={SelfExplanationExercise} />
       <Route component={NotFound} />
     </Switch>
   );

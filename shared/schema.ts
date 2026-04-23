@@ -667,11 +667,41 @@ export const tabariExercises = pgTable("tabari_exercises", {
   generationFailureReason: text("generation_failure_reason"),
   // false for generation_failed / deactivated rows — excluded from random serving
   isActive: boolean("is_active").default(true),
+  // ── Self-Explanation fields (added 2026-04) ──────────────────────────────
+  // Approved context reason from Tafsir al-Tabari — used as ground truth for LLM evaluation
+  approvedContextReason: text("approved_context_reason"),
+  // Comma-separated keywords that must appear in a valid explanation
+  acceptedKeywords: text("accepted_keywords"),
+  // Comma-separated keywords that should NOT appear (red flags)
+  rejectedKeywords: text("rejected_keywords"),
+  // Approved meaning of the target word (for LLM reference)
+  approvedMeaning: text("approved_meaning"),
 });
 
 export const insertTabariExerciseSchema = createInsertSchema(tabariExercises).omit({ id: true });
 export type TabariExercise = typeof tabariExercises.$inferSelect;
 export type InsertTabariExercise = z.infer<typeof insertTabariExerciseSchema>;
+
+// ── Self-Explanation Attempts ────────────────────────────────────────────────
+export const selfExplanationAttempts = pgTable("self_explanation_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  exerciseId: varchar("exercise_id").notNull(),
+  userId: varchar("user_id"),
+  learnerExplanation: text("learner_explanation").notNull(),
+  learnerLocale: text("learner_locale").default("en"),
+  semanticAccuracyScore: integer("semantic_accuracy_score"),
+  contextLinkScore: integer("context_link_score"),
+  precisionScore: integer("precision_score"),
+  sourceConflict: boolean("source_conflict").default(false),
+  missingContextLink: text("missing_context_link"),
+  shortFeedback: text("short_feedback"),
+  detailedFeedback: text("detailed_feedback"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertSelfExplanationAttemptSchema = createInsertSchema(selfExplanationAttempts).omit({ id: true, createdAt: true });
+export type SelfExplanationAttempt = typeof selfExplanationAttempts.$inferSelect;
+export type InsertSelfExplanationAttempt = z.infer<typeof insertSelfExplanationAttemptSchema>;
 
 // ── Pricing Plans (admin-editable prices) ───────────────────────────────────
 export const pricingPlans = pgTable("pricing_plans", {

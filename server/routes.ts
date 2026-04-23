@@ -33,6 +33,7 @@ import {
   sponsorships,
   scholarshipMatches,
   tabariExercises,
+  selfExplanationAttempts,
   pricingPlans,
   type User,
   type ExerciseSession,
@@ -49,7 +50,7 @@ import { philosophicalSentencesData } from "../client/src/lib/philosophical-sent
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer, getVocabBankSurahs } from "./ai-service";
+import { validateExerciseAnswer, generateVocabularyExercise, validateVocabularyAnswer, getVocabBankSurahs, evaluateSelfExplanation } from "./ai-service";
 import { getRandomPrepositionExercise, PREPOSITION_OPTIONS } from "./preposition-bank";
 import { isQuranicText, validateHumanWisdom } from "@shared/quran-protection";
 
@@ -4167,6 +4168,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to validate answer" });
     }
   });
+  // ── Self-Explanation Exercise Routes ─────────────────────────────────────
+
+  // GET random exercise that has approved_context_reason set (required for self-explanation)
+  app.get("/api/self-explanation/random", async (req, res) => {
+    try {
+      const { eq, and, isNotNull, notInArray } = await import("drizzle-orm");
+      const excludeIds = req.query.exclude
+        ? String(req.query.exclude).split(",").filter(Boolean)
+        : [];
+
+      const conditions = [
+        eq(tabariExercises.isActive, true),
+        isNotNull(tabariExercises.approvedContextReason),
+      ];
+
+      const candidates = excludeIds.length > 0
+        ? await db.select().from(tabariExercises)
+            .where(and(...conditions, notInArray(tabariExercises.id, excludeIds)))
+            .limit(30)
+        : await db.select().from(tabariExercises)
+            .where(and(...conditions))
+            .limit(30);
+
+      if (candidates.length === 0) {
+        return res.status(404).json({ message: "No more exercises available" });
+      }
+
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      res.json(pick);
+    } catch (err) {
+      console.error("[self-explanation] random fetch error:", err);
+      res.status(500).json({ message: "Failed to fetch exercise" });
+    }
+  });
+
+  // POST evaluate a self-explanation
+  app.post("/api/self-explanation/evaluate", async (req, res) => {
+    try {
+      const { exerciseId, learnerExplanation, learnerLocale, userId } = req.body;
+
+      if (!exerciseId || !learnerExplanation || typeof learnerExplanation !== "string") {
+        return res.status(400).json({ message: "exerciseId and learnerExplanation are required" });
+      }
+      if (learnerExplanation.trim().length < 10) {
+        return res.status(400).json({ message: "Explanation too short — write at least one sentence." });
+      }
+
+      const { eq } = await import("drizzle-orm");
+      const [exercise] = await db.select().from(tabariExercises)
+        .where(eq(tabariExercises.id, String(exerciseId)))
+        .limit(1);
+
+      if (!exercise) return res.status(404).json({ message: "Exercise not found" });
+
+      // CRITICAL: reject if approved_context_reason is missing
+      if (!exercise.approvedContextReason) {
+        return res.status(422).json({
+          message: "This exercise does not have approved reference data for self-explanation evaluation.",
+          code: "NO_APPROVED_CONTEXT",
+        });
+      }
+
+      console.log(`[self-explanation] evaluating exercise=${exerciseId}, locale=${learnerLocale || 'en'}`);
+
+      const evalResult = await evaluateSelfExplanation({
+        displayedPassageText: exercise.displayedPassageText || exercise.verseText,
+        targetWord: exercise.correctWord,
+        approvedMeaning: exercise.approvedMeaning || exercise.correctWord,
+        approvedContextReason: exercise.approvedContextReason,
+        acceptedKeywords: exercise.acceptedKeywords,
+        rejectedKeywords: exercise.rejectedKeywords,
+        learnerExplanation: learnerExplanation.trim(),
+        learnerLocale: learnerLocale || "en",
+      });
+
+      // Persist the attempt
+      try {
+        await db.insert(selfExplanationAttempts).values({
+          exerciseId: String(exerciseId),
+          userId: userId ? String(userId) : null,
+          learnerExplanation: learnerExplanation.trim(),
+          learnerLocale: learnerLocale || "en",
+          semanticAccuracyScore: evalResult.semanticAccuracyScore,
+          contextLinkScore: evalResult.contextLinkScore,
+          precisionScore: evalResult.precisionScore,
+          sourceConflict: evalResult.sourceConflict,
+          missingContextLink: evalResult.missingContextLink,
+          shortFeedback: evalResult.shortFeedback,
+          detailedFeedback: evalResult.detailedFeedback,
+        });
+      } catch (dbErr) {
+        console.error("[self-explanation] DB insert failed (non-fatal):", dbErr);
+      }
+
+      res.json(evalResult);
+    } catch (err) {
+      console.error("[self-explanation] evaluate error:", err);
+      res.status(500).json({ message: "Failed to evaluate explanation" });
+    }
+  });
+
+  // GET admin stats for self-explanation attempts
+  app.get("/api/admin/self-explanation-stats", async (_req, res) => {
+    try {
+      const result = await db.execute(
+        `SELECT COUNT(*) as total_attempts,
+                AVG(semantic_accuracy_score) as avg_semantic,
+                AVG(context_link_score) as avg_context,
+                AVG(precision_score) as avg_precision,
+                COUNT(CASE WHEN source_conflict THEN 1 END) as conflict_count
+         FROM self_explanation_attempts` as any
+      );
+      res.json(result.rows?.[0] || {});
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
   // ─────────────────────────────────────────────────────────────────────
 
   const httpServer = createServer(app);
