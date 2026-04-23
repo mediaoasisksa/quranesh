@@ -53,6 +53,20 @@ The **Philosophical Match Exercise** pairs 2,400+ universal philosophical wisdom
 
 The **frontend recall workflow** ensures active learning: no "Show Solution" button before submission, hints show only the first word of the verse, and the full verse is revealed only after the user submits their answer.
 
+## Automated Self-Explanation Exercise
+A new 3-phase exercise type at `/self-explanation` that combines MCQ selection with AI-graded self-explanation:
+1. **Phase 1 (MCQ)**: Learner selects the correct Quranic word from 4 options
+2. **Phase 2 (Explain)**: After answering, learner writes a short explanation of why the word fits the verse
+3. **Phase 3 (Feedback)**: AI evaluates the explanation against approved DB reference data (Tafsir al-Tabari) and returns 3 scores
+
+**Key constraint**: The LLM does NOT generate its own Tafsir. It evaluates only against `approved_context_reason`, `accepted_keywords`, `rejected_keywords` stored in `tabari_exercises`. If `approved_context_reason` is NULL, the exercise is excluded (server returns 422).
+
+**Score dimensions**: `semantic_accuracy_score`, `context_link_score`, `precision_score` (each 0-100). Also detects `source_conflict` (learner introduced unsupported meaning) and `missing_context_link`.
+
+**DB additions**: New columns on `tabari_exercises` (`approved_context_reason`, `accepted_keywords`, `rejected_keywords`, `approved_meaning`) + new `self_explanation_attempts` table. All 298 active exercises pre-populated with `approved_context_reason` from `promptEn`.
+
+**Routes**: `GET /api/self-explanation/random`, `POST /api/self-explanation/evaluate`, `GET /api/admin/self-explanation-stats`. Frontend function: `evaluateSelfExplanation()` in `server/ai-service.ts`.
+
 ## Global Quranic Chat
 Real-time chat system with 11 language-specific rooms (English, French, Indonesian, Urdu, Turkish, Russian, Spanish, Bengali, Hindi, German, Swahili). Uses Socket.io for bi-directional messaging and Gemini AI for automatic Arabic↔target-language translation. Messages are persisted in the `chat_messages` table. The chat is accessible at `/chat` with a lobby showing all rooms and individual chat room views with WhatsApp-style message bubbles. Each message shows the translated text with a "Show original" toggle for learning.
 
