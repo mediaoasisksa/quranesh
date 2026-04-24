@@ -23,9 +23,28 @@ jobs:
           script: |
             set -e
             cd /var/www/quranesh
+
+            echo "==> [1/6] Pulling latest code from GitHub..."
             git fetch https://x-access-token:${GH_REPO_SYNC_TOKEN}@github.com/mediaoasisksa/quranesh.git main
             git reset --hard FETCH_HEAD
-            pm2 restart quranesh
+            echo "    Code is now at: $(git rev-parse --short HEAD)"
+
+            echo "==> [2/6] Installing dependencies..."
+            npm ci --prefer-offline 2>/dev/null || npm install
+
+            echo "==> [3/6] Generating build metadata (git commit stamp)..."
+            node scripts/gen-build-meta.mjs
+
+            echo "==> [4/6] Building production bundle..."
+            npm run build
+
+            echo "==> [5/6] Running database migrations..."
+            npm run db:push -- --force 2>/dev/null || npm run db:push
+
+            echo "==> [6/6] Restarting application..."
+            pm2 restart quranesh --update-env
             pm2 save
-            echo "Deployed $(git rev-parse --short HEAD)"
+
+            echo ""
+            echo "✅ Deploy complete — commit=$(git rev-parse --short HEAD)"
             pm2 ls --no-color | grep quranesh
