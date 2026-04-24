@@ -1,28 +1,21 @@
 /**
  * Build Information & Version Fingerprint
  * ========================================
- * Loaded once at server startup. Exposes a complete release fingerprint so that
- * any environment (dev, staging, production) can be identified unambiguously by
- * hitting /api/version — no guessing, no assumptions.
- *
- * Fields:
- *   commit        - git short sha (7 chars)
- *   commitFull    - full 40-char sha
- *   commitDate    - date of the HEAD commit (YYYY-MM-DD)
- *   builtAt       - ISO timestamp when the server process started
- *   env           - NODE_ENV value
- *   appVersion    - semantic version from package.json (or "0.0.0" fallback)
- *   buildId       - human-readable "<commit>@<date>" stamp
- *   featureFlags  - snapshot of key feature flag env vars (values redacted)
- *   nodeVersion   - Node.js runtime version
+ * Priority for commit resolution:
+ *   1. dist/build-meta.json  — written by scripts/gen-build-meta.mjs at BUILD TIME
+ *      (git is available during build; not available at runtime in production)
+ *   2. process.env.COMMIT_SHA / COMMIT_DATE — injected by CI/CD if present
+ *   3. Live git commands     — works in dev, falls back to "unknown" in production
  */
 
 import { execSync } from "child_process";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ── helpers ─────────────────────────────────────────────────────────────────
 
 function git(cmd: string, fallback = "unknown"): string {
   try {
@@ -41,10 +34,6 @@ function getAppVersion(): string {
   }
 }
 
-/**
- * Snapshot of feature-relevant environment variables.
- * Values are replaced with true/false so secrets are NEVER exposed.
- */
 function getFeatureFlags(): Record<string, boolean> {
   const keys = [
     "GEMINI_API_KEY",
@@ -56,18 +45,48 @@ function getFeatureFlags(): Record<string, boolean> {
     "HYPERPAY_SERVER_URL",
   ];
   const flags: Record<string, boolean> = {};
-  for (const k of keys) {
-    flags[k] = Boolean(process.env[k]);
-  }
+  for (const k of keys) flags[k] = Boolean(process.env[k]);
   return flags;
 }
 
-const commit      = git("git rev-parse --short HEAD");
-const commitFull  = git("git rev-parse HEAD");
-const commitDate  = git('git log -1 --format="%ci"').substring(0, 10);
-const builtAt     = new Date().toISOString();
-const env         = process.env.NODE_ENV || "development";
-const appVersion  = getAppVersion();
+// ── resolve commit from build-meta.json (created at build time) ─────────────
+
+interface BuildMeta {
+  commit: string;
+  commitFull: string;
+  commitDate: string;
+  branch: string;
+  builtAt: string;
+}
+
+function loadBuildMeta(): BuildMeta | null {
+  const candidates = [
+    path.join(__dirname, "build-meta.json"),       // dist/build-meta.json when running dist/index.js
+    path.join(__dirname, "../dist/build-meta.json"),// dev server running from server/
+    path.join(__dirname, "../../dist/build-meta.json"),
+  ];
+  for (const p of candidates) {
+    try {
+      if (existsSync(p)) {
+        return JSON.parse(readFileSync(p, "utf-8")) as BuildMeta;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
+const meta = loadBuildMeta();
+
+const commit     = meta?.commit     ?? process.env.COMMIT_SHA?.substring(0, 7) ?? git("git rev-parse --short HEAD");
+const commitFull = meta?.commitFull ?? process.env.COMMIT_SHA                  ?? git("git rev-parse HEAD");
+const commitDate = meta?.commitDate ?? process.env.COMMIT_DATE                 ?? git('git log -1 --format="%ci"').substring(0, 10);
+const builtAt    = new Date().toISOString();
+const env        = process.env.NODE_ENV || "development";
+const appVersion = getAppVersion();
+
+// ── export ───────────────────────────────────────────────────────────────────
 
 export const BUILD_INFO = {
   commit,
@@ -79,4 +98,5 @@ export const BUILD_INFO = {
   buildId: `${commit}@${commitDate}`,
   featureFlags: getFeatureFlags(),
   nodeVersion: process.version,
+  source: meta ? "build-meta.json" : (process.env.COMMIT_SHA ? "env-var" : "git-runtime"),
 };
