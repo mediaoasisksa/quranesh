@@ -141,7 +141,18 @@ export async function seedTabariExercises() {
     return;
   }
 
-  const toInsert = csvRows.filter(
+  // ── Source enforcement: reject any row not from Tafsir al-Tabari ────────────
+  const ALLOWED_SOURCE = "Tafsir al-Tabari only";
+  const blockedRows = csvRows.filter(r => r.source !== ALLOWED_SOURCE);
+  if (blockedRows.length > 0) {
+    console.warn(`⛔ SOURCE BLOCK: ${blockedRows.length} rows rejected — source is not "${ALLOWED_SOURCE}".`);
+    blockedRows.forEach(r =>
+      console.warn(`   Row ${r.id} (surah=${r.surah_number} ayah=${r.ayah}): source="${r.source}"`)
+    );
+  }
+  const allowedRows = csvRows.filter(r => r.source === ALLOWED_SOURCE);
+
+  const toInsert = allowedRows.filter(
     r => !existingKeys.has(`${r.surah_number}:${r.ayah}:${r.correct_word}`)
   );
 

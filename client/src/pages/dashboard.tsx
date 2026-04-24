@@ -364,7 +364,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground flex-1">
-                  300 multiple-choice questions on Quranic word meanings sourced from Tafsir al-Tabari — covering Surah Al-Fatiha and Surahs 93–114.
+                  Multiple-choice questions on Quranic word meanings sourced exclusively from Tafsir al-Tabari — covering Surah Al-Fatiha and Surahs 93–114.
                 </p>
               </CardContent>
             </Card>
