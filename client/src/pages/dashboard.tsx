@@ -366,10 +366,6 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground flex-1">
                   300 multiple-choice questions on Quranic word meanings sourced from Tafsir al-Tabari — covering Surah Al-Fatiha and Surahs 93–114.
                 </p>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2 py-1 rounded-full">300 exercises</span>
-                  <span className="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">22 surahs</span>
-                </div>
               </CardContent>
             </Card>
           </div>
