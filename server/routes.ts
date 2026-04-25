@@ -4292,13 +4292,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST evaluate a self-explanation
   app.post("/api/self-explanation/evaluate", async (req, res) => {
     try {
-      const { exerciseId, learnerExplanation, learnerLocale, userId } = req.body;
+      const { exerciseId, learnerExplanation, learnerLocale } = req.body;
 
       if (!exerciseId || !learnerExplanation || typeof learnerExplanation !== "string") {
         return res.status(400).json({ message: "exerciseId and learnerExplanation are required" });
       }
       if (learnerExplanation.trim().length < 10) {
         return res.status(400).json({ message: "Explanation too short — write at least one sentence." });
+      }
+
+      // Extract userId from JWT if present — never trust body-provided userId
+      let userId: string | null = null;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        try {
+          const decoded = jwt.verify(authHeader.slice(7), JWT_SECRET) as { userId: string };
+          userId = decoded.userId;
+        } catch {
+          // Invalid token — proceed as anonymous (userId stays null)
+        }
       }
 
       const { eq } = await import("drizzle-orm");
@@ -4352,6 +4364,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("[self-explanation] evaluate error:", err);
       res.status(500).json({ message: "Failed to evaluate explanation" });
+    }
+  });
+
+  // GET history of self-explanation attempts — authenticated users only
+  app.get("/api/self-explanation/history", async (req, res) => {
+    try {
+      // Verify JWT and extract userId from token (never trust client-provided userId)
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      const token = authHeader.slice(7);
+      let userId: string;
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+        userId = decoded.userId;
+      } catch {
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+
+      const { eq, desc } = await import("drizzle-orm");
+      const rows = await db
+        .select({
+          id: selfExplanationAttempts.id,
+          exerciseId: selfExplanationAttempts.exerciseId,
+          learnerExplanation: selfExplanationAttempts.learnerExplanation,
+          semanticAccuracyScore: selfExplanationAttempts.semanticAccuracyScore,
+          contextLinkScore: selfExplanationAttempts.contextLinkScore,
+          precisionScore: selfExplanationAttempts.precisionScore,
+          sourceConflict: selfExplanationAttempts.sourceConflict,
+          shortFeedback: selfExplanationAttempts.shortFeedback,
+          createdAt: selfExplanationAttempts.createdAt,
+          surahNameAr: tabariExercises.surahNameAr,
+          surahNumber: tabariExercises.surahNumber,
+          ayah: tabariExercises.ayah,
+          correctWord: tabariExercises.correctWord,
+        })
+        .from(selfExplanationAttempts)
+        .leftJoin(tabariExercises, eq(selfExplanationAttempts.exerciseId, tabariExercises.id))
+        .where(eq(selfExplanationAttempts.userId, userId))
+        .orderBy(desc(selfExplanationAttempts.createdAt))
+        .limit(100);
+      res.json(rows);
+    } catch (err) {
+      console.error("[self-explanation] history fetch error:", err);
+      res.status(500).json({ message: "Failed to fetch history" });
     }
   });
 
