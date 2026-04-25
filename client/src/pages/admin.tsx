@@ -219,7 +219,7 @@ function TabariKeywordsTab() {
               }}
             >
               <KeyRound className="h-3.5 w-3.5" />
-              {seeding ? "جارٍ البذر…" : "بذر كلمات الفاتحة"}
+              {seeding ? "جارٍ البذر…" : "بذر كلمات الفاتحة وجزء عمّ"}
             </Button>
           </div>
 

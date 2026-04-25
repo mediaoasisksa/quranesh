@@ -4193,7 +4193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin: seed Al-Fatiha keywords (idempotent — only fills empty rows)
+  // Admin: seed keywords for Al-Fatiha + Juz Amma surahs 93–114 (idempotent — only fills empty rows)
   app.post("/api/admin/tabari-seed-keywords", requireAdminAuth, async (req, res) => {
     try {
       const { seedTabariKeywords } = await import("./seed-tabari-keywords");
