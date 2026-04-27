@@ -337,16 +337,16 @@ export default function Dashboard() {
                     🧠
                   </div>
                   <div>
-                    <h3 className="font-bold text-foreground text-sm">Automated Self-Explanation</h3>
+                    <h3 className="font-bold text-foreground text-sm">{t('selfExplanationTitle')}</h3>
                     <p className="text-xs text-violet-600 dark:text-violet-400">تفسير ذاتي مُقيَّم</p>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground flex-1">
-                  Choose the correct Quranic word, then explain why it fits the verse — your reasoning is evaluated against Tafsir al-Tabari reference data by AI.
+                  {t('selfExplanationDashDesc')}
                 </p>
                 <div className="mt-4 flex items-center gap-2">
-                  <span className="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-1 rounded-full">AI-graded</span>
-                  <span className="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">Tabari source</span>
+                  <span className="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-1 rounded-full">{t('aiGraded')}</span>
+                  <span className="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">{t('tabariSource')}</span>
                 </div>
               </CardContent>
             </Card>
@@ -359,12 +359,12 @@ export default function Dashboard() {
                     📖
                   </div>
                   <div>
-                    <h3 className="font-bold text-foreground text-sm">Tafsir al-Tabari Vocabulary</h3>
+                    <h3 className="font-bold text-foreground text-sm">{t('tabariVocabularyTitle')}</h3>
                     <p className="text-xs text-amber-600 dark:text-amber-400">تفسير الطبري</p>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground flex-1">
-                  Multiple-choice questions on Quranic word meanings sourced exclusively from Tafsir al-Tabari — covering Surah Al-Fatiha and Surahs 93–114.
+                  {t('tabariVocabularyDesc')}
                 </p>
               </CardContent>
             </Card>

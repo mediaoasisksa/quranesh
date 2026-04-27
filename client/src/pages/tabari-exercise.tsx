@@ -115,7 +115,7 @@ function AyahPassage({ exercise }: { exercise: TabariExercise }) {
 }
 
 export default function TabariExercisePage() {
-  const { dir } = useLanguage();
+  const { dir, t } = useLanguage();
   const [selectedAnswer, setSelectedAnswer] = useState<AnswerLetter | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
