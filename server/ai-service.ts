@@ -4926,12 +4926,14 @@ Respond ONLY with this JSON (no markdown, no preamble):
   });
 }
 
-// ── Tafsir meaning translator (lightweight, cached) ──────────────────────────
-// Translates the English approvedContextReason into the learner's locale.
-// Results are cached in-process so the same phrase is only translated once.
-const _tabariTranslationCache = new Map<string, string>();
+// ── Translation Library (persistent DB + in-process L1 cache) ────────────────
+// Priority order: L1 memory → DB library → static Arabic dict → Gemini → English
+// Every new Gemini-generated translation is saved to DB for permanent reuse.
 
-// Static Arabic fallback for common Quranic terms — avoids Gemini for these
+/** L1 in-process cache — avoids DB round-trip for hot entries */
+const _translationL1 = new Map<string, string>();
+
+/** Static Arabic fallback for the most common Quranic terms — instant, no I/O */
 const ARABIC_FALLBACK: Record<string, string> = {
   "all praise": "كل الثناء والحمد",
   "The Most Merciful": "الرحيم",
@@ -4945,6 +4947,8 @@ const ARABIC_FALLBACK: Record<string, string> = {
   "Day": "اليوم",
   "Read": "اقرأ",
   "Say": "قل",
+  "O": "يا",
+  "O you": "يا أيها",
   "I seek refuge": "أعوذ بالله",
   "I worship": "أعبد",
   "You alone": "إياك",
@@ -4957,6 +4961,9 @@ const ARABIC_FALLBACK: Record<string, string> = {
   "Judgment / religion": "الدين",
   "We created": "خلقنا",
   "We have given you": "أعطيناك",
+  "We expand": "نشرح",
+  "We sent it down": "أنزلناه",
+  "We returned him": "رددناه",
   "abundant good": "الكوثر",
   "No indeed": "كلا",
   "Have you seen": "أرأيت",
@@ -4964,43 +4971,89 @@ const ARABIC_FALLBACK: Record<string, string> = {
   "guide us": "اهدنا",
   "a servant": "عبد",
   "a life": "حياة",
+  "a thousand": "ألف",
   "and sacrifice": "والنحر",
   "and the Spirit": "والروح",
   "and the olive": "والزيتون",
   "and seek His forgiveness": "واستغفره",
+  "and surely soon": "ولسوف",
+  "and surely the Hereafter": "وللآخرة",
+  "and his wife": "وامرأته",
+  "and perished he": "تبّ",
+  "and the polytheists": "والمشركين",
+  "and the opening / conquest": "والفتح",
+  "and Mount": "والطور",
+  "and summer": "والصيف",
+  "and sent": "وأرسل",
+  "and brought out": "وأخرج",
+  "and We raised": "ورفعنا",
+  "and We removed": "ووضعنا",
   "Quraysh": "قريش",
   "Sinai": "سيناء",
   "By the chargers": "والعاديات",
 };
 
+const LOCALE_NAMES: Record<string, string> = {
+  ar: "Arabic", id: "Indonesian", tr: "Turkish", fr: "French",
+  zh: "Chinese", sw: "Swahili", so: "Somali", bs: "Bosnian",
+  sq: "Albanian", ru: "Russian", ur: "Urdu", bn: "Bengali",
+  ms: "Malay", sus: "Soso/Susu", ky: "Kyrgyz",
+};
+
+/**
+ * Translate a short English Tafsir meaning into the learner's locale.
+ * Lookup order: L1 memory cache → DB library → static Arabic dict → Gemini AI
+ * Every AI-generated translation is persisted in the DB for future reuse.
+ */
 export async function translateTabariMeaning(
   englishMeaning: string,
   targetLocale: string,
 ): Promise<string> {
   if (!englishMeaning || targetLocale === "en") return englishMeaning;
+
   const cacheKey = `${targetLocale}::${englishMeaning}`;
-  if (_tabariTranslationCache.has(cacheKey)) {
-    return _tabariTranslationCache.get(cacheKey)!;
+
+  // ── L1: in-process memory ─────────────────────────────────────────────────
+  if (_translationL1.has(cacheKey)) return _translationL1.get(cacheKey)!;
+
+  // ── L2: persistent DB library ─────────────────────────────────────────────
+  try {
+    const { db } = await import("./db.js");
+    const { translationCache } = await import("../shared/schema.js");
+    const { and, eq } = await import("drizzle-orm");
+
+    const [dbRow] = await db.select()
+      .from(translationCache)
+      .where(and(
+        eq(translationCache.sourceText, englishMeaning),
+        eq(translationCache.targetLocale, targetLocale),
+      ))
+      .limit(1);
+
+    if (dbRow) {
+      _translationL1.set(cacheKey, dbRow.translatedText);
+      return dbRow.translatedText;
+    }
+  } catch (dbErr) {
+    console.warn("[translation-lib] DB lookup failed (non-fatal):", String(dbErr).substring(0, 80));
   }
 
-  // For Arabic locale: check the static fallback dictionary first
+  // ── L3: static Arabic dictionary (most common Quranic terms) ─────────────
   if (targetLocale === "ar" && ARABIC_FALLBACK[englishMeaning]) {
     const arResult = ARABIC_FALLBACK[englishMeaning];
-    _tabariTranslationCache.set(cacheKey, arResult);
+    _translationL1.set(cacheKey, arResult);
+    // Persist the static entry to DB so it appears in the library
+    _persistTranslation(englishMeaning, targetLocale, arResult, "static_dict").catch(() => {});
     return arResult;
   }
 
-  const languageNameMap: Record<string, string> = {
-    ar: "Arabic", id: "Indonesian", tr: "Turkish", fr: "French",
-    zh: "Chinese", sw: "Swahili", so: "Somali", bs: "Bosnian",
-    sq: "Albanian", ru: "Russian", ur: "Urdu", bn: "Bengali",
-    ms: "Malay", sus: "Soso/Susu", ky: "Kyrgyz",
-  };
-  const langName = languageNameMap[targetLocale] || "English";
+  // ── L4: Gemini AI translation ─────────────────────────────────────────────
+  const langName = LOCALE_NAMES[targetLocale] || "English";
+  const prompt = `Translate this short Quranic vocabulary meaning into ${langName}. Reply with ONLY the translated phrase, no quotes, no explanation:\n\n${englishMeaning}`;
 
-  const prompt = `Translate this short Quranic vocabulary meaning into ${langName}. Reply with ONLY the translated phrase, nothing else:\n\n"${englishMeaning}"`;
-
+  let usedModel = "";
   for (const modelUrl of SELF_EVAL_MODELS) {
+    const modelName = modelUrl.match(/models\/([\w.-]+):/)?.[1] ?? "unknown";
     try {
       const response = await axios.post(modelUrl, {
         contents: [{ parts: [{ text: prompt }] }],
@@ -5010,18 +5063,47 @@ export async function translateTabariMeaning(
       const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       if (text) {
         const cleaned = text.replace(/^["']|["']$/g, "").trim();
-        _tabariTranslationCache.set(cacheKey, cleaned);
+        usedModel = modelName;
+        _translationL1.set(cacheKey, cleaned);
+        // Persist to DB — don't await, fire-and-forget
+        _persistTranslation(englishMeaning, targetLocale, cleaned, modelName).catch(() => {});
+        console.log(`[translation-lib] "${englishMeaning}" → "${cleaned}" (${modelName}, locale=${targetLocale}) — saved to library`);
         return cleaned;
       }
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : null;
-      if (status !== 429) break; // Only retry on rate-limit, not other errors
+      if (status !== 429) break;
     }
   }
 
-  // Fallback — return English as-is
-  _tabariTranslationCache.set(cacheKey, englishMeaning);
+  // ── L5: fallback — English as-is ──────────────────────────────────────────
+  _translationL1.set(cacheKey, englishMeaning);
   return englishMeaning;
+}
+
+/** Fire-and-forget: save a translation to the DB library */
+async function _persistTranslation(
+  sourceText: string,
+  targetLocale: string,
+  translatedText: string,
+  modelUsed: string,
+): Promise<void> {
+  const { db } = await import("./db.js");
+  const { translationCache } = await import("../shared/schema.js");
+  const { and, eq } = await import("drizzle-orm");
+
+  // Upsert — ignore if already exists (race condition safe)
+  const [existing] = await db.select({ id: translationCache.id })
+    .from(translationCache)
+    .where(and(
+      eq(translationCache.sourceText, sourceText),
+      eq(translationCache.targetLocale, targetLocale),
+    ))
+    .limit(1);
+
+  if (!existing) {
+    await db.insert(translationCache).values({ sourceText, targetLocale, translatedText, modelUsed });
+  }
 }
 
 // ── Local rule-based evaluator (works without Gemini API) ───────────────────

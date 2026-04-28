@@ -4445,6 +4445,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Translation Library — admin routes ────────────────────────────────────
+  // GET  /api/admin/translation-library         — list entries (paginated)
+  // POST /api/admin/translation-library/seed    — seed static dict into DB
+  // DELETE /api/admin/translation-library/:id   — remove an entry
+
+  app.get("/api/admin/translation-library", requireAdminAuth, async (req, res) => {
+    try {
+      const { translationCache } = await import("../shared/schema.js");
+      const { desc, ilike, and, eq } = await import("drizzle-orm");
+
+      const locale = req.query.locale as string | undefined;
+      const search = req.query.search as string | undefined;
+      const page   = Math.max(1, Number(req.query.page) || 1);
+      const limit  = Math.min(100, Number(req.query.limit) || 50);
+
+      const conditions: any[] = [];
+      if (locale)  conditions.push(eq(translationCache.targetLocale, locale));
+      if (search)  conditions.push(ilike(translationCache.sourceText, `%${search}%`));
+
+      const rows = await db.select()
+        .from(translationCache)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(translationCache.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit);
+
+      const [{ count }] = await db.execute(
+        `SELECT COUNT(*)::int as count FROM translation_cache` as any
+      ).then(r => r.rows as { count: number }[]);
+
+      res.json({ rows, total: count, page, limit });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to load translation library" });
+    }
+  });
+
+  app.post("/api/admin/translation-library/seed", requireAdminAuth, async (_req, res) => {
+    try {
+      const { translateTabariMeaning } = await import("./ai-service.js");
+      // Trigger translation of all unique approvedContextReason values into Arabic
+      const { tabariExercises, translationCache } = await import("../shared/schema.js");
+      const { isNotNull, notInArray, sql: drizzleSql } = await import("drizzle-orm");
+
+      // Get all unique context reasons not yet in the library for Arabic
+      const existing = await db.select({ src: translationCache.sourceText })
+        .from(translationCache)
+        .where(drizzleSql`target_locale = 'ar'`);
+      const existingSrc = existing.map(r => r.src);
+
+      const uniqueReasons = await db.selectDistinct({ reason: tabariExercises.approvedContextReason })
+        .from(tabariExercises)
+        .where(isNotNull(tabariExercises.approvedContextReason));
+
+      const toTranslate = uniqueReasons
+        .map(r => r.reason!)
+        .filter(r => r && !existingSrc.includes(r));
+
+      // Translate all in parallel (batches of 5)
+      let saved = 0;
+      const batch = 5;
+      for (let i = 0; i < toTranslate.length; i += batch) {
+        const chunk = toTranslate.slice(i, i + batch);
+        await Promise.all(chunk.map(async (phrase) => {
+          const result = await translateTabariMeaning(phrase, "ar");
+          if (result !== phrase) saved++; // means it was actually translated
+        }));
+        await new Promise(r => setTimeout(r, 200)); // small delay between batches
+      }
+
+      res.json({ total: toTranslate.length, saved, message: `Seeded ${saved} new Arabic translations into the library` });
+    } catch (err) {
+      res.status(500).json({ message: String(err) });
+    }
+  });
+
+  app.delete("/api/admin/translation-library/:id", requireAdminAuth, async (req, res) => {
+    try {
+      const { translationCache } = await import("../shared/schema.js");
+      const { eq } = await import("drizzle-orm");
+      await db.delete(translationCache).where(eq(translationCache.id, req.params.id));
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ message: "Delete failed" });
+    }
+  });
+
   // ─────────────────────────────────────────────────────────────────────
 
   const httpServer = createServer(app);

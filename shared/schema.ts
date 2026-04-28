@@ -703,6 +703,22 @@ export const insertSelfExplanationAttemptSchema = createInsertSchema(selfExplana
 export type SelfExplanationAttempt = typeof selfExplanationAttempts.$inferSelect;
 export type InsertSelfExplanationAttempt = z.infer<typeof insertSelfExplanationAttemptSchema>;
 
+// ── Translation Cache Library ────────────────────────────────────────────────
+// Stores AI-generated translations permanently so they never need to be
+// re-generated. Source text is always English; targetLocale is the BCP-47 code.
+export const translationCache = pgTable("translation_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sourceText: text("source_text").notNull(),
+  targetLocale: text("target_locale").notNull(),
+  translatedText: text("translated_text").notNull(),
+  modelUsed: text("model_used"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const insertTranslationCacheSchema = createInsertSchema(translationCache).omit({ id: true, createdAt: true });
+export type TranslationCache = typeof translationCache.$inferSelect;
+export type InsertTranslationCache = z.infer<typeof insertTranslationCacheSchema>;
+
 // ── Pricing Plans (admin-editable prices) ───────────────────────────────────
 export const pricingPlans = pgTable("pricing_plans", {
   id: text("id").primaryKey(), // "learner" | "sponsor-5" | "sponsor-10" | "certificate"
