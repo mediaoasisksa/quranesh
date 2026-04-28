@@ -4286,7 +4286,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Translate the meaning (promptEn) into the learner's locale for localised question display
       let promptTranslated: string = pick.promptEn;
-      if (locale && locale !== "en") {
+      // Skip translation for Arabic: the static dict maps English meanings to actual
+      // Arabic Quranic words, which would show the answer inside the question itself.
+      // Arabic-locale users see the English gloss as the meaning clue (pedagogically correct).
+      if (locale && locale !== "en" && locale !== "ar") {
         try {
           const { translateTabariMeaning } = await import("./ai-service.js");
           promptTranslated = await translateTabariMeaning(pick.promptEn, locale);
