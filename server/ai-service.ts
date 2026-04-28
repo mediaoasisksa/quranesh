@@ -325,6 +325,13 @@ if (!GEMINI_API_KEY) {
 // Using gemini-2.0-flash for reliable translations
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+// Self-explanation uses its own model cascade (separate quotas per model)
+const SELF_EVAL_MODELS = [
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+];
+
 // نظام التقييم الجديد: ثلاث درجات بدل صح/خطأ
 type ValidationGrade = 'exact_match' | 'valid_but_less_suitable' | 'incorrect';
 
@@ -4872,19 +4879,18 @@ Respond ONLY with this JSON (no markdown, no preamble):
   "detailed_feedback": "<string in ${langInstruction}>"
 }`;
 
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY_MS = 4000;
-
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  // ── Try each Gemini model in turn (each has its own quota) ──────────────────
+  for (const modelUrl of SELF_EVAL_MODELS) {
+    const modelName = modelUrl.match(/models\/([^:]+)/)?.[1] ?? "unknown";
     try {
-      console.log(`[self-explanation] attempt ${attempt}/${MAX_RETRIES} — word="${targetWord}", locale=${learnerLocale}`);
-      const response = await axios.post(GEMINI_API_URL, {
+      console.log(`[self-explanation] trying model=${modelName} word="${targetWord}" locale=${learnerLocale}`);
+      const response = await axios.post(modelUrl, {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 800, topP: 0.8 },
       });
 
       const rawText: string = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      console.log(`[self-explanation] raw response (attempt ${attempt}): ${rawText.substring(0, 200)}`);
+      console.log(`[self-explanation] ${modelName} response: ${rawText.substring(0, 200)}`);
 
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("No JSON in Gemini response");
@@ -4901,22 +4907,150 @@ Respond ONLY with this JSON (no markdown, no preamble):
       };
     } catch (err) {
       const is429 = axios.isAxiosError(err) && err.response?.status === 429;
-      if (is429 && attempt < MAX_RETRIES) {
-        const wait = RETRY_DELAY_MS * attempt;
-        console.warn(`[self-explanation] 429 rate-limited on attempt ${attempt}. Retrying in ${wait}ms…`);
-        await new Promise(r => setTimeout(r, wait));
-        continue;
+      if (is429) {
+        console.warn(`[self-explanation] ${modelName} rate-limited (429) — trying next model`);
+        continue; // move to next model
       }
-      // All retries exhausted or non-rate-limit error
-      const is429Final = axios.isAxiosError(err) && err.response?.status === 429;
-      console.error(`[self-explanation] evaluation failed after ${attempt} attempt(s) (429=${is429Final}):`,
-        axios.isAxiosError(err) ? `HTTP ${err.response?.status}` : err);
-      // Throw a typed error so the route can return a proper HTTP response
-      const e = new Error(is429Final ? "RATE_LIMITED" : "AI_ERROR") as Error & { code: string };
-      e.code = is429Final ? "RATE_LIMITED" : "AI_ERROR";
-      throw e;
+      // Non-429 error — log and try next model anyway
+      console.error(`[self-explanation] ${modelName} failed:`,
+        axios.isAxiosError(err) ? `HTTP ${err.response?.status}` : String(err).substring(0, 120));
+      continue;
     }
   }
-  // Should never reach here
-  throw Object.assign(new Error("RATE_LIMITED"), { code: "RATE_LIMITED" });
+
+  // ── All Gemini models exhausted — use local rule-based evaluator ──────────
+  console.warn("[self-explanation] all Gemini models rate-limited — using local rule-based evaluator");
+  return localRuleBasedEvaluator({
+    targetWord, approvedMeaning, approvedContextReason,
+    acceptedKeywords, rejectedKeywords, learnerExplanation, learnerLocale,
+  });
+}
+
+// ── Local rule-based evaluator (works without Gemini API) ───────────────────
+// Evaluates learner explanation against approved DB reference data using
+// keyword matching and linguistic heuristics. Always returns a real result.
+
+/** Strip Arabic diacritics (harakat) and normalise alef variants */
+function normalizeArText(s: string): string {
+  return s
+    .replace(/[\u064B-\u065F\u0670]/g, "")  // remove harakat
+    .replace(/[أإآ]/g, "ا")                  // normalise alef
+    .replace(/ة/g, "ه")                      // ta marbuta → ha
+    .replace(/ى/g, "ي")                      // alef maqsura → ya
+    .toLowerCase()
+    .trim();
+}
+
+function localRuleBasedEvaluator(params: {
+  targetWord: string;
+  approvedMeaning: string;
+  approvedContextReason: string;
+  acceptedKeywords: string | null;
+  rejectedKeywords: string | null;
+  learnerExplanation: string;
+  learnerLocale: string;
+}): SelfExplanationEvalResult {
+  const { targetWord, approvedMeaning, approvedContextReason,
+          acceptedKeywords, rejectedKeywords, learnerExplanation, learnerLocale } = params;
+
+  const isAr = learnerLocale === 'ar';
+  // Normalise the learner's text for Arabic + lowercase for Latin
+  const normExp = normalizeArText(learnerExplanation);
+  const expLen  = learnerExplanation.trim().length;
+
+  /** Tokenise a string into significant words */
+  const tokenise = (s: string) =>
+    normalizeArText(s).split(/[\s,،؛\-\/]+/).filter(w => w.length > 1);
+
+  // Tokenise reference data (normalised)
+  const meaningTokens  = tokenise(approvedMeaning || "");
+  const contextTokens  = tokenise(approvedContextReason || "").filter(w => w.length > 2);
+  const acceptedKws    = (acceptedKeywords || "").split(",")
+    .map(k => normalizeArText(k)).filter(Boolean);
+  const rejectedKws    = (rejectedKeywords || "").split(",")
+    .map(k => normalizeArText(k)).filter(Boolean);
+
+  // ── Conflict detection ────────────────────────────────────────────────────
+  const hasConflict = rejectedKws.some(k => k && normExp.includes(k));
+
+  // ── Semantic accuracy: meaning match ─────────────────────────────────────
+  const meaningMatches  = meaningTokens.filter(t => t && normExp.includes(t)).length;
+  const meaningCoverage = meaningTokens.length > 0 ? meaningMatches / meaningTokens.length : 0;
+  const acceptedMatches = acceptedKws.filter(k => k && normExp.includes(k)).length;
+  const acceptedCoverage = acceptedKws.length > 0 ? acceptedMatches / acceptedKws.length : 0;
+
+  // Length bonus (encourages full sentences)
+  const lengthBonus = expLen >= 60 ? 20 : expLen >= 35 ? 12 : expLen >= 20 ? 5 : 0;
+
+  let semanticScore = Math.round(
+    meaningCoverage  * 55 +
+    acceptedCoverage * 25 +
+    lengthBonus
+  );
+  if (hasConflict) semanticScore = Math.max(0, semanticScore - 40);
+  semanticScore = Math.min(100, Math.max(0, semanticScore));
+
+  // ── Context link score: context reason match ──────────────────────────────
+  const contextMatches  = contextTokens.filter(t => t && normExp.includes(t)).length;
+  const contextCoverage = contextTokens.length > 0 ? contextMatches / contextTokens.length : 0;
+
+  let contextScore = Math.round(
+    contextCoverage  * 65 +
+    (acceptedMatches > 0 ? 25 : 0) +
+    (expLen >= 30 ? 10 : 0)
+  );
+  if (hasConflict) contextScore = Math.max(0, contextScore - 30);
+  contextScore = Math.min(100, Math.max(0, contextScore));
+
+  // ── Precision: length + specificity ──────────────────────────────────────
+  let precisionScore = Math.round((semanticScore + contextScore) / 2);
+  if (expLen < 20) precisionScore = Math.min(35, precisionScore); // penalise very short
+  precisionScore = Math.min(100, Math.max(0, precisionScore));
+
+  const avgScore = Math.round((semanticScore + contextScore + precisionScore) / 3);
+  const refMeaning = approvedMeaning || approvedContextReason || targetWord;
+
+  // ── Generate feedback in learner's language ───────────────────────────────
+  let shortFeedback: string;
+  let detailedFeedback: string;
+  let missingContextLink = "";
+
+  if (avgScore >= 70) {
+    shortFeedback   = isAr
+      ? `شرحك جيد ويتوافق مع المعنى المعتمد للكلمة "${targetWord}".`
+      : `Good explanation aligning with the approved meaning of "${targetWord}".`;
+    detailedFeedback = isAr
+      ? `شرحك يعكس المعنى الصحيح كما ورد في تفسير الطبري: "${refMeaning}". استمر في ربط معاني الكلمات بسياق الآية.`
+      : `Your explanation reflects the correct meaning per Tafsir al-Tabari: "${refMeaning}". Keep linking word meanings to the verse context.`;
+  } else if (avgScore >= 40) {
+    shortFeedback   = isAr
+      ? `شرحك جزئي — يمكن توسيعه ليشمل المعنى الدقيق للكلمة "${targetWord}".`
+      : `Partial explanation — expand it to cover the precise meaning of "${targetWord}".`;
+    detailedFeedback = isAr
+      ? `شرحك يُشير إلى بعض جوانب المعنى، لكنه لم يُغطِّ المعنى الكامل. المعنى المعتمد في تفسير الطبري: "${refMeaning}". حاول أن تربط شرحك بهذا المعنى بشكل مباشر.`
+      : `Your explanation hints at some aspects of the meaning, but doesn't fully cover it. The Tabari-approved meaning is: "${refMeaning}". Try to directly reference this in your explanation.`;
+    missingContextLink = isAr ? "أضف ربطاً أوضح بالمعنى المعتمد من تفسير الطبري" : "Add a clearer link to the Tabari-approved meaning";
+  } else {
+    shortFeedback   = isAr
+      ? `شرحك بحاجة إلى مراجعة — المعنى الدقيق للكلمة "${targetWord}" لم يظهر بوضوح.`
+      : `Explanation needs revision — the precise meaning of "${targetWord}" was not clearly expressed.`;
+    detailedFeedback = isAr
+      ? `المعنى المعتمد للكلمة "${targetWord}" في تفسير الطبري هو: "${refMeaning}". راجع شرحك واربطه بهذا المعنى مباشرةً، مع ذكر سياق الآية.`
+      : `The Tabari-approved meaning of "${targetWord}" is: "${refMeaning}". Revise your explanation to directly reference this meaning and the verse context.`;
+    missingContextLink = isAr
+      ? `الشرح لا يعكس بوضوح المعنى المعتمد: "${refMeaning}"`
+      : `Explanation doesn't clearly reflect the approved meaning: "${refMeaning}"`;
+  }
+
+  if (hasConflict) {
+    const note = isAr
+      ? ` ⚠️ تنبيه: شرحك يتضمن معنىً غير مُعتمد في المصدر.`
+      : ` ⚠️ Note: Your explanation includes a meaning not found in the approved source.`;
+    shortFeedback   += note;
+    detailedFeedback += note;
+  }
+
+  return { semanticAccuracyScore: semanticScore, contextLinkScore: contextScore,
+           precisionScore, sourceConflict: hasConflict, missingContextLink,
+           shortFeedback, detailedFeedback };
 }
