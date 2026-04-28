@@ -810,6 +810,42 @@ export default function SelfExplanationExercisePage() {
                         <p className="text-sm text-foreground italic">"{explanation}"</p>
                       </div>
 
+                      {/* ── Tafsir al-Tabari reference box ── */}
+                      {(exercise.approvedContextReason || exercise.approvedMeaning) && (
+                        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="h-4 w-4 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
+                            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300" dir="rtl">
+                              المعنى المعتمد في تفسير الطبري
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-baseline gap-2 flex-wrap" dir="rtl">
+                              <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0">الكلمة:</span>
+                              <span className="font-amiri text-xl font-bold text-emerald-900 dark:text-emerald-100" lang="ar">
+                                {exercise.correctWord}
+                              </span>
+                            </div>
+                            {exercise.approvedContextReason && (
+                              <div className="flex items-start gap-2 flex-wrap" dir="rtl">
+                                <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0 mt-0.5">المعنى:</span>
+                                <span className="text-sm text-emerald-900 dark:text-emerald-100 font-medium">
+                                  {exercise.approvedContextReason}
+                                </span>
+                              </div>
+                            )}
+                            {exercise.approvedMeaning && exercise.approvedMeaning !== exercise.correctWord && exercise.approvedMeaning !== exercise.approvedContextReason && (
+                              <div className="flex items-start gap-2 flex-wrap" dir="rtl">
+                                <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0 mt-0.5">التفسير:</span>
+                                <span className="text-sm text-emerald-800 dark:text-emerald-200">
+                                  {exercise.approvedMeaning}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {isAuthenticated && (
                         <button
                           onClick={() => setActiveTab("history")}
