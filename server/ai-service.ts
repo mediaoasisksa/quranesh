@@ -4926,6 +4926,104 @@ Respond ONLY with this JSON (no markdown, no preamble):
   });
 }
 
+// ── Tafsir meaning translator (lightweight, cached) ──────────────────────────
+// Translates the English approvedContextReason into the learner's locale.
+// Results are cached in-process so the same phrase is only translated once.
+const _tabariTranslationCache = new Map<string, string>();
+
+// Static Arabic fallback for common Quranic terms — avoids Gemini for these
+const ARABIC_FALLBACK: Record<string, string> = {
+  "all praise": "كل الثناء والحمد",
+  "The Most Merciful": "الرحيم",
+  "The Especially Merciful": "الرحمن",
+  "Lord": "الرب",
+  "Allah": "الله",
+  "God": "الله",
+  "Master": "المالك",
+  "King": "الملك",
+  "One": "الواحد الأحد",
+  "Day": "اليوم",
+  "Read": "اقرأ",
+  "Say": "قل",
+  "I seek refuge": "أعوذ بالله",
+  "I worship": "أعبد",
+  "You alone": "إياك",
+  "and You alone": "وإياك",
+  "In the name of": "بسم الله",
+  "By time": "والعصر",
+  "By the fig": "والتين",
+  "By the morning brightness": "والضحى",
+  "and by the night": "والليل",
+  "Judgment / religion": "الدين",
+  "We created": "خلقنا",
+  "We have given you": "أعطيناك",
+  "abundant good": "الكوثر",
+  "No indeed": "كلا",
+  "Have you seen": "أرأيت",
+  "the straight path": "الصراط المستقيم",
+  "guide us": "اهدنا",
+  "a servant": "عبد",
+  "a life": "حياة",
+  "and sacrifice": "والنحر",
+  "and the Spirit": "والروح",
+  "and the olive": "والزيتون",
+  "and seek His forgiveness": "واستغفره",
+  "Quraysh": "قريش",
+  "Sinai": "سيناء",
+  "By the chargers": "والعاديات",
+};
+
+export async function translateTabariMeaning(
+  englishMeaning: string,
+  targetLocale: string,
+): Promise<string> {
+  if (!englishMeaning || targetLocale === "en") return englishMeaning;
+  const cacheKey = `${targetLocale}::${englishMeaning}`;
+  if (_tabariTranslationCache.has(cacheKey)) {
+    return _tabariTranslationCache.get(cacheKey)!;
+  }
+
+  // For Arabic locale: check the static fallback dictionary first
+  if (targetLocale === "ar" && ARABIC_FALLBACK[englishMeaning]) {
+    const arResult = ARABIC_FALLBACK[englishMeaning];
+    _tabariTranslationCache.set(cacheKey, arResult);
+    return arResult;
+  }
+
+  const languageNameMap: Record<string, string> = {
+    ar: "Arabic", id: "Indonesian", tr: "Turkish", fr: "French",
+    zh: "Chinese", sw: "Swahili", so: "Somali", bs: "Bosnian",
+    sq: "Albanian", ru: "Russian", ur: "Urdu", bn: "Bengali",
+    ms: "Malay", sus: "Soso/Susu", ky: "Kyrgyz",
+  };
+  const langName = languageNameMap[targetLocale] || "English";
+
+  const prompt = `Translate this short Quranic vocabulary meaning into ${langName}. Reply with ONLY the translated phrase, nothing else:\n\n"${englishMeaning}"`;
+
+  for (const modelUrl of SELF_EVAL_MODELS) {
+    try {
+      const response = await axios.post(modelUrl, {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 60, temperature: 0.1 },
+      }, { timeout: 8000 });
+
+      const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (text) {
+        const cleaned = text.replace(/^["']|["']$/g, "").trim();
+        _tabariTranslationCache.set(cacheKey, cleaned);
+        return cleaned;
+      }
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : null;
+      if (status !== 429) break; // Only retry on rate-limit, not other errors
+    }
+  }
+
+  // Fallback — return English as-is
+  _tabariTranslationCache.set(cacheKey, englishMeaning);
+  return englishMeaning;
+}
+
 // ── Local rule-based evaluator (works without Gemini API) ───────────────────
 // Evaluates learner explanation against approved DB reference data using
 // keyword matching and linguistic heuristics. Always returns a real result.

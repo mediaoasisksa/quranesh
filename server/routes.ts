@@ -4342,6 +4342,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         learnerLocale: learnerLocale || "en",
       });
 
+      // Translate the Tafsir meaning into the learner's language (cached)
+      const { translateTabariMeaning } = await import("./ai-service.js");
+      const tabariMeaning = await translateTabariMeaning(
+        exercise.approvedContextReason || "",
+        learnerLocale || "en",
+      );
+
       // Persist the attempt
       try {
         await db.insert(selfExplanationAttempts).values({
@@ -4361,7 +4368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("[self-explanation] DB insert failed (non-fatal):", dbErr);
       }
 
-      res.json(evalResult);
+      res.json({ ...evalResult, tabariMeaning });
     } catch (err: any) {
       if (err?.code === "RATE_LIMITED") {
         console.warn("[self-explanation] rate-limited — returning 503");

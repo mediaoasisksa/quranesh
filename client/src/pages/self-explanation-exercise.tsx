@@ -38,6 +38,7 @@ interface EvalResult {
   missingContextLink: string;
   shortFeedback: string;
   detailedFeedback: string;
+  tabariMeaning?: string;
 }
 
 interface HistoryItem {
@@ -811,35 +812,27 @@ export default function SelfExplanationExercisePage() {
                       </div>
 
                       {/* ── Tafsir al-Tabari reference box ── */}
-                      {(exercise.approvedContextReason || exercise.approvedMeaning) && (
+                      {(evalResult.tabariMeaning || exercise.approvedContextReason || exercise.approvedMeaning) && (
                         <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
                           <div className="flex items-center gap-2 mb-3">
                             <BookOpen className="h-4 w-4 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
                             <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300" dir="rtl">
-                              المعنى المعتمد في تفسير الطبري
+                              {t('tabariMeaningTitle')}
                             </p>
                           </div>
-                          <div className="space-y-2">
-                            <div className="flex items-baseline gap-2 flex-wrap" dir="rtl">
-                              <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0">الكلمة:</span>
-                              <span className="font-amiri text-xl font-bold text-emerald-900 dark:text-emerald-100" lang="ar">
+                          <div className="space-y-3">
+                            <div className="flex items-baseline gap-3 flex-wrap" dir="rtl">
+                              <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0">{t('tabariWordLabel')}:</span>
+                              <span className="font-amiri text-2xl font-bold text-emerald-900 dark:text-emerald-100" lang="ar">
                                 {exercise.correctWord}
                               </span>
                             </div>
-                            {exercise.approvedContextReason && (
-                              <div className="flex items-start gap-2 flex-wrap" dir="rtl">
-                                <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0 mt-0.5">المعنى:</span>
-                                <span className="text-sm text-emerald-900 dark:text-emerald-100 font-medium">
-                                  {exercise.approvedContextReason}
-                                </span>
-                              </div>
-                            )}
-                            {exercise.approvedMeaning && exercise.approvedMeaning !== exercise.correctWord && exercise.approvedMeaning !== exercise.approvedContextReason && (
-                              <div className="flex items-start gap-2 flex-wrap" dir="rtl">
-                                <span className="text-xs text-emerald-700 dark:text-emerald-400 flex-shrink-0 mt-0.5">التفسير:</span>
-                                <span className="text-sm text-emerald-800 dark:text-emerald-200">
-                                  {exercise.approvedMeaning}
-                                </span>
+                            {(evalResult.tabariMeaning || exercise.approvedContextReason) && (
+                              <div className="bg-white dark:bg-emerald-900/20 rounded-lg p-3 border border-emerald-100 dark:border-emerald-800" dir="rtl">
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-1">{t('tabariMeaningLabel')}:</p>
+                                <p className="text-base font-semibold text-emerald-900 dark:text-emerald-100 leading-relaxed">
+                                  {evalResult.tabariMeaning || exercise.approvedContextReason}
+                                </p>
                               </div>
                             )}
                           </div>
