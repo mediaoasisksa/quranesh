@@ -362,8 +362,11 @@ export default function SelfExplanationExercisePage() {
     mutationFn: async (data: { exerciseId: string; learnerExplanation: string; learnerLocale: string }) => {
       const res = await apiRequest("POST", "/api/self-explanation/evaluate", data);
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Evaluation failed");
+        const err = await res.json().catch(() => ({}));
+        const e = new Error(err.message || "Evaluation failed") as Error & { code?: string; status?: number };
+        e.code = err.code;
+        e.status = res.status;
+        throw e;
       }
       return res.json() as Promise<EvalResult>;
     },
@@ -705,12 +708,35 @@ export default function SelfExplanationExercisePage() {
                         </Button>
                       </div>
 
-                      {evaluateMutation.isError && (
-                        <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
-                          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                          {evaluateMutation.error?.message || "Evaluation failed. Please try again."}
-                        </div>
-                      )}
+                      {evaluateMutation.isError && (() => {
+                        const err = evaluateMutation.error as any;
+                        const isRateLimited = err?.code === "RATE_LIMITED" || err?.status === 503;
+                        return (
+                          <div className={`flex items-start gap-2 text-xs rounded-lg p-3 ${
+                            isRateLimited
+                              ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
+                              : "bg-red-50 dark:bg-red-950/30 text-red-600"
+                          }`}>
+                            <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                            <div>
+                              {isRateLimited ? (
+                                <>
+                                  <p className="font-semibold mb-1">
+                                    {locale === 'ar' ? "خدمة التقييم مشغولة مؤقتاً" : "AI Evaluator temporarily busy"}
+                                  </p>
+                                  <p>
+                                    {locale === 'ar'
+                                      ? "الذكاء الاصطناعي يُعالج طلبات أخرى. انتظر لحظة ثم أعد المحاولة."
+                                      : "The AI is processing other requests. Please wait a moment and try again."}
+                                  </p>
+                                </>
+                              ) : (
+                                err?.message || "Evaluation failed. Please try again."
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
 

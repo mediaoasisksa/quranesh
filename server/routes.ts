@@ -4333,7 +4333,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const evalResult = await evaluateSelfExplanation({
         displayedPassageText: exercise.displayedPassageText || exercise.verseText,
         targetWord: exercise.correctWord,
-        approvedMeaning: exercise.approvedMeaning || exercise.correctWord,
+        // Prefer stored approvedMeaning, fall back to promptEn (English keyword), then the word itself
+        approvedMeaning: exercise.approvedMeaning || exercise.promptEn || exercise.correctWord,
         approvedContextReason: exercise.approvedContextReason,
         acceptedKeywords: exercise.acceptedKeywords,
         rejectedKeywords: exercise.rejectedKeywords,
@@ -4361,7 +4362,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json(evalResult);
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.code === "RATE_LIMITED") {
+        console.warn("[self-explanation] rate-limited — returning 503");
+        return res.status(503).json({
+          code: "RATE_LIMITED",
+          message: "AI evaluation service is temporarily busy. Please wait a moment and try again.",
+        });
+      }
       console.error("[self-explanation] evaluate error:", err);
       res.status(500).json({ message: "Failed to evaluate explanation" });
     }

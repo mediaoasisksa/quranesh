@@ -4872,52 +4872,51 @@ Respond ONLY with this JSON (no markdown, no preamble):
   "detailed_feedback": "<string in ${langInstruction}>"
 }`;
 
-  try {
-    console.log(`[self-explanation] evaluating for word="${targetWord}", locale=${learnerLocale}`);
-    const response = await axios.post(GEMINI_API_URL, {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 800, topP: 0.8 },
-    });
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 4000;
 
-    const rawText: string = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    console.log(`[self-explanation] raw response: ${rawText.substring(0, 200)}`);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`[self-explanation] attempt ${attempt}/${MAX_RETRIES} — word="${targetWord}", locale=${learnerLocale}`);
+      const response = await axios.post(GEMINI_API_URL, {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 800, topP: 0.8 },
+      });
 
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in Gemini response");
-    const parsed = JSON.parse(jsonMatch[0]);
+      const rawText: string = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      console.log(`[self-explanation] raw response (attempt ${attempt}): ${rawText.substring(0, 200)}`);
 
-    return {
-      semanticAccuracyScore: Math.min(100, Math.max(0, Number(parsed.semantic_accuracy_score) || 0)),
-      contextLinkScore: Math.min(100, Math.max(0, Number(parsed.context_link_score) || 0)),
-      precisionScore: Math.min(100, Math.max(0, Number(parsed.precision_score) || 0)),
-      sourceConflict: Boolean(parsed.source_conflict),
-      missingContextLink: String(parsed.missing_context_link || ""),
-      shortFeedback: String(parsed.short_feedback || ""),
-      detailedFeedback: String(parsed.detailed_feedback || ""),
-    };
-  } catch (err) {
-    console.error("[self-explanation] evaluation failed:", err);
-    // Graceful fallback — basic keyword scoring
-    const lcExplanation = learnerExplanation.toLowerCase();
-    const lcApproved = approvedContextReason.toLowerCase();
-    const words = approvedMeaning.toLowerCase().split(/\s+/);
-    const matchCount = words.filter(w => lcExplanation.includes(w)).length;
-    const baseScore = Math.round((matchCount / Math.max(words.length, 1)) * 70);
-    const fallbackMsg = learnerLocale === 'ar'
-      ? "تعذّر تحليل الإجابة تلقائياً — يُرجى المراجعة مع مدرب."
-      : "Automatic evaluation unavailable — please review with a teacher.";
-    const approvedKeywords = (acceptedKeywords || "").split(",").filter(Boolean);
-    const contextScore = approvedKeywords.some(k => lcExplanation.includes(k.trim().toLowerCase())) ? 50 : 20;
-    const conflictWords = (rejectedKeywords || "").split(",").filter(Boolean);
-    const hasConflict = conflictWords.some(k => lcExplanation.includes(k.trim().toLowerCase()));
-    return {
-      semanticAccuracyScore: baseScore,
-      contextLinkScore: contextScore,
-      precisionScore: Math.round((baseScore + contextScore) / 2),
-      sourceConflict: hasConflict,
-      missingContextLink: lcExplanation.length < 20 ? "Explanation too short" : "",
-      shortFeedback: fallbackMsg,
-      detailedFeedback: fallbackMsg,
-    };
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON in Gemini response");
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      return {
+        semanticAccuracyScore: Math.min(100, Math.max(0, Number(parsed.semantic_accuracy_score) || 0)),
+        contextLinkScore: Math.min(100, Math.max(0, Number(parsed.context_link_score) || 0)),
+        precisionScore: Math.min(100, Math.max(0, Number(parsed.precision_score) || 0)),
+        sourceConflict: Boolean(parsed.source_conflict),
+        missingContextLink: String(parsed.missing_context_link || ""),
+        shortFeedback: String(parsed.short_feedback || ""),
+        detailedFeedback: String(parsed.detailed_feedback || ""),
+      };
+    } catch (err) {
+      const is429 = axios.isAxiosError(err) && err.response?.status === 429;
+      if (is429 && attempt < MAX_RETRIES) {
+        const wait = RETRY_DELAY_MS * attempt;
+        console.warn(`[self-explanation] 429 rate-limited on attempt ${attempt}. Retrying in ${wait}ms…`);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+      // All retries exhausted or non-rate-limit error
+      const is429Final = axios.isAxiosError(err) && err.response?.status === 429;
+      console.error(`[self-explanation] evaluation failed after ${attempt} attempt(s) (429=${is429Final}):`,
+        axios.isAxiosError(err) ? `HTTP ${err.response?.status}` : err);
+      // Throw a typed error so the route can return a proper HTTP response
+      const e = new Error(is429Final ? "RATE_LIMITED" : "AI_ERROR") as Error & { code: string };
+      e.code = is429Final ? "RATE_LIMITED" : "AI_ERROR";
+      throw e;
+    }
   }
+  // Should never reach here
+  throw Object.assign(new Error("RATE_LIMITED"), { code: "RATE_LIMITED" });
 }
