@@ -4263,6 +4263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const excludeIds = req.query.exclude
         ? String(req.query.exclude).split(",").filter(Boolean)
         : [];
+      const locale = String(req.query.locale || "en").trim().toLowerCase();
 
       const conditions = [
         eq(tabariExercises.isActive, true),
@@ -4282,7 +4283,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      res.json(pick);
+
+      // Translate the meaning (promptEn) into the learner's locale for localised question display
+      let promptTranslated: string = pick.promptEn;
+      if (locale && locale !== "en") {
+        try {
+          const { translateTabariMeaning } = await import("./ai-service.js");
+          promptTranslated = await translateTabariMeaning(pick.promptEn, locale);
+        } catch (_) {}
+      }
+
+      res.json({ ...pick, promptTranslated });
     } catch (err) {
       console.error("[self-explanation] random fetch error:", err);
       res.status(500).json({ message: "Failed to fetch exercise" });

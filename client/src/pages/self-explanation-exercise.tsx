@@ -313,11 +313,13 @@ export default function SelfExplanationExercisePage() {
 
   const excludeParam = seenIds.join(",");
 
-  const { data: exercise, isLoading, refetch, error } = useQuery<TabariExercise>({
-    queryKey: ["/api/self-explanation/random", excludeParam],
+  const { data: exercise, isLoading, refetch, error } = useQuery<TabariExercise & { promptTranslated?: string }>({
+    queryKey: ["/api/self-explanation/random", excludeParam, locale],
     queryFn: async () => {
-      const params = excludeParam ? `?exclude=${excludeParam}` : "";
-      const res = await fetch(`/api/self-explanation/random${params}`);
+      const p = new URLSearchParams();
+      if (excludeParam) p.set("exclude", excludeParam);
+      if (locale) p.set("locale", locale);
+      const res = await fetch(`/api/self-explanation/random?${p.toString()}`);
       if (res.status === 404) { setAllExhausted(true); throw new Error("exhausted"); }
       if (!res.ok) throw new Error("Failed to load");
       setAllExhausted(false);
@@ -593,7 +595,7 @@ export default function SelfExplanationExercisePage() {
                     </div>
                   )}
                   <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white mt-2" onClick={handleReset}>
-                    <RotateCcw className="h-4 w-4 mr-2" /> Start New Session
+                    <RotateCcw className="h-4 w-4 mr-2" /> {t('selfExplanationStartNew')}
                   </Button>
                 </CardContent>
               </Card>
@@ -601,8 +603,8 @@ export default function SelfExplanationExercisePage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <XCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
-                  <p className="text-muted-foreground mb-4">Could not load exercise. Please try again.</p>
-                  <Button onClick={() => refetch()}>Try Again</Button>
+                  <p className="text-muted-foreground mb-4">{t('selfExplanationLoadError')}</p>
+                  <Button onClick={() => refetch()}>{t('selfExplanationTryAgain')}</Button>
                 </CardContent>
               </Card>
             ) : exercise ? (
@@ -614,10 +616,10 @@ export default function SelfExplanationExercisePage() {
                       {exercise.surahNameAr}
                     </Badge>
                     <Badge variant="outline" className="text-slate-600">
-                      Surah {exercise.surahNumber} : Ayah {exercise.ayah}
+                      {t('selfExplanationSurahAyah').replace('{surah}', String(exercise.surahNumber)).replace('{ayah}', String(exercise.ayah))}
                     </Badge>
                     {exercise.contextMode === "multi_ayah" && (
-                      <Badge variant="outline" className="text-amber-700 border-amber-400 text-xs">Multi-verse</Badge>
+                      <Badge variant="outline" className="text-amber-700 border-amber-400 text-xs">{t('selfExplanationMultiVerse')}</Badge>
                     )}
                   </div>
 
@@ -626,8 +628,13 @@ export default function SelfExplanationExercisePage() {
 
                   {/* MCQ Question */}
                   <div className="border-t border-border pt-4">
-                    <p className="text-sm text-muted-foreground mb-1 font-medium">Question</p>
-                    <p className="text-base font-semibold text-foreground">{exercise.questionEn}</p>
+                    <p className="text-sm text-muted-foreground mb-1 font-medium">{t('selfExplanationQuestion')}</p>
+                    <p className="text-base font-semibold text-foreground" dir={locale === 'ar' || locale === 'ur' ? 'rtl' : 'ltr'}>
+                      {t('selfExplanationQuestionTemplate').replace(
+                        '{meaning}',
+                        (exercise as any).promptTranslated || exercise.promptEn
+                      )}
+                    </p>
                   </div>
 
                   {/* Options */}
