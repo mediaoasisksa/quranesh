@@ -4256,19 +4256,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   // ── Self-Explanation Exercise Routes ─────────────────────────────────────
 
-  // GET random exercise that has approved_context_reason set (required for self-explanation)
+  // GET random active exercise — eval falls back to approvedMeaning/promptEn when
+  // approvedContextReason is not yet seeded by the admin.
   app.get("/api/self-explanation/random", async (req, res) => {
     try {
-      const { eq, and, isNotNull, notInArray } = await import("drizzle-orm");
+      const { eq, and, notInArray } = await import("drizzle-orm");
       const excludeIds = req.query.exclude
         ? String(req.query.exclude).split(",").filter(Boolean)
         : [];
       const locale = String(req.query.locale || "en").trim().toLowerCase();
 
-      const conditions = [
-        eq(tabariExercises.isActive, true),
-        isNotNull(tabariExercises.approvedContextReason),
-      ];
+      const conditions = [eq(tabariExercises.isActive, true)];
 
       const candidates = excludeIds.length > 0
         ? await db.select().from(tabariExercises)
@@ -4334,22 +4332,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!exercise) return res.status(404).json({ message: "Exercise not found" });
 
-      // CRITICAL: reject if approved_context_reason is missing
-      if (!exercise.approvedContextReason) {
-        return res.status(422).json({
-          message: "This exercise does not have approved reference data for self-explanation evaluation.",
-          code: "NO_APPROVED_CONTEXT",
-        });
-      }
-
       console.log(`[self-explanation] evaluating exercise=${exerciseId}, locale=${learnerLocale || 'en'}`);
 
+      const fallbackMeaning = exercise.approvedMeaning || exercise.promptEn || exercise.correctWord;
       const evalResult = await evaluateSelfExplanation({
         displayedPassageText: exercise.displayedPassageText || exercise.verseText,
         targetWord: exercise.correctWord,
-        // Prefer stored approvedMeaning, fall back to promptEn (English keyword), then the word itself
-        approvedMeaning: exercise.approvedMeaning || exercise.promptEn || exercise.correctWord,
-        approvedContextReason: exercise.approvedContextReason,
+        approvedMeaning: fallbackMeaning,
+        // Fall back to the meaning when no curated context-reason exists yet
+        approvedContextReason: exercise.approvedContextReason || fallbackMeaning,
         acceptedKeywords: exercise.acceptedKeywords,
         rejectedKeywords: exercise.rejectedKeywords,
         learnerExplanation: learnerExplanation.trim(),
