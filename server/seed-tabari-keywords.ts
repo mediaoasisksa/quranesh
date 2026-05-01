@@ -742,6 +742,7 @@ export async function seedTabariKeywords(): Promise<{ updated: number; skipped: 
           acceptedKeywords: tabariExercises.acceptedKeywords,
           rejectedKeywords: tabariExercises.rejectedKeywords,
           approvedMeaning: tabariExercises.approvedMeaning,
+          approvedContextReason: tabariExercises.approvedContextReason,
         })
         .from(tabariExercises)
         .where(
@@ -756,6 +757,9 @@ export async function seedTabariKeywords(): Promise<{ updated: number; skipped: 
         if (!exercise.acceptedKeywords) patch.acceptedKeywords = seed.acceptedKeywords;
         if (!exercise.rejectedKeywords) patch.rejectedKeywords = seed.rejectedKeywords;
         if (!exercise.approvedMeaning) patch.approvedMeaning = seed.approvedMeaning;
+        // approvedContextReason serves as ground truth for the LLM evaluator.
+        // We reuse approvedMeaning when no separate reason has been curated.
+        if (!exercise.approvedContextReason) patch.approvedContextReason = seed.approvedMeaning;
 
         if (Object.keys(patch).length === 0) {
           skipped++;
